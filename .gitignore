@@ -12,6 +12,7 @@
 /home/*
 !/home/.gitignore
 !/home/build.gradle
+!/home/firma.gradle
 !/home/settings.gradle
 !/home/app/
 !/home/cover/

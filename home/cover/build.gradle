@@ -19,3 +19,5 @@ android {
     }
     lint { disable 'ExpiredTargetSdkVersion' }
 }
+
+apply from: "$rootDir/firma.gradle"

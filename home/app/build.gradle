@@ -21,3 +21,5 @@ android {
     // Sideloaded on an Android 11 Stick, never published on Google Play; WRITE_SECURE_SETTINGS comes from adb.
     lint { disable 'ExpiredTargetSdkVersion', 'ProtectedPermissions' }
 }
+
+apply from: "$rootDir/firma.gradle"

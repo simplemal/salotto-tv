@@ -22,7 +22,16 @@ T="$PWD/.toolchain"; JAVA_HOME="$T/jdk-17.0.21+9/Contents/Home" ANDROID_HOME="$T
 
 Le versioni nuove si installano sopra le vecchie solo se firmate con la stessa chiave. La chiave non va mai nel repository: conservala a parte, con una copia di sicurezza. Se si perde, chi ha già Salotto deve disinstallarlo e reinstallarlo.
 
-Oggi l'APK è una build debug. Permette di caricare gli sfondi con `run-as`, ma va sostituita da una firma definitiva prima di un rilascio pubblico stabile.
+Oggi l'APK è firmato con la chiave di sviluppo di questo Mac. La chiave definitiva è pronta in `chiavi-aggiornamento/`, ignorata da Git, ma non è ancora in uso: `firma-salotto.jks` e `firma.properties`, con la password. Salotto e `home/cover` la usano aggiungendo `-Pfirma` alla compilazione (`home/firma.gradle`). La build resta debuggable, e non è una dimenticanza: il ritorno alla versione precedente usa `pm install -d`, che Android accetta solo su queste build, e gli sfondi personali usano `run-as`.
+
+Il passaggio cambia la firma, quindi Android rifiuta l'aggiornamento sopra la versione installata e l'aggiornatore si ferma con SAL-F111. Si fa una volta sola, così:
+
+1. Sulla Stick, Impostazioni → Backup, per salvare app, aspetto e meteo.
+2. `FIRMA=1 distro/tools/prepara-copertura.sh`, poi da `home` `gradle -Pfirma :app:assembleDebug`.
+3. Disinstalla `it.simplemal.firehome` e `it.simplemal.firehome.cover` e rilancia l'installer, che dà di nuovo tutti i permessi.
+4. Da lì in poi compila sempre con `-Pfirma` e pubblica con `distro/tools/pubblica-aggiornamento.sh`.
+
+Tieni una copia della cartella `chiavi-aggiornamento/` fuori da Dropbox, per esempio nel gestore di password: chi perde la chiave deve far reinstallare tutti.
 
 ## Aggiornare un programma di terzi
 
