@@ -231,7 +231,7 @@ final class ControlPanel extends LinearLayout {
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
 
         LinearLayout modes = row();
-        Tile quiet = small(modes, R.drawable.ic_moon, "Non disturbare", 0, () -> {
+        Tile quiet = small(modes, R.drawable.ic_moon, "Notifiche a comparsa", 0, () -> {
             toggleQuiet();
             refresh();
         });
@@ -250,7 +250,7 @@ final class ControlPanel extends LinearLayout {
 
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
-        refreshers.add(() -> quiet.show(quiet() ? "attivo" : "spento", quiet()));
+        refreshers.add(() -> quiet.show(quiet() ? "nascoste" : "mostrate", quiet()));
         refreshers.add(() -> {
             int left = TaskService.sleepMinutesLeft();
             timer.show(left > 0 ? "tra " + left + " min" : "spento", left > 0);
