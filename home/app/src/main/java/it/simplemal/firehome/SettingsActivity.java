@@ -741,9 +741,12 @@ public final class SettingsActivity extends CardActivity {
         return index >= 0 ? names[index] : "—";
     }
 
+    /** The only row of this page takes the focus: the place in the real page has to survive it. */
     private void showWaiting(String title) {
+        int focus = levels.peek().focus;
         show(title, Arrays.asList(new Entry("Leggo le impostazioni…", null, getDrawable(R.drawable.ic_image),
             "Serve un attimo.", false, () -> { })));
+        levels.peek().focus = focus;
     }
 
     private void showVideo() {
