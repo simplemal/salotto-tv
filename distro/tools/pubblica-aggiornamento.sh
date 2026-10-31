@@ -4,8 +4,6 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-# Sticks up to 0.12.20 look only here: it gets the same files until none of them is left.
-OLD_REPO="simplemal/salotto-tv-updates"
 APK="$ROOT/home/.toolchain/app-build/outputs/apk/debug/app-debug.apk"
 KEY="$ROOT/chiavi-aggiornamento/privata.pem"
 CODE="$(sed -n "s/.*versionCode \([0-9]*\).*/\1/p" "$ROOT/home/app/build.gradle")"
@@ -44,8 +42,6 @@ python3 "$ROOT/distro/tools/genera-errori.py" "$ROOT/ERRORI.md"
 git -C "$ROOT" add ERRORI.md
 git -C "$ROOT" diff --cached --quiet || git -C "$ROOT" commit -q -m "Errori per la versione $NAME"
 git -C "$ROOT" push -q origin HEAD
-for target in "$REPO" "$OLD_REPO"; do
-  gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" \
-    --repo "$target" --title "Salotto $NAME" --notes "$(printf -- '- %s\n' "$@")" --latest
-done
+gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" \
+  --repo "$REPO" --title "Salotto $NAME" --notes "$(printf -- '- %s\n' "$@")" --latest
 echo "Pubblicata la versione $NAME ($CODE)"

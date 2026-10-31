@@ -61,7 +61,7 @@ gh release create v0.1.0 rilasci/salotto-distro-0.1.0.zip --title "Salotto 0.1.0
 1. Alza `versionCode` e `versionName` in `home/app/build.gradle` e compila.
 2. Lancia `distro/tools/pubblica-aggiornamento.sh "prima novità" "seconda novità"`.
 
-Lo strumento controlla versione e dati personali, firma `update.json`, aggiorna `ERRORI.md` e crea la release qui e, finché esistono Stick con la 0.12.20 o precedenti, anche in `simplemal/salotto-tv-updates`. Le Stick la propongono al controllo successivo. Le novità compaiono così sulla TV: scrivile per chi la usa.
+Lo strumento controlla versione e dati personali, firma `update.json`, aggiorna `ERRORI.md` e crea la release in questo repository. Le Stick la propongono al controllo successivo. Le novità compaiono così sulla TV: scrivile per chi la usa.
 
 ## Prima del primo rilascio pubblico
 
