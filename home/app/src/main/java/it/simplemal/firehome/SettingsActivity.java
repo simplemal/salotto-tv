@@ -8,11 +8,13 @@ import android.app.usage.StorageStatsManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.Typeface;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -23,11 +25,13 @@ import android.os.Bundle;
 import android.os.Process;
 import android.os.storage.StorageManager;
 import android.provider.Settings;
+import android.service.dreams.DreamService;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -60,6 +64,8 @@ public final class SettingsActivity extends CardActivity {
     private static final String CHECK = "✓";
     private static final int COLUMN_TOP = 44;
     private static final int PICTURE_SIZE = 120;
+    /** As wide as a preview of the screen needs: an icon stays square in the middle. */
+    private static final int PICTURE_WIDTH = 213;
     private static final int LOCK_SIZE = 16;
     private static final int WIFI_5GHZ = 5000;
     /** Its middle sits just above the middle of the 540-tall screen. */
@@ -97,6 +103,7 @@ public final class SettingsActivity extends CardActivity {
     private static final String WIFI_ON = "wifi-on";
     private static final int MINUTE = (int) Fire.MINUTE_MS;
     private static final String SAVER_ENABLED = "screensaver_enabled";
+    private static final String SAVER_CHOSEN = "screensaver_components";
     private static final int[] SAVER_MINUTES = {1, 5, 10, 15, 30};
     private static final int SAVER_DEFAULT = 5 * MINUTE;
     private static final int[] SLEEP_MINUTES = {5, 20, 30, 60};
@@ -117,6 +124,23 @@ public final class SettingsActivity extends CardActivity {
     private static final int[] TABLE_WIDTHS = {96, 96, 112};
     private static final int TABLE_ROW = 34;
     private static final int TABLE_PADDING = 14;
+
+    /** One of Salotto's own screensavers, in the list after Fire OS's. Without a service it is still to come. */
+    private static final class Saver {
+        final String name;
+        final String text;
+        final int preview;
+        final Class<? extends DreamService> service;
+
+        Saver(String name, String text, int preview, Class<? extends DreamService> service) {
+            this.name = name;
+            this.text = text;
+            this.preview = preview;
+            this.service = service;
+        }
+    }
+
+    private static final Saver[] SAVERS = {new Saver("Salvaschermo di Salotto", "Spegne quello di Fire OS.", R.drawable.ic_photo, null)};
 
     private static final class Entry {
         final String title;
@@ -203,7 +227,13 @@ public final class SettingsActivity extends CardActivity {
         left.addView(heading, placed(-1, -2, COLUMN_TOP));
         picture = new ImageView(this);
         picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        left.addView(picture, placed(dp(PICTURE_SIZE), dp(PICTURE_SIZE), PICTURE_TOP));
+        picture.setClipToOutline(true);
+        picture.setOutlineProvider(new ViewOutlineProvider() {
+            @Override public void getOutline(View view, Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(12));
+            }
+        });
+        left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
         explanation = label("", EXPLANATION_SP);
         explanation.setGravity(Gravity.CENTER_HORIZONTAL);
         explanation.setLineSpacing(dp(3), 1f);
@@ -480,7 +510,7 @@ public final class SettingsActivity extends CardActivity {
                 "Il progetto, la licenza e il software di altri che usa.", true,
                 () -> open(new Intent(this, AboutActivity.class))),
             new Entry("Impostazioni Fire TV", null, getDrawable(R.drawable.ic_s_open),
-                "Ciò che Salotto non può fare: account Amazon, controllo genitori, nuovo telecomando Alexa, opzioni del salvaschermo.",
+                "Ciò che Salotto non può fare: account Amazon, controllo genitori, nuovo telecomando Alexa, opzioni del salvaschermo Amazon.",
                 false, () -> {
                     TaskService.wantFireSettings();
                     open(fireOsSettings());
@@ -1386,17 +1416,54 @@ public final class SettingsActivity extends CardActivity {
         }
     }
 
+    private boolean ownSaver() {
+        String chosen = Settings.Secure.getString(getContentResolver(), SAVER_CHOSEN);
+        return chosen != null && chosen.startsWith(getPackageName() + "/");
+    }
+
     private void showSaver() {
         boolean on = saverOn();
+        boolean own = ownSaver();
         Drawable picture = getDrawable(R.drawable.ic_image);
         show("Salvaschermo", Arrays.asList(
             new Entry("Attivo", on ? YES : NO, picture,
-                "Il salvaschermo Amazon parte quando la Stick resta ferma.", false,
+                "Il salvaschermo parte quando la Stick resta ferma.", false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
+            new Entry("Tipo", own ? "Salotto" : "Fire OS", getDrawable(R.drawable.ic_photo),
+                "Quale salvaschermo usare.", true, () -> enter(this::showSaverKinds)),
             new Entry("Si avvia dopo", saverMinutes() + " minuti", picture,
                 "Quanto aspetta la Stick prima di farlo partire.", true, () -> enter(this::showSaverTimes)),
             new Entry("Avvia adesso", null, picture, "Fa partire subito il salvaschermo. Si chiude con Indietro.", false,
                 () -> open(Fire.screensaver()))));
+    }
+
+    /** Only one screensaver runs at a time: choosing ours is what turns off Fire OS's. */
+    private void showSaverKinds() {
+        boolean own = ownSaver();
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry("Deciso da Fire OS", own ? null : CHECK, getDrawable(R.drawable.ic_image),
+            "Il salvaschermo di Amazon, con le sue immagini.", false, () -> chooseSaver(Fire.AMAZON_SAVER)));
+        if (!own) {
+            entries.add(new Entry("Scegli", null, getDrawable(R.drawable.ic_s_open),
+                "Apre il menu di Fire OS per scegliere tra i suoi salvaschermi.", true, () -> open(Fire.saverMenu())));
+        }
+        for (Saver saver : SAVERS) entries.add(saverEntry(saver));
+        show("Tipo", entries);
+    }
+
+    private Entry saverEntry(Saver saver) {
+        if (saver.service == null) {
+            return new Entry(saver.name, "In arrivo", getDrawable(saver.preview), saver.text, false,
+                () -> say("Non è ancora pronto"));
+        }
+        String name = new ComponentName(this, saver.service).flattenToShortString();
+        String chosen = Settings.Secure.getString(getContentResolver(), SAVER_CHOSEN);
+        return new Entry(saver.name, name.equals(chosen) ? CHECK : null, getDrawable(saver.preview), saver.text, false,
+            () -> chooseSaver(name));
+    }
+
+    private void chooseSaver(String name) {
+        changeSystem(() -> Settings.Secure.putString(getContentResolver(), SAVER_CHOSEN, name));
     }
 
     private void showSaverTimes() {

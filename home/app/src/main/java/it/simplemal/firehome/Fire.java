@@ -56,7 +56,12 @@ final class Fire {
             || name != null && name.contains(REMOTE_NAME);
     }
 
-    /** Not a settings page: Android's own way to start the Amazon screensaver. */
+    static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
+
+    /** Fire OS's own menu of its screensavers. */
+    static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }
+
+    /** Not a settings page: Android's own way to start the chosen screensaver. */
     static Intent screensaver() {
         return new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
     }
