@@ -3,7 +3,7 @@
         <package android:name="it.simplemal.firehome" />
     </queries>
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
-    <application android:label="Salotto, aggiornamenti" android:allowBackup="false">
+    <application android:label="Salotto, aggiornamenti" android:icon="@drawable/home_icon" android:allowBackup="false">
         <activity android:name=".CoverActivity" android:exported="true" android:excludeFromRecents="true"
             android:theme="@style/Cover" />
     </application>

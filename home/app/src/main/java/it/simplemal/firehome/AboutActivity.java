@@ -17,7 +17,8 @@ import android.widget.TextView;
 /** Text to read and nothing to press, like the regulatory pages of a device: the arrows scroll it. */
 public final class AboutActivity extends CardActivity {
     private static final int WIDTH = 720;
-    private static final int LOGO = 72;
+    private static final int LOGO = 44;
+    private static final int LOGO_GAP = 12;
     private static final int STEP = 120;
     private static final int BODY_SP = 13;
     private static final int SMALL_SP = 12;
@@ -58,10 +59,15 @@ public final class AboutActivity extends CardActivity {
     private void write() {
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.drawable.ic_salotto);
-        text.addView(logo, new LinearLayout.LayoutParams(dp(LOGO), dp(LOGO)));
+        LinearLayout.LayoutParams logoPlace = new LinearLayout.LayoutParams(dp(LOGO), dp(LOGO));
+        logoPlace.setMarginEnd(dp(LOGO_GAP));
+        LinearLayout title = new LinearLayout(this);
+        title.setGravity(Gravity.CENTER_VERTICAL);
+        title.addView(logo, logoPlace);
         TextView name = label("Salotto", 26);
         name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        text.addView(name);
+        title.addView(name);
+        text.addView(title);
         paragraph("Versione " + BuildVersion.full(this));
         paragraph("Launcher per Fire TV, di simplemal.");
         paragraph("https://github.com/" + Fire.UPDATES_REPO);

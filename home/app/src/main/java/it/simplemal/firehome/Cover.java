@@ -24,7 +24,7 @@ final class Cover {
     private static final String ACTIVITY = PACKAGE + ".CoverActivity";
     private static final String APK = "copertura.apk";
     private static final String EXTRA_PAGE = "page";
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
     private static final int BEST = 100;
     private static final long INSTALL_LIMIT_MS = 15000;
     private static final long POLL_MS = 200;
