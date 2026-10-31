@@ -1,0 +1,8 @@
+<resources>
+    <!-- No preview and no animation: Salotto's page, below, stays until the picture of it is drawn. -->
+    <style name="Cover" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

@@ -1,0 +1,114 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <queries>
+        <package android:name="com.amazon.tv.settings.v2" />
+        <!-- The lists in distro/config, and Fire OS's menu: Reenabled looks at them. -->
+        <package android:name="com.amazon.aca" />
+        <package android:name="com.amazon.ale" />
+        <package android:name="com.amazon.alexa.datastore.app" />
+        <package android:name="com.amazon.alexa.externalmediaplayer.fireos" />
+        <package android:name="com.amazon.alexadirectivebrokerservice" />
+        <package android:name="com.amazon.alexamediaplayer.runtime.ftv" />
+        <package android:name="com.amazon.aria" />
+        <package android:name="com.amazon.audiohome" />
+        <package android:name="com.amazon.ceviche" />
+        <package android:name="com.amazon.connectivitydiag" />
+        <package android:name="com.amazon.dp.logger" />
+        <package android:name="com.amazon.dummy.alarmclock" />
+        <package android:name="com.amazon.dummy.calendar" />
+        <package android:name="com.amazon.dummy.contacts" />
+        <package android:name="com.amazon.dummy.gallery" />
+        <package android:name="com.amazon.dummy.music" />
+        <package android:name="com.amazon.hedwig" />
+        <package android:name="com.amazon.hybridadidservice" />
+        <package android:name="com.amazon.logan" />
+        <package android:name="com.amazon.perfc" />
+        <package android:name="com.amazon.perfcollection" />
+        <package android:name="com.amazon.privacypassservice" />
+        <package android:name="com.amazon.rtcsessioncontroller" />
+        <package android:name="com.amazon.shoptv.client" />
+        <package android:name="com.amazon.shoptv.firetv.client" />
+        <package android:name="com.amazon.smarthomemapviewapp" />
+        <package android:name="com.amazon.sneakpeek" />
+        <package android:name="com.amazon.spotify.mediabrowserservice" />
+        <package android:name="com.amazon.storm.lightning.tutorial" />
+        <package android:name="com.amazon.systemnotices" />
+        <package android:name="com.amazon.tigris" />
+        <package android:name="com.amazon.tmm.tutorial" />
+        <package android:name="com.amazon.tv.acr" />
+        <package android:name="com.amazon.tv.alexaalerts" />
+        <package android:name="com.amazon.tv.alexanotifications" />
+        <package android:name="com.amazon.tv.developer.dataservice" />
+        <package android:name="com.amazon.tv.easyupgrade" />
+        <package android:name="com.amazon.tv.forcedotaupdater.v2" />
+        <package android:name="com.amazon.tv.quicksettings.ui" />
+        <package android:name="com.amazon.tv.releasenotes" />
+        <package android:name="com.amazon.tv.website_launcher" />
+        <package android:name="com.amazon.whad" />
+        <package android:name="com.amazon.whasettings" />
+        <package android:name="com.amazon.wirelessmetrics.service" />
+    </queries>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <queries>
+        <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LEANBACK_LAUNCHER" /></intent>
+        <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent>
+        <package android:name="it.simplemal.firehome.cover" />
+    </queries>
+    <application android:label="Salotto" android:icon="@drawable/home_icon"
+        android:banner="@drawable/home_banner" android:allowBackup="false"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+        <activity android:name=".MainActivity" android:exported="true"
+            android:screenOrientation="landscape" android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver android:name=".SelfInstall" android:exported="false" />
+        <activity android:name=".AppsActivity" android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity android:name=".AboutActivity" android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity android:name=".SettingsActivity" android:exported="false"
+            android:screenOrientation="landscape" />
+        <activity android:name=".TasksActivity" android:exported="true"
+            android:screenOrientation="landscape" android:launchMode="singleInstance"
+            android:excludeFromRecents="true" android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name=".PanelActivity" android:exported="true"
+            android:screenOrientation="landscape" android:launchMode="singleInstance"
+            android:excludeFromRecents="true" android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name=".WelcomeActivity" android:exported="true"
+            android:screenOrientation="landscape" android:launchMode="singleInstance"
+            android:excludeFromRecents="true" android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name=".UpdateActivity" android:exported="true" android:theme="@style/UpdatePage"
+            android:screenOrientation="landscape" android:launchMode="singleTask" />
+        <service android:name=".TaskService" android:exported="true"
+            android:label="Salotto"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/task_service" />
+        </service>
+    </application>
+</manifest>

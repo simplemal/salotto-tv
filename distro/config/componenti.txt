@@ -1,0 +1,5 @@
+# Scaricati dai progetti originali e controllati con SHA-256: la distro non li ridistribuisce.
+# nome|versione|pacchetto|url|sha256
+FireStick Fixer|3.1.0|io.github.hatim.firestickfixer|https://github.com/Hornet34/firestick-fixer/releases/download/v3.1.0/firestick-fixer-3.1.0.apk|f94d14b14d1eac0f7c75f6fcb108438a855749fdb503c99bfe1078521db9d9b6
+AirPlay Server|0.0.36|io.github.jqssun.airplay|https://github.com/jqssun/android-airplay-server/releases/download/v0.0.36/app-release.apk|b8c7c595ed93f91562feedce92c27800f08f9c84df424f6ac2045e82324cf2a4
+Aurora Store|4.8.4|com.aurora.store|https://f-droid.org/repo/com.aurora.store_76.apk|fd9c75d90d0f4a7c132b9b4a5a2cf1992a45e03b8d8ff988b7dcfbc0db2c4d11

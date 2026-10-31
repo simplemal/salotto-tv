@@ -1,0 +1,6 @@
+<resources>
+    <!-- Without Android's grey preview: coming back after an update, the cover app stays until the page is drawn. -->
+    <style name="UpdatePage" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+</resources>

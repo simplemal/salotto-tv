@@ -1,0 +1,33 @@
+# Allow-list: this folder holds private backups, logs and screenshots. Only what is named here
+# may reach the public repository.
+/*
+!/.gitignore
+!/LICENSE
+!/NOTICE.md
+!/README.md
+!/ERRORI.md
+!/distro/
+!/home/
+
+/home/*
+!/home/.gitignore
+!/home/build.gradle
+!/home/settings.gradle
+!/home/app/
+!/home/cover/
+
+/home/app/*
+!/home/app/build.gradle
+!/home/app/src/
+
+/home/cover/*
+!/home/cover/build.gradle
+!/home/cover/src/
+
+/distro/scaricati/
+/distro/dati-personali.local
+/rilasci/
+.DS_Store
+*.jks
+*.keystore
+/chiavi-aggiornamento/

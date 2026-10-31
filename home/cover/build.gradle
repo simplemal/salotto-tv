@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+// Inside .toolchain, which Dropbox leaves alone, like the app's.
+layout.buildDirectory = file("$rootDir/.toolchain/cover-build")
+
+android {
+    namespace 'it.simplemal.firehome.cover'
+    compileSdk 35
+    buildToolsVersion '34.0.0'
+    defaultConfig {
+        applicationId 'it.simplemal.firehome.cover'
+        minSdk 26
+        targetSdk 30
+        versionCode 1
+        versionName '1'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { disable 'ExpiredTargetSdkVersion', 'MissingApplicationIcon' }
+}

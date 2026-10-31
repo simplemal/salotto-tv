@@ -1,0 +1,23 @@
+plugins { id 'com.android.application' }
+// Inside .toolchain, which Dropbox leaves alone: in a synced folder it swapped new APKs for old ones.
+layout.buildDirectory = file("$rootDir/.toolchain/app-build")
+
+android {
+    namespace 'it.simplemal.firehome'
+    compileSdk 35
+    buildToolsVersion '34.0.0'
+    sourceSets { main { assets.srcDirs += '../../distro/config' } }
+    defaultConfig {
+        applicationId 'it.simplemal.firehome'
+        minSdk 26
+        targetSdk 30
+        versionCode 52
+        versionName '0.12.21'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    // Sideloaded on an Android 11 Stick, never published on Google Play; WRITE_SECURE_SETTINGS comes from adb.
+    lint { disable 'ExpiredTargetSdkVersion', 'ProtectedPermissions' }
+}

@@ -1,0 +1,63 @@
+package it.simplemal.firehome;
+
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.graphics.Color;
+
+/** What several screens share about the Stick and the apps around Salotto. */
+final class Fire {
+    /** The tools read this line too: pubblica-aggiornamento.sh and genera-errori.py. */
+    static final String UPDATES_REPO = "simplemal/salotto-tv";
+    static final String FIXER = "io.github.hatim.firestickfixer";
+    static final String AIRPLAY = "io.github.jqssun.airplay";
+    static final String AMAZON_HOME = "com.amazon.tv.launcher";
+    static final String QUICK_MENU = "com.amazon.tv.quicksettings.ui";
+    static final String SETTINGS = "com.amazon.tv.settings.v2";
+    static final String INSTALLER = "com.android.packageinstaller";
+    static final String INSTALL_BUTTON = "android:id/button1";
+    static final String DEVICE_PAGE = "com.amazon.device.settings.action.DEVICE";
+    static final String[] FORCE_STOP = {"Forza arresto", "Force stop"};
+    static final String[] RESTART = {"Riavvia", "Restart"};
+    /** What Fire OS opens on Home held when the quick menu is off. */
+    static final String HOME_HELD_PAGE = "com.amazon.tv.settings.v2.hud.HudActivity";
+    /** What Fire OS opens on a remote's Settings key. */
+    static final String SETTINGS_PAGE = "com.amazon.tv.launcher.ui.MainSettingsActivity";
+    /** Fixer's switches answer only to the shell. */
+    static final String FIXER_COMMAND = "dumpsys activity service " + FIXER + "/.HijackService ";
+    static final String DOUBLE_HOME_ON = "doubleTap=true";
+    static final String HEADS_UP = "heads_up_notifications_enabled";
+    static final String CMD_SLEEP = "input keyevent SLEEP";
+    static final long MINUTE_MS = 60 * 1000L;
+    static final long DAY_MS = 24 * 60 * MINUTE_MS;
+    /** Text and symbols on a white surface. */
+    static final int INK = Color.rgb(24, 26, 30);
+
+    private static final String REMOTE_NAME = "Remote";
+
+    private Fire() {}
+
+    /** Bonded only says it was paired once. Android has the answer, but keeps the call to itself. */
+    static boolean connected(BluetoothDevice device) {
+        try {
+            return (boolean) BluetoothDevice.class.getMethod("isConnected").invoke(device);
+        } catch (ReflectiveOperationException e) {
+            return false;
+        }
+    }
+
+    /** Always connected while someone is holding it, so it says nothing to them. */
+    @SuppressLint("MissingPermission")
+    static boolean remote(BluetoothDevice device) {
+        BluetoothClass type = device.getBluetoothClass();
+        String name = device.getName();
+        return type != null && type.getMajorDeviceClass() == BluetoothClass.Device.Major.PERIPHERAL
+            || name != null && name.contains(REMOTE_NAME);
+    }
+
+    /** Not a settings page: Android's own way to start the Amazon screensaver. */
+    static Intent screensaver() {
+        return new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+    }
+}
