@@ -27,7 +27,6 @@ final class Fire {
     /** Fixer's switches answer only to the shell. */
     static final String FIXER_COMMAND = "dumpsys activity service " + FIXER + "/.HijackService ";
     static final String DOUBLE_HOME_ON = "doubleTap=true";
-    static final String HEADS_UP = "heads_up_notifications_enabled";
     static final String CMD_SLEEP = "input keyevent SLEEP";
     static final long MINUTE_MS = 60 * 1000L;
     static final long DAY_MS = 24 * 60 * MINUTE_MS;
@@ -57,6 +56,9 @@ final class Fire {
     }
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
+
+    /** Fire OS's list of notifications. They never show over the Home: this page is where they end up. */
+    static Intent notifications() { return new Intent("com.amazon.tv.action.NOTIFICATION_CENTER"); }
 
     /** Fire OS's own menu of its screensavers. */
     static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }

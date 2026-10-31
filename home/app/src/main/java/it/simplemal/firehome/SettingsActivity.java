@@ -550,9 +550,11 @@ public final class SettingsActivity extends CardActivity {
         return choices(names, chosen, picture, index -> text, choose);
     }
 
+    private static String minutes(int count) { return count + (count == 1 ? " minuto" : " minuti"); }
+
     private String[] minuteNames(int[] minutes) {
         String[] names = new String[minutes.length];
-        for (int index = 0; index < minutes.length; index++) names[index] = minutes[index] + " minuti";
+        for (int index = 0; index < minutes.length; index++) names[index] = minutes(minutes[index]);
         return names;
     }
 
@@ -674,7 +676,6 @@ public final class SettingsActivity extends CardActivity {
         boolean tvOff = Settings.Global.getInt(getContentResolver(), CEC_TV_OFF, 0) == 1;
         boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
         boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
-        boolean popups = Settings.Global.getInt(getContentResolver(), Fire.HEADS_UP, 1) == 1;
         Drawable picture = getDrawable(R.drawable.ic_image);
         show("Schermo e audio", Arrays.asList(
             new Entry("Salvaschermo", saverValue(), getDrawable(R.drawable.ic_image),
@@ -698,9 +699,6 @@ public final class SettingsActivity extends CardActivity {
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, scale);
                 })),
-            new Entry("Notifiche a comparsa", popups ? YES : NO, getDrawable(R.drawable.ic_s_notify),
-                "I messaggi che compaiono sopra quello che stai guardando.", false,
-                () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), Fire.HEADS_UP, popups ? 0 : 1))),
             new Entry("Video", null, getDrawable(R.drawable.ic_s_movie), "Risoluzione, HDR, colore e qualità dei video.", true, () -> enter(this::showVideo)),
             new Entry("Audio", null, getDrawable(R.drawable.ic_s_volume), "Audio surround e volume uniforme.", true, () -> enter(this::showAudio)),
             new Entry("Standard audio e video", null, getDrawable(R.drawable.ic_s_standards), "Cosa sanno fare la Stick e la TV, e cosa è in uso adesso.",
@@ -1406,7 +1404,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private String saverValue() {
-        return saverOn() ? saverMinutes() + " minuti" : "Spento";
+        return saverOn() ? minutes(saverMinutes()) : "Spento";
     }
 
     /** Needs WRITE_SECURE_SETTINGS, which only adb can grant: without it the values stay readable. */
@@ -1434,8 +1432,7 @@ public final class SettingsActivity extends CardActivity {
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
             new Entry("Tipo", own ? "Salotto" : "Fire OS", getDrawable(R.drawable.ic_photo),
                 "Quale salvaschermo usare.", true, () -> enter(this::showSaverKinds)),
-            new Entry("Si avvia dopo", saverMinutes() + " minuti", picture,
-                "Quanto aspetta la Stick prima di farlo partire.", true, () -> enter(this::showSaverTimes)),
+            new Entry("Si avvia dopo", minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
             new Entry("Avvia adesso", null, picture, "Fa partire subito il salvaschermo. Si chiude con Indietro.", false,
                 () -> open(Fire.screensaver()))));
     }
@@ -1448,7 +1445,7 @@ public final class SettingsActivity extends CardActivity {
             "Il salvaschermo di Amazon, con le sue immagini.", false, () -> chooseSaver(Fire.AMAZON_SAVER)));
         if (!own) {
             entries.add(new Entry("Scegli", null, getDrawable(R.drawable.ic_s_open),
-                "Apre il menu di Fire OS per scegliere tra i suoi salvaschermi.", true, () -> open(Fire.saverMenu())));
+                "Apre il menu di Fire OS per scegliere tra i suoi salvaschermi: foto, stile, velocità. Il tempo di avvio che conta è quello scelto qui in Salotto.", true, () -> open(Fire.saverMenu())));
         }
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
         show("Tipo", entries);
@@ -1469,9 +1466,16 @@ public final class SettingsActivity extends CardActivity {
         changeSystem(() -> Settings.Secure.putString(getContentResolver(), SAVER_CHOSEN, name));
     }
 
+    /** The Stick goes to sleep at its own time, whatever the screensaver is doing. */
+    private String saverWait() {
+        int sleep = sleepMinutes();
+        if (saverMinutes() < sleep) return "Quanto aspetta la Stick prima di far partire il salvaschermo.";
+        return "La Stick si spegne dopo " + minutes(sleep) + ": il salvaschermo non farà in tempo a partire. Scegli meno, o allunga lo Spegnimento automatico.";
+    }
+
     private void showSaverTimes() {
         show("Si avvia dopo", choices(minuteNames(SAVER_MINUTES), indexOf(SAVER_MINUTES, saverMinutes()), R.drawable.ic_image,
-            "Quanto aspetta la Stick prima di far partire il salvaschermo.",
+            saverWait(),
             index -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_OFF_TIMEOUT, SAVER_MINUTES[index] * MINUTE))));
     }

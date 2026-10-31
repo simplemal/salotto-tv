@@ -12,7 +12,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.FocusFinder;
 import android.view.Gravity;
@@ -231,10 +230,7 @@ final class ControlPanel extends LinearLayout {
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
 
         LinearLayout modes = row();
-        Tile quiet = small(modes, R.drawable.ic_moon, "Notifiche a comparsa", 0, () -> {
-            toggleQuiet();
-            refresh();
-        });
+        small(modes, R.drawable.ic_s_notify, "Notifiche", 0, () -> host.open(Fire.notifications()));
         Tile timer = small(modes, R.drawable.ic_timer, "Timer", GAP, () -> {
             nextTimer();
             refresh();
@@ -250,7 +246,6 @@ final class ControlPanel extends LinearLayout {
 
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
-        refreshers.add(() -> quiet.show(quiet() ? "nascoste" : "mostrate", quiet()));
         refreshers.add(() -> {
             int left = TaskService.sleepMinutesLeft();
             timer.show(left > 0 ? "tra " + left + " min" : "spento", left > 0);
@@ -321,18 +316,6 @@ final class ControlPanel extends LinearLayout {
 
     private void settings(String section) {
         host.open(new Intent(host, SettingsActivity.class).putExtra(SettingsActivity.SECTION, section));
-    }
-
-    private boolean quiet() {
-        return Settings.Global.getInt(host.getContentResolver(), Fire.HEADS_UP, 1) == 0;
-    }
-
-    private void toggleQuiet() {
-        try {
-            Settings.Global.putInt(host.getContentResolver(), Fire.HEADS_UP, quiet() ? 1 : 0);
-        } catch (SecurityException e) {
-            host.say("Manca il permesso di sistema per Salotto");
-        }
     }
 
     /** The levels go round, and the last one is off. */
