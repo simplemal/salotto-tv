@@ -1,0 +1,512 @@
+package it.simplemal.firehome;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import org.json.JSONException;
+
+/**
+ * The first time after the installation, instead of the Home: Salotto, the Stick's name, its network,
+ * the city and the keys held down. The Home starts only at the end, or its first animation would go
+ * by unseen under these pages. Its words are in the Stick's language or the one chosen on the first
+ * page, and only here: the rest of Salotto is in Italian.
+ */
+public final class FirstRunActivity extends CardActivity {
+    private static final String FILE = "first_run";
+    private static final String DONE = "done";
+    private static final String LANGUAGE = "language";
+    /** What the guide that came before left behind: a Stick that has seen it needs no introduction. */
+    private static final String OLD_FILE = "welcome";
+    private static final String OLD_DONE = "greeted";
+    private static final String[] LANGUAGES = {"it", "en", "es", "fr", "de", "pt", "ru", "ar", "hi", "zh"};
+    private static final String[] LANGUAGE_NAMES = {"italiano", "English", "español", "français", "Deutsch",
+        "português", "русский", "العربية", "हिन्दी", "中文"};
+    private static final String FALLBACK = "en";
+    private static final String RIGHT_TO_LEFT = "ar";
+    private static final String NO_NAME = "<unknown ssid>";
+    private static final int PAGES = 5;
+    private static final int LOGO = 92;
+    private static final int NAME_SP = 30;
+    private static final int VERSION_SP = 9;
+    private static final int WELCOME_SP = 34;
+    private static final int TITLE_SP = 30;
+    private static final int TEXT_SP = 17;
+    private static final int VALUE_SP = 26;
+    private static final int BUTTON_SP = 17;
+    private static final int TEXT_WIDTH = 720;
+    private static final int WIDE = 300;
+    private static final int LANGUAGE_WIDTH = 200;
+    private static final int LANGUAGE_ROWS = 5;
+    private static final int ROW_HEIGHT = 44;
+    private static final int ROW_GAP = 8;
+    private static final int RESULT_WIDTH = 480;
+    private static final int RESULTS = 5;
+    private static final int LIST_ROOM = 8;
+    private static final int NETWORK_ICON = 56;
+    private static final int GUIDE_WIDTH = 680;
+    private static final int GUIDE_HEIGHT = 246;
+    private static final int DOT = 7;
+    private static final int DOT_GAP = 9;
+    private static final int DOTS_BOTTOM = 26;
+    private static final int DOT_OFF = Color.argb(70, 255, 255, 255);
+
+    private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity, this::showRemote};
+    private LinearLayout page;
+    private LinearLayout dots;
+    private TextView note;
+    private Context words;
+    private int at;
+    private Runnable back = () -> { };
+
+    static boolean due(Context context) {
+        return !prefs(context).getBoolean(DONE, false)
+            && !context.getSharedPreferences(OLD_FILE, Context.MODE_PRIVATE).getBoolean(OLD_DONE, false);
+    }
+
+    private static SharedPreferences prefs(Context context) {
+        return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
+    }
+
+    @Override protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackground(Look.plainBackdrop());
+        page = new LinearLayout(this);
+        page.setOrientation(LinearLayout.VERTICAL);
+        page.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.addView(page, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        dots = new LinearLayout(this);
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        place.bottomMargin = dp(DOTS_BOTTOM);
+        root.addView(dots, place);
+        setContentView(root);
+        speak(prefs(this).getString(LANGUAGE, startLanguage()));
+        go(0);
+    }
+
+    /** Back from the Settings the network may be another. */
+    @Override protected void onRestart() {
+        super.onRestart();
+        if (at == 2) showNetwork();
+    }
+
+    @Override public void onBackPressed() { back.run(); }
+
+    private String startLanguage() {
+        String stick = Locale.getDefault().getLanguage();
+        return Arrays.asList(LANGUAGES).contains(stick) ? stick : FALLBACK;
+    }
+
+    private void speak(String language) {
+        Configuration config = new Configuration(getResources().getConfiguration());
+        config.setLocale(new Locale(language));
+        words = createConfigurationContext(config);
+        getWindow().getDecorView().setLayoutDirection(RIGHT_TO_LEFT.equals(language)
+            ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+    }
+
+    private String words(int id) { return words.getString(id); }
+
+    private void go(int index) {
+        at = index;
+        back = index == 0 ? () -> { } : () -> go(index - 1);
+        pages[index].run();
+        dots.removeAllViews();
+        for (int dot = 0; dot < PAGES; dot++) {
+            View mark = new View(this);
+            GradientDrawable fill = new GradientDrawable();
+            fill.setShape(GradientDrawable.OVAL);
+            fill.setColor(dot == index ? Color.WHITE : DOT_OFF);
+            mark.setBackground(fill);
+            LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(DOT), dp(DOT));
+            if (dot > 0) size.setMarginStart(dp(DOT_GAP));
+            dots.addView(mark, size);
+        }
+    }
+
+    private void next() {
+        if (at < PAGES - 1) {
+            go(at + 1);
+            return;
+        }
+        prefs(this).edit().putBoolean(DONE, true).apply();
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    private void showWelcome() {
+        page.removeAllViews();
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.drawable.ic_salotto);
+        page.addView(logo, new LinearLayout.LayoutParams(dp(LOGO), dp(LOGO)));
+        TextView name = label(Brand.NAME, NAME_SP);
+        name.setGravity(Gravity.CENTER);
+        page.addView(name);
+        TextView version = label(BuildVersion.name(this), VERSION_SP);
+        version.setGravity(Gravity.CENTER);
+        version.setAlpha(0.5f);
+        page.addView(version);
+        TextView welcome = label(words(R.string.first_welcome), WELCOME_SP);
+        welcome.setGravity(Gravity.CENTER);
+        welcome.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        LinearLayout.LayoutParams line = new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2);
+        line.topMargin = dp(26);
+        page.addView(welcome, line);
+        String language = prefs(this).getString(LANGUAGE, startLanguage());
+        page.addView(button(LANGUAGE_NAMES[Arrays.asList(LANGUAGES).indexOf(language)], BUTTON_SP, this::showLanguages), place(WIDE, 26));
+        View next = button(words(R.string.first_next), BUTTON_SP, this::next);
+        page.addView(next, place(WIDE, 10));
+        next.requestFocus();
+    }
+
+    private void showLanguages() {
+        heading(words(R.string.first_language), null);
+        back = () -> go(0);
+        String chosen = prefs(this).getString(LANGUAGE, startLanguage());
+        LinearLayout columns = new LinearLayout(this);
+        columns.setGravity(Gravity.CENTER);
+        columns.setClipChildren(false);
+        View selected = null;
+        for (int column = 0; column < LANGUAGES.length / LANGUAGE_ROWS; column++) {
+            LinearLayout rows = new LinearLayout(this);
+            rows.setOrientation(LinearLayout.VERTICAL);
+            rows.setClipChildren(false);
+            for (int row = 0; row < LANGUAGE_ROWS; row++) {
+                int index = column * LANGUAGE_ROWS + row;
+                String language = LANGUAGES[index];
+                View choice = button(LANGUAGE_NAMES[index], BUTTON_SP, () -> {
+                    prefs(this).edit().putString(LANGUAGE, language).apply();
+                    speak(language);
+                    go(0);
+                });
+                rows.addView(choice, place(LANGUAGE_WIDTH, row == 0 ? 0 : ROW_GAP));
+                if (language.equals(chosen)) selected = choice;
+            }
+            LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(-2, -2);
+            if (column > 0) gap.setMarginStart(dp(ROW_GAP * 2));
+            columns.addView(rows, gap);
+        }
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(24);
+        page.addView(columns, under);
+        selected.requestFocus();
+    }
+
+    private void showName() {
+        String name = DeviceInfo.name(this);
+        heading(words(R.string.first_name_title), words(R.string.first_name_text));
+        page.addView(value(name));
+        View next = button(words(R.string.first_next), BUTTON_SP, this::next);
+        page.addView(next, place(WIDE, 26));
+        page.addView(button(words(R.string.first_name_change), BUTTON_SP, () -> changeName(name)), place(WIDE, 10));
+        next.requestFocus();
+    }
+
+    private void changeName(String name) {
+        heading(words(R.string.first_name_title), words(R.string.first_name_text));
+        back = () -> go(1);
+        Runnable[] save = new Runnable[1];
+        EditText field = field(words(R.string.first_name_hint), () -> save[0].run());
+        field.setText(name);
+        field.setSelection(name.length());
+        save[0] = () -> {
+            String chosen = field.getText().toString().trim();
+            if (chosen.isEmpty()) return;
+            if (!DeviceInfo.setName(this, chosen)) sayLong(words(R.string.first_name_refused));
+            go(1);
+        };
+        page.addView(field, place(WIDE, 26));
+        page.addView(button(words(R.string.first_save), BUTTON_SP, () -> save[0].run()), place(WIDE, 22));
+        field.requestFocus();
+    }
+
+    private void showNetwork() {
+        ConnectivityManager network = getSystemService(ConnectivityManager.class);
+        NetworkCapabilities link = network.getNetworkCapabilities(network.getActiveNetwork());
+        boolean wired = link != null && link.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
+        heading(words(R.string.first_network_title), words(link != null ? R.string.first_network_on : R.string.first_network_off));
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(wired ? R.drawable.ic_ethernet : R.drawable.ic_wifi);
+        icon.setColorFilter(link != null ? ControlPanel.LINKED : Color.WHITE);
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(dp(NETWORK_ICON), dp(NETWORK_ICON));
+        size.topMargin = dp(24);
+        page.addView(icon, size);
+        page.addView(value(link == null ? words(R.string.first_network_none) : wired ? "Ethernet" : wifiName()));
+        View next = button(words(R.string.first_next), BUTTON_SP, this::next);
+        page.addView(next, place(WIDE, 26));
+        page.addView(button(words(R.string.first_network_change), BUTTON_SP, () -> open(new Intent(this, SettingsActivity.class)
+            .putExtra(SettingsActivity.SECTION, SettingsActivity.NETWORK))), place(WIDE, 10));
+        next.requestFocus();
+    }
+
+    private String wifiName() {
+        String name = getSystemService(WifiManager.class).getConnectionInfo().getSSID();
+        return name == null || name.equals(NO_NAME) ? "Wi-Fi" : name.replace("\"", "");
+    }
+
+    private void showCity() {
+        String place = Weather.place(this);
+        if (place == null) {
+            askCity();
+            return;
+        }
+        heading(words(R.string.first_city_title), words(R.string.first_city_text));
+        page.addView(value(place));
+        View next = button(words(R.string.first_next), BUTTON_SP, this::next);
+        page.addView(next, place(WIDE, 26));
+        page.addView(button(words(R.string.first_city_change), BUTTON_SP, this::askCity), place(WIDE, 10));
+        next.requestFocus();
+    }
+
+    private void askCity() {
+        heading(words(R.string.first_city_title), words(R.string.first_city_text));
+        if (Weather.place(this) != null) back = () -> go(at);
+        Runnable[] find = new Runnable[1];
+        EditText name = field(words(R.string.first_city_hint), () -> find[0].run());
+        find[0] = () -> search(name.getText().toString().trim());
+        page.addView(name, place(WIDE, 26));
+        page.addView(button(words(R.string.first_search), BUTTON_SP, () -> find[0].run()), place(WIDE, 22));
+        page.addView(button(words(R.string.first_not_now), BUTTON_SP, this::next), place(WIDE, 10));
+        name.requestFocus();
+    }
+
+    private void search(String name) {
+        if (name.isEmpty()) return;
+        note.setText(words(R.string.first_searching));
+        Background.run(() -> {
+            try {
+                List<Weather.Place> places = Weather.search(name);
+                runOnUiThread(() -> {
+                    if (places.isEmpty()) note.setText(words(R.string.first_no_place));
+                    else showPlaces(places);
+                });
+            } catch (IOException | JSONException e) {
+                runOnUiThread(() -> note.setText(words(R.string.first_no_connection)));
+            }
+        });
+    }
+
+    private void showPlaces(List<Weather.Place> places) {
+        heading(words(R.string.first_place_title), words(R.string.first_place_text));
+        back = this::askCity;
+        LinearLayout rows = new LinearLayout(this);
+        rows.setOrientation(LinearLayout.VERTICAL);
+        // Room for the selected row to grow without losing its rounded ends.
+        rows.setPadding(dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM));
+        rows.setClipChildren(false);
+        rows.setClipToPadding(false);
+        View first = null;
+        for (Weather.Place place : places) {
+            View row = button(place.name + "  ·  " + place.detail, BUTTON_SP, () -> {
+                Weather.setPlace(this, place);
+                next();
+            });
+            LinearLayout.LayoutParams wide = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
+            if (first != null) wide.topMargin = dp(ROW_GAP);
+            rows.addView(row, wide);
+            if (first == null) first = row;
+        }
+        ScrollView list = new ScrollView(this);
+        list.setVerticalScrollBarEnabled(false);
+        list.addView(rows);
+        int shown = Math.min(RESULTS, places.size());
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(RESULT_WIDTH),
+            dp(shown * ROW_HEIGHT + (shown - 1) * ROW_GAP + 2 * LIST_ROOM));
+        place.topMargin = dp(24);
+        page.addView(list, place);
+        first.requestFocus();
+    }
+
+    private void showRemote() {
+        heading(words(R.string.first_remote_title), words(R.string.first_remote_text));
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(GUIDE_WIDTH), dp(GUIDE_HEIGHT));
+        place.topMargin = dp(24);
+        page.addView(new Guide(this), place);
+        View start = button(words(R.string.first_start), BUTTON_SP, this::next);
+        page.addView(start, place(WIDE, 24));
+        start.requestFocus();
+    }
+
+    private void heading(String title, String text) {
+        page.removeAllViews();
+        TextView name = label(title, TITLE_SP);
+        name.setGravity(Gravity.CENTER);
+        name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        page.addView(name);
+        if (text == null) return;
+        note = label(text, TEXT_SP);
+        note.setGravity(Gravity.CENTER);
+        note.setAlpha(0.8f);
+        note.setPadding(0, dp(8), 0, 0);
+        page.addView(note, new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2));
+    }
+
+    private TextView value(String text) {
+        TextView view = label(text, VALUE_SP);
+        view.setGravity(Gravity.CENTER);
+        view.setPadding(0, dp(18), 0, 0);
+        return view;
+    }
+
+    private LinearLayout.LayoutParams place(int width, int top) {
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(width), -2);
+        place.topMargin = dp(top);
+        return place;
+    }
+
+    private EditText field(String hint, Runnable done) {
+        EditText field = new EditText(this);
+        field.setSingleLine(true);
+        field.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        field.setGravity(Gravity.CENTER);
+        field.setTextColor(Color.WHITE);
+        field.setTextSize(BUTTON_SP);
+        field.setHint(hint);
+        field.setHintTextColor(Color.argb(130, 255, 255, 255));
+        field.setPadding(dp(12), dp(10), dp(12), dp(10));
+        field.setDefaultFocusHighlightEnabled(false);
+        Runnable paint = () -> {
+            GradientDrawable fill = new GradientDrawable();
+            fill.setCornerRadius(dp(12));
+            fill.setColor(Color.argb(42, 255, 255, 255));
+            fill.setStroke(dp(2), field.isFocused() ? Color.WHITE : Color.TRANSPARENT);
+            field.setBackground(fill);
+        };
+        paint.run();
+        field.setOnFocusChangeListener((changed, focused) -> paint.run());
+        field.setOnEditorActionListener((view, action, event) -> {
+            done.run();
+            return true;
+        });
+        return field;
+    }
+
+    /** The remote in outline, with a line from each of the three keys to what it does. */
+    private final class Guide extends View {
+        private static final float BODY_HALF = 56;
+        private static final float BODY_BOTTOM = 176;
+        private static final float RING_Y = 68;
+        private static final float KEYS_Y = 134;
+        private static final float KEYS_APART = 31;
+        private static final float KEY = 13;
+        private static final float REACH = 170;
+        private static final float HOME_LINE_END = 198;
+
+        private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint key = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint name = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint action = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        Guide(Context context) {
+            super(context);
+            for (Paint paint : new Paint[]{line, key}) {
+                paint.setStyle(Paint.Style.STROKE);
+                paint.setStrokeCap(Paint.Cap.ROUND);
+                paint.setStrokeJoin(Paint.Join.ROUND);
+            }
+            line.setStrokeWidth(px(1.5f));
+            line.setColor(Color.WHITE);
+            key.setStrokeWidth(px(1.5f));
+            key.setColor(ControlPanel.LINKED);
+            name.setColor(Color.WHITE);
+            name.setTextSize(px(18));
+            name.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            action.setColor(ControlPanel.LINKED);
+            action.setTextSize(px(15));
+        }
+
+        private float px(float value) { return value * getResources().getDisplayMetrics().density; }
+
+        @Override protected void onDraw(Canvas canvas) {
+            float mid = getWidth() / 2f;
+            float corner = px(28);
+            float half = px(BODY_HALF);
+            canvas.drawRoundRect(new RectF(mid - half, px(1), mid + half, px(BODY_BOTTOM)), corner, corner, line);
+            canvas.drawCircle(mid, px(17), px(4), line);
+            canvas.drawCircle(mid, px(RING_Y), px(36), line);
+            canvas.drawCircle(mid, px(RING_Y), px(12), line);
+            float y = px(KEYS_Y);
+            float left = mid - px(KEYS_APART);
+            float right = mid + px(KEYS_APART);
+            for (float x : new float[]{left, mid, right}) canvas.drawCircle(x, y, px(KEY), key);
+            canvas.drawPath(backIcon(left, y), line);
+            canvas.drawPath(homeIcon(mid, y), line);
+            canvas.drawPath(menuIcon(right, y), line);
+
+            canvas.drawLine(left - px(KEY), y, mid - px(REACH), y, key);
+            canvas.drawLine(right + px(KEY), y, mid + px(REACH), y, key);
+            canvas.drawLine(mid, y + px(KEY), mid, px(HOME_LINE_END), key);
+
+            float gap = px(REACH + 12);
+            write(canvas, words(R.string.first_key_back), words(R.string.first_does_tasks), mid - gap, y, Paint.Align.RIGHT);
+            write(canvas, words(R.string.first_key_menu), words(R.string.first_does_settings), mid + gap, y, Paint.Align.LEFT);
+            write(canvas, words(R.string.first_key_home), words(R.string.first_does_panel), mid, px(HOME_LINE_END + 22), Paint.Align.CENTER);
+        }
+
+        private void write(Canvas canvas, String title, String does, float x, float y, Paint.Align align) {
+            name.setTextAlign(align);
+            action.setTextAlign(align);
+            canvas.drawText(title, x, y - px(3), name);
+            canvas.drawText(does, x, y + px(18), action);
+        }
+
+        private Path backIcon(float x, float y) {
+            Path path = new Path();
+            path.moveTo(x - px(2), y - px(6));
+            path.lineTo(x - px(6), y - px(2));
+            path.lineTo(x - px(2), y + px(2));
+            path.moveTo(x - px(6), y - px(2));
+            path.lineTo(x + px(2), y - px(2));
+            path.quadTo(x + px(6), y - px(2), x + px(6), y + px(1.5f));
+            path.quadTo(x + px(6), y + px(5), x + px(2), y + px(5));
+            path.lineTo(x - px(2), y + px(5));
+            return path;
+        }
+
+        private Path homeIcon(float x, float y) {
+            Path path = new Path();
+            path.moveTo(x - px(7), y);
+            path.lineTo(x, y - px(6));
+            path.lineTo(x + px(7), y);
+            path.moveTo(x - px(4.5f), y - px(2));
+            path.lineTo(x - px(4.5f), y + px(6));
+            path.lineTo(x + px(4.5f), y + px(6));
+            path.lineTo(x + px(4.5f), y - px(2));
+            return path;
+        }
+
+        private Path menuIcon(float x, float y) {
+            Path path = new Path();
+            for (int row = -1; row <= 1; row++) {
+                path.moveTo(x - px(6), y + row * px(4));
+                path.lineTo(x + px(6), y + row * px(4));
+            }
+            return path;
+        }
+    }
+}

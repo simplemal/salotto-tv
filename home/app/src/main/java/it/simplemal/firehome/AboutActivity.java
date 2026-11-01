@@ -105,6 +105,7 @@ public final class AboutActivity extends CardActivity {
         credit("Android Open Source Project", "Apache 2.0", "Piattaforma e compilazione", "source.android.com");
         credit("Gradle e Android Gradle Plugin", "Apache 2.0", "Compilazione", "gradle.org");
         credit("Pillow", "HPND", "Riduzione delle illustrazioni meteo, solo in compilazione", "python-pillow.org");
+        credit("Space Grotesk", "SIL OFL 1.1", "Il carattere del nome Salotto", "github.com/floriankarsten/space-grotesk");
 
         section("Programmi non inclusi");
         paragraph("L'installazione li scarica dai progetti originali, senza modificarli.");

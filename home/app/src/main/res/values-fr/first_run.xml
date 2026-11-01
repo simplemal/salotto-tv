@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">Bonjour ! Voici votre nouveau Centre Multimédia</string>
+    <string name="first_next">Suivant</string>
+    <string name="first_language">Choisissez votre langue</string>
+    <string name="first_name_title">Le nom de ce Stick</string>
+    <string name="first_name_text">Il le distingue des autres appareils de la maison.</string>
+    <string name="first_name_change">Changer le nom</string>
+    <string name="first_name_hint">Nom du Stick</string>
+    <string name="first_save">Enregistrer</string>
+    <string name="first_name_refused">Fire OS n’a pas accepté le nom</string>
+    <string name="first_network_title">Votre réseau</string>
+    <string name="first_network_on">Le Stick est connecté à Internet.</string>
+    <string name="first_network_off">Le Stick n’est pas connecté à Internet.</string>
+    <string name="first_network_none">Aucun réseau</string>
+    <string name="first_network_change">Changer de réseau</string>
+    <string name="first_city_title">Votre ville</string>
+    <string name="first_city_text">Pour la météo et les fonds d’écran qui changent avec elle.</string>
+    <string name="first_city_hint">Nom de la ville</string>
+    <string name="first_search">Rechercher</string>
+    <string name="first_not_now">Pas maintenant</string>
+    <string name="first_city_change">Changer de ville</string>
+    <string name="first_searching">Recherche…</string>
+    <string name="first_no_place">Aucun lieu trouvé. Essayez de l’écrire autrement.</string>
+    <string name="first_no_connection">Échec de la connexion. Réessayez ou choisissez Pas maintenant.</string>
+    <string name="first_place_title">Choisissez le lieu</string>
+    <string name="first_place_text">La météo viendra d’ici.</string>
+    <string name="first_remote_title">Maintenez une touche enfoncée</string>
+    <string name="first_remote_text">Ce sont des raccourcis de Salotto : ils ne figurent pas sur la télécommande.</string>
+    <string name="first_key_back">Retour</string>
+    <string name="first_key_home">Accueil</string>
+    <string name="first_key_menu">Menu</string>
+    <string name="first_does_tasks">Gestionnaire de tâches</string>
+    <string name="first_does_panel">Centre de contrôle</string>
+    <string name="first_does_settings">Réglages</string>
+    <string name="first_start">Commencer</string>
+</resources>

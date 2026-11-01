@@ -1,6 +1,8 @@
 package it.simplemal.firehome;
 
 import android.app.ActivityManager;
+import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -28,6 +30,9 @@ final class DeviceInfo {
 
     private static final long GB = 1024L * 1024 * 1024;
 
+    private static final String DEVICE_NAME = "device_name";
+    private static final String BLUETOOTH_NAME = "bluetooth_name";
+
     private static volatile String fireOs;
 
     private DeviceInfo() {}
@@ -35,10 +40,28 @@ final class DeviceInfo {
     /** Reading the version starts a process: this does it once, ahead of the page that shows it. */
     static void prepare() { Background.run(DeviceInfo::fireOs); }
 
+    static String name(Context context) {
+        String name = Settings.Global.getString(context.getContentResolver(), DEVICE_NAME);
+        return name != null ? name : Build.MODEL;
+    }
+
+    /** Fire OS keeps the name in two places, and Bluetooth holds a copy of its own. */
+    @SuppressLint("MissingPermission")
+    static boolean setName(Context context, String name) {
+        try {
+            Settings.Global.putString(context.getContentResolver(), DEVICE_NAME, name);
+            Settings.Secure.putString(context.getContentResolver(), BLUETOOTH_NAME, name);
+        } catch (SecurityException e) {
+            return false;
+        }
+        BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
+        if (bluetooth != null) bluetooth.setName(name);
+        return true;
+    }
+
     static List<String[]> system(Context context) {
         List<String[]> rows = new ArrayList<>();
-        String name = Settings.Global.getString(context.getContentResolver(), "device_name");
-        rows.add(new String[]{"Nome", name != null ? name : Build.MODEL});
+        rows.add(new String[]{"Nome", name(context)});
         rows.add(new String[]{"Modello", Build.MODEL});
         rows.add(new String[]{"Sistema", fireOs()});
         rows.add(new String[]{"Android", Build.VERSION.RELEASE});

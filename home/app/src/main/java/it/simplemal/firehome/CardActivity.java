@@ -43,6 +43,10 @@ abstract class CardActivity extends Activity {
     protected static final int GLASS = 3;
     protected static final int MARGIN = 48;
     protected static final int GAP = 10;
+    private static final int SOFT_LIGHT = 110;
+    private static final int SOFT_DEPTH = 3;
+    private static final int BUTTON_RADIUS = 12;
+    private static final int BUTTON_PADDING = 10;
     /** Quieter than the pill: on artwork the glass must stay a hint. */
     private static final int CARD_REFLECTION = 14;
     private static final int CARD_LIGHT = 100;
@@ -388,12 +392,42 @@ abstract class CardActivity extends Activity {
         return glass;
     }
 
-    /** The same glass, quieter, for wide surfaces where the full effect would be too much. */
+    /** For rows and buttons: flat under the words, the light stays in a few pixels along the edge. */
     protected Drawable softGlass(int radius) {
         GradientDrawable fill = new GradientDrawable();
         fill.setColor(Color.argb(42, 255, 255, 255));
         fill.setCornerRadius(radius);
-        return new LayerDrawable(new Drawable[]{fill, glassEdge(radius, 30, 180)});
+        return new LayerDrawable(new Drawable[]{fill, GlassRim.soft(radius, SOFT_LIGHT, dp(SOFT_DEPTH))});
+    }
+
+    /** What a row or a button becomes under the focus. */
+    protected Drawable selectedFill(int radius) {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.argb(240, 255, 255, 255));
+        fill.setCornerRadius(radius);
+        return fill;
+    }
+
+    /** Every button in Salotto, the same as a row of the Settings. */
+    protected TextView button(String name, int sp, Runnable run) {
+        TextView view = label(name, sp);
+        view.setGravity(Gravity.CENTER);
+        view.setSingleLine(true);
+        view.setFocusable(true);
+        view.setClickable(true);
+        view.setPadding(dp(20), dp(BUTTON_PADDING), dp(20), dp(BUTTON_PADDING));
+        view.setDefaultFocusHighlightEnabled(false);
+        Drawable rest = softGlass(dp(BUTTON_RADIUS));
+        Drawable selected = selectedFill(dp(BUTTON_RADIUS));
+        view.setBackground(rest);
+        view.setOnFocusChangeListener((changed, focused) -> {
+            view.setBackground(focused ? selected : rest);
+            view.setTextColor(focused ? Fire.INK : Color.WHITE);
+            float scale = focused ? 1.03f : 1f;
+            view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
+        });
+        view.setOnClickListener(changed -> run.run());
+        return view;
     }
 
     /**
@@ -442,7 +476,7 @@ abstract class CardActivity extends Activity {
 
     protected TextView label(String text, int sp) {
         TextView view = new TextView(this);
-        view.setText(text);
+        view.setText(Brand.mark(this, text));
         view.setTextSize(sp);
         view.setTextColor(Color.WHITE);
         return view;

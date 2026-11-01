@@ -111,22 +111,7 @@ public final class UpdateActivity extends CardActivity {
     }
 
     private View action(String name, Runnable run) {
-        TextView view = text(name, ACTION_SP, false);
-        view.setFocusable(true);
-        view.setClickable(true);
-        view.setPadding(dp(24), dp(7), dp(24), dp(7));
-        view.setDefaultFocusHighlightEnabled(false);
-        Runnable paint = () -> {
-            GradientDrawable fill = new GradientDrawable();
-            fill.setCornerRadius(dp(8));
-            fill.setColor(view.isFocused() ? Color.WHITE : Color.argb(50, 255, 255, 255));
-            view.setBackground(fill);
-            view.setTextColor(view.isFocused() ? Fire.INK : Color.WHITE);
-        };
-        paint.run();
-        view.setOnFocusChangeListener((changed, focused) -> paint.run());
-        view.setOnClickListener(changed -> run.run());
-        return view;
+        return button(name, ACTION_SP, run);
     }
 
     private void actions(View... views) {
@@ -145,7 +130,7 @@ public final class UpdateActivity extends CardActivity {
 
     private void look() {
         clear();
-        title.setText("Aggiornamento di Salotto");
+        title.setText(Brand.mark(this, "Aggiornamento di Salotto"));
         line = text("Cerco una nuova versione…", 19, false);
         body.addView(line);
         background(() -> {
@@ -159,7 +144,7 @@ public final class UpdateActivity extends CardActivity {
 
     private void showCurrent() {
         clear();
-        title.setText("Salotto è aggiornata");
+        title.setText(Brand.mark(this, "Salotto è aggiornata"));
         body.addView(text("Hai l’ultima versione disponibile.", 19, false));
         actions(action("Chiudi", this::finish));
     }
@@ -167,7 +152,7 @@ public final class UpdateActivity extends CardActivity {
     private void showOffer(Updater.Release found) {
         release = found;
         clear();
-        title.setText("È disponibile Salotto " + found.versionName);
+        title.setText(Brand.mark(this, "È disponibile Salotto " + found.versionName));
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
         list.setPadding(dp(20), dp(2), dp(15), dp(2));
@@ -206,7 +191,7 @@ public final class UpdateActivity extends CardActivity {
 
     private void showSteps() {
         clear();
-        title.setText("Aggiornamento a Salotto " + (release != null ? release.versionName : BuildVersion.name(this)));
+        title.setText(Brand.mark(this, "Aggiornamento a Salotto " + (release != null ? release.versionName : BuildVersion.name(this))));
         LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(24), dp(18), dp(24), dp(18));

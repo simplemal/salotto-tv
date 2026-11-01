@@ -139,6 +139,7 @@ install_components() {
   W install -r "$apk" || stop "installazione di Salotto fallita."
   W shell pm grant "$SALOTTO" android.permission.WRITE_SECURE_SETTINGS
   W shell pm grant "$SALOTTO" android.permission.READ_LOGS
+  W shell pm grant "$SALOTTO" android.permission.ACCESS_FINE_LOCATION
   W shell appops set "$SALOTTO" GET_USAGE_STATS allow
   W shell appops set "$SALOTTO" REQUEST_INSTALL_PACKAGES allow
   W shell cmd notification allow_listener "$SALOTTO/$SALOTTO.NotificationCounter" || true

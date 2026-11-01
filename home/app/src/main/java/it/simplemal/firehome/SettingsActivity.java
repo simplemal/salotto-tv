@@ -329,7 +329,7 @@ public final class SettingsActivity extends CardActivity {
 
     /** The note stays under the rows, for what is true of all of them. */
     private void show(String title, List<Entry> entries, String note) {
-        heading.setText(title);
+        heading.setText(Brand.mark(this, title));
         boolean table = entries.get(0).columns != null;
         tableHead.setVisibility(table ? View.VISIBLE : View.GONE);
         rows.setPadding(dp(8), dp(table ? 8 : COLUMN_TOP), dp(8), dp(16));
@@ -427,7 +427,7 @@ public final class SettingsActivity extends CardActivity {
             if (focused) {
                 levels.peek().focus = rows.indexOfChild(view);
                 picture.setImageDrawable(entry.pkg != null ? appIcon(entry.pkg) : entry.picture);
-                explanation.setText(entry.text);
+                explanation.setText(Brand.mark(this, entry.text));
             }
         });
     }
@@ -477,12 +477,7 @@ public final class SettingsActivity extends CardActivity {
 
     /** Only one row has the focus, so they can all share this. */
     private Drawable focusFill() {
-        if (focusFill == null) {
-            GradientDrawable fill = new GradientDrawable();
-            fill.setColor(Color.argb(240, 255, 255, 255));
-            fill.setCornerRadius(dp(12));
-            focusFill = fill;
-        }
+        if (focusFill == null) focusFill = selectedFill(dp(12));
         return focusFill;
     }
 
@@ -1249,6 +1244,9 @@ public final class SettingsActivity extends CardActivity {
             });
         }
         show("Strumenti", Arrays.asList(
+            new Entry("Presentazione iniziale", null, getDrawable(R.drawable.ic_salotto),
+                "Rivedi le pagine del primo avvio, con la spiegazione del telecomando.", false,
+                () -> open(new Intent(this, FirstRunActivity.class))),
             new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
                 "Ricevi video da iPhone, iPad e Mac. Dopo ogni riavvio va aperto una volta.",
                 false, () -> openPackage(Fire.AIRPLAY)),

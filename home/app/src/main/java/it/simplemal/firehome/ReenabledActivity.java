@@ -1,0 +1,123 @@
+package it.simplemal.firehome;
+
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import java.util.ArrayList;
+
+/** Over the Home, when Fire OS has turned back on what Salotto had turned off: usually an update. */
+public final class ReenabledActivity extends CardActivity {
+    static final String REENABLED = "reenabled";
+    private static final int MOST_NAMES = 6;
+    private static final int WHEEL = 40;
+    private static final int DIM = Color.argb(204, 0, 0, 0);
+    private static final int WIDE = 260;
+    private static final int BUTTON_SP = 15;
+
+    private LinearLayout page;
+    private TextView note;
+    private Runnable back = this::finish;
+
+    @Override protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(DIM);
+        page = new LinearLayout(this);
+        page.setOrientation(LinearLayout.VERTICAL);
+        page.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.addView(page, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        setContentView(root);
+        showReenabled(getIntent().getStringArrayListExtra(REENABLED));
+    }
+
+    @Override public void onBackPressed() { back.run(); }
+
+    private void showReenabled(ArrayList<String> names) {
+        heading("Fire OS ha riattivato alcune parti",
+            "Probabilmente con un aggiornamento. Avevi spento queste funzioni:");
+        back = this::finish;
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(0, dp(18), 0, 0);
+        int shown = 0;
+        for (String name : Reenabled.labels(this, names)) {
+            if (shown == MOST_NAMES) break;
+            shown++;
+            TextView line = label(name, 15);
+            line.setGravity(Gravity.CENTER);
+            list.addView(line);
+        }
+        if (names.size() > shown) {
+            TextView more = label(shown == 0 ? names.size() + " parti di Fire OS" : "e altre " + (names.size() - shown) + " parti di Fire OS", 14);
+            more.setGravity(Gravity.CENTER);
+            more.setAlpha(0.7f);
+            list.addView(more);
+        }
+        page.addView(list);
+        TextView off = button("Spegnili", BUTTON_SP, () -> warnBeforeTurningOff(names));
+        page.addView(off, wide(26));
+        page.addView(button("Lasciali attivi", BUTTON_SP, () -> leaveOn(names)), wide(10));
+        off.requestFocus();
+    }
+
+    private void leaveOn(ArrayList<String> names) {
+        Reenabled.leaveOn(this, names);
+        finish();
+    }
+
+    private void warnBeforeTurningOff(ArrayList<String> names) {
+        heading("Prima di spegnerli",
+            "La TV chiederà «Consenti debug wireless su questa rete?».\nRispondi Consenti: è una domanda di Android.");
+        back = () -> showReenabled(names);
+        TextView go = button("Continua", BUTTON_SP, () -> turnOff(names));
+        page.addView(go, wide(26));
+        page.addView(button("Annulla", BUTTON_SP, () -> showReenabled(names)), wide(10));
+        go.requestFocus();
+    }
+
+    private void turnOff(ArrayList<String> names) {
+        heading("Li sto spegnendo", "Un attimo.");
+        back = () -> { };
+        ProgressBar wheel = new ProgressBar(this);
+        wheel.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(WHEEL), dp(WHEEL));
+        place.topMargin = dp(24);
+        page.addView(wheel, place);
+        TaskService.turnOffAgain(names, turnedOff -> {
+            if (turnedOff) {
+                finish();
+                return;
+            }
+            heading("Non è stato possibile", "Se la TV ha chiesto il permesso, serve rispondere Consenti.");
+            back = this::finish;
+            TextView close = button("Chiudi", BUTTON_SP, this::finish);
+            page.addView(close, wide(26));
+            close.requestFocus();
+        });
+    }
+
+    private void heading(String name, String text) {
+        page.removeAllViews();
+        TextView title = label(name, 26);
+        title.setGravity(Gravity.CENTER);
+        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        page.addView(title);
+        note = label(text, 15);
+        note.setGravity(Gravity.CENTER);
+        note.setAlpha(0.8f);
+        note.setPadding(0, dp(8), 0, 0);
+        page.addView(note);
+    }
+
+    private LinearLayout.LayoutParams wide(int top) {
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(WIDE), -2);
+        place.topMargin = dp(top);
+        return place;
+    }
+}

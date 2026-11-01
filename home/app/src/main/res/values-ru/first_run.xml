@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">Привет! Это ваш новый медиацентр</string>
+    <string name="first_next">Далее</string>
+    <string name="first_language">Выберите язык</string>
+    <string name="first_name_title">Название этого Stick</string>
+    <string name="first_name_text">Так вы отличите его от других устройств дома.</string>
+    <string name="first_name_change">Изменить название</string>
+    <string name="first_name_hint">Название Stick</string>
+    <string name="first_save">Сохранить</string>
+    <string name="first_name_refused">Fire OS не принял название</string>
+    <string name="first_network_title">Ваша сеть</string>
+    <string name="first_network_on">Stick подключён к интернету.</string>
+    <string name="first_network_off">Stick не подключён к интернету.</string>
+    <string name="first_network_none">Нет сети</string>
+    <string name="first_network_change">Сменить сеть</string>
+    <string name="first_city_title">Ваш город</string>
+    <string name="first_city_text">Для прогноза погоды и фонов, которые меняются вместе с ней.</string>
+    <string name="first_city_hint">Название города</string>
+    <string name="first_search">Найти</string>
+    <string name="first_not_now">Не сейчас</string>
+    <string name="first_city_change">Сменить город</string>
+    <string name="first_searching">Поиск…</string>
+    <string name="first_no_place">Ничего не найдено. Попробуйте написать иначе.</string>
+    <string name="first_no_connection">Не удалось подключиться. Повторите попытку или выберите «Не сейчас».</string>
+    <string name="first_place_title">Выберите место</string>
+    <string name="first_place_text">Прогноз будет для этого места.</string>
+    <string name="first_remote_title">Удерживайте кнопку</string>
+    <string name="first_remote_text">Это быстрые команды Salotto: на пульте они не обозначены.</string>
+    <string name="first_key_back">Назад</string>
+    <string name="first_key_home">Домой</string>
+    <string name="first_key_menu">Меню</string>
+    <string name="first_does_tasks">Диспетчер задач</string>
+    <string name="first_does_panel">Центр управления</string>
+    <string name="first_does_settings">Настройки</string>
+    <string name="first_start">Начать</string>
+</resources>

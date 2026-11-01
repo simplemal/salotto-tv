@@ -22,6 +22,8 @@ Tutti i marchi appartengono ai rispettivi proprietari. Fire TV, Alexa, Prime Vid
 | [Gradle](https://gradle.org/) e [Android Gradle Plugin](https://developer.android.com/build) | Compilazione | Apache 2.0 |
 | [Pillow](https://python-pillow.org/) | Riduzione delle illustrazioni meteo, solo in compilazione | HPND |
 
+Il nome Salotto è scritto in [Space Grotesk](https://github.com/floriankarsten/space-grotesk), di Florian Karsten, con licenza SIL Open Font License 1.1. Il carattere è incluso nell'app.
+
 Non inclusi: l'installazione li scarica dai progetti originali, senza modificarli.
 
 | Software | Uso | Licenza |

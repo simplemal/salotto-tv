@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">Hallo! Das ist dein neues Medienzentrum</string>
+    <string name="first_next">Weiter</string>
+    <string name="first_language">Wähle deine Sprache</string>
+    <string name="first_name_title">Der Name dieses Sticks</string>
+    <string name="first_name_text">So erkennst du ihn unter den anderen Geräten zu Hause.</string>
+    <string name="first_name_change">Namen ändern</string>
+    <string name="first_name_hint">Name des Sticks</string>
+    <string name="first_save">Speichern</string>
+    <string name="first_name_refused">Fire OS hat den Namen nicht angenommen</string>
+    <string name="first_network_title">Dein Netzwerk</string>
+    <string name="first_network_on">Der Stick ist mit dem Internet verbunden.</string>
+    <string name="first_network_off">Der Stick ist nicht mit dem Internet verbunden.</string>
+    <string name="first_network_none">Kein Netzwerk</string>
+    <string name="first_network_change">Netzwerk wechseln</string>
+    <string name="first_city_title">Deine Stadt</string>
+    <string name="first_city_text">Für das Wetter und für Hintergründe, die sich damit ändern.</string>
+    <string name="first_city_hint">Name der Stadt</string>
+    <string name="first_search">Suchen</string>
+    <string name="first_not_now">Nicht jetzt</string>
+    <string name="first_city_change">Stadt ändern</string>
+    <string name="first_searching">Suche…</string>
+    <string name="first_no_place">Kein Ort gefunden. Versuche es mit einer anderen Schreibweise.</string>
+    <string name="first_no_connection">Verbindung fehlgeschlagen. Versuche es noch einmal oder wähle Nicht jetzt.</string>
+    <string name="first_place_title">Wähle den Ort</string>
+    <string name="first_place_text">Das Wetter kommt von hier.</string>
+    <string name="first_remote_title">Halte eine Taste gedrückt</string>
+    <string name="first_remote_text">Das sind Kurzbefehle von Salotto: Auf der Fernbedienung stehen sie nicht.</string>
+    <string name="first_key_back">Zurück</string>
+    <string name="first_key_home">Home</string>
+    <string name="first_key_menu">Menü</string>
+    <string name="first_does_tasks">Task-Manager</string>
+    <string name="first_does_panel">Kontrollzentrum</string>
+    <string name="first_does_settings">Einstellungen</string>
+    <string name="first_start">Los geht’s</string>
+</resources>

@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">你好！这是你的全新媒体中心</string>
+    <string name="first_next">下一步</string>
+    <string name="first_language">选择语言</string>
+    <string name="first_name_title">这台 Stick 的名称</string>
+    <string name="first_name_text">这样就能把它和家里的其他设备区分开。</string>
+    <string name="first_name_change">更改名称</string>
+    <string name="first_name_hint">Stick 名称</string>
+    <string name="first_save">保存</string>
+    <string name="first_name_refused">Fire OS 未接受此名称</string>
+    <string name="first_network_title">你的网络</string>
+    <string name="first_network_on">Stick 已连接到互联网。</string>
+    <string name="first_network_off">Stick 未连接到互联网。</string>
+    <string name="first_network_none">无网络</string>
+    <string name="first_network_change">更改网络</string>
+    <string name="first_city_title">你所在的城市</string>
+    <string name="first_city_text">用于显示天气，以及随天气变化的背景。</string>
+    <string name="first_city_hint">城市名称</string>
+    <string name="first_search">搜索</string>
+    <string name="first_not_now">以后再说</string>
+    <string name="first_city_change">更改城市</string>
+    <string name="first_searching">正在搜索…</string>
+    <string name="first_no_place">未找到地点，请换一种写法试试。</string>
+    <string name="first_no_connection">连接失败。请重试，或选择“以后再说”。</string>
+    <string name="first_place_title">选择地点</string>
+    <string name="first_place_text">将显示这里的天气。</string>
+    <string name="first_remote_title">长按按键</string>
+    <string name="first_remote_text">这些是 Salotto 的快捷操作，遥控器上没有标注。</string>
+    <string name="first_key_back">返回</string>
+    <string name="first_key_home">主页</string>
+    <string name="first_key_menu">菜单</string>
+    <string name="first_does_tasks">任务管理器</string>
+    <string name="first_does_panel">控制中心</string>
+    <string name="first_does_settings">设置</string>
+    <string name="first_start">开始</string>
+</resources>

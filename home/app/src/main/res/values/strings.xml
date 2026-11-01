@@ -1,3 +1,3 @@
 <resources>
-    <string name="task_service">Apre il task manager di Salotto tenendo premuto Menu.</string>
+    <string name="task_service" translatable="false">Apre il task manager di Salotto tenendo premuto Menu.</string>
 </resources>

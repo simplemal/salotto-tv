@@ -70,12 +70,6 @@ final class Weather {
     static void setEnabled(Context context, boolean value) { prefs(context).edit().putBoolean("enabled", value).apply(); }
     static String place(Context context) { return prefs(context).getString("place", null); }
     /** True once, the first time the Home finds no place: it is asked for only that time. */
-    static boolean firstAsk(Context context) {
-        SharedPreferences saved = prefs(context);
-        if (place(context) != null || saved.getBoolean("asked", false)) return false;
-        saved.edit().putBoolean("asked", true).apply();
-        return true;
-    }
     static boolean fahrenheit(Context context) { return prefs(context).getBoolean("fahrenheit", false); }
     static void setFahrenheit(Context context, boolean value) {
         failedAt = 0;

@@ -109,6 +109,9 @@ final class Look {
         return new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, PRESET_COLORS[preset]);
     }
 
+    /** The dark shading of the Settings, for pages that do not follow the chosen backdrop. */
+    static Drawable plainBackdrop() { return preset(PRESET_NAMES[0]); }
+
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
         String chosen = backdrop(context);

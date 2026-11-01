@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">مرحبًا! هذا هو مركز الوسائط الجديد</string>
+    <string name="first_next">التالي</string>
+    <string name="first_language">اختر لغتك</string>
+    <string name="first_name_title">اسم جهاز Stick هذا</string>
+    <string name="first_name_text">يساعدك على تمييزه عن الأجهزة الأخرى في المنزل.</string>
+    <string name="first_name_change">تغيير الاسم</string>
+    <string name="first_name_hint">اسم Stick</string>
+    <string name="first_save">حفظ</string>
+    <string name="first_name_refused">لم يقبل Fire OS الاسم</string>
+    <string name="first_network_title">شبكتك</string>
+    <string name="first_network_on">جهاز Stick متصل بالإنترنت.</string>
+    <string name="first_network_off">جهاز Stick غير متصل بالإنترنت.</string>
+    <string name="first_network_none">لا توجد شبكة</string>
+    <string name="first_network_change">تغيير الشبكة</string>
+    <string name="first_city_title">مدينتك</string>
+    <string name="first_city_text">للطقس وللخلفيات التي تتغير معه.</string>
+    <string name="first_city_hint">اسم المدينة</string>
+    <string name="first_search">بحث</string>
+    <string name="first_not_now">ليس الآن</string>
+    <string name="first_city_change">تغيير المدينة</string>
+    <string name="first_searching">جارٍ البحث…</string>
+    <string name="first_no_place">لم يتم العثور على مكان. جرّب كتابته بطريقة أخرى.</string>
+    <string name="first_no_connection">تعذّر الاتصال. حاول مرة أخرى أو اختر «ليس الآن».</string>
+    <string name="first_place_title">اختر المكان</string>
+    <string name="first_place_text">سيأتي الطقس من هنا.</string>
+    <string name="first_remote_title">اضغط مطولًا على زر</string>
+    <string name="first_remote_text">هذه اختصارات Salotto، ولن تجدها مكتوبة على جهاز التحكم.</string>
+    <string name="first_key_back">رجوع</string>
+    <string name="first_key_home">الرئيسية</string>
+    <string name="first_key_menu">القائمة</string>
+    <string name="first_does_tasks">مدير المهام</string>
+    <string name="first_does_panel">مركز التحكم</string>
+    <string name="first_does_settings">الإعدادات</string>
+    <string name="first_start">ابدأ</string>
+</resources>

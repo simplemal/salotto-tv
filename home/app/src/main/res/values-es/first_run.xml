@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">¡Hola! Este es tu nuevo Centro Multimedia</string>
+    <string name="first_next">Siguiente</string>
+    <string name="first_language">Elige tu idioma</string>
+    <string name="first_name_title">El nombre de este Stick</string>
+    <string name="first_name_text">Así lo distingues de los demás dispositivos de casa.</string>
+    <string name="first_name_change">Cambiar nombre</string>
+    <string name="first_name_hint">Nombre del Stick</string>
+    <string name="first_save">Guardar</string>
+    <string name="first_name_refused">Fire OS no ha aceptado el nombre</string>
+    <string name="first_network_title">Tu red</string>
+    <string name="first_network_on">El Stick está conectado a Internet.</string>
+    <string name="first_network_off">El Stick no está conectado a Internet.</string>
+    <string name="first_network_none">Sin red</string>
+    <string name="first_network_change">Cambiar de red</string>
+    <string name="first_city_title">Tu ciudad</string>
+    <string name="first_city_text">Para el tiempo y para los fondos que cambian con él.</string>
+    <string name="first_city_hint">Nombre de la ciudad</string>
+    <string name="first_search">Buscar</string>
+    <string name="first_not_now">Ahora no</string>
+    <string name="first_city_change">Cambiar de ciudad</string>
+    <string name="first_searching">Buscando…</string>
+    <string name="first_no_place">No se ha encontrado ningún lugar. Prueba a escribirlo de otra forma.</string>
+    <string name="first_no_connection">No se ha podido conectar. Inténtalo de nuevo o elige Ahora no.</string>
+    <string name="first_place_title">Elige el lugar</string>
+    <string name="first_place_text">El tiempo llegará de aquí.</string>
+    <string name="first_remote_title">Mantén pulsado un botón</string>
+    <string name="first_remote_text">Son atajos de Salotto: no aparecen escritos en el mando.</string>
+    <string name="first_key_back">Atrás</string>
+    <string name="first_key_home">Inicio</string>
+    <string name="first_key_menu">Menú</string>
+    <string name="first_does_tasks">Administrador de tareas</string>
+    <string name="first_does_panel">Centro de control</string>
+    <string name="first_does_settings">Ajustes</string>
+    <string name="first_start">Empezar</string>
+</resources>

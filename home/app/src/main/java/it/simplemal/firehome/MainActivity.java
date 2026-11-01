@@ -167,6 +167,11 @@ public final class MainActivity extends CardActivity {
         super.onCreate(state);
         TaskService.keysByDefault(this);
         TaskService.keepAdbKey(this);
+        if (FirstRunActivity.due(this)) {
+            startActivity(new Intent(this, FirstRunActivity.class));
+            finish();
+            return;
+        }
         root = new FrameLayout(this);
         weatherView = new WeatherView(this);
         // Once the scene covers the screen, the plain background underneath is wasted drawing.
@@ -488,19 +493,17 @@ public final class MainActivity extends CardActivity {
         root.postDelayed(offerStart, OFFER_START_MS);
     }
 
-    /** After the backdrop has come in, or the guide would open over an empty Home. */
+    /** After the backdrop has come in, or the question would open over an empty Home. */
     private void offerStart() {
-        if (WelcomeActivity.due(this) || Weather.firstAsk(this)) {
-            startActivity(new Intent(this, WelcomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        } else if (!reenabledChecked) {
+        if (!reenabledChecked) {
             reenabledChecked = true;
             Background.run(() -> {
                 ArrayList<String> found = Reenabled.find(this);
                 if (found.isEmpty()) return;
                 runOnUiThread(() -> {
                     if (!inFront) return;
-                    startActivity(new Intent(this, WelcomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putStringArrayListExtra(WelcomeActivity.REENABLED, found));
+                    startActivity(new Intent(this, ReenabledActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .putStringArrayListExtra(ReenabledActivity.REENABLED, found));
                 });
             });
         }

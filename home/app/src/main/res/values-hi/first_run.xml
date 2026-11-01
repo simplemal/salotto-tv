@@ -1,0 +1,36 @@
+<resources>
+    <string name="first_welcome">नमस्ते! यह आपका नया मीडिया सेंटर है</string>
+    <string name="first_next">आगे</string>
+    <string name="first_language">अपनी भाषा चुनें</string>
+    <string name="first_name_title">इस Stick का नाम</string>
+    <string name="first_name_text">इससे आप इसे घर के दूसरे डिवाइसों से अलग पहचान सकते हैं।</string>
+    <string name="first_name_change">नाम बदलें</string>
+    <string name="first_name_hint">Stick का नाम</string>
+    <string name="first_save">सहेजें</string>
+    <string name="first_name_refused">Fire OS ने नाम स्वीकार नहीं किया</string>
+    <string name="first_network_title">आपका नेटवर्क</string>
+    <string name="first_network_on">Stick इंटरनेट से कनेक्ट है।</string>
+    <string name="first_network_off">Stick इंटरनेट से कनेक्ट नहीं है।</string>
+    <string name="first_network_none">कोई नेटवर्क नहीं</string>
+    <string name="first_network_change">नेटवर्क बदलें</string>
+    <string name="first_city_title">आपका शहर</string>
+    <string name="first_city_text">मौसम के लिए, और मौसम के साथ बदलने वाले बैकग्राउंड के लिए।</string>
+    <string name="first_city_hint">शहर का नाम</string>
+    <string name="first_search">खोजें</string>
+    <string name="first_not_now">अभी नहीं</string>
+    <string name="first_city_change">शहर बदलें</string>
+    <string name="first_searching">खोज रहे हैं…</string>
+    <string name="first_no_place">कोई जगह नहीं मिली। इसे किसी और तरह से लिखकर देखें।</string>
+    <string name="first_no_connection">कनेक्शन नहीं हो सका। फिर कोशिश करें या «अभी नहीं» चुनें।</string>
+    <string name="first_place_title">जगह चुनें</string>
+    <string name="first_place_text">मौसम यहीं का दिखेगा।</string>
+    <string name="first_remote_title">कोई बटन दबाए रखें</string>
+    <string name="first_remote_text">ये Salotto के शॉर्टकट हैं: रिमोट पर ये लिखे नहीं मिलेंगे।</string>
+    <string name="first_key_back">वापस</string>
+    <string name="first_key_home">होम</string>
+    <string name="first_key_menu">मेनू</string>
+    <string name="first_does_tasks">टास्क मैनेजर</string>
+    <string name="first_does_panel">कंट्रोल सेंटर</string>
+    <string name="first_does_settings">सेटिंग</string>
+    <string name="first_start">शुरू करें</string>
+</resources>

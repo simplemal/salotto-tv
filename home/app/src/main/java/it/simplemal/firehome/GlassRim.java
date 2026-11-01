@@ -17,18 +17,34 @@ import android.graphics.drawable.Drawable;
  */
 final class GlassRim extends Drawable {
     private static final float SIDE_SHARE = 0.12f;
+    private static final float ROUND_SHARE = 0.5f;
     private static final float BOTTOM_SHARE = 0.48f;
     private static final float MAX_FADE = 0.45f;
     private static final float CORNER_REACH = 1.3f;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF edge = new RectF();
+    private final RectF step = new RectF();
+    private int alpha = 255;
     private final float radius;
     private final int light;
+    private final float sides;
+    private final int depth;
 
     GlassRim(int radius, int thickness, int light) {
+        this(radius, thickness, light, SIDE_SHARE, 1);
+    }
+
+    /** All round, and sinking `depth` pixels into the glass as it dies out: past that, nothing. */
+    static GlassRim soft(int radius, int light, int depth) {
+        return new GlassRim(radius, 1, light, ROUND_SHARE, depth);
+    }
+
+    private GlassRim(int radius, int thickness, int light, float sides, int depth) {
         this.radius = radius;
         this.light = light;
+        this.sides = sides;
+        this.depth = depth;
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(thickness);
     }
@@ -41,15 +57,21 @@ final class GlassRim extends Drawable {
         edge.inset(half, half);
         float fade = bounds.height() == 0 ? MAX_FADE : Math.min(MAX_FADE, radius * CORNER_REACH / bounds.height());
         paint.setShader(new LinearGradient(0, bounds.top, 0, bounds.bottom,
-            new int[]{white(1), white(SIDE_SHARE), white(SIDE_SHARE), white(BOTTOM_SHARE)},
+            new int[]{white(1), white(sides), white(sides), white(BOTTOM_SHARE)},
             new float[]{0, fade, 1 - fade, 1}, Shader.TileMode.CLAMP));
     }
 
     @Override public void draw(Canvas canvas) {
-        canvas.drawRoundRect(edge, radius, radius, paint);
+        step.set(edge);
+        for (int inward = 0; inward < depth; inward++) {
+            float left = 1f - (float) inward / depth;
+            paint.setAlpha(Math.round(alpha * left * left));
+            canvas.drawRoundRect(step, radius - inward, radius - inward, paint);
+            step.inset(paint.getStrokeWidth(), paint.getStrokeWidth());
+        }
     }
 
-    @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); }
+    @Override public void setAlpha(int alpha) { this.alpha = alpha; }
 
     @Override public void setColorFilter(ColorFilter filter) { paint.setColorFilter(filter); }
 
