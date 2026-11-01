@@ -9,6 +9,7 @@ Provata finora su una sola Stick: Fire TV Stick 4K 2ª generazione, con Fire OS 
 - **Home:** griglia delle tue app, sfondi che seguono il meteo e l'ora della tua città, oppure illustrazioni, sculture 3D e città notturne che cambiano da sole.
 - **Dieci lingue:** italiano, inglese, spagnolo, francese, tedesco, portoghese, russo, arabo, hindi e cinese.
 - **Primo avvio:** una presentazione guidata prima della Home.
+- **Salvaschermi:** le stesse immagini, con solo ora e data.
 - **Centro di controllo:** tieni premuto Home in qualsiasi app per Wi-Fi, Bluetooth, timer, luminosità e filtro luce blu.
 - **Task manager:** tieni premuto Indietro. Con Menu tenuto premuto si aprono le Impostazioni.
 - **Meno tracciamento:** l'installazione spegne i pacchetti di pubblicità, telemetria e Alexa, limita l'identificativo pubblicitario e ferma l'invio dei dati d'uso. Se Fire OS li riattiva, Salotto te lo dice.
