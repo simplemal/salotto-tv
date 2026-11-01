@@ -14,11 +14,11 @@ import android.graphics.drawable.Drawable;
 
 /** A picture of the control panel with a number in it: cut out of it, or drawn inside its outline. */
 final class NumberIcon extends Drawable {
-    /** Thin and tall, so that two digits still fit in a small circle. */
-    private static final String FONT = "sans-serif-condensed-light";
-    private static final float TEXT_SHARE = 0.6f;
-    private static final float LONG_TEXT_SHARE = 0.46f;
-    private static final int LONG = 3;
+    /** Bold and narrow: what stays readable at this size. */
+    private static final String FONT = "sans-serif-condensed";
+    private static final float TEXT_SHARE = 0.5f;
+    /** The room inside the circle: a longer number gets narrower, not shorter. */
+    private static final float ROOM_SHARE = 0.54f;
 
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Rect ink = new Rect();
@@ -32,7 +32,7 @@ final class NumberIcon extends Drawable {
         this.center = center;
         text.setColor(Color.WHITE);
         text.setTextAlign(Paint.Align.CENTER);
-        text.setTypeface(Typeface.create(FONT, Typeface.NORMAL));
+        text.setTypeface(Typeface.create(FONT, Typeface.BOLD));
         if (cut) text.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
     }
 
@@ -41,7 +41,9 @@ final class NumberIcon extends Drawable {
         int layer = canvas.saveLayer(new RectF(bounds), null);
         picture.setBounds(bounds);
         picture.draw(canvas);
-        text.setTextSize(bounds.height() * (number.length() < LONG ? TEXT_SHARE : LONG_TEXT_SHARE));
+        text.setTextSize(bounds.height() * TEXT_SHARE);
+        text.setTextScaleX(1);
+        text.setTextScaleX(Math.min(1, bounds.height() * ROOM_SHARE / text.measureText(number)));
         text.getTextBounds(number, 0, number.length(), ink);
         canvas.drawText(number, bounds.exactCenterX(), bounds.top + bounds.height() * center - ink.exactCenterY(), text);
         canvas.restoreToCount(layer);
