@@ -85,7 +85,7 @@
     <string name="about_others">借助他人的程序。</string>
     <string name="about_others_text">FireStick Fixer 把主页键交给 Salotto。AirPlay Server 接收来自 iPhone、iPad 和 Mac 的内容。Aurora Store 可以安装 Android 应用，无需账户。</string>
     <string name="about_only">Salotto 独有。</string>
-    <string name="about_only_text">插画或照片背景，跟随你所在城市的天气和时间。在任何应用中长按主页键，都能打开控制中心：Wi-Fi、Bluetooth、定时、亮度和蓝光过滤。长按返回键打开任务管理器。一个展示 Stick 和电视音频、视频规格的页面。更清晰的对白和统一音量触手可及：它们是 Fire OS 的滤镜，这里集中在一处。更新经过签名，安装前会先检查。</string>
+    <string name="about_only_text">插画或照片背景，跟随你所在城市的天气和时间。在任何应用中长按菜单键，都能打开控制中心：Wi-Fi、Bluetooth、定时、亮度和蓝光过滤。长按返回键打开任务管理器。一个展示 Stick 和电视音频、视频规格的页面。更清晰的对白和统一音量触手可及：它们是 Fire OS 的滤镜，这里集中在一处。更新经过签名，安装前会先检查。</string>
     <string name="about_license">许可</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0。Salotto 可以免费用于非商业目的的使用、研究、修改和衍生。若要销售，需要获得作者的许可。</string>
     <string name="about_marks">商标</string>

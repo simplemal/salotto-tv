@@ -78,15 +78,11 @@ public final class TaskService extends AccessibilityService {
     private static final long ANSWER_WAIT_MS = 30000;
     private static final long ANSWER_POLL_MS = 2000;
     private static final String DOUBLE_HOME = "double_home";
-    private static final long QUICK_MENU_ONCE_MS = 2000;
-    private static final long QUICK_MENU_CLOSE_MS = 250;
-    private static final long QUICK_MENU_FOCUS_MS = 400;
+    private static final long RECENTS_ONCE_MS = 2000;
     private static final int PAGE_TRIES = 50;
     private static final long PAGE_TRY_MS = 20;
     private static final int PAGE_BACK_EVERY = 12;
     private static final int PAGE_NO_BACK = -1;
-    /** Without adb Fire OS's page normally comes within a second of Home held. */
-    private static final long PANEL_WAIT_MS = 1500;
     private static final String ENABLED_SERVICES = Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES;
     private static final String KEY_LIFETIME = "adb_allowed_connection_time";
     private static final String KEYS_FILE = "keys";
@@ -111,13 +107,11 @@ public final class TaskService extends AccessibilityService {
     private static final int WHEEL_DP = 40;
     /**
      * The key's own line comes first, but can come a second late; Amazon's Home starting never does.
-     * Home held shows as Fire OS sending its long press, whether or not its quick menu answers.
      */
     private static final String LOG_FILTER = "HOME_PRESSED|START.u0.*cat=.android.intent.category.HOME.*cmp="
-        + Fire.AMAZON_HOME + "|sendLongHomeBroadcast|" + Fire.RECENTS_ACTION;
+        + Fire.AMAZON_HOME + "|" + Fire.RECENTS_ACTION;
     private static final String HOME_LOG = "logcat -v brief -T 1 -e '" + LOG_FILTER + "'";
     private static final String HOME_PRESSED = "HOME_PRESSED";
-    private static final String HOME_HELD = "sendLongHomeBroadcast";
     private static final long HOME_LOG_START_MS = 1000;
     private static final long HOME_LOG_RETRY_MS = 30000;
     /** From distro/config, the same lists the installer offers. */
@@ -155,12 +149,10 @@ public final class TaskService extends AccessibilityService {
     private IntConsumer stopAnswer;
     private volatile boolean stopReady;
     private int stopLeaving;
-    private long quickMenuAt;
     private long recentsAt;
     private PanelWindow panelWindow;
     /** The app under the panel: seeing it again says nothing has changed. */
     private String panelApp;
-    private final Runnable panelAnyway = this::openPanel;
     private String front;
     private View veil;
     private HomeCover cover;
@@ -584,9 +576,6 @@ public final class TaskService extends AccessibilityService {
         // The mask is a window too, and it would take itself for whatever comes next.
         else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
         if (name.equals(Fire.AMAZON_HOME) && homeLog == null) cover.pressed();
-        if (name.equals(Fire.QUICK_MENU) && client == null) quickMenuShown();
-        // It closes by itself once something else comes in front.
-        if (Fire.HOME_HELD_PAGE.contentEquals(String.valueOf(event.getClassName()))) homePageShown();
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
@@ -629,20 +618,6 @@ public final class TaskService extends AccessibilityService {
         return fired && key == KeyEvent.KEYCODE_MENU;
     }
 
-    /** Stopped this early, Fire OS's menu never reaches the screen. It starts again next time. */
-    private void homeHeld() {
-        if (front == null) front = appOnScreen();
-        panelApp = front;
-        if (client != null) {
-            adb.post(() -> run("cmd activity force-stop " + Fire.QUICK_MENU));
-            openPanel();
-            return;
-        }
-        cover.overQuickMenu();
-        if (overHome()) openPanel();
-        else main.postDelayed(panelAnyway, PANEL_WAIT_MS);
-    }
-
     /** Salotto may have restarted under an app, and then nothing has said which one it is. */
     private String appOnScreen() {
         AccessibilityNodeInfo active = getRootInActiveWindow();
@@ -650,29 +625,10 @@ public final class TaskService extends AccessibilityService {
         return pkg != null && HomeApps.isUserApp(this, pkg.toString()) ? pkg.toString() : null;
     }
 
-    /** Over an app the page has to go first: the panel's window would take the Back that closes it. */
-    private void homePageShown() {
-        main.removeCallbacks(panelAnyway);
-        if (panelApp == null) panelApp = front;
-        if (overHome()) openPanel();
-        else closePage(Fire.SETTINGS, this::openPanel, PAGE_TRIES, PAGE_NO_BACK);
-    }
-
-    /** Without adb the menu can only be closed once it is up: it shows for a moment. */
-    private void quickMenuShown() {
-        long now = SystemClock.elapsedRealtime();
-        if (now - quickMenuAt < QUICK_MENU_ONCE_MS) return;
-        quickMenuAt = now;
-        // Sooner than this the menu does not have the focus yet, and Back would miss it.
-        main.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_BACK), QUICK_MENU_FOCUS_MS);
-        main.removeCallbacks(panelAnyway);
-        if (homeLog == null || !overHome()) main.postDelayed(this::openPanel, QUICK_MENU_FOCUS_MS + QUICK_MENU_CLOSE_MS);
-    }
-
     /** Left under the task manager, the page would come back when that closes. */
     private void recentsPageShown() {
         long now = SystemClock.elapsedRealtime();
-        if (now - recentsAt < QUICK_MENU_ONCE_MS) return;
+        if (now - recentsAt < RECENTS_ONCE_MS) return;
         recentsAt = now;
         holdScreen();
         closePage(Fire.AMAZON_HOME, this::openTasks, PAGE_TRIES, PAGE_NO_BACK);
@@ -778,9 +734,12 @@ public final class TaskService extends AccessibilityService {
         return context.getPackageName() + "/" + TaskService.class.getName();
     }
 
+    /** Home held would be the natural key, but Fire OS answers that with a page of its own, which stops the video. */
     private void menuHeld() {
         keyFired = true;
-        openSettings();
+        if (front == null) front = appOnScreen();
+        panelApp = front;
+        openPanel();
     }
 
     private void openSettings() {
@@ -909,9 +868,7 @@ public final class TaskService extends AccessibilityService {
         for (String line; (line = lines.next()) != null; ) {
             // logcat first repeats the last line it has: that press is long over.
             if (SystemClock.elapsedRealtime() - started <= HOME_LOG_START_MS) continue;
-            if (line.contains(HOME_HELD)) {
-                main.post(this::homeHeld);
-            } else if (line.contains(Fire.RECENTS_ACTION)) {
+            if (line.contains(Fire.RECENTS_ACTION)) {
                 main.post(this::holdScreen);
             } else {
                 int side = line.contains(HOME_PRESSED) ? 1 : -1;

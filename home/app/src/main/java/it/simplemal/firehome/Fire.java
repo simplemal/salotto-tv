@@ -30,8 +30,6 @@ final class Fire {
     static final String[] RESTART = {"Riavvia", "Restart"};
     private static final String FORCE_STOP_WORDS = "force_stop";
     private static final String RESTART_WORDS = "restart_settings_title";
-    /** What Fire OS opens on Home held when the quick menu is off. */
-    static final String HOME_HELD_PAGE = "com.amazon.tv.settings.v2.hud.HudActivity";
     /** What Fire OS opens on a remote's Settings key. */
     static final String SETTINGS_PAGE = "com.amazon.tv.launcher.ui.MainSettingsActivity";
     static final String RECENTS_ACTION = "com.amazon.tv.action.NAVIGATE_TO_RECENTS";

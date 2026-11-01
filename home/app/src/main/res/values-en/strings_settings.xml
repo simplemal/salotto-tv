@@ -44,7 +44,7 @@
     <string name="settings_task_manager">Task manager</string>
     <string name="settings_task_manager_text">The apps used since you turned the Stick on, to reopen or close.</string>
     <string name="settings_held_keys">Held-down keys</string>
-    <string name="settings_held_keys_text">Back opens the task manager, Home the control center, Menu the Settings. For Home, and for closing apps with one click, you also need to confirm once on the TV.</string>
+    <string name="settings_held_keys_text">Back opens the task manager, Menu the control center. For closing apps with one click, you also need to confirm once on the TV.</string>
     <string name="settings_sort_home">Sort the Home A to Z</string>
     <string name="settings_sort_home_text">Puts the apps on the Home back in alphabetical order.</string>
     <string name="settings_home_sorted">Home in alphabetical order</string>

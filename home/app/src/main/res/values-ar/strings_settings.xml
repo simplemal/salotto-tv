@@ -44,7 +44,7 @@
     <string name="settings_task_manager">مدير المهام</string>
     <string name="settings_task_manager_text">التطبيقات المستخدمة منذ تشغيل جهاز Stick، لإعادة فتحها أو إغلاقها.</string>
     <string name="settings_held_keys">الأزرار المضغوطة مطولًا</string>
-    <string name="settings_held_keys_text">رجوع يفتح مدير المهام، والرئيسية يفتح مركز التحكم، والقائمة تفتح الإعدادات. للرئيسية ولإغلاق التطبيقات بنقرة واحدة يلزم أيضًا تأكيد لمرة واحدة على التلفزيون.</string>
+    <string name="settings_held_keys_text">رجوع يفتح مدير المهام، والقائمة تفتح مركز التحكم. لإغلاق التطبيقات بنقرة واحدة يلزم أيضًا تأكيد لمرة واحدة على التلفزيون.</string>
     <string name="settings_sort_home">رتّب الرئيسية من أ إلى ي</string>
     <string name="settings_sort_home_text">يعيد تطبيقات الرئيسية إلى الترتيب الأبجدي.</string>
     <string name="settings_home_sorted">الرئيسية مرتبة أبجديًا</string>

@@ -44,7 +44,7 @@
     <string name="settings_task_manager">टास्क मैनेजर</string>
     <string name="settings_task_manager_text">Stick चालू होने के बाद इस्तेमाल हुए ऐप, दोबारा खोलने या बंद करने के लिए।</string>
     <string name="settings_held_keys">दबाए रखने वाले बटन</string>
-    <string name="settings_held_keys_text">वापस से टास्क मैनेजर, होम से कंट्रोल सेंटर, मेनू से सेटिंग खुलती है। होम के लिए और ऐप को एक क्लिक में बंद करने के लिए टीवी पर एक बार पुष्टि भी करनी होगी।</string>
+    <string name="settings_held_keys_text">वापस से टास्क मैनेजर और मेनू से कंट्रोल सेंटर खुलता है। ऐप को एक क्लिक में बंद करने के लिए टीवी पर एक बार पुष्टि भी करनी होगी।</string>
     <string name="settings_sort_home">होम को A से Z क्रम में लगाएं</string>
     <string name="settings_sort_home_text">होम के ऐप को फिर से वर्णमाला क्रम में लगाता है।</string>
     <string name="settings_home_sorted">होम वर्णमाला क्रम में</string>

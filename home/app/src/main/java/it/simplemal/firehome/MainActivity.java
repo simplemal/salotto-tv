@@ -478,7 +478,7 @@ public final class MainActivity extends CardActivity {
         return place;
     }
 
-    /** Home held on the Home. */
+    /** Menu held on the Home. */
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (!intent.getBooleanExtra(OPEN_PANEL, false)) return;

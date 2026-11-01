@@ -88,7 +88,7 @@
     <string name="about_others">Avec des programmes d’autres auteurs.</string>
     <string name="about_others_text">FireStick Fixer redirige la touche Accueil vers Salotto. AirPlay Server reçoit depuis iPhone, iPad et Mac. Aurora Store installe des applis Android, même sans compte.</string>
     <string name="about_only">Uniquement dans Salotto.</string>
-    <string name="about_only_text">Fonds d’écran illustrés ou photographiques qui suivent la météo et l’heure de votre ville. Centre de contrôle sur n’importe quelle appli, en maintenant Accueil : Wi-Fi, Bluetooth, minuteur, luminosité et filtre lumière bleue. Gestionnaire de tâches en maintenant Retour. Une page avec les normes audio et vidéo du Stick et de la TV. Dialogues plus clairs et volume uniforme à portée de main : ce sont des filtres de Fire OS, réunis en un seul endroit. Mises à jour signées et vérifiées avant l’installation.</string>
+    <string name="about_only_text">Fonds d’écran illustrés ou photographiques qui suivent la météo et l’heure de votre ville. Centre de contrôle sur n’importe quelle appli, en maintenant Menu : Wi-Fi, Bluetooth, minuteur, luminosité et filtre lumière bleue. Gestionnaire de tâches en maintenant Retour. Une page avec les normes audio et vidéo du Stick et de la TV. Dialogues plus clairs et volume uniforme à portée de main : ce sont des filtres de Fire OS, réunis en un seul endroit. Mises à jour signées et vérifiées avant l’installation.</string>
     <string name="about_license">Licence</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto peut être utilisé, étudié, modifié et dérivé gratuitement à des fins non commerciales. Pour le vendre, il faut l’accord de l’auteur.</string>
     <string name="about_marks">Marques</string>

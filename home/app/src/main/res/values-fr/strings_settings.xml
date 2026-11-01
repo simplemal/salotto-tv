@@ -44,7 +44,7 @@
     <string name="settings_task_manager">Gestionnaire de tâches</string>
     <string name="settings_task_manager_text">Les applis utilisées depuis l’allumage du Stick, à rouvrir ou à fermer.</string>
     <string name="settings_held_keys">Touches maintenues enfoncées</string>
-    <string name="settings_held_keys_text">Retour ouvre le gestionnaire de tâches, Accueil le centre de contrôle, Menu les Réglages. Pour Accueil et pour fermer les applis en un clic, il faut aussi une confirmation unique sur la TV.</string>
+    <string name="settings_held_keys_text">Retour ouvre le gestionnaire de tâches, Menu le centre de contrôle. Pour fermer les applis en un clic, il faut aussi une confirmation unique sur la TV.</string>
     <string name="settings_sort_home">Trier l’Accueil de A à Z</string>
     <string name="settings_sort_home_text">Remet les applis de l’Accueil par ordre alphabétique.</string>
     <string name="settings_home_sorted">Accueil par ordre alphabétique</string>

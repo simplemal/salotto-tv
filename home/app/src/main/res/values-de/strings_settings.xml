@@ -44,7 +44,7 @@
     <string name="settings_task_manager">Task-Manager</string>
     <string name="settings_task_manager_text">Die Apps, die seit dem Einschalten des Sticks genutzt wurden, zum erneuten Öffnen oder Schließen.</string>
     <string name="settings_held_keys">Gedrückt gehaltene Tasten</string>
-    <string name="settings_held_keys_text">Zurück öffnet den Task-Manager, Home das Kontrollzentrum, Menü die Einstellungen. Für Home und zum Schließen von Apps mit einem Klick braucht es einmalig eine Bestätigung am Fernseher.</string>
+    <string name="settings_held_keys_text">Zurück öffnet den Task-Manager, Menü das Kontrollzentrum. Zum Schließen von Apps mit einem Klick braucht es einmalig eine Bestätigung am Fernseher.</string>
     <string name="settings_sort_home">Home von A bis Z sortieren</string>
     <string name="settings_sort_home_text">Sortiert die Apps auf Home wieder alphabetisch.</string>
     <string name="settings_home_sorted">Home alphabetisch sortiert</string>

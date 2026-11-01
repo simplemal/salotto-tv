@@ -34,7 +34,6 @@ final class HomeCover {
     /** Fixer can keep its black to the limit after a second press, a second and a half and its tail. */
     private static final long FIXER_BLACK_MS = 2000;
     private static final long PAIR_MS = 2000;
-    private static final long QUICK_MENU_MS = 1100;
 
     /** Fixer's double press leaves Amazon's Home on screen, so the cover has to step aside. */
     static volatile boolean doubleHome;
@@ -118,16 +117,6 @@ final class HomeCover {
     private void bringBack() {
         returning = false;
         service.startActivity(new Intent(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    /** Without adb Fire OS's menu comes up and is closed: on the Home, this picture hides all of it. */
-    void overQuickMenu() {
-        if (!MainActivity.showing || home == null) return;
-        take(home, () -> {
-            show();
-            main.removeCallbacks(hide);
-            main.postDelayed(hide, QUICK_MENU_MS);
-        });
     }
 
     /** Stays until letGo: `still` over a Fire OS page on its way out, black if there is nothing to show. */

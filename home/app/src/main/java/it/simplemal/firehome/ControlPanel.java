@@ -207,7 +207,7 @@ final class ControlPanel extends LinearLayout {
         return out != null ? out : focused;
     }
 
-    /** Opened with Home held on the Home: nothing chosen, and Back closes it, leaving the focus on `from`. */
+    /** Opened with Menu held on the Home: nothing chosen, and Back closes it, leaving the focus on `from`. */
     void openEmpty(View from) {
         backTo = from;
         rest.setFocusable(true);

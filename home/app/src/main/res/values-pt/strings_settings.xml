@@ -44,7 +44,7 @@
     <string name="settings_task_manager">Gerenciador de tarefas</string>
     <string name="settings_task_manager_text">Os apps usados desde que você ligou o Stick, para reabrir ou fechar.</string>
     <string name="settings_held_keys">Botões mantidos pressionados</string>
-    <string name="settings_held_keys_text">Voltar abre o Gerenciador de tarefas, Início abre a Central de controle, Menu abre as Configurações. Para o Início e para fechar apps com um clique, também é preciso uma confirmação única na TV.</string>
+    <string name="settings_held_keys_text">Voltar abre o Gerenciador de tarefas, Menu abre a Central de controle. Para fechar apps com um clique, também é preciso uma confirmação única na TV.</string>
     <string name="settings_sort_home">Ordenar o Início de A a Z</string>
     <string name="settings_sort_home_text">Coloca os apps do Início em ordem alfabética.</string>
     <string name="settings_home_sorted">Início em ordem alfabética</string>

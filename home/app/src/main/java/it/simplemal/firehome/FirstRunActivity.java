@@ -572,7 +572,6 @@ public final class FirstRunActivity extends CardActivity {
         private static final float KEYS_APART = 31;
         private static final float KEY = 13;
         private static final float REACH = 170;
-        private static final float HOME_LINE_END = 198;
 
         private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint key = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -617,12 +616,10 @@ public final class FirstRunActivity extends CardActivity {
 
             canvas.drawLine(left - px(KEY), y, mid - px(REACH), y, key);
             canvas.drawLine(right + px(KEY), y, mid + px(REACH), y, key);
-            canvas.drawLine(mid, y + px(KEY), mid, px(HOME_LINE_END), key);
 
             float gap = px(REACH + 12);
             write(canvas, words(R.string.first_key_back), words(R.string.first_does_tasks), mid - gap, y, Paint.Align.RIGHT);
-            write(canvas, words(R.string.first_key_menu), words(R.string.first_does_settings), mid + gap, y, Paint.Align.LEFT);
-            write(canvas, words(R.string.first_key_home), words(R.string.first_does_panel), mid, px(HOME_LINE_END + 22), Paint.Align.CENTER);
+            write(canvas, words(R.string.first_key_menu), words(R.string.first_does_panel), mid + gap, y, Paint.Align.LEFT);
         }
 
         private void write(Canvas canvas, String title, String does, float x, float y, Paint.Align align) {

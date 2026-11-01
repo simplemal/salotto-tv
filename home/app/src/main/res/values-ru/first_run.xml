@@ -27,7 +27,6 @@
     <string name="first_remote_title">Удерживайте кнопку</string>
     <string name="first_remote_text">Это быстрые команды Salotto: на пульте они не обозначены.</string>
     <string name="first_key_back">Назад</string>
-    <string name="first_key_home">Домой</string>
     <string name="first_key_menu">Меню</string>
     <string name="first_does_tasks">Диспетчер задач</string>
     <string name="first_does_panel">Центр управления</string>

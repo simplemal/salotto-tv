@@ -45,7 +45,7 @@
     <string name="settings_task_manager">任务管理器</string>
     <string name="settings_task_manager_text">开机以来用过的应用，可以重新打开或关闭。</string>
     <string name="settings_held_keys">长按按键</string>
-    <string name="settings_held_keys_text">长按返回键打开任务管理器，长按主页键打开控制中心，长按菜单键打开设置。主页键和一键关闭应用，还需要在电视上确认一次。</string>
+    <string name="settings_held_keys_text">长按返回键打开任务管理器，长按菜单键打开控制中心。一键关闭应用还需要在电视上确认一次。</string>
     <string name="settings_sort_home">按字母顺序排列主页</string>
     <string name="settings_sort_home_text">让主页上的应用按字母顺序重新排列。</string>
     <string name="settings_home_sorted">主页已按字母排序</string>

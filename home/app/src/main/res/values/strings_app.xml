@@ -123,7 +123,7 @@
     <string name="about_others_text">FireStick Fixer porta il tasto Home su Salotto. AirPlay Server riceve da iPhone, iPad e Mac. Aurora Store installa app Android, anche senza account.</string>
     <!-- Salotto is the app here, not a room -->
     <string name="about_only">Solo in Salotto.</string>
-    <string name="about_only_text">Sfondi illustrati o fotografici che seguono il meteo e l’ora della tua città. Centro di controllo su qualsiasi app, tenendo premuto Home: Wi-Fi, Bluetooth, timer, luminosità e filtro luce blu. Task manager tenendo premuto Indietro. Una pagina con gli standard audio e video di Stick e TV. Dialoghi più chiari e volume uniforme a portata di mano: sono filtri di Fire OS, raccolti in un posto solo. Aggiornamenti firmati e controllati prima di installarli.</string>
+    <string name="about_only_text">Sfondi illustrati o fotografici che seguono il meteo e l’ora della tua città. Centro di controllo su qualsiasi app, tenendo premuto Menu: Wi-Fi, Bluetooth, timer, luminosità e filtro luce blu. Task manager tenendo premuto Indietro. Una pagina con gli standard audio e video di Stick e TV. Dialoghi più chiari e volume uniforme a portata di mano: sono filtri di Fire OS, raccolti in un posto solo. Aggiornamenti firmati e controllati prima di installarli.</string>
     <string name="about_license">Licenza</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto si può usare, studiare, modificare e derivare gratis per scopi non commerciali. Per venderlo serve il permesso dell’autore.</string>
     <string name="about_marks">Marchi</string>

@@ -44,7 +44,7 @@
     <string name="settings_task_manager">Task manager</string>
     <string name="settings_task_manager_text">Le app usate da quando hai acceso la Stick, da riaprire o chiudere.</string>
     <string name="settings_held_keys">Tasti tenuti premuti</string>
-    <string name="settings_held_keys_text">Indietro apre il task manager, Home il centro di controllo, Menu le Impostazioni. Per Home e per chiudere le app con un clic serve anche una conferma una tantum sulla TV.</string>
+    <string name="settings_held_keys_text">Indietro apre il task manager, Menu il centro di controllo. Per chiudere le app con un clic serve anche una conferma una tantum sulla TV.</string>
     <string name="settings_sort_home">Ordina la Home dalla A alla Z</string>
     <string name="settings_sort_home_text">Rimette le app della Home in ordine alfabetico.</string>
     <string name="settings_home_sorted">Home in ordine alfabetico</string>

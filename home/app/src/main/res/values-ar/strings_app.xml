@@ -100,7 +100,7 @@
     <string name="about_others">مع برامج من آخرين.</string>
     <string name="about_others_text">FireStick Fixer ينقل زر الرئيسية إلى Salotto. AirPlay Server يستقبل من iPhone وiPad وMac. Aurora Store يثبّت تطبيقات Android، حتى بلا حساب.</string>
     <string name="about_only">في Salotto فقط.</string>
-    <string name="about_only_text">خلفيات مرسومة أو فوتوغرافية تتبع طقس مدينتك ووقتها. مركز التحكم فوق أي تطبيق، بالضغط مطولًا على الرئيسية: Wi-Fi وBluetooth والمؤقت والسطوع وفلتر الضوء الأزرق. مدير المهام بالضغط مطولًا على رجوع. صفحة بمعايير الصوت والفيديو في Stick والتلفزيون. حوارات أوضح ومستوى صوت موحّد في متناول يدك: هي مرشّحات Fire OS مجمّعة في مكان واحد. تحديثات موقّعة ومفحوصة قبل تثبيتها.</string>
+    <string name="about_only_text">خلفيات مرسومة أو فوتوغرافية تتبع طقس مدينتك ووقتها. مركز التحكم فوق أي تطبيق، بالضغط مطولًا على القائمة: Wi-Fi وBluetooth والمؤقت والسطوع وفلتر الضوء الأزرق. مدير المهام بالضغط مطولًا على رجوع. صفحة بمعايير الصوت والفيديو في Stick والتلفزيون. حوارات أوضح ومستوى صوت موحّد في متناول يدك: هي مرشّحات Fire OS مجمّعة في مكان واحد. تحديثات موقّعة ومفحوصة قبل تثبيتها.</string>
     <string name="about_license">الترخيص</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. يمكن استخدام Salotto ودراسته وتعديله والاشتقاق منه مجانًا لأغراض غير تجارية. أما بيعه فيحتاج إلى إذن المؤلف.</string>
     <string name="about_marks">العلامات التجارية</string>
