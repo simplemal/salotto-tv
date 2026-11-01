@@ -15,7 +15,7 @@ if grep -rnE -f "$ROOT/distro/dati-personali.local" "$ROOT/home/app/src" > /dev/
   echo "Fermo: dati personali nei sorgenti."; exit 1
 fi
 
-BADGING="$("$ROOT/home/.toolchain/android-sdk/build-tools/34.0.0/aapt2" dump badging "$APK" | head -1)"
+BADGING="$("$ROOT/home/.toolchain/android-sdk/build-tools/34.0.0/aapt2" dump badging "$APK" | sed -n 1p)"
 case "$BADGING" in
   *"versionCode='$CODE' versionName='$NAME'"*) ;;
   *) echo "Fermo: l'APK non è la versione $NAME ($CODE), va ricompilato."; exit 1 ;;
