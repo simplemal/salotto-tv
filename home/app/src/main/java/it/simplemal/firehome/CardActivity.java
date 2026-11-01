@@ -568,6 +568,10 @@ abstract class CardActivity extends Activity {
     protected void appRemoved() { recreate(); }
 
     protected Intent launchIntent(String pkg) {
+        if (Fire.APPSTORE.equals(pkg)) {
+            Intent store = new Intent(Fire.APPSTORE_PAGE).setPackage(pkg).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (store.resolveActivity(getPackageManager()) != null) return store;
+        }
         Intent intent = getPackageManager().getLeanbackLaunchIntentForPackage(pkg);
         return intent != null ? intent : getPackageManager().getLaunchIntentForPackage(pkg);
     }

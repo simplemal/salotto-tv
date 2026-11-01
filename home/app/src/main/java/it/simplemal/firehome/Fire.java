@@ -17,6 +17,9 @@ final class Fire {
     static final String FIXER = "io.github.hatim.firestickfixer";
     static final String AIRPLAY = "io.github.jqssun.airplay";
     static final String AMAZON_HOME = "com.amazon.tv.launcher";
+    static final String APPSTORE = "com.amazon.venezia";
+    /** The store itself. Its launcher entry only asks Amazon's Home for a tab, and Salotto has replaced that Home. */
+    static final String APPSTORE_PAGE = "com.amazon.venezia.ade.FEATURED_LAUNCH";
     static final String QUICK_MENU = "com.amazon.tv.quicksettings.ui";
     static final String SETTINGS = "com.amazon.tv.settings.v2";
     static final String UNINSTALL_PROGRESS = ".television.UninstallAppProgress";

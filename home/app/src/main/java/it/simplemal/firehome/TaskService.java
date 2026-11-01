@@ -626,7 +626,8 @@ public final class TaskService extends AccessibilityService {
 
     private void openPanel() {
         // Fire OS's own page may already have paused the Home: `front` still says where this was.
-        Intent panel = MainActivity.showing || front == null
+        // Over an app the panel itself clears `front`, and without adb Fire OS's page comes after it.
+        Intent panel = !PanelActivity.open && (MainActivity.showing || front == null)
             ? new Intent(this, MainActivity.class).putExtra(MainActivity.OPEN_PANEL, true)
             : new Intent(this, PanelActivity.class);
         startActivity(panel.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
