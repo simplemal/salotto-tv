@@ -133,6 +133,7 @@ public final class TaskService extends AccessibilityService {
     private volatile AdbClient client;
     private volatile Runnable homeLog;
     private boolean refused;
+    private boolean waitsAnswer;
     private boolean keyFired;
     private FireSteps fireSteps;
     private FrameLayout installMask;
@@ -171,6 +172,17 @@ public final class TaskService extends AccessibilityService {
     /** Runs a command as the shell user. Null without a connection, or if the helper refused. */
     static void shell(String command, Consumer<String> done) {
         onAdb(null, service -> service.run(command), done);
+    }
+
+    /** For a press on the remote: the TV may ask about debugging, and the command waits for the answer. */
+    static void shellAsked(String command, Consumer<String> done) {
+        onAdb(null, service -> {
+            service.refused = false;
+            service.waitsAnswer = true;
+            String output = service.run(command);
+            service.waitsAnswer = false;
+            return output;
+        }, done);
     }
 
     /**
@@ -677,7 +689,7 @@ public final class TaskService extends AccessibilityService {
         if (refused) return false;
         AdbClient opened = null;
         try {
-            boolean asks = Settings.Global.getInt(getContentResolver(), WIRELESS_DEBUGGING, 0) == 0;
+            boolean asks = waitsAnswer || Settings.Global.getInt(getContentResolver(), WIRELESS_DEBUGGING, 0) == 0;
             Settings.Global.putInt(getContentResolver(), WIRELESS_DEBUGGING, 1);
             opened = open(asks);
             opened.openShell("CLASSPATH=" + getPackageCodePath() + " app_process / " + ShellHelper.class.getName());

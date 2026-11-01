@@ -107,6 +107,8 @@ public final class SettingsActivity extends CardActivity {
     private static final int[] SAVER_MINUTES = {1, 5, 10, 15, 30};
     private static final int SAVER_DEFAULT = 5 * MINUTE;
     private static final int[] SLEEP_MINUTES = {5, 20, 30, 60};
+    private static final int COUNTER_MS = 200;
+    private static final int COUNTER_TRIES = 25;
     private static final int SLEEP_DEFAULT = 20 * MINUTE;
     private static final String SLEEP_TIMEOUT = "sleep_timeout";
     private static final String CEC_ENABLED = "hdmi_control_enabled";
@@ -157,6 +159,8 @@ public final class SettingsActivity extends CardActivity {
         boolean opensGroup;
         /** A lock at the end of the row. */
         boolean locked;
+        /** Shown but not to be chosen: the focus skips it. */
+        boolean off;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -320,6 +324,11 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void show(String title, List<Entry> entries) {
+        show(title, entries, null);
+    }
+
+    /** The note stays under the rows, for what is true of all of them. */
+    private void show(String title, List<Entry> entries, String note) {
         heading.setText(title);
         boolean table = entries.get(0).columns != null;
         tableHead.setVisibility(table ? View.VISIBLE : View.GONE);
@@ -330,6 +339,12 @@ public final class SettingsActivity extends CardActivity {
         rows.removeAllViews();
         for (Entry entry : entries) {
             rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
+        }
+        if (note != null) {
+            TextView line = label(note, 16);
+            line.setAlpha(0.75f);
+            line.setPadding(dp(20), dp(8), dp(16), 0);
+            rows.addView(line, new LinearLayout.LayoutParams(-1, -2));
         }
         int focus = levels.peek().focus;
         if (focus == 0) scroll.scrollTo(0, 0);
@@ -452,6 +467,11 @@ public final class SettingsActivity extends CardActivity {
             lock.setColorFilter(text);
             if (onOff) toggle.setRowFocused(focused);
         });
+        if (entry.off) {
+            row.setFocusable(false);
+            row.setClickable(false);
+            row.setAlpha(0.4f);
+        }
         return row;
     }
 
@@ -980,11 +1000,34 @@ public final class SettingsActivity extends CardActivity {
         super.onDestroy();
     }
 
+    private void changeCounter(boolean on) {
+        Level level = levels.peek();
+        String component = new ComponentName(this, NotificationCounter.class).flattenToString();
+        shell("cmd notification " + (on ? "disallow_listener " : "allow_listener ") + component, output -> {
+            if (output == null) {
+                sayLong("Fire OS non ha accettato la scelta");
+                refreshIf(level);
+            } else {
+                waitCounter(on, level, COUNTER_TRIES);
+            }
+        });
+    }
+
+    /** Android saves the choice a moment after the command ends. */
+    private void waitCounter(boolean before, Level level, int tries) {
+        if (tries == 0 || NotificationCounter.allowed(this) != before) refreshIf(level);
+        else rows.postDelayed(() -> waitCounter(before, level, tries - 1), COUNTER_MS);
+    }
+
     private void showPrivacy() {
         boolean adsLimited = Settings.Secure.getInt(getContentResolver(), ADS_LIMITED, 1) == 1;
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
+        boolean counted = NotificationCounter.allowed(this);
         Drawable picture = getDrawable(R.drawable.ic_settings);
         show("Privacy", Arrays.asList(
+            new Entry("Numero delle notifiche", counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
+                "Mostra nel centro di controllo quante notifiche ci sono. Salotto le conta soltanto, senza leggerne il testo.", false,
+                () -> changeCounter(counted)),
             new Entry("Limita il tracciamento pubblicitario", adsLimited ? YES : NO, getDrawable(R.drawable.ic_s_ads),
                 "Chiede alle app di non usare la tua attività per la pubblicità.", false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
@@ -1467,17 +1510,29 @@ public final class SettingsActivity extends CardActivity {
     }
 
     /** The Stick goes to sleep at its own time, whatever the screensaver is doing. */
-    private String saverWait() {
+    private boolean saverInTime(int minutes) {
         int sleep = sleepMinutes();
-        if (saverMinutes() < sleep) return "Quanto aspetta la Stick prima di far partire il salvaschermo.";
-        return "La Stick si spegne dopo " + minutes(sleep) + ": il salvaschermo non farà in tempo a partire. Scegli meno, o allunga lo Spegnimento automatico.";
+        return sleep <= 0 || minutes < sleep;
+    }
+
+    private String saverWait() {
+        if (saverInTime(saverMinutes())) return "Quanto aspetta la Stick prima di far partire il salvaschermo.";
+        return "La Stick si spegne dopo " + minutes(sleepMinutes()) + ": il salvaschermo non farà in tempo a partire. Scegli meno, o allunga lo Spegnimento automatico.";
     }
 
     private void showSaverTimes() {
-        show("Si avvia dopo", choices(minuteNames(SAVER_MINUTES), indexOf(SAVER_MINUTES, saverMinutes()), R.drawable.ic_image,
+        List<Entry> entries = choices(minuteNames(SAVER_MINUTES), indexOf(SAVER_MINUTES, saverMinutes()), R.drawable.ic_image,
             saverWait(),
             index -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
-                Settings.System.SCREEN_OFF_TIMEOUT, SAVER_MINUTES[index] * MINUTE))));
+                Settings.System.SCREEN_OFF_TIMEOUT, SAVER_MINUTES[index] * MINUTE)));
+        boolean limited = false;
+        for (int index = 0; index < entries.size(); index++) {
+            if (saverInTime(SAVER_MINUTES[index])) continue;
+            entries.get(index).off = true;
+            limited = true;
+        }
+        show("Si avvia dopo", entries, limited
+            ? "L’attuale Spegnimento automatico, " + minutes(sleepMinutes()) + ", limita le opzioni del salvaschermo." : null);
     }
 
     private void showFonts() {

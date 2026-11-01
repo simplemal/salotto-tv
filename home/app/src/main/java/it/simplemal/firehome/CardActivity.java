@@ -474,16 +474,10 @@ abstract class CardActivity extends Activity {
     protected void sayLong(String text) { Toast.makeText(this, text, Toast.LENGTH_LONG).show(); }
 
     /** False, with a word on screen, while the connection to the shell is not there. */
-    protected boolean connected() {
-        if (TaskService.ready()) return true;
-        TaskService.retry();
-        sayLong("Se la TV lo chiede, conferma. Poi riprova");
-        return false;
-    }
-
     /** What a normal app may not do goes through TaskService. Done runs with the output. */
     protected void shell(String command, Consumer<String> done) {
-        if (connected()) TaskService.shell(command, done);
+        if (!TaskService.ready()) sayLong("Se la TV lo chiede, conferma");
+        TaskService.shellAsked(command, done);
     }
 
     /** Through the shell, so that nothing leaves Salotto. Salotto itself stays: it is the Home. */

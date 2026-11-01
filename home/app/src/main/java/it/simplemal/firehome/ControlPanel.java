@@ -49,6 +49,9 @@ final class ControlPanel extends LinearLayout {
     private static final int BIG_ICON = 40;
     private static final int WIDE_ICON = 18;
     private static final int SMALL_ICON = 20;
+    private static final int BADGE = 15;
+    private static final int BADGE_FILL = Color.rgb(235, 60, 50);
+    private static final int MOST_SHOWN = 9;
     /** Dark enough to carry white on a bright backdrop. */
     private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
@@ -207,6 +210,27 @@ final class ControlPanel extends LinearLayout {
         for (Runnable refresher : refreshers) refresher.run();
     }
 
+    /** Over the tile, not in it, so that the icon stays where it is. */
+    private void showCount(Tile tile, int count) {
+        tile.show(count > 0 ? String.valueOf(count) : "", false);
+        tile.view.getOverlay().clear();
+        if (count == 0) return;
+        TextView badge = host.label(count > MOST_SHOWN ? MOST_SHOWN + "+" : String.valueOf(count), 8);
+        badge.setGravity(Gravity.CENTER);
+        badge.setTextColor(Color.WHITE);
+        badge.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(BADGE_FILL);
+        fill.setCornerRadius(host.dp(BADGE));
+        badge.setBackground(fill);
+        int side = host.dp(BADGE);
+        int size = MeasureSpec.makeMeasureSpec(side, MeasureSpec.EXACTLY);
+        badge.measure(size, size);
+        int left = host.dp(UNIT) - side - host.dp(2);
+        badge.layout(left, host.dp(2), left + side, host.dp(2) + side);
+        tile.view.getOverlay().add(badge);
+    }
+
     private LayoutParams size(int width, int height, int startGap, int topGap) {
         LayoutParams size = new LayoutParams(host.dp(width), host.dp(height));
         size.setMarginStart(host.dp(startGap));
@@ -230,7 +254,10 @@ final class ControlPanel extends LinearLayout {
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
 
         LinearLayout modes = row();
-        small(modes, R.drawable.ic_s_notify, "Notifiche", 0, () -> host.open(Fire.notifications()));
+        Tile notify = small(modes, R.drawable.ic_s_notify, "Notifiche", 0, () -> {
+            NotificationCounter.seen(host);
+            host.open(Fire.notifications());
+        });
         Tile timer = small(modes, R.drawable.ic_timer, "Timer", GAP, () -> {
             nextTimer();
             refresh();
@@ -244,6 +271,7 @@ final class ControlPanel extends LinearLayout {
         small(tools, R.drawable.ic_tasks, "Task manager", GAP, () -> host.open(new Intent(host, TasksActivity.class)));
         small(tools, R.drawable.ic_restart, "Riavvia", GAP, TaskService::restart);
 
+        refreshers.add(() -> showCount(notify, NotificationCounter.count(host)));
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
         refreshers.add(() -> {

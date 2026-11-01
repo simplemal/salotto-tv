@@ -141,6 +141,7 @@ install_components() {
   W shell pm grant "$SALOTTO" android.permission.READ_LOGS
   W shell appops set "$SALOTTO" GET_USAGE_STATS allow
   W shell appops set "$SALOTTO" REQUEST_INSTALL_PACKAGES allow
+  W shell cmd notification allow_listener "$SALOTTO/$SALOTTO.NotificationCounter" || true
 }
 
 configure_fixer() {

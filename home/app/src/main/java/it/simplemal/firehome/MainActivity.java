@@ -468,6 +468,7 @@ public final class MainActivity extends CardActivity {
         inFront = true;
         showing = true;
         HomeCover.homeShown(getWindow());
+        if (panelOpen) panel.refresh();
         root.postOnAnimation(() -> {
             // A Home press from the Home opens no new window, and Fixer keeps its black up until
             // it sees one: its limit is a second and a half.
