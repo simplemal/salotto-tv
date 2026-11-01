@@ -268,4 +268,5 @@
     <string name="update_error_r301">Copia anterior no disponible</string>
     <string name="update_error_r302">No se pudo volver a la versión anterior</string>
     <string name="update_error_r303">Estado final desconocido</string>
+    <string name="card_fixer_stays">FireStick Fixer hace funcionar el botón Home y sigue instalado</string>
 </resources>

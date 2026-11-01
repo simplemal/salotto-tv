@@ -28,6 +28,7 @@ ask() {
   [[ "$answer" == [sS]* ]]
 }
 
+command -v adb > /dev/null || { echo "Manca adb: installa Android Platform Tools e riprova."; exit 1; }
 adb connect "$DEV" > /dev/null < /dev/null
 [[ "$(adb -s "$DEV" get-state 2>&1 < /dev/null | tail -1)" == device ]] || { echo "Dispositivo non raggiungibile."; exit 1; }
 
@@ -35,6 +36,22 @@ if [[ -s "$BACKUP/disabled-by-distro.txt" ]] && ask "Riattivo i pacchetti disatt
   while IFS= read -r package; do
     [[ -n "$package" ]] && W shell pm enable --user 0 "$package"
   done < "$BACKUP/disabled-by-distro.txt"
+fi
+
+# What Salotto may have changed from its own pages, as the copy found it.
+restore_setting() {
+  local value
+  value="$(grep -m1 "^$2=" "$BACKUP/settings-$1.txt" | cut -d= -f2-)"
+  [[ -n "$value" ]] && W shell "settings put $1 $2 '$value'"
+}
+
+if [[ -s "$BACKUP/settings-global.txt" ]] && ask "Rimetto nome della Stick, salvaschermo e spegnimento di prima?"; then
+  restore_setting global device_name
+  restore_setting secure bluetooth_name
+  restore_setting secure screensaver_components
+  restore_setting secure screensaver_enabled
+  restore_setting secure sleep_timeout
+  restore_setting system screen_off_timeout
 fi
 
 if [[ -s "$BACKUP/privacy-before.txt" ]] && ask "Rimetto le impostazioni di privacy di prima?"; then

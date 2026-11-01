@@ -21,6 +21,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Bundle;
 import android.os.Process;
 import android.os.storage.StorageManager;
@@ -73,7 +75,7 @@ public final class SettingsActivity extends CardActivity {
     /** Its middle sits just above the middle of the 540-tall screen. */
     private static final int PICTURE_TOP = 170;
     private static final int EXPLANATION_TOP = PICTURE_TOP + PICTURE_SIZE + 22;
-    private static final int EXPLANATION_SP = 15;
+    private static final int EXPLANATION_SP = 16;
     private static final String RESOLUTION = "pq_video_resolution";
     private static final String[] RESOLUTIONS = {"-1", "97", "96", "16", "31", "4", "19"};
     private static final int[] RESOLUTION_NAMES = {R.string.settings_resolution_auto, R.string.settings_resolution_4k_60,
@@ -166,8 +168,10 @@ public final class SettingsActivity extends CardActivity {
         boolean off;
         /** The backdrop this row would give: the page turns into it while the row has the focus. */
         Drawable preview;
-        /** The pictures of this row, going by in place of the icon. */
-        String strip;
+        /** The pictures of this row: they become the page's background while it has the focus. */
+        String mosaic;
+        /** Scenes of the dynamic weather, one after the other in place of the icon. */
+        boolean scenes;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -198,7 +202,8 @@ public final class SettingsActivity extends CardActivity {
     private LinearLayout root;
     private TextView heading;
     private ImageView picture;
-    private PictureStrip strip;
+    private PictureMosaic mosaic;
+    private ScenePreview scenePreview;
     private TextView previewNote;
     private boolean previewing;
     private TextView explanation;
@@ -252,9 +257,8 @@ public final class SettingsActivity extends CardActivity {
             }
         });
         left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
-        strip = new PictureStrip(this);
-        strip.setVisibility(View.GONE);
-        left.addView(strip, placed(-1, dp(PICTURE_SIZE), PICTURE_TOP));
+        mosaic = new PictureMosaic(this);
+        scenePreview = new ScenePreview(picture);
         explanation = label("", EXPLANATION_SP);
         explanation.setGravity(Gravity.CENTER_HORIZONTAL);
         explanation.setLineSpacing(dp(3), 1f);
@@ -291,7 +295,7 @@ public final class SettingsActivity extends CardActivity {
         setContentView(root);
         FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
         corner.bottomMargin = dp(PREVIEW_MARGIN);
-        corner.setMarginEnd(dp(PREVIEW_MARGIN));
+        corner.setMarginStart(dp(PREVIEW_MARGIN));
         addContentView(previewNote, corner);
         // A mouse click puts the window in touch mode, which drops the selection: take it back.
         root.getViewTreeObserver().addOnTouchModeChangeListener(touching -> {
@@ -371,7 +375,7 @@ public final class SettingsActivity extends CardActivity {
         rows.setPadding(dp(8), dp(table ? 8 : COLUMN_TOP), dp(8), dp(16));
         // The rows of the table must not run under its head.
         scroll.setClipChildren(table);
-        explanation.setTextSize(table ? 16 : 21);
+        explanation.setTextSize(table ? 14 : EXPLANATION_SP);
         rows.removeAllViews();
         for (Entry entry : entries) {
             rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
@@ -471,13 +475,15 @@ public final class SettingsActivity extends CardActivity {
 
     private void showPreview(Entry entry) {
         boolean plain = entry.preview != null;
+        boolean pictures = entry.mosaic != null;
+        mosaic.show(entry.mosaic);
+        if (entry.scenes) scenePreview.start();
+        else scenePreview.stop();
         if (plain) root.setBackground(entry.preview);
+        else if (pictures) root.setBackground(mosaic);
         else if (previewing) Look.show(this, root::setBackground);
-        previewing = plain;
+        previewing = plain || pictures;
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
-        boolean pictures = entry.strip != null;
-        strip.show(entry.strip);
-        strip.setVisibility(pictures ? View.VISIBLE : View.GONE);
         picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
     }
 
@@ -734,16 +740,19 @@ public final class SettingsActivity extends CardActivity {
         if (launchIntent(pkg) != null) {
             entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
         }
-        entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
-            () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-        entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
-            false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
-                getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
-                () -> shell("pm clear " + pkg, output -> {
-                    sayLong(output != null && output.contains("Success") ? getString(R.string.settings_data_cleared)
-                        : getString(R.string.settings_data_not_cleared));
-                    refreshIf(level);
-                }))));
+        // Without it the Home key would land on Amazon's Home.
+        if (!pkg.equals(Fire.FIXER)) {
+            entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
+                () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
+            entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+                false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
+                    getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
+                    () -> shell("pm clear " + pkg, output -> {
+                        sayLong(output != null && output.contains("Success") ? getString(R.string.settings_data_cleared)
+                            : getString(R.string.settings_data_not_cleared));
+                        refreshIf(level);
+                    }))));
+        }
         entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, getString(R.string.settings_uninstall_text), false, () -> {
             uninstalling = level;
             uninstall(pkg);
@@ -897,6 +906,7 @@ public final class SettingsActivity extends CardActivity {
         Background.run(() -> {
             boolean written = fire.write(provider, id, action);
             runOnUiThread(() -> {
+                if (isDestroyed()) return;
                 if (!written) sayLong(getString(R.string.settings_fire_refused));
                 done.run();
             });
@@ -936,30 +946,45 @@ public final class SettingsActivity extends CardActivity {
                 .setNegativeButton(getString(R.string.settings_resolution_go_back), null)
                 .setPositiveButton(getString(R.string.settings_resolution_keep), null)
                 .create();
+            // Not on a view of this page: with a black screen the person presses Home, and the
+            // way back must still run after the page is gone.
+            Handler clock = new Handler(Looper.getMainLooper());
             Runnable[] count = new Runnable[1];
             Runnable goBack = () -> {
-                rows.removeCallbacks(count[0]);
-                dialog.dismiss();
-                writeFire(FireSettings.PICTURE, RESOLUTION, previous, this::onBackPressed);
+                clock.removeCallbacks(count[0]);
+                if (!isDestroyed()) dialog.dismiss();
+                restoreResolution(previous);
             };
             count[0] = () -> {
                 if (--left[0] <= 0) {
                     goBack.run();
                     return;
                 }
-                dialog.setMessage(resolutionCountdown(left[0]));
-                rows.postDelayed(count[0], 1000);
+                if (!isDestroyed()) dialog.setMessage(resolutionCountdown(left[0]));
+                clock.postDelayed(count[0], 1000);
             };
             dialog.setOnShowListener(shown -> {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(button -> {
-                    rows.removeCallbacks(count[0]);
+                    clock.removeCallbacks(count[0]);
                     dialog.dismiss();
                     onBackPressed();
                 });
                 dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(button -> goBack.run());
             });
             dialog.show();
-            rows.postDelayed(count[0], 1000);
+            clock.postDelayed(count[0], 1000);
+        });
+    }
+
+    /** With its own connection: this page's closes when the page goes. */
+    private void restoreResolution(String previous) {
+        FireSettings own = new FireSettings(this);
+        Background.run(() -> {
+            own.write(FireSettings.PICTURE, RESOLUTION, previous);
+            own.close();
+            runOnUiThread(() -> {
+                if (!isDestroyed()) onBackPressed();
+            });
         });
     }
 
@@ -1066,6 +1091,8 @@ public final class SettingsActivity extends CardActivity {
 
     @Override protected void onDestroy() {
         stopSearch();
+        mosaic.show(null);
+        scenePreview.stop();
         fire.close();
         super.onDestroy();
     }
@@ -1253,7 +1280,10 @@ public final class SettingsActivity extends CardActivity {
         String secret = password.isEmpty() ? "" : " " + quoted(password);
         Level level = levels.peek();
         shell("cmd wifi connect-network " + quoted(name) + " " + security + secret,
-            output -> rows.postDelayed(() -> refreshIf(level), WIFI_JOIN_MS));
+            output -> {
+                if (output == null) sayLong(getString(R.string.settings_fire_refused));
+                rows.postDelayed(() -> refreshIf(level), WIFI_JOIN_MS);
+            });
     }
 
     private void forgetWifi(String name) {
@@ -1331,6 +1361,10 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
                 getString(R.string.settings_double_home_text),
                 false, () -> shell(Fire.FIXER_COMMAND + "set doubleTap " + !doubleHome, output -> {
+                    if (output == null) {
+                        sayLong(getString(R.string.settings_fire_refused));
+                        return;
+                    }
                     doubleHome = !doubleHome;
                     TaskService.rememberDoubleHome(this, doubleHome);
                     refreshIf(level);
@@ -1392,20 +1426,24 @@ public final class SettingsActivity extends CardActivity {
 
     private void showBackdrops() {
         List<Entry> weather = new ArrayList<>();
-        weather.add(weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud,
-            getString(R.string.settings_backdrop_weather_text)));
+        Entry scenes = weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud, getString(R.string.settings_backdrop_weather_text));
+        scenes.scenes = true;
+        weather.add(scenes);
         Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
             getString(R.string.settings_backdrop_pictures_text));
-        pictures.strip = Look.PICTURES_FOLDER;
+        pictures.mosaic = Look.PICTURES_FOLDER;
         weather.add(pictures);
         Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
             getString(R.string.settings_backdrop_photos_text));
-        photos.strip = Look.PHOTOS_FOLDER;
+        photos.mosaic = Look.PHOTOS_FOLDER;
         weather.add(photos);
         List<Entry> others = new ArrayList<>();
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text), false);
-        drawn.strip = Look.ABSTRACT_FOLDER;
+        drawn.mosaic = Look.ABSTRACT_FOLDER;
         others.add(drawn);
+        Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text), false);
+        city.mosaic = Look.NOX_FOLDER;
+        others.add(city);
         others.add(new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)), getDrawable(R.drawable.ic_timer),
             getString(R.string.settings_abstract_time_text), true, () -> enter(this::showAbstractTimes)));
         for (String name : Look.PRESET_NAMES) others.add(plainBackdrop(name, getString(R.string.settings_backdrop_preset_text), true));

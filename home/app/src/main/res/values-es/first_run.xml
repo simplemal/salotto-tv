@@ -47,4 +47,5 @@
     <string name="first_abstract_text">Ilustraciones abstractas que cambian solas cada 5 minutos, en orden aleatorio.</string>
     <string name="first_plain_text">Un degradado sencillo, siempre igual.</string>
     <string name="first_remote_note">La primera vez, la TV puede pedir permiso para la depuración inalámbrica: elige Permitir.</string>
+    <string name="first_nox_text">Vistas de una ciudad futura de noche, entre neones y lluvia, que cambian solas cada 5 minutos, en orden aleatorio.</string>
 </resources>

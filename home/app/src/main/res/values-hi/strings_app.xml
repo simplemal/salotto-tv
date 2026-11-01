@@ -268,4 +268,5 @@
     <string name="update_error_r301">पिछली कॉपी उपलब्ध नहीं</string>
     <string name="update_error_r302">पिछले वर्ज़न पर लौटना नहीं हो सका</string>
     <string name="update_error_r303">अंतिम स्थिति पता नहीं</string>
+    <string name="card_fixer_stays">FireStick Fixer से Home बटन चलता है, इसलिए यह इंस्टॉल रहता है</string>
 </resources>

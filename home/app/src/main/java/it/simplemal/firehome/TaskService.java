@@ -91,6 +91,8 @@ public final class TaskService extends AccessibilityService {
     private static final long PICTURE_RAREST_MS = 5 * Fire.MINUTE_MS;
     private static final long PICTURE_WAIT_MS = 600;
     private static final long RETRY_EVERY_MS = Fire.MINUTE_MS;
+    private static final long MASK_LIMIT_MS = 30000;
+    private static final String PACKAGE_NAME = "[A-Za-z0-9._]+";
     /** Protected video reaches a capture as a black frame: the card art is better than that. */
     private static final int BLACK_LEVEL = 10;
     /** About 16 by 9 pixels: enough to tell a black frame, and far quicker to decode than the whole of it. */
@@ -200,7 +202,7 @@ public final class TaskService extends AccessibilityService {
         }
         String name = HomeApps.label(service, pkg);
         Intent page = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
-        service.onFirePage(page, new String[][]{Fire.FORCE_STOP}, new String[]{service.getString(R.string.task_press_to_close, name)},
+        service.onFirePage(page, new String[][]{Fire.forceStop(service)}, new String[]{service.getString(R.string.task_press_to_close, name)},
             service.getString(R.string.task_closing, name), done);
     }
 
@@ -231,7 +233,7 @@ public final class TaskService extends AccessibilityService {
         FireSteps steps = new FireSteps(this, main);
         fireSteps = steps;
         Intent page = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
-        steps.run(page, new String[][]{Fire.FORCE_STOP}, step -> stopReady = true, pressed -> {
+        steps.run(page, new String[][]{Fire.forceStop(this)}, step -> stopReady = true, pressed -> {
             fireSteps = null;
             if (pressed) {
                 cover.findViewWithTag(MASK_DIM).setVisibility(View.VISIBLE);
@@ -264,7 +266,7 @@ public final class TaskService extends AccessibilityService {
     static void restart() {
         TaskService service = running;
         if (service == null) return;
-        service.onFirePage(new Intent(Fire.DEVICE_PAGE), new String[][]{Fire.RESTART, Fire.RESTART},
+        service.onFirePage(new Intent(Fire.DEVICE_PAGE), new String[][]{Fire.restart(service), Fire.restart(service)},
             new String[]{service.getString(R.string.task_restart_confirm), service.getString(R.string.task_restart_again)},
             service.getString(R.string.task_restarting), null);
     }
@@ -285,6 +287,10 @@ public final class TaskService extends AccessibilityService {
             if (pressed && done == null) {
                 title.setText(working);
                 wheel.setVisibility(View.VISIBLE);
+                // What looked like a press may not have been one: the screen must come back.
+                main.postDelayed(() -> {
+                    if (mask.isAttachedToWindow()) getSystemService(WindowManager.class).removeView(mask);
+                }, MASK_LIMIT_MS);
                 return;
             }
             if (pressed) {
@@ -480,7 +486,9 @@ public final class TaskService extends AccessibilityService {
         lastRetry = now;
         service.adb.post(() -> {
             service.refused = false;
+            service.waitsAnswer = true;
             service.connected();
+            service.waitsAnswer = false;
         });
     }
 
@@ -556,6 +564,8 @@ public final class TaskService extends AccessibilityService {
         boolean ok = key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
         if (stopAnswer != null) return keyOnPreparedStop(key, ok, up);
+        // Under a mask a press would move on a page nobody can see, a step from Reset or Uninstall.
+        if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;
         if (ok && up && fireSteps != null) fireSteps.okPressed();
         if (key != KeyEvent.KEYCODE_MENU && key != KeyEvent.KEYCODE_BACK) return false;
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -732,8 +742,7 @@ public final class TaskService extends AccessibilityService {
             try {
                 return AdbClient.connect(this);
             } catch (IOException e) {
-                boolean refused = Settings.Global.getInt(getContentResolver(), WIRELESS_DEBUGGING, 0) == 0;
-                if (refused || SystemClock.elapsedRealtime() >= limit) throw e;
+                if (SystemClock.elapsedRealtime() >= limit) throw e;
                 SystemClock.sleep(ANSWER_POLL_MS);
             }
         }
@@ -817,7 +826,13 @@ public final class TaskService extends AccessibilityService {
             service.refused = false;
             boolean connected = service.connected();
             if (connected) {
-                for (String name : names) service.run("pm disable-user --user 0 " + name);
+                List<String> staysOn = new ArrayList<>();
+                for (String name : names) {
+                    String output = name.matches(PACKAGE_NAME) ? service.run("pm disable-user --user 0 " + name) : null;
+                    if (output == null || !output.contains("disabled-user")) staysOn.add(name);
+                }
+                // Refused for good: asking again at every start would change nothing.
+                Reenabled.leaveOn(service, staysOn);
             }
             service.main.post(() -> done.accept(connected));
         });
@@ -830,9 +845,11 @@ public final class TaskService extends AccessibilityService {
 
     private String ask(String line) {
         if (!connected()) return NOTHING;
+        AdbClient open = client;
+        if (open == null) return NOTHING;
         try {
-            client.writeLine(line);
-            return client.readLine();
+            open.writeLine(line);
+            return open.readLine();
         } catch (IOException e) {
             disconnect();
             return NOTHING;

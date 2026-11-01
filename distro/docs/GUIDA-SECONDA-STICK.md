@@ -63,7 +63,7 @@ Se qualcosa non va, lo script si ferma e dice perché. Si può rilanciare: salta
 
 1. **Tasto Home:** premilo. Deve aprirsi Salotto. Riavvia la Stick una volta e controlla che riparta su Salotto.
 2. **Meteo:** Impostazioni di Salotto → Meteo → Luogo.
-3. **AirPlay:** apri AirPlay Server una volta. Va riaperto dopo ogni riavvio.
+3. **AirPlay:** parte da solo circa due minuti dopo l'accensione: se è appena installato, aprilo una volta.
 4. **Aurora Store:** aprilo e scegli l'accesso anonimo. Nelle impostazioni del dispositivo scegli il profilo **Sony BRAVIA VU2**, API 30, `armeabi-v7a`: serve per ricevere le versioni Android TV. Dopo il cambio ripeti l'accesso anonimo.
 5. **Home:** tieni premuto OK su una card per spostarla, toglierla, vedere le informazioni o disinstallare. Le altre app sono in Tutte le app.
 6. **Task manager:** Impostazioni di Salotto → App → Apri tenendo premuto Menu. Poi dal Mac lancia `distro/tools/autorizza-adb.py <ip>` e sulla TV premi OK sulla casella **Consenti sempre**, freccia giù, OK su Consenti: la selezione parte già sulla casella. Serve una volta sola.
@@ -72,7 +72,7 @@ Se qualcosa non va, lo script si ferma e dice perché. Si può rilanciare: salta
 ## 5. Cosa controllare alla fine
 
 - [ ] Home apre Salotto, anche dopo un riavvio
-- [ ] Il doppio Home apre la Home Amazon, e un'app la richiude
+- [ ] Con «Home Fire TV con doppio Home» attivo in Strumenti, il doppio Home apre la Home Amazon, e un'app la richiude
 - [ ] Le app si aprono e riproducono: sulla prima Stick la riproduzione non è stata provata servizio per servizio
 - [ ] Indietro risale nelle Impostazioni di Salotto
 - [ ] Meteo aggiornato

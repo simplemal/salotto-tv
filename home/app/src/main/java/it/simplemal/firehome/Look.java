@@ -44,9 +44,11 @@ final class Look {
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
     static final String ABSTRACT = "Abstract Illustrated";
+    static final String NOX = "Nox City";
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
     static final String ABSTRACT_FOLDER = "astratti";
+    static final String NOX_FOLDER = "nox-city";
     static final int[] ABSTRACT_MINUTES = {1, 5, 15, 30, 60};
     private static final int ABSTRACT_DEFAULT = 5;
     private static final long MINUTE_MS = 60 * 1000L;
@@ -114,7 +116,12 @@ final class Look {
         return PICTURES.equals(backdrop(context)) || weatherPhotos(context) || abstractPictures(context);
     }
 
-    static boolean abstractPictures(Context context) { return ABSTRACT.equals(backdrop(context)); }
+    static boolean abstractPictures(Context context) { return timedFolder(context) != null; }
+
+    private static String timedFolder(Context context) {
+        String chosen = backdrop(context);
+        return ABSTRACT.equals(chosen) ? ABSTRACT_FOLDER : NOX.equals(chosen) ? NOX_FOLDER : null;
+    }
 
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
     static void setAbstractMinutes(Context context, int value) {
@@ -124,14 +131,16 @@ final class Look {
     /** The one on show until its time is up, then any other: nothing is decided ahead. */
     static String abstractPicture(Context context) {
         SharedPreferences saved = prefs(context);
+        String folder = timedFolder(context);
         String shown = saved.getString("abstract", null);
+        boolean same = shown != null && shown.startsWith(folder + "/");
         long now = System.currentTimeMillis();
         long since = now - saved.getLong("abstract_at", 0);
-        if (shown != null && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
         List<String> files = new ArrayList<>();
         try {
-            for (String name : context.getAssets().list(ABSTRACT_FOLDER)) {
-                if (!(ABSTRACT_FOLDER + "/" + name).equals(shown)) files.add(ABSTRACT_FOLDER + "/" + name);
+            for (String name : context.getAssets().list(folder)) {
+                if (!(folder + "/" + name).equals(shown)) files.add(folder + "/" + name);
             }
         } catch (IOException e) {
             return shown;

@@ -268,4 +268,5 @@
     <string name="update_error_r301">Previous copy not available</string>
     <string name="update_error_r302">Going back to the previous version failed</string>
     <string name="update_error_r303">Final state unknown</string>
+    <string name="card_fixer_stays">FireStick Fixer runs the Home key, so it stays installed</string>
 </resources>

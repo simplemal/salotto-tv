@@ -527,6 +527,10 @@ abstract class CardActivity extends Activity {
             sayLong(getString(R.string.card_home_stays));
             return;
         }
+        if (pkg.equals(Fire.FIXER)) {
+            sayLong(getString(R.string.card_fixer_stays));
+            return;
+        }
         confirm(getString(R.string.card_uninstall_title, HomeApps.label(this, pkg)), getString(R.string.card_uninstall_text),
             getString(R.string.card_uninstall), () -> removeApp(pkg));
     }

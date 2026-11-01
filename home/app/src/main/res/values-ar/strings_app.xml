@@ -284,4 +284,5 @@
     <string name="update_error_r301">النسخة السابقة غير متوفرة</string>
     <string name="update_error_r302">فشلت العودة إلى الإصدار السابق</string>
     <string name="update_error_r303">الحالة النهائية غير معروفة</string>
+    <string name="card_fixer_stays">FireStick Fixer يشغّل زر Home ويبقى مثبتًا</string>
 </resources>

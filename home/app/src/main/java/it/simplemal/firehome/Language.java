@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -17,14 +18,14 @@ final class Language {
     private static final String FILE = "language";
     private static final String CHOSEN = "chosen";
     private static final String FALLBACK = "en";
-    private static final Locale SYSTEM = Locale.getDefault();
 
     private Language() {}
 
     static String code(Context context) {
         String chosen = context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getString(CHOSEN, null);
         if (chosen != null) return chosen;
-        return Arrays.asList(CODES).contains(SYSTEM.getLanguage()) ? SYSTEM.getLanguage() : FALLBACK;
+        String system = Resources.getSystem().getConfiguration().getLocales().get(0).getLanguage();
+        return Arrays.asList(CODES).contains(system) ? system : FALLBACK;
     }
 
     static String name(Context context) { return NAMES[Arrays.asList(CODES).indexOf(code(context))]; }

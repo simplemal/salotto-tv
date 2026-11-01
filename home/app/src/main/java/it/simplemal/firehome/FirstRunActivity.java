@@ -51,6 +51,7 @@ public final class FirstRunActivity extends CardActivity {
     private static final int WELCOME_SP = 34;
     private static final int TITLE_SP = 30;
     private static final int TEXT_SP = 17;
+    private static final int EXPLAINED_SP = 15;
     private static final int VALUE_SP = 26;
     private static final int BUTTON_SP = 17;
     private static final int TEXT_WIDTH = 720;
@@ -64,10 +65,15 @@ public final class FirstRunActivity extends CardActivity {
     private static final int LIST_ROOM = 8;
     private static final int NETWORK_ICON = 56;
     private static final int NOTE_SP = 12;
-    private static final int LIST_WIDTH = 330;
-    private static final int LIST_HEIGHT = 340;
-    private static final int SIDE_WIDTH = 500;
-    private static final int STRIP_HEIGHT = 170;
+    /** The two columns of the backdrop page, as in the Settings: the list runs the whole height. */
+    private static final int SIDE_WEIGHT = 46;
+    private static final int LIST_WEIGHT = 54;
+    /** Together they centre the words on the middle column of the pictures. */
+    private static final int SIDE_START = 56;
+    private static final int SIDE_END = 20;
+    private static final int LIST_END = 40;
+    private static final int LIST_TOP = 26;
+    private static final float SIDE_CENTER = 0.24f;
     private static final int PREVIEW_SP = 12;
     private static final int PREVIEW_MARGIN = 24;
     private static final int GUIDE_WIDTH = 680;
@@ -97,6 +103,7 @@ public final class FirstRunActivity extends CardActivity {
         new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER)};
     private static final Choice[] OTHER_CHOICES = {
         new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER),
+        new Choice(Look.NOX, 0, R.string.first_nox_text, Look.NOX_FOLDER),
         new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null),
         new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null),
         new Choice(Look.PRESET_NAMES[2], R.string.first_backdrop_forest, R.string.first_plain_text, null),
@@ -106,12 +113,15 @@ public final class FirstRunActivity extends CardActivity {
     private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity,
         this::showBackdrop, this::showRemote};
     private FrameLayout root;
+    private PictureMosaic mosaic;
     private TextView previewNote;
     private LinearLayout page;
     private LinearLayout dots;
     private TextView note;
     private Context words;
     private int at;
+    /** Tells a late answer that its page is gone. */
+    private int visit;
     private Runnable back = () -> { };
 
     static boolean due(Context context) {
@@ -127,6 +137,7 @@ public final class FirstRunActivity extends CardActivity {
         super.onCreate(state);
         root = new FrameLayout(this);
         root.setBackground(Look.plainBackdrop());
+        mosaic = new PictureMosaic(this);
         page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -138,13 +149,18 @@ public final class FirstRunActivity extends CardActivity {
         previewNote = label("", PREVIEW_SP);
         previewNote.setAlpha(0.7f);
         previewNote.setVisibility(View.GONE);
-        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.END);
+        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
         corner.bottomMargin = dp(PREVIEW_MARGIN);
-        corner.setMarginEnd(dp(PREVIEW_MARGIN));
+        corner.setMarginStart(dp(PREVIEW_MARGIN));
         root.addView(previewNote, corner);
         setContentView(root);
         speak();
         go(0);
+    }
+
+    @Override protected void onDestroy() {
+        mosaic.show(null);
+        super.onDestroy();
     }
 
     /** Back from the Settings the network may be another. */
@@ -165,9 +181,13 @@ public final class FirstRunActivity extends CardActivity {
 
     private void go(int index) {
         at = index;
-        back = index == 0 ? () -> { } : () -> go(index - 1);
+        visit++;
+        back = index > 0 ? () -> go(index - 1) : due(this) ? () -> { } : this::finish;
         root.setBackground(Look.plainBackdrop());
+        mosaic.show(null);
         previewNote.setVisibility(View.GONE);
+        page.setLayoutParams(new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        dots.setTranslationX(0);
         pages[index].run();
         dots.removeAllViews();
         for (int dot = 0; dot < PAGES; dot++) {
@@ -188,7 +208,9 @@ public final class FirstRunActivity extends CardActivity {
             return;
         }
         prefs(this).edit().putBoolean(DONE, true).apply();
-        startActivity(new Intent(this, MainActivity.class));
+        // Fresh, because seen from the Settings the language may have changed on the way.
+        startActivity(new Intent(this, MainActivity.class)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
     }
 
@@ -317,7 +339,8 @@ public final class FirstRunActivity extends CardActivity {
 
     private void askCity() {
         heading(words(R.string.first_city_title), words(R.string.first_city_text));
-        if (Weather.place(this) != null) back = () -> go(at);
+        visit++;
+        back = () -> go(Weather.place(this) != null ? at : at - 1);
         Runnable[] find = new Runnable[1];
         EditText name = field(words(R.string.first_city_hint), () -> find[0].run());
         find[0] = () -> search(name.getText().toString().trim());
@@ -330,15 +353,19 @@ public final class FirstRunActivity extends CardActivity {
     private void search(String name) {
         if (name.isEmpty()) return;
         note.setText(words(R.string.first_searching));
+        int asked = visit;
         Background.run(() -> {
             try {
                 List<Weather.Place> places = Weather.search(this, name);
                 runOnUiThread(() -> {
+                    if (asked != visit) return;
                     if (places.isEmpty()) note.setText(words(R.string.first_no_place));
                     else showPlaces(places);
                 });
             } catch (IOException | JSONException e) {
-                runOnUiThread(() -> note.setText(words(R.string.first_no_connection)));
+                runOnUiThread(() -> {
+                    if (asked == visit) note.setText(words(R.string.first_no_connection));
+                });
             }
         });
     }
@@ -375,20 +402,28 @@ public final class FirstRunActivity extends CardActivity {
     }
 
     private void showBackdrop() {
-        heading(words(R.string.first_backdrop_title), null);
+        page.removeAllViews();
+        page.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
+        float toSide = getResources().getDisplayMetrics().widthPixels * (0.5f - SIDE_CENTER);
+        dots.setTranslationX(RIGHT_TO_LEFT.equals(Language.code(this)) ? toSide : -toSide);
         List<Choice> choices = new ArrayList<>();
         if (Weather.place(this) != null) choices.addAll(Arrays.asList(WEATHER_CHOICES));
         choices.addAll(Arrays.asList(OTHER_CHOICES));
         LinearLayout rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
-        rows.setPadding(dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM));
+        rows.setPaddingRelative(dp(LIST_ROOM), dp(LIST_TOP), dp(LIST_ROOM), dp(LIST_TOP));
         rows.setClipChildren(false);
         rows.setClipToPadding(false);
         LinearLayout side = new LinearLayout(this);
         side.setOrientation(LinearLayout.VERTICAL);
-        TextView explained = label("", TEXT_SP);
+        side.setGravity(Gravity.CENTER);
+        side.setPaddingRelative(dp(SIDE_START), 0, dp(SIDE_END), 0);
+        TextView title = label(words(R.string.first_backdrop_title), TITLE_SP);
+        title.setGravity(Gravity.CENTER);
+        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        TextView explained = label("", EXPLAINED_SP);
+        explained.setGravity(Gravity.CENTER);
         explained.setAlpha(0.85f);
-        PictureStrip strip = new PictureStrip(this);
         View first = null;
         for (Choice choice : choices) {
             String name = choice.name == 0 ? choice.key : words(choice.name);
@@ -399,7 +434,7 @@ public final class FirstRunActivity extends CardActivity {
             View.OnFocusChangeListener style = row.getOnFocusChangeListener();
             row.setOnFocusChangeListener((view, focused) -> {
                 style.onFocusChange(view, focused);
-                if (focused) preview(choice, explained, strip);
+                if (focused) preview(choice, explained);
             });
             LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
             if (first != null) size.topMargin = dp(ROW_GAP);
@@ -409,28 +444,26 @@ public final class FirstRunActivity extends CardActivity {
         ScrollView list = new ScrollView(this);
         hideFromFixer(list);
         list.setVerticalScrollBarEnabled(false);
+        list.setClipChildren(false);
         list.addView(rows);
         LinearLayout columns = new LinearLayout(this);
-        columns.setGravity(Gravity.CENTER_VERTICAL);
-        columns.addView(list, new LinearLayout.LayoutParams(dp(LIST_WIDTH), dp(LIST_HEIGHT)));
-        side.addView(explained, new LinearLayout.LayoutParams(-1, -2));
-        LinearLayout.LayoutParams stripPlace = new LinearLayout.LayoutParams(-1, dp(STRIP_HEIGHT));
-        stripPlace.topMargin = dp(18);
-        side.addView(strip, stripPlace);
-        LinearLayout.LayoutParams sidePlace = new LinearLayout.LayoutParams(dp(SIDE_WIDTH), -2);
-        sidePlace.setMarginStart(dp(24));
-        columns.addView(side, sidePlace);
-        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
-        under.topMargin = dp(18);
-        page.addView(columns, under);
+        side.addView(title);
+        LinearLayout.LayoutParams textPlace = new LinearLayout.LayoutParams(-1, -2);
+        textPlace.topMargin = dp(10);
+        side.addView(explained, textPlace);
+        // Words first and rows after, as in the Settings: the pictures fade out before the rows.
+        columns.addView(side, new LinearLayout.LayoutParams(0, -1, SIDE_WEIGHT));
+        LinearLayout.LayoutParams listPlace = new LinearLayout.LayoutParams(0, -1, LIST_WEIGHT);
+        listPlace.setMarginEnd(dp(LIST_END));
+        columns.addView(list, listPlace);
+        page.addView(columns, new LinearLayout.LayoutParams(-1, -1));
         first.requestFocus();
     }
 
-    private void preview(Choice choice, TextView explained, PictureStrip strip) {
+    private void preview(Choice choice, TextView explained) {
         explained.setText(words(choice.text));
-        strip.show(choice.folder);
-        strip.setVisibility(choice.folder != null ? View.VISIBLE : View.INVISIBLE);
-        root.setBackground(choice.folder != null ? Look.plainBackdrop() : Look.preset(choice.key));
+        mosaic.show(choice.folder);
+        root.setBackground(choice.folder != null ? mosaic : Look.preset(choice.key));
         previewNote.setText(words(R.string.first_preview));
         previewNote.setVisibility(choice.folder != null ? View.GONE : View.VISIBLE);
     }

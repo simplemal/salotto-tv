@@ -268,4 +268,5 @@
     <string name="update_error_r301">Copie précédente indisponible</string>
     <string name="update_error_r302">Échec du retour à la version précédente</string>
     <string name="update_error_r303">État final inconnu</string>
+    <string name="card_fixer_stays">FireStick Fixer fait fonctionner la touche Home et reste installé</string>
 </resources>

@@ -41,8 +41,8 @@ Il primo comando legge soltanto e mostra cosa farebbe. Il secondo salva una copi
 ## Limiti noti
 
 - Fire OS può aggiornarsi da solo: i pacchetti degli aggiornamenti non sono disattivabili.
-- La Home Amazon resta sotto: il doppio Home la riapre.
-- AirPlay va aperto una volta dopo ogni riavvio, non gestisce contenuti protetti da DRM e non equivale ad AirPlay 2 completo.
+- La Home Amazon resta sotto: si riapre attivando «Home Fire TV con doppio Home» in Impostazioni → Strumenti.
+- AirPlay parte da solo circa due minuti dopo l'accensione, non gestisce contenuti protetti da DRM e non equivale ad AirPlay 2 completo.
 - Suoni e schermo e il selettore profili sono riservati alle app di sistema: Salotto non può aprirli direttamente.
 - Disattivare i pacchetti Alexa toglie i comandi vocali.
 

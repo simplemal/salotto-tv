@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">Ein anderes Foto für jeden Moment des Tages und jedes Wetter des gewählten Ortes, immer unbewegt.</string>
     <string name="settings_backdrop_abstract_text">Abstrakte Illustrationen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_abstract_time">Bild wechselt alle</string>
-    <string name="settings_abstract_time_text">Wie lange jede abstrakte Illustration auf dem Bildschirm bleibt.</string>
+    <string name="settings_abstract_time_text">Wie lange jedes Bild von Abstract Illustrated und Nox City zu sehen ist.</string>
     <string name="settings_backdrop_preset_text">Farbverlauf von Salotto.</string>
     <string name="settings_backdrop_image_text">Eigenes Bild, an den Bildschirm angepasst.</string>
     <string name="settings_clock">Uhr</string>
@@ -288,4 +288,5 @@
         <item quantity="one">Das aktuelle Automatische Ausschalten, %1$d Minute, begrenzt die Optionen des Bildschirmschoners.</item>
         <item quantity="other">Das aktuelle Automatische Ausschalten, %1$d Minuten, begrenzt die Optionen des Bildschirmschoners.</item>
     </plurals>
+    <string name="settings_backdrop_nox_text">Ansichten einer Zukunftsstadt bei Nacht, mit Neon und Regen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
 </resources>

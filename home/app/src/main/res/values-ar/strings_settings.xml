@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">صورة فوتوغرافية مختلفة لكل لحظة من اليوم ولكل حالة طقس في المكان المختار، ثابتة دائمًا.</string>
     <string name="settings_backdrop_abstract_text">رسوم تجريدية تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_abstract_time">تتغير الصورة كل</string>
-    <string name="settings_abstract_time_text">كم تبقى كل رسمة تجريدية على الشاشة.</string>
+    <string name="settings_abstract_time_text">المدة التي تبقى فيها كل صورة من Abstract Illustrated وNox City على الشاشة.</string>
     <string name="settings_backdrop_preset_text">تدرّج لوني من Salotto.</string>
     <string name="settings_backdrop_image_text">صورة شخصية، مُلائمة للشاشة.</string>
     <string name="settings_clock">الساعة</string>
@@ -312,4 +312,5 @@
         <item quantity="many">«الإيقاف التلقائي» الحالي، %1$d دقيقة، يحدّ من خيارات شاشة التوقف.</item>
         <item quantity="other">«الإيقاف التلقائي» الحالي، %1$d دقيقة، يحدّ من خيارات شاشة التوقف.</item>
     </plurals>
+    <string name="settings_backdrop_nox_text">مشاهد لمدينة مستقبلية في الليل بين النيون والمطر، تتغير تلقائيًا بترتيب عشوائي.</string>
 </resources>

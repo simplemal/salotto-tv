@@ -59,9 +59,9 @@ final class Updater {
     /** Only updates signed by the private half of this key are ever considered. */
     private static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+Xr4FLe8cXoDAqAen4eIgxam1dviQ81GfwoMv51vrd0sajsazDnwlEzdFR3+VfTHJDTFK7qeOebtfvoWzgePQ==";
     private static final String FILE = "update";
+    private static final String FIXER_BEFORE = "fixer_before";
     private static final String APK = "update.apk";
     private static final String PREVIOUS = "update-previous.apk";
-    private static final String TEST_FAIL = "update-test-fail";
     /** A failed look is usually a network still waking up. */
     private static final long RETRY = 10 * Fire.MINUTE_MS;
     /** The script reports well within this; a state left older than this has no one behind it. */
@@ -89,7 +89,6 @@ final class Updater {
     static File state(Context context) { return shared(context, "update-state"); }
     static File health(Context context) { return shared(context, "update-health"); }
     static File previous(Context context) { return shared(context, PREVIOUS); }
-    static boolean failHealthForTest(Context context) { return shared(context, TEST_FAIL).exists(); }
 
     static int target(Context context) { return prefs(context).getInt("target", 0); }
     static void setTarget(Context context, int code) { prefs(context).edit().putInt("target", code).commit(); }
@@ -115,6 +114,7 @@ final class Updater {
 
     /** Android's installer only goes forward, so the way back has to be set aside first. */
     static void keepCurrent(Context context) throws Failure {
+        prefs(context).edit().putBoolean(FIXER_BEFORE, fixerActive(context)).commit();
         try {
             Files.copy(new File(context.getPackageCodePath()).toPath(), previous(context).toPath(),
                 StandardCopyOption.REPLACE_EXISTING);
@@ -309,7 +309,12 @@ final class Updater {
         }
     }
 
-    static boolean fixerActive(Context context) {
+    /** A Stick set up without Fixer has nothing to lose: that says nothing about the update. */
+    static boolean fixerLost(Context context) {
+        return prefs(context).getBoolean(FIXER_BEFORE, true) && !fixerActive(context);
+    }
+
+    private static boolean fixerActive(Context context) {
         String services = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
         return services != null && services.contains(Fire.FIXER);
     }

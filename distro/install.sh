@@ -62,9 +62,9 @@ connect() {
   say "1. Collegamento"
   [[ $USB == 1 ]] || adb connect "$DEV" > /dev/null < /dev/null
   local state
-  state="$(adb -s "$DEV" get-state 2>&1 < /dev/null | tail -1)"
+  state="$(adb -s "$DEV" get-state 2>&1 < /dev/null | tr '\n' ' ')"
   case "$state" in
-    device) echo "Collegato a $DEV." ;;
+    device*) echo "Collegato a $DEV." ;;
     *unauthorized*) stop "conferma il dialogo sulla TV, oppure spegni e riaccendi Debug ADB in Opzioni sviluppatore, poi rilancia." ;;
     *) stop "dispositivo non raggiungibile ($state). Controlla IP e Debug ADB." ;;
   esac
@@ -217,7 +217,7 @@ finish() {
   if [[ $PREVIEW == 1 ]]; then echo; echo "Anteprima finita: nessuna modifica eseguita."; return; fi
   sleep 3
   echo "Salotto: $(version_of "$SALOTTO")"
-  if A shell dumpsys accessibility | grep -m1 'Bound services' | grep -q 'FireStick Fixer'; then
+  if A shell dumpsys accessibility | sed -n '/Bound services/,/Enabled services/p' | grep -q 'FireStick Fixer'; then
     echo "Fixer collegato."
   else
     echo "ATTENZIONE: Fixer non risulta collegato. Riavvia la Stick e controlla il tasto Home."

@@ -216,8 +216,11 @@ final class AvStandards {
             for (String type : info.getSupportedTypes()) {
                 Decoder decoder = decoder(info, type, hardware);
                 Decoder known = decoders.get(type);
+                if (known != null) {
+                    decoder.profiles.addAll(known.profiles);
+                    known.profiles.addAll(decoder.profiles);
+                }
                 if (known == null || decoder.beats(known)) decoders.put(type, decoder);
-                if (known != null) decoders.get(type).profiles.addAll(known.profiles);
             }
         }
     }
@@ -296,7 +299,10 @@ final class AvStandards {
 
     private void hdr() {
         Set<Integer> tv = new HashSet<>();
-        for (int type : display.getHdrCapabilities().getSupportedHdrTypes()) tv.add(type);
+        Display.HdrCapabilities shown = display.getHdrCapabilities();
+        if (shown != null) {
+            for (int type : shown.getSupportedHdrTypes()) tv.add(type);
+        }
         String active = property(HDR_NOW).toLowerCase(Locale.ROOT);
         boolean known = !active.isEmpty();
         boolean on = known && !active.equals(HDR_NOW_NONE);

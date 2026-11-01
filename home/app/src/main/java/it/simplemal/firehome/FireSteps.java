@@ -1,6 +1,7 @@
 package it.simplemal.firehome;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -33,6 +34,8 @@ final class FireSteps {
     private volatile boolean okPressed;
     private int step;
     private long limit;
+    private Runnable choose;
+    private boolean ended;
 
     FireSteps(AccessibilityService service, Handler main) {
         this.service = service;
@@ -45,13 +48,23 @@ final class FireSteps {
         this.selected = selected;
         this.done = done;
         limit = SystemClock.elapsedRealtime() + FIND_LIMIT_MS;
-        service.startActivity(page.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-        main.postDelayed(look, POLL_MS);
+        try {
+            service.startActivity(page.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            main.postDelayed(look, POLL_MS);
+        } catch (ActivityNotFoundException e) {
+            main.post(() -> end(false));
+        }
     }
 
-    void cancel() {
+    void cancel() { end(false); }
+
+    /** Once: a press can arrive while the next look is on its way. */
+    private void end(boolean pressed) {
+        if (ended) return;
+        ended = true;
         main.removeCallbacks(look);
-        done.accept(false);
+        main.removeCallbacks(choose);
+        done.accept(pressed);
     }
 
     private void look() {
@@ -62,11 +75,12 @@ final class FireSteps {
     private void findEntry() {
         AccessibilityNodeInfo found = onFirePage() ? find(steps[step]) : null;
         if (found != null) {
-            main.postDelayed(() -> select(found), SETTLE_MS);
+            choose = () -> select(found);
+            main.postDelayed(choose, SETTLE_MS);
         } else if (SystemClock.elapsedRealtime() < limit) {
             main.postDelayed(look, POLL_MS);
         } else {
-            done.accept(false);
+            end(false);
         }
     }
 
@@ -98,7 +112,7 @@ final class FireSteps {
             limit = SystemClock.elapsedRealtime() + FIND_LIMIT_MS;
             main.postDelayed(look, POLL_MS);
         } else {
-            done.accept(pressed);
+            end(pressed);
         }
     }
 

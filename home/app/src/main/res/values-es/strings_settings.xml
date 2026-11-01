@@ -213,7 +213,7 @@
     <string name="settings_backdrop_photos_text">Una fotografía distinta para cada momento del día y cada tiempo del lugar elegido, siempre fija.</string>
     <string name="settings_backdrop_abstract_text">Ilustraciones abstractas que cambian solas, en orden aleatorio.</string>
     <string name="settings_abstract_time">Cambiar de imagen cada</string>
-    <string name="settings_abstract_time_text">Cuánto tiempo se queda en pantalla cada ilustración abstracta.</string>
+    <string name="settings_abstract_time_text">Cuánto tiempo se queda en pantalla cada imagen de Abstract Illustrated y Nox City.</string>
     <string name="settings_backdrop_preset_text">Degradado de Salotto.</string>
     <string name="settings_backdrop_image_text">Imagen personal, adaptada a la pantalla.</string>
     <string name="settings_clock">Reloj</string>
@@ -289,4 +289,5 @@
         <item quantity="one">El Apagado automático actual, %1$d minuto, limita las opciones del salvapantallas.</item>
         <item quantity="other">El Apagado automático actual, %1$d minutos, limita las opciones del salvapantallas.</item>
     </plurals>
+    <string name="settings_backdrop_nox_text">Vistas de una ciudad futura de noche, entre neones y lluvia, que cambian solas, en orden aleatorio.</string>
 </resources>

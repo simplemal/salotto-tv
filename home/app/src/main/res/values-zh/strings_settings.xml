@@ -213,7 +213,7 @@
     <string name="settings_backdrop_photos_text">一天中的每个时段、所选地点的每种天气，各有一张照片，画面静止。</string>
     <string name="settings_backdrop_abstract_text">抽象插画自动更换，顺序随机。</string>
     <string name="settings_abstract_time">更换图片间隔</string>
-    <string name="settings_abstract_time_text">每幅抽象插画在屏幕上停留多久。</string>
+    <string name="settings_abstract_time_text">Abstract Illustrated 和 Nox City 的每张图片在屏幕上停留的时间。</string>
     <string name="settings_backdrop_preset_text">Salotto 的渐变色。</string>
     <string name="settings_backdrop_image_text">你自己的图片，自动适应屏幕。</string>
     <string name="settings_clock">时钟</string>
@@ -283,4 +283,5 @@
     <plurals name="settings_saver_limited">
         <item quantity="other">当前的“自动待机”为 %1$d 分钟，限制了屏保的选项。</item>
     </plurals>
+    <string name="settings_backdrop_nox_text">夜色中的未来城市，霓虹与雨水交织，自动更换，顺序随机。</string>
 </resources>

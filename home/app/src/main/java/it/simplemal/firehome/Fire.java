@@ -3,8 +3,12 @@ package it.simplemal.firehome;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
+import java.util.Arrays;
 
 /** What several screens share about the Stick and the apps around Salotto. */
 final class Fire {
@@ -20,6 +24,8 @@ final class Fire {
     static final String DEVICE_PAGE = "com.amazon.device.settings.action.DEVICE";
     static final String[] FORCE_STOP = {"Forza arresto", "Force stop"};
     static final String[] RESTART = {"Riavvia", "Restart"};
+    private static final String FORCE_STOP_WORDS = "force_stop";
+    private static final String RESTART_WORDS = "restart_settings_title";
     /** What Fire OS opens on Home held when the quick menu is off. */
     static final String HOME_HELD_PAGE = "com.amazon.tv.settings.v2.hud.HudActivity";
     /** What Fire OS opens on a remote's Settings key. */
@@ -56,6 +62,24 @@ final class Fire {
     }
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
+
+    static String[] forceStop(Context context) { return labels(context, FORCE_STOP_WORDS, FORCE_STOP); }
+
+    static String[] restart(Context context) { return labels(context, RESTART_WORDS, RESTART); }
+
+    /** Fire OS's pages speak its own language, not Salotto's: the words come from its app, these only if that fails. */
+    private static String[] labels(Context context, String words, String[] known) {
+        try {
+            Resources fire = context.getPackageManager().getResourcesForApplication(SETTINGS);
+            int id = fire.getIdentifier(words, "string", SETTINGS);
+            if (id == 0) return known;
+            String[] all = Arrays.copyOf(known, known.length + 1);
+            all[known.length] = fire.getString(id);
+            return all;
+        } catch (PackageManager.NameNotFoundException e) {
+            return known;
+        }
+    }
 
     /** Fire OS's list of notifications. They never show over the Home: this page is where they end up. */
     static Intent notifications() { return new Intent("com.amazon.tv.action.NOTIFICATION_CENTER"); }

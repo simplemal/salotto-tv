@@ -4,6 +4,11 @@ import android.app.ActivityManager;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -13,6 +18,7 @@ import android.provider.Settings;
 import android.view.Display;
 import android.view.WindowManager;
 import java.io.BufferedReader;
+import java.net.Inet4Address;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -74,6 +80,11 @@ final class DeviceInfo {
 
     static List<String[]> network(Context context) {
         List<String[]> rows = new ArrayList<>();
+        String wired = wiredAddress(context);
+        if (wired != null) {
+            rows.add(new String[]{context.getString(R.string.device_ip), wired});
+            return rows;
+        }
         WifiManager wifi = context.getSystemService(WifiManager.class);
         WifiInfo info = wifi.getConnectionInfo();
         int address = info.getIpAddress();
@@ -82,6 +93,19 @@ final class DeviceInfo {
         rows.add(new String[]{context.getString(R.string.device_signal), address == 0 ? "—" : info.getRssi() + " dBm"});
         rows.add(new String[]{context.getString(R.string.device_speed), address == 0 ? "—" : info.getLinkSpeed() + " Mbps"});
         return rows;
+    }
+
+    private static String wiredAddress(Context context) {
+        ConnectivityManager network = context.getSystemService(ConnectivityManager.class);
+        Network active = network.getActiveNetwork();
+        NetworkCapabilities link = network.getNetworkCapabilities(active);
+        if (link == null || !link.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) return null;
+        LinkProperties properties = network.getLinkProperties(active);
+        if (properties == null) return null;
+        for (LinkAddress address : properties.getLinkAddresses()) {
+            if (address.getAddress() instanceof Inet4Address) return address.getAddress().getHostAddress();
+        }
+        return null;
     }
 
     /** Fire OS keeps its version in a system property, without the build number it stays short. */

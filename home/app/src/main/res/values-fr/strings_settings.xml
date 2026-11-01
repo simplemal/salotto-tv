@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">Une photographie différente pour chaque moment de la journée et chaque météo du lieu choisi, toujours fixe.</string>
     <string name="settings_backdrop_abstract_text">Des illustrations abstraites qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_abstract_time">Changer d’image toutes les</string>
-    <string name="settings_abstract_time_text">Durée d’affichage de chaque illustration abstraite.</string>
+    <string name="settings_abstract_time_text">Durée d’affichage de chaque image d’Abstract Illustrated et de Nox City.</string>
     <string name="settings_backdrop_preset_text">Dégradé de Salotto.</string>
     <string name="settings_backdrop_image_text">Image personnelle, adaptée à l’écran.</string>
     <string name="settings_clock">Horloge</string>
@@ -288,4 +288,5 @@
         <item quantity="one">L’Arrêt automatique actuel, %1$d minute, limite les options de l’économiseur d’écran.</item>
         <item quantity="other">L’Arrêt automatique actuel, %1$d minutes, limite les options de l’économiseur d’écran.</item>
     </plurals>
+    <string name="settings_backdrop_nox_text">Des vues d’une ville future la nuit, entre néons et pluie, qui changent toutes seules, dans un ordre aléatoire.</string>
 </resources>

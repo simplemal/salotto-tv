@@ -33,7 +33,9 @@ public final class ReenabledActivity extends CardActivity {
         page.setGravity(Gravity.CENTER_HORIZONTAL);
         root.addView(page, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
         setContentView(root);
-        showReenabled(getIntent().getStringArrayListExtra(REENABLED));
+        ArrayList<String> names = getIntent().getStringArrayListExtra(REENABLED);
+        if (names == null) finish();
+        else showReenabled(names);
     }
 
     @Override public void onBackPressed() { back.run(); }

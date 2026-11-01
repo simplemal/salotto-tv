@@ -34,7 +34,8 @@ import org.json.JSONException;
 public final class UpdateActivity extends CardActivity {
     static final String EXTRA_AFTER = "after";
     private static final long POLL_MS = 500;
-    private static final long READY_WAIT_MS = 60000;
+    /** Long enough for a second try after the first one's half minute at the question on the TV. */
+    private static final long READY_WAIT_MS = 100000;
     private static final long HEALTH_WAIT_MS = 30000;
     private static final long INSTALL_LIMIT_MS = 120000;
     private static final long END_LIMIT_MS = 20000;
@@ -259,6 +260,8 @@ public final class UpdateActivity extends CardActivity {
         busy = true;
         showSteps();
         background(() -> {
+            // Nobody else would press Install, and from the background the question could not open.
+            if (!TaskService.running()) throw new Updater.Failure(UpdateError.F115);
             step(CHECK, getString(R.string.update_detail_check));
             release = Updater.check(this);
             if (release == null) throw new Updater.Failure(UpdateError.F105);
@@ -369,9 +372,8 @@ public final class UpdateActivity extends CardActivity {
         background(() -> {
             long limit = System.currentTimeMillis() + HEALTH_WAIT_MS;
             String verdict = "good";
-            if (Updater.failHealthForTest(this)) verdict = UpdateError.C203.name();
-            else if (Updater.installedCode(this) != Updater.target(this)) verdict = UpdateError.C204.name();
-            else if (!Updater.fixerActive(this)) verdict = UpdateError.C205.name();
+            if (Updater.installedCode(this) != Updater.target(this)) verdict = UpdateError.C204.name();
+            else if (Updater.fixerLost(this)) verdict = UpdateError.C205.name();
             else {
                 while (!TaskService.running() && System.currentTimeMillis() < limit) pause();
                 if (!TaskService.running()) verdict = UpdateError.C206.name();
@@ -468,6 +470,7 @@ public final class UpdateActivity extends CardActivity {
     }
 
     private void showError(UpdateError error) {
+        TaskService.installEnded();
         busy = false;
         forget();
         clear();

@@ -268,4 +268,5 @@
     <string name="update_error_r301">Vorherige Kopie nicht verfügbar</string>
     <string name="update_error_r302">Rückkehr zur vorherigen Version fehlgeschlagen</string>
     <string name="update_error_r303">Endstatus unbekannt</string>
+    <string name="card_fixer_stays">FireStick Fixer steuert die Home-Taste und bleibt installiert</string>
 </resources>
