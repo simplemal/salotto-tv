@@ -925,10 +925,10 @@ public final class SettingsActivity extends CardActivity {
                     new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), getDrawable(R.drawable.ic_s_surround),
                         getString(R.string.settings_surround_text), true,
                         () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
-                    new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, getDrawable(R.drawable.ic_s_voice),
+                    new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, getDrawable(R.drawable.ic_dialogue),
                         getString(R.string.settings_dialogue_text), false,
                         () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
-                    new Entry(getString(R.string.settings_leveler), even ? YES : NO, getDrawable(R.drawable.ic_s_equalizer),
+                    new Entry(getString(R.string.settings_leveler), even ? YES : NO, getDrawable(R.drawable.ic_leveler),
                         getString(R.string.settings_leveler_text), false,
                         () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level)))));
             });

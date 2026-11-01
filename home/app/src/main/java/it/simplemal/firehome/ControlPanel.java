@@ -271,8 +271,8 @@ final class ControlPanel extends LinearLayout {
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
 
         LinearLayout modes = row();
-        audioSwitch(modes, R.drawable.ic_s_voice, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
-        audioSwitch(modes, R.drawable.ic_s_equalizer, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
+        audioSwitch(modes, R.drawable.ic_dialogue, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
+        audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(getContext())));
         Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
