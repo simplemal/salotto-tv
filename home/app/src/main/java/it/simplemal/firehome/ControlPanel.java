@@ -37,18 +37,19 @@ final class ControlPanel extends LinearLayout {
     private static final int TOP = 76;
     /** Over an app there is no pill to leave room for: the panel takes its place. */
     private static final int TOP_OVER_APP = 22;
-    private static final int HEIGHT = 194;
     /** Lined up with the side of the Home's dock. */
     private static final int EDGE = 28;
-    private static final int UNIT = 38;
-    private static final int GAP = 8;
-    private static final int PADDING = 9;
+    private static final int UNIT = 44;
+    private static final int GAP = 9;
+    private static final int PADDING = 10;
     private static final int WIDE = 2 * UNIT + GAP;
-    private static final int RADIUS = 9;
-    private static final int PANEL_RADIUS = 18;
-    private static final int BIG_ICON = 40;
-    private static final int WIDE_ICON = 18;
-    private static final int SMALL_ICON = 20;
+    /** On the Home it ends over the weather, with three times the room the weather has over the dock. */
+    private static final int HEIGHT = 2 * PADDING + 4 * UNIT + 3 * GAP;
+    private static final int RADIUS = 10;
+    private static final int PANEL_RADIUS = 20;
+    private static final int BIG_ICON = 56;
+    private static final int WIDE_ICON = 24;
+    private static final int SMALL_ICON = 28;
     /** Dark enough to carry white on a bright backdrop. */
     private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
@@ -71,12 +72,12 @@ final class ControlPanel extends LinearLayout {
 
         Tile(int picture, String name) {
             icon.setImageResource(picture);
-            title = host.label(name, 10);
+            title = host.label(name, 11);
             title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            value = host.label("", 8);
+            value = host.label("", 9);
             value.setSingleLine(true);
             value.setEllipsize(TextUtils.TruncateAt.END);
-            number = host.label("", 11);
+            number = host.label("", 12);
             number.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             number.setPadding(host.dp(3), 0, 0, 0);
             number.setVisibility(GONE);
@@ -155,7 +156,7 @@ final class ControlPanel extends LinearLayout {
 
     /** Adds the panel and the line under it to `root`: under the pill if the Home shows one. */
     static ControlPanel addTo(Host host, FrameLayout root, View opener, boolean pill) {
-        TextView hint = host.label("", 11);
+        TextView hint = host.label("", 12);
         hint.setPadding(host.dp(10), host.dp(3), host.dp(10), host.dp(3));
         GradientDrawable fill = new GradientDrawable();
         fill.setColor(Color.argb(128, 0, 0, 0));
