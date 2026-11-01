@@ -583,7 +583,7 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_apps), null, getDrawable(R.drawable.ic_apps),
                 getString(R.string.settings_apps_text),
                 true, () -> enter(this::showApps)),
-            new Entry(getString(R.string.settings_screen), saverValue(), getDrawable(R.drawable.ic_s_tv),
+            new Entry(getString(R.string.settings_screen), null, getDrawable(R.drawable.ic_s_tv),
                 getString(R.string.settings_screen_text),
                 true, () -> enter(this::showScreen)),
             new Entry(getString(R.string.settings_language), Language.name(this), getDrawable(R.drawable.ic_s_language),
