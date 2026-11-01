@@ -55,8 +55,8 @@ final class ControlPanel extends LinearLayout {
     private static final float SUN_CENTER = 0.5f;
     private static final float TIMER_CENTER = 0.545f;
     private static final long TIMER_TICK_MS = 5000;
-    /** A shade lighter than the panel under it. */
-    private static final int TILE_OFF = Color.argb(30, 255, 255, 255);
+    /** Dark enough to carry white on a bright backdrop. */
+    private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
     /** The icon of a connection in use. */
     static final int LINKED = Color.rgb(125, 205, 255);

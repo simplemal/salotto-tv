@@ -40,11 +40,10 @@ final class GlassRim extends Drawable {
     /** The whole body of the control panel: glass, a sheen from above and this line. */
     static Drawable panel(int radius, int thickness) {
         GradientDrawable glass = new GradientDrawable();
-        // Dark: nothing here can blur the picture behind, and a light glass only washes out what is on it.
-        glass.setColor(Color.argb(190, 12, 14, 18));
+        glass.setColor(Color.argb(46, 255, 255, 255));
         glass.setCornerRadius(radius);
         GradientDrawable sheen = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{Color.argb(22, 255, 255, 255), Color.TRANSPARENT, Color.TRANSPARENT});
+            new int[]{Color.argb(54, 255, 255, 255), Color.TRANSPARENT, Color.TRANSPARENT});
         sheen.setCornerRadius(radius);
         return new LayerDrawable(new Drawable[]{glass, sheen, new GlassRim(radius, thickness, 235)});
     }
