@@ -86,14 +86,16 @@ final class ControlPanel extends LinearLayout {
             view.setDefaultFocusHighlightEnabled(false);
             view.setContentDescription(name);
             view.setOnFocusChangeListener((changed, focused) -> paint());
+            tiles.add(this);
             fill.setCornerRadius(host.dp(RADIUS));
             view.setBackground(fill);
             paint();
         }
 
         void paint() {
-            boolean lit = view.isFocused() || active;
-            fill.setColor(view.isFocused() ? Color.WHITE : active ? TILE_ACTIVE : TILE_OFF);
+            boolean selected = view.isFocused() || view == chosen;
+            boolean lit = selected || active;
+            fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : TILE_OFF);
             int ink = lit ? Color.BLACK : Color.WHITE;
             icon.setColorFilter(!lit && linked ? LINKED : ink);
             title.setTextColor(ink);
@@ -117,7 +119,7 @@ final class ControlPanel extends LinearLayout {
             value.setText(text);
             active = on;
             paint();
-            if (small && view.isFocused()) describe(this);
+            if (small && (view.isFocused() || view == chosen)) describe(this);
         }
     }
 
@@ -140,7 +142,10 @@ final class ControlPanel extends LinearLayout {
     private final View opener;
     private final TextView hint;
     private final List<Runnable> refreshers = new ArrayList<>();
+    private final List<Tile> tiles = new ArrayList<>();
     private View first;
+    /** The selection when the panel's window has no focus to keep it in. See PanelWindow. */
+    private View chosen;
     private Supplier<View> below;
     /** Holds the focus when the panel opens with nothing chosen, so that OK does nothing. */
     private View rest;
@@ -218,6 +223,23 @@ final class ControlPanel extends LinearLayout {
     void leadDownTo(Supplier<View> view) { below = view; }
 
     View first() { return first; }
+
+    void choose(int direction) {
+        View next = chosen == null ? first : FocusFinder.getInstance().findNextFocus(this, chosen, direction);
+        if (next == null) return;
+        chosen = next;
+        hint.setVisibility(GONE);
+        for (Tile tile : tiles) {
+            tile.paint();
+            if (tile.view != next || !tile.small) continue;
+            describe(tile);
+            hint.setVisibility(VISIBLE);
+        }
+    }
+
+    void pressChosen() {
+        if (chosen != null) chosen.performClick();
+    }
 
     void hideHint() { hint.setVisibility(GONE); }
 

@@ -10,7 +10,6 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -47,16 +46,7 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
             PixelFormat.TRANSLUCENT);
         place.gravity = Gravity.TOP | Gravity.END;
         windows.addView(root, place);
-        selectable(panel);
         panel.refresh();
-    }
-
-    /** A window without the focus of the screen counts as touched, and its views could not be selected. */
-    private static void selectable(View view) {
-        if (view.isFocusable()) view.setFocusableInTouchMode(true);
-        if (!(view instanceof ViewGroup)) return;
-        ViewGroup group = (ViewGroup) view;
-        for (int index = 0; index < group.getChildCount(); index++) selectable(group.getChildAt(index));
     }
 
     /** True if the key was the panel's. Nothing is selected until the first arrow. */
@@ -65,7 +55,7 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
         int code = event.getKeyCode();
         int direction = direction(code);
         if (direction != 0) {
-            if (down) move(direction);
+            if (down) panel.choose(direction);
             return true;
         }
         boolean ok = code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER;
@@ -74,9 +64,8 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
             pressed = event.getRepeatCount() == 0 || pressed;
         } else if (pressed) {
             pressed = false;
-            View selected = root.findFocus();
-            if (!ok) close();
-            else if (selected != null) selected.performClick();
+            if (ok) panel.pressChosen();
+            else close();
         }
         return true;
     }
@@ -89,12 +78,6 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
             case KeyEvent.KEYCODE_DPAD_DOWN: return View.FOCUS_DOWN;
             default: return 0;
         }
-    }
-
-    private void move(int direction) {
-        View selected = root.findFocus();
-        View next = selected == null ? panel.first() : selected.focusSearch(direction);
-        if (next != null) next.requestFocus(direction);
     }
 
     void close() {

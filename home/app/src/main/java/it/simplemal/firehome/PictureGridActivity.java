@@ -4,9 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Outline;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
@@ -22,7 +25,8 @@ import java.util.List;
 
 /**
  * Every picture of one set, or Salotto's own backdrops with no set named, four across and four down
- * at a time. OK shows one as the whole screen, as the Home would, to keep it or go back to the grid.
+ * at a time. OK shows one as the whole screen, as the Home would: left and right go through the
+ * others there, Confirm keeps the one on show and Back returns to the grid.
  */
 public final class PictureGridActivity extends CardActivity {
     static final String FOLDER = "folder";
@@ -49,6 +53,8 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BUTTON_BOTTOM = 48;
     /** A selected button grows a little, and would be cut at the edge of its row. */
     private static final int BUTTON_ROOM = 8;
+    private static final int ARROW_SP = 34;
+    private static final float ARROW_ALPHA = 0.55f;
 
     private final List<ImageView> cells = new ArrayList<>();
     private List<String> pictures = new ArrayList<>();
@@ -57,6 +63,9 @@ public final class PictureGridActivity extends CardActivity {
     private TextView title;
     private TextView confirmButton;
     private String previewed;
+    private int previewIndex;
+    private TextView before;
+    private TextView after;
     private ScrollView scroll;
     private FrameLayout preview;
     private ImageView full;
@@ -142,7 +151,7 @@ public final class PictureGridActivity extends CardActivity {
             view.setForeground(focused ? edge() : null);
             if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index))));
         });
-        cell.setOnClickListener(view -> showPreview(cell, index));
+        cell.setOnClickListener(view -> showPreview(index));
         return cell;
     }
 
@@ -193,11 +202,14 @@ public final class PictureGridActivity extends CardActivity {
         buttons.setGravity(Gravity.CENTER);
         int room = dp(BUTTON_ROOM);
         buttons.setPadding(room, room, room, room);
+        before = arrow("‹");
+        buttons.addView(before);
         TextView confirm = button(getString(R.string.card_confirm), BUTTON_SP, this::confirm);
-        buttons.addView(confirm, new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2));
-        LinearLayout.LayoutParams second = new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2);
-        second.setMarginStart(dp(BUTTON_GAP));
-        buttons.addView(button(getString(R.string.first_key_back), BUTTON_SP, this::closePreview), second);
+        LinearLayout.LayoutParams middle = new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2);
+        middle.setMargins(dp(BUTTON_GAP), 0, dp(BUTTON_GAP), 0);
+        buttons.addView(confirm, middle);
+        after = arrow("›");
+        buttons.addView(after);
         FrameLayout.LayoutParams bottom = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         bottom.bottomMargin = dp(BUTTON_BOTTOM);
         page.addView(buttons, bottom);
@@ -205,18 +217,33 @@ public final class PictureGridActivity extends CardActivity {
         return page;
     }
 
+    /** Not a button: it only says that the arrows of the remote go on from here. */
+    private TextView arrow(String mark) {
+        TextView arrow = label(mark, ARROW_SP);
+        arrow.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        arrow.setAlpha(ARROW_ALPHA);
+        return arrow;
+    }
+
     /** The thumbnail at once, the real picture as soon as it is read, finished as on the Home. */
-    private void showPreview(ImageView cell, int index) {
+    private void showPreview(int index) {
+        previewIndex = index;
+        ImageView cell = cells.get(index);
         opened = cell;
         previewed = pictures.get(index);
         String asset = previewed;
         int shown = ++previews;
-        full.setImageDrawable(files ? cell.getDrawable() : Look.preset(asset));
+        before.setVisibility(index > 0 ? View.VISIBLE : View.INVISIBLE);
+        after.setVisibility(index < pictures.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+        Drawable quick = files ? cell.getDrawable() : Look.preset(asset);
+        if (quick != null) full.setImageDrawable(quick);
         preview.setVisibility(View.VISIBLE);
         scroll.setVisibility(View.INVISIBLE);
         confirmButton.requestFocus();
         if (!files) return;
         Background.draw(() -> {
+            // Going through them quickly leaves the ones already passed behind.
+            if (shown != previews) return;
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap picture = decode(asset, options);
@@ -242,8 +269,20 @@ public final class PictureGridActivity extends CardActivity {
         finish();
     }
 
-    @Override public void onBackPressed() {
-        if (preview.getVisibility() == View.VISIBLE) closePreview();
-        else super.onBackPressed();
+    /** Back is decided here, and the arrows in a preview: its one button has the focus and stays. */
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        int code = event.getKeyCode();
+        boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        boolean previewing = preview.getVisibility() == View.VISIBLE;
+        if (code == KeyEvent.KEYCODE_BACK) {
+            if (!down && previewing) closePreview();
+            else if (!down) finish();
+            return true;
+        }
+        int step = code == KeyEvent.KEYCODE_DPAD_LEFT ? -1 : code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : 0;
+        if (!previewing || step == 0) return super.dispatchKeyEvent(event);
+        int next = previewIndex + step;
+        if (down && next >= 0 && next < pictures.size()) showPreview(next);
+        return true;
     }
 }
