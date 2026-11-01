@@ -53,6 +53,7 @@ final class ControlPanel extends LinearLayout {
     /** Where the number goes in each picture, as a share of its height. */
     private static final float SUN_CENTER = 0.5f;
     private static final float TIMER_CENTER = 0.545f;
+    private static final long TIMER_TICK_MS = 5000;
     /** Dark enough to carry white on a bright backdrop. */
     private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
@@ -129,6 +130,10 @@ final class ControlPanel extends LinearLayout {
     }
 
     private final Host host;
+    private final Runnable timerTick = () -> {
+        if (isShown()) showTimer();
+    };
+    private Tile timerTile;
     private FireSettings fire;
     private final View opener;
     private final TextView hint;
@@ -283,12 +288,8 @@ final class ControlPanel extends LinearLayout {
 
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
-        refreshers.add(() -> {
-            int left = TaskService.sleepMinutesLeft();
-            timer.icon.setImageDrawable(left == 0 ? getContext().getDrawable(R.drawable.ic_timer) : new NumberIcon(
-                getContext().getDrawable(R.drawable.ic_timer_full), String.valueOf(left), TIMER_CENTER));
-            timer.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
-        });
+        timerTile = timer;
+        refreshers.add(this::showTimer);
         refreshers.add(() -> showDim(dim));
         refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
@@ -420,6 +421,21 @@ final class ControlPanel extends LinearLayout {
             else host.say(getContext().getString(R.string.panel_command_failed));
             refresh();
         });
+    }
+
+    /** Counts down in front of whoever is looking, and stops once the panel is shut. */
+    private void showTimer() {
+        int left = TaskService.sleepMinutesLeft();
+        timerTile.icon.setImageDrawable(left == 0 ? getContext().getDrawable(R.drawable.ic_timer) : new NumberIcon(
+            getContext().getDrawable(R.drawable.ic_timer_full), String.valueOf(left), TIMER_CENTER));
+        timerTile.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
+        removeCallbacks(timerTick);
+        if (left > 0) postDelayed(timerTick, TIMER_TICK_MS);
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        removeCallbacks(timerTick);
+        super.onDetachedFromWindow();
     }
 
     /** Zero is off. A level in use is cut out of the sun. */
