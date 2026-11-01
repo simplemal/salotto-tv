@@ -6,6 +6,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APK="$ROOT/home/.toolchain/app-build/outputs/apk/debug/app-debug.apk"
 KEY="$ROOT/chiavi-aggiornamento/privata.pem"
+# The certificate of firma-salotto.jks, which is public: every Stick has it. A build with any other
+# key cannot update them.
+CERTIFICATE="864ae0a359c87748a250d8a9185072854c2d6fb94367bcf517abdf0887a2feb2"
 CODE="$(sed -n "s/.*versionCode \([0-9]*\).*/\1/p" "$ROOT/home/app/build.gradle")"
 NAME="$(sed -n "s/.*versionName '\(.*\)'.*/\1/p" "$ROOT/home/app/build.gradle")"
 REPO="$(sed -n 's/.*UPDATES_REPO = "\(.*\)".*/\1/p' "$ROOT/home/app/src/main/java/it/simplemal/firehome/Fire.java")"
@@ -20,6 +23,10 @@ case "$BADGING" in
   *"versionCode='$CODE' versionName='$NAME'"*) ;;
   *) echo "Fermo: l'APK non è la versione $NAME ($CODE), va ricompilato."; exit 1 ;;
 esac
+
+TOOLS="$ROOT/home/.toolchain"
+SIGNER="$(JAVA_HOME="$(echo "$TOOLS"/jdk-*/Contents/Home)" "$TOOLS/android-sdk/build-tools/34.0.0/apksigner" verify --print-certs "$APK" 2>/dev/null | sed -n 's/.*certificate SHA-256 digest: //p' | sed -n 1p)"
+[ "$SIGNER" = "$CERTIFICATE" ] || { echo "Fermo: l'APK non ha la firma definitiva."; exit 1; }
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT

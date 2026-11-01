@@ -22,14 +22,14 @@ T="$PWD/.toolchain"; JAVA_HOME="$T/jdk-17.0.21+9/Contents/Home" ANDROID_HOME="$T
 
 Le versioni nuove si installano sopra le vecchie solo se firmate con la stessa chiave. La chiave non va mai nel repository: conservala a parte, con una copia di sicurezza. Se si perde, chi ha già Salotto deve disinstallarlo e reinstallarlo.
 
-Oggi l'APK è firmato con la chiave di sviluppo di questo Mac. La chiave definitiva è pronta in `chiavi-aggiornamento/`, ignorata da Git, ma non è ancora in uso: `firma-salotto.jks` e `firma.properties`, con la password. Salotto e `home/cover` la usano aggiungendo `-Pfirma` alla compilazione (`home/firma.gradle`). La build resta debuggable, e non è una dimenticanza: il ritorno alla versione precedente usa `pm install -d`, che Android accetta solo su queste build, e gli sfondi personali usano `run-as`.
+Dalla 1.0.0 Salotto e `home/cover` sono firmati con la chiave definitiva, in `chiavi-aggiornamento/`, ignorata da Git: `firma-salotto.jks` e `firma.properties`, con la password. `home/firma.gradle` la usa da sola quando la trova; senza, compila con la chiave di sviluppo, e `distro/tools/pubblica-aggiornamento.sh` rifiuta di pubblicare un APK con un certificato diverso da quello definitivo. La build resta debuggable, e non è una dimenticanza: il ritorno alla versione precedente usa `pm install -d`, che Android accetta solo su queste build, e gli sfondi personali usano `run-as`.
 
-Il passaggio cambia la firma, quindi Android rifiuta l'aggiornamento sopra la versione installata e l'aggiornatore si ferma con SAL-F111. Si fa una volta sola, così:
+Il passaggio dalla chiave di sviluppo è stato fatto il 2026-11-01. Android rifiuta un aggiornamento con firma diversa e l'aggiornatore si ferma con SAL-F111, quindi una Stick ancora sulla vecchia firma va portata così, conservando le scelte:
 
-1. Sulla Stick, Impostazioni → Backup, per salvare app, aspetto e meteo.
-2. `FIRMA=1 distro/tools/prepara-copertura.sh`, poi da `home` `gradle -Pfirma :app:assembleDebug`.
-3. Disinstalla `it.simplemal.firehome` e `it.simplemal.firehome.cover` e rilancia l'installer, che dà di nuovo tutti i permessi.
-4. Da lì in poi compila sempre con `-Pfirma` e pubblica con `distro/tools/pubblica-aggiornamento.sh`.
+1. `adb exec-out run-as it.simplemal.firehome tar cf - shared_prefs files > salotto-dati.tar`, fuori dal repository.
+2. `adb uninstall` di `it.simplemal.firehome.cover` e di `it.simplemal.firehome`.
+3. `adb install` del nuovo APK e, prima di aprirlo, `adb exec-in run-as it.simplemal.firehome tar xf - < salotto-dati.tar`. Controlla che `files` sia tornata: una volta il primo tentativo si è fermato a `shared_prefs`.
+4. Apri Installa Salotto, che dà di nuovo i permessi e riattiva i servizi.
 
 Tieni una copia della cartella `chiavi-aggiornamento/` fuori da Dropbox, per esempio nel gestore di password: chi perde la chiave deve far reinstallare tutti.
 
@@ -75,7 +75,7 @@ Lo strumento controlla versione e dati personali, firma `update.json`, aggiorna 
 ## Prima del primo rilascio pubblico
 
 - [ ] Licenza di Salotto scelta. Fixer, AirPlay Server e Aurora sono GPL-3.0, e non vengono ridistribuiti
-- [ ] Firma definitiva
+- [x] Firma definitiva
 - [ ] Provata su una seconda Stick
 - [ ] Controllo di privacy di tutta la storia Git, non solo dell'ultima versione
 - [ ] Nomi e marchi: «Fire TV» e «Apple TV» si citano solo per descrivere la compatibilità

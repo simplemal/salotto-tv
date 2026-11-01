@@ -1,10 +1,11 @@
-// With -Pfirma, signs with the final key instead of the development one. The build stays debuggable:
-// the way back to the previous version installs with `pm install -d`, which works only on those.
-// The key stays out of Git, in chiavi-aggiornamento/. See distro/docs/RILASCIO.md.
-if (project.hasProperty('firma')) {
-    def folder = rootProject.file('../chiavi-aggiornamento')
-    def file = new File(folder, 'firma.properties')
-    if (!file.exists()) throw new GradleException("Manca ${file}: la firma definitiva non è su questo computer.")
+// Signs with the final key when it is on this computer, with the development one otherwise: the
+// two cannot update each other, so choosing by hand would be one forgotten flag away from a broken
+// release. The build stays debuggable: the way back to the previous version installs with
+// `pm install -d`, which works only on those. The key stays out of Git, in chiavi-aggiornamento/.
+// See distro/docs/RILASCIO.md.
+def folder = rootProject.file('../chiavi-aggiornamento')
+def file = new File(folder, 'firma.properties')
+if (file.exists()) {
     def firma = new Properties()
     file.withInputStream { firma.load(it) }
     android {
