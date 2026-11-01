@@ -40,6 +40,7 @@ public final class PanelActivity extends CardActivity {
 
     @Override protected void onDestroy() {
         open = false;
+        panel.closed();
         super.onDestroy();
     }
 }

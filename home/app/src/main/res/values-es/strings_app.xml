@@ -21,6 +21,7 @@
     <string name="apps_add_hint">Mantén pulsado OK para añadirla a Inicio</string>
     <string name="apps_remove_hint">Esta app ya está en Inicio. Mantén pulsado OK para quitarla</string>
 
+    <string name="panel_on">encendido</string>
     <string name="panel_off">apagado</string>
     <string name="panel_level">nivel %1$d</string>
     <string name="panel_standby">Standby</string>

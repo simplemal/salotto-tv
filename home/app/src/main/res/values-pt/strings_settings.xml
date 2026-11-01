@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">Pressione OK para parear.</string>
     <string name="settings_pairing_failed">Falha no pareamento</string>
     <string name="settings_pairing_mode">Coloque o dispositivo em modo de pareamento.</string>
+    <string name="settings_notifications_text">As notificações do Fire OS e das apps.</string>
     <string name="settings_notification_count">Número de notificações</string>
     <string name="settings_notification_count_text">Mostra na Central de controle quantas notificações há. O Salotto só as conta, sem ler o texto.</string>
     <string name="settings_limit_ads">Limitar o rastreamento de anúncios</string>

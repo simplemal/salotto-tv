@@ -168,6 +168,8 @@ public final class MainActivity extends CardActivity {
     private List<String> home;
     private List<String> shownApps = new ArrayList<>();
     private String shown;
+    private String lookShown;
+    private LinearLayout dock;
     private String plainBackdrop;
     private String moving;
     private boolean noUpdateLeft;
@@ -517,11 +519,12 @@ public final class MainActivity extends CardActivity {
         if (!HomeCover.ready()) root.postDelayed(() -> HomeCover.take(getWindow()), FIRST_PICTURE_MS);
         home = HomeApps.load(this);
         List<String> apps = visible();
-        if (!state(apps).equals(shown)) {
-            String focus = focusedTag();
+        String look = Look.signature(this);
+        if (!look.equals(lookShown)) {
+            lookShown = look;
             applyLook();
-            render(focus, apps);
         }
+        if (!state(apps).equals(shown)) render(focusedTag(), apps);
         Look.backHome(this);
         waitForSaver();
         ticker.post(weatherCheck);
@@ -626,7 +629,7 @@ public final class MainActivity extends CardActivity {
     }
 
     private String state(List<String> apps) {
-        return TextUtils.join(",", apps) + "|" + Look.signature(this);
+        return TextUtils.join(",", apps) + "|" + Look.cardsSignature(this);
     }
 
     /**
@@ -660,6 +663,7 @@ public final class MainActivity extends CardActivity {
 
     private void applyLook() {
         showBackdrop();
+        if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
         columns = Look.columns(this);
         clock.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
         clock.setTextSize(Look.SIZES[Look.size(this)]);
@@ -718,7 +722,8 @@ public final class MainActivity extends CardActivity {
                 row = row(page);
                 row.setPadding(inset, index == 0 ? dockPadding : 0, inset, index == 0 ? dockPadding : 0);
                 if (index == 0) {
-                    row.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
+                    dock = row;
+                    dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }

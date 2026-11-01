@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">Drücke OK, um es zu koppeln.</string>
     <string name="settings_pairing_failed">Kopplung fehlgeschlagen</string>
     <string name="settings_pairing_mode">Versetze das Gerät in den Kopplungsmodus.</string>
+    <string name="settings_notifications_text">Benachrichtigungen von Fire OS und Apps.</string>
     <string name="settings_notification_count">Anzahl der Benachrichtigungen</string>
     <string name="settings_notification_count_text">Zeigt im Kontrollzentrum, wie viele Benachrichtigungen es gibt. Salotto zählt sie nur, ohne den Text zu lesen.</string>
     <string name="settings_limit_ads">Werbe-Tracking begrenzen</string>

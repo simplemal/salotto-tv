@@ -103,8 +103,8 @@ public final class SettingsActivity extends CardActivity {
     private static final String[] SURROUNDS = {"BEST_AVAILABLE", "STEREO", "DD_PLUS_ALWAYS", "DD_ALWAYS"};
     /** In the order of encoded_surround_output: 0 to 3. */
     private static final String SURROUND_MODE = "encoded_surround_output";
-    private static final String LEVELER = "aq_volume_leveler";
-    private static final String DIALOGUE = "aq_dialogue_enhancer";
+    static final String LEVELER = "aq_volume_leveler";
+    static final String DIALOGUE = "aq_dialogue_enhancer";
     private boolean doubleHome;
     private static final String VIDEO_QUALITY = "com.amazon.tv.settings.VIDEO_QUALITY";
     private static final int[] VIDEO_QUALITY_NAMES = {R.string.settings_quality_good,
@@ -586,6 +586,11 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_screen), null, getDrawable(R.drawable.ic_s_tv),
                 getString(R.string.settings_screen_text),
                 true, () -> enter(this::showScreen)),
+            new Entry(getString(R.string.panel_notifications), notificationValue(), getDrawable(R.drawable.ic_s_notify),
+                getString(R.string.settings_notifications_text), false, () -> {
+                    NotificationCounter.seen(this);
+                    open(Fire.notifications());
+                }),
             new Entry(getString(R.string.settings_language), Language.name(this), getDrawable(R.drawable.ic_s_language),
                 getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
             new Entry(getString(R.string.settings_network), null, getDrawable(R.drawable.ic_s_language),
@@ -613,6 +618,11 @@ public final class SettingsActivity extends CardActivity {
                     TaskService.wantFireSettings();
                     open(fireOsSettings());
                 })));
+    }
+
+    private String notificationValue() {
+        int count = NotificationCounter.count(this);
+        return count > 0 ? String.valueOf(count) : null;
     }
 
     /** A word in the middle of a sentence: German keeps its capital. */

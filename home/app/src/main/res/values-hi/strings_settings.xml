@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">पेयर करने के लिए OK दबाएं।</string>
     <string name="settings_pairing_failed">पेयरिंग नहीं हो सकी</string>
     <string name="settings_pairing_mode">डिवाइस को पेयरिंग मोड में रखें।</string>
+    <string name="settings_notifications_text">Fire OS और ऐप्स के नोटिफ़िकेशन।</string>
     <string name="settings_notification_count">नोटिफ़िकेशन की संख्या</string>
     <string name="settings_notification_count_text">कंट्रोल सेंटर में दिखाता है कि कितने नोटिफ़िकेशन हैं। Salotto उन्हें सिर्फ़ गिनता है, उनका टेक्स्ट नहीं पढ़ता।</string>
     <string name="settings_limit_ads">विज्ञापन ट्रैकिंग सीमित करें</string>

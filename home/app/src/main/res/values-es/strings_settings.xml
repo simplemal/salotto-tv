@@ -141,6 +141,7 @@
     <string name="settings_press_to_pair">Pulsa OK para emparejarlo.</string>
     <string name="settings_pairing_failed">No se ha podido emparejar</string>
     <string name="settings_pairing_mode">Pon el dispositivo en modo de emparejamiento.</string>
+    <string name="settings_notifications_text">Las notificaciones de Fire OS y de las apps.</string>
     <string name="settings_notification_count">Número de notificaciones</string>
     <string name="settings_notification_count_text">Muestra en el Centro de control cuántas notificaciones hay. Salotto solo las cuenta, sin leer su texto.</string>
     <string name="settings_limit_ads">Limitar el seguimiento publicitario</string>

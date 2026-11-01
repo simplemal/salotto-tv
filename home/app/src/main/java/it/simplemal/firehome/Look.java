@@ -230,6 +230,11 @@ final class Look {
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context);
     }
 
+    /** The part of it the Home's cards are built from: the rest changes without touching them. */
+    static String cardsSignature(Context context) {
+        return columns(context) + "/" + names(context);
+    }
+
     /** Images copied into the app's own folder: the Stick has no system image picker. */
     static List<File> images(Context context) {
         List<File> images = new ArrayList<>();

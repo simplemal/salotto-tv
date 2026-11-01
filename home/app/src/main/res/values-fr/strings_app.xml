@@ -21,6 +21,7 @@
     <string name="apps_add_hint">Maintenez OK pour l’ajouter à l’Accueil</string>
     <string name="apps_remove_hint">Cette appli est déjà sur l’Accueil. Maintenez OK pour la retirer</string>
 
+    <string name="panel_on">activé</string>
     <string name="panel_off">désactivé</string>
     <string name="panel_level">niveau %1$d</string>
     <string name="panel_standby">Veille</string>

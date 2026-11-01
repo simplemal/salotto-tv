@@ -34,6 +34,8 @@ final class Fire {
     static final String HOME_HELD_PAGE = "com.amazon.tv.settings.v2.hud.HudActivity";
     /** What Fire OS opens on a remote's Settings key. */
     static final String SETTINGS_PAGE = "com.amazon.tv.launcher.ui.MainSettingsActivity";
+    /** What Fire OS opens on the recent apps key. */
+    static final String RECENTS_PAGE = "com.amazon.tv.launcher.deeplink.activity.RecentDeepLinkActivityDI";
     /** Fixer's switches answer only to the shell. */
     static final String FIXER_COMMAND = "dumpsys activity service " + FIXER + "/.HijackService ";
     static final String DOUBLE_HOME_ON = "doubleTap=true";

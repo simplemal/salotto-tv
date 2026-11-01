@@ -21,6 +21,7 @@
     <string name="apps_add_hint">होम में जोड़ने के लिए OK दबाए रखें</string>
     <string name="apps_remove_hint">यह ऐप पहले से होम में है। हटाने के लिए OK दबाए रखें</string>
 
+    <string name="panel_on">चालू</string>
     <string name="panel_off">बंद</string>
     <string name="panel_level">लेवल %1$d</string>
     <string name="panel_standby">स्टैंडबाय</string>

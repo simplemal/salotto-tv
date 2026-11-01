@@ -81,6 +81,10 @@ public final class TaskService extends AccessibilityService {
     private static final long QUICK_MENU_ONCE_MS = 2000;
     private static final long QUICK_MENU_CLOSE_MS = 250;
     private static final long QUICK_MENU_FOCUS_MS = 400;
+    private static final int RECENTS_TRIES = 50;
+    private static final long RECENTS_TRY_MS = 20;
+    private static final int RECENTS_BACK_EVERY = 12;
+    private static final int RECENTS_NO_BACK = -1;
     private static final String ENABLED_SERVICES = Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES;
     private static final String KEY_LIFETIME = "adb_allowed_connection_time";
     private static final String KEYS_FILE = "keys";
@@ -149,6 +153,7 @@ public final class TaskService extends AccessibilityService {
     private volatile boolean stopReady;
     private int stopLeaving;
     private long quickMenuAt;
+    private long recentsAt;
     private String front;
     private View veil;
     private HomeCover cover;
@@ -571,6 +576,8 @@ public final class TaskService extends AccessibilityService {
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
+        // The recent apps key of the newer remotes goes straight to Fire OS: no app ever hears it.
+        if (Fire.RECENTS_PAGE.contentEquals(String.valueOf(event.getClassName()))) recentsPageShown();
         if (name.equals(front)) return;
         if (HomeApps.isUserApp(this, name)) front = name;
         else if (HomeApps.isHome(this, name)) front = null;
@@ -622,6 +629,32 @@ public final class TaskService extends AccessibilityService {
         // Sooner than this the menu does not have the focus yet, and Back would miss it.
         main.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_BACK), QUICK_MENU_FOCUS_MS);
         if (homeLog == null) main.postDelayed(this::openPanel, QUICK_MENU_FOCUS_MS + QUICK_MENU_CLOSE_MS);
+    }
+
+    /** Left under the task manager, the page would come back when that closes. */
+    private void recentsPageShown() {
+        long now = SystemClock.elapsedRealtime();
+        if (now - recentsAt < QUICK_MENU_ONCE_MS) return;
+        recentsAt = now;
+        closeRecentsPage(RECENTS_TRIES, RECENTS_NO_BACK);
+    }
+
+    /**
+     * Back before the page has the focus would go to the app under it, and a page just opened can
+     * ignore its first one. `sinceBack` counts the tries since the last Back.
+     */
+    private void closeRecentsPage(int tries, int sinceBack) {
+        AccessibilityNodeInfo active = getRootInActiveWindow();
+        boolean there = active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+        boolean asked = sinceBack != RECENTS_NO_BACK;
+        if (tries == 0 || asked && !there) {
+            openTasks();
+            return;
+        }
+        boolean back = there && (!asked || sinceBack >= RECENTS_BACK_EVERY);
+        if (back) performGlobalAction(GLOBAL_ACTION_BACK);
+        int next = back ? 0 : asked ? sinceBack + 1 : RECENTS_NO_BACK;
+        main.postDelayed(() -> closeRecentsPage(tries - 1, next), RECENTS_TRY_MS);
     }
 
     private void openPanel() {

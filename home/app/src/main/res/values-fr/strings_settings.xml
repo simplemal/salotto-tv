@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">Appuyez sur OK pour l’appairer.</string>
     <string name="settings_pairing_failed">Échec de l’appairage</string>
     <string name="settings_pairing_mode">Mettez l’appareil en mode appairage.</string>
+    <string name="settings_notifications_text">Les notifications de Fire OS et des applis.</string>
     <string name="settings_notification_count">Nombre de notifications</string>
     <string name="settings_notification_count_text">Affiche dans le centre de contrôle le nombre de notifications. Salotto les compte seulement, sans en lire le texte.</string>
     <string name="settings_limit_ads">Limiter le suivi publicitaire</string>

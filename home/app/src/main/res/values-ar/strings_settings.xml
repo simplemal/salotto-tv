@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">اضغط OK لإقرانه.</string>
     <string name="settings_pairing_failed">فشل الإقران</string>
     <string name="settings_pairing_mode">ضع الجهاز في وضع الإقران.</string>
+    <string name="settings_notifications_text">إشعارات Fire OS والتطبيقات.</string>
     <string name="settings_notification_count">عدد الإشعارات</string>
     <string name="settings_notification_count_text">يعرض في مركز التحكم عدد الإشعارات. يعدّها Salotto فقط دون قراءة نصها.</string>
     <string name="settings_limit_ads">الحدّ من تتبّع الإعلانات</string>

@@ -140,6 +140,7 @@
     <string name="settings_press_to_pair">Premi OK per associarlo.</string>
     <string name="settings_pairing_failed">Associazione non riuscita</string>
     <string name="settings_pairing_mode">Metti il dispositivo in associazione.</string>
+    <string name="settings_notifications_text">Le notifiche ricevute da Fire OS e dalle app.</string>
     <string name="settings_notification_count">Numero delle notifiche</string>
     <string name="settings_notification_count_text">Mostra nel centro di controllo quante notifiche ci sono. Salotto le conta soltanto, senza leggerne il testo.</string>
     <string name="settings_limit_ads">Limita il tracciamento pubblicitario</string>

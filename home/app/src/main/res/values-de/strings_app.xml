@@ -21,6 +21,7 @@
     <string name="apps_add_hint">OK gedrückt halten, um sie zu Home hinzuzufügen</string>
     <string name="apps_remove_hint">Diese App ist schon auf Home. OK gedrückt halten, um sie zu entfernen</string>
 
+    <string name="panel_on">an</string>
     <string name="panel_off">aus</string>
     <string name="panel_level">Stufe %1$d</string>
     <string name="panel_standby">Standby</string>

@@ -141,6 +141,7 @@
     <string name="settings_press_to_pair">按 OK 键配对。</string>
     <string name="settings_pairing_failed">配对失败</string>
     <string name="settings_pairing_mode">请让设备进入配对模式。</string>
+    <string name="settings_notifications_text">来自 Fire OS 和应用的通知。</string>
     <string name="settings_notification_count">通知数量</string>
     <string name="settings_notification_count_text">在控制中心显示有多少条通知。Salotto 只计数，不会读取内容。</string>
     <string name="settings_limit_ads">限制广告跟踪</string>

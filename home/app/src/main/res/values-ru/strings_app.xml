@@ -21,6 +21,7 @@
     <string name="apps_add_hint">Удерживайте OK, чтобы добавить на главный экран</string>
     <string name="apps_remove_hint">Это приложение уже на главном экране. Удерживайте OK, чтобы убрать</string>
 
+    <string name="panel_on">вкл.</string>
     <string name="panel_off">выкл.</string>
     <string name="panel_level">уровень %1$d</string>
     <string name="panel_standby">Ожидание</string>

@@ -21,6 +21,7 @@
     <string name="apps_add_hint">اضغط مطولًا على OK لإضافته إلى الرئيسية</string>
     <string name="apps_remove_hint">هذا التطبيق موجود في الرئيسية. اضغط مطولًا على OK لإزالته</string>
 
+    <string name="panel_on">مُفعّل</string>
     <string name="panel_off">متوقف</string>
     <string name="panel_level">مستوى %1$d</string>
     <string name="panel_standby">الاستعداد</string>

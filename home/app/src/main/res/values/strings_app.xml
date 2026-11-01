@@ -32,6 +32,7 @@
 
     <!-- Control panel. The tiles are very small: keep these short -->
     <!-- State of a tile, in lower case, after its name: "Timer: spento" -->
+    <string name="panel_on">acceso</string>
     <string name="panel_off">spento</string>
     <!-- State of a tile: %1$d is 1 or 2 -->
     <string name="panel_level">livello %1$d</string>

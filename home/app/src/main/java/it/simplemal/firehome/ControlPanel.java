@@ -49,9 +49,6 @@ final class ControlPanel extends LinearLayout {
     private static final int BIG_ICON = 40;
     private static final int WIDE_ICON = 18;
     private static final int SMALL_ICON = 20;
-    private static final int BADGE = 15;
-    private static final int BADGE_FILL = Color.rgb(235, 60, 50);
-    private static final int MOST_SHOWN = 9;
     /** Dark enough to carry white on a bright backdrop. */
     private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
@@ -125,6 +122,7 @@ final class ControlPanel extends LinearLayout {
     }
 
     private final CardActivity host;
+    private FireSettings fire;
     private final View opener;
     private final TextView hint;
     private final List<Runnable> refreshers = new ArrayList<>();
@@ -197,7 +195,10 @@ final class ControlPanel extends LinearLayout {
         rest.requestFocus();
     }
 
-    void closed() { backTo = null; }
+    void closed() {
+        backTo = null;
+        letGoOfFire();
+    }
 
     /** On the Home, the last row leads down to the apps. */
     void leadDownTo(Supplier<View> view) { below = view; }
@@ -208,27 +209,6 @@ final class ControlPanel extends LinearLayout {
 
     void refresh() {
         for (Runnable refresher : refreshers) refresher.run();
-    }
-
-    /** Over the tile, not in it, so that the icon stays where it is. */
-    private void showCount(Tile tile, int count) {
-        tile.show(count > 0 ? String.valueOf(count) : "", false);
-        tile.view.getOverlay().clear();
-        if (count == 0) return;
-        TextView badge = host.label(count > MOST_SHOWN ? MOST_SHOWN + "+" : String.valueOf(count), 8);
-        badge.setGravity(Gravity.CENTER);
-        badge.setTextColor(Color.WHITE);
-        badge.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(BADGE_FILL);
-        fill.setCornerRadius(host.dp(BADGE));
-        badge.setBackground(fill);
-        int side = host.dp(BADGE);
-        int size = MeasureSpec.makeMeasureSpec(side, MeasureSpec.EXACTLY);
-        badge.measure(size, size);
-        int left = host.dp(UNIT) - side - host.dp(2);
-        badge.layout(left, host.dp(2), left + side, host.dp(2) + side);
-        tile.view.getOverlay().add(badge);
     }
 
     private LayoutParams size(int width, int height, int startGap, int topGap) {
@@ -254,14 +234,8 @@ final class ControlPanel extends LinearLayout {
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
 
         LinearLayout modes = row();
-        Tile notify = small(modes, R.drawable.ic_s_notify, host.getString(R.string.panel_notifications), 0, () -> {
-            NotificationCounter.seen(host);
-            host.open(Fire.notifications());
-        });
-        Tile timer = small(modes, R.drawable.ic_timer, host.getString(R.string.panel_timer), GAP, () -> {
-            nextTimer();
-            refresh();
-        });
+        audioSwitch(modes, R.drawable.ic_s_voice, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
+        audioSwitch(modes, R.drawable.ic_s_equalizer, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, host.getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(host)));
         Tile warm = small(modes, R.drawable.ic_eye, host.getString(R.string.panel_blue_filter), GAP,
@@ -269,12 +243,14 @@ final class ControlPanel extends LinearLayout {
 
         LinearLayout tools = row();
         small(tools, R.drawable.ic_image, host.getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver()));
-        small(tools, R.drawable.ic_airplay, "AirPlay", GAP, () -> host.openPackage(Fire.AIRPLAY));
+        Tile timer = small(tools, R.drawable.ic_timer, host.getString(R.string.panel_timer), GAP, () -> {
+            nextTimer();
+            refresh();
+        });
         small(tools, R.drawable.ic_tasks, host.getString(R.string.first_does_tasks), GAP,
             () -> host.open(new Intent(host, TasksActivity.class)));
         small(tools, R.drawable.ic_restart, host.getString(R.string.panel_restart), GAP, TaskService::restart);
 
-        refreshers.add(() -> showCount(notify, NotificationCounter.count(host)));
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
         refreshers.add(() -> {
@@ -334,6 +310,41 @@ final class ControlPanel extends LinearLayout {
         return tile;
     }
 
+    /** Fire OS's setting takes a moment to read or write, so the tile answers the press at once. */
+    private void audioSwitch(LinearLayout row, int picture, int name, int startGap, String id) {
+        Tile[] tile = new Tile[1];
+        tile[0] = small(row, picture, host.getString(name), startGap, () -> flip(tile[0], id));
+        refreshers.add(() -> {
+            FireSettings settings = fire();
+            Background.run(() -> {
+                boolean on = "true".equals(settings.read(FireSettings.AUDIO, id));
+                host.runOnUiThread(() -> showSwitch(tile[0], on));
+            });
+        });
+    }
+
+    private void flip(Tile tile, String id) {
+        boolean on = !tile.active;
+        showSwitch(tile, on);
+        FireSettings settings = fire();
+        Background.run(() -> {
+            if (settings.write(FireSettings.AUDIO, id, String.valueOf(on))) return;
+            host.runOnUiThread(() -> {
+                host.sayLong(host.getString(R.string.settings_fire_refused));
+                showSwitch(tile, !on);
+            });
+        });
+    }
+
+    private void showSwitch(Tile tile, boolean on) {
+        tile.show(host.getString(on ? R.string.panel_on : R.string.panel_off), on);
+    }
+
+    private FireSettings fire() {
+        if (fire == null) fire = new FireSettings(host);
+        return fire;
+    }
+
     private void describe(Tile tile) {
         CharSequence state = tile.value.getText();
         hint.setText(state.length() == 0 ? tile.title.getText()
@@ -344,6 +355,12 @@ final class ControlPanel extends LinearLayout {
         host.shell(command, output -> {
             if (output == null) host.say(host.getString(R.string.panel_command_failed));
         });
+    }
+
+    /** A shut panel keeps nothing of Amazon's settings app awake. */
+    private void letGoOfFire() {
+        if (fire != null) fire.close();
+        fire = null;
     }
 
     private void settings(String section) {

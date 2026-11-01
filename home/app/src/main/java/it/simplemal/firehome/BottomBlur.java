@@ -10,11 +10,13 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 
 /**
- * Blurs the lower third of a picture, from nothing at its top to all of it at the bottom. Done
+ * Blurs the lower part of a picture, from nothing at its top to all of it near the bottom. Done
  * once, when the picture is loaded: what the Home then draws is still one plain bitmap.
  */
 final class BottomBlur {
-    private static final float START = 2 / 3f;
+    private static final float START = 0.6f;
+    /** Where in that part the blur is complete. */
+    private static final float FULL = 0.7f;
     /** Each halving doubles the blur. Android 11 has no blur of its own for a view. */
     private static final int HALVINGS = 4;
 
@@ -30,7 +32,7 @@ final class BottomBlur {
         int layer = canvas.saveLayer(0, top, width, height, null);
         canvas.drawBitmap(soft, 0, top, null);
         Paint fade = new Paint();
-        fade.setShader(new LinearGradient(0, top, 0, height, Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP));
+        fade.setShader(new LinearGradient(0, top, 0, top + FULL * (height - top), Color.TRANSPARENT, Color.BLACK, Shader.TileMode.CLAMP));
         fade.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
         canvas.drawRect(0, top, width, height, fade);
         canvas.restoreToCount(layer);

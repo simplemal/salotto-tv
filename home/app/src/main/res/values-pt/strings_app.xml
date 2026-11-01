@@ -21,6 +21,7 @@
     <string name="apps_add_hint">Mantenha OK pressionado para adicioná-lo ao Início</string>
     <string name="apps_remove_hint">Este app já está no Início. Mantenha OK pressionado para tirá-lo</string>
 
+    <string name="panel_on">ligado</string>
     <string name="panel_off">desligado</string>
     <string name="panel_level">nível %1$d</string>
     <string name="panel_standby">Standby</string>
