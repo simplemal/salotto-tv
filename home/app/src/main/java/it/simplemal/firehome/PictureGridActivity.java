@@ -110,8 +110,7 @@ public final class PictureGridActivity extends CardActivity {
         scroll = new ScrollView(this);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
-        // FireStick Fixer takes a scrolling page of the launcher for the Home and keeps Back for itself.
-        scroll.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+        hideFromFixer(scroll);
         scroll.addView(rows);
         int shown = ROWS_SHOWN * dp(CELL_HEIGHT) + (ROWS_SHOWN - 1) * dp(GAP) + 2 * dp(SIDE_ROOM);
         page.addView(scroll, new LinearLayout.LayoutParams(-2, shown));
