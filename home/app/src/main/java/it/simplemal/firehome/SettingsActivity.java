@@ -1655,10 +1655,7 @@ public final class SettingsActivity extends CardActivity {
         }
     }
 
-    private boolean ownSaver() {
-        String chosen = Settings.Secure.getString(getContentResolver(), SAVER_CHOSEN);
-        return chosen != null && chosen.startsWith(getPackageName() + "/");
-    }
+    private boolean ownSaver() { return Look.ownSaver(this); }
 
     private void showSaver() {
         boolean on = saverOn();
@@ -1672,7 +1669,7 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
             new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
             new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
-                () -> open(Fire.screensaver()))));
+                () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver()))));
     }
 
     /** Only one screensaver runs at a time: choosing ours is what turns off Fire OS's. */

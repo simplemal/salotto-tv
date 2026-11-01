@@ -14,6 +14,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.format.DateFormat;
 import android.text.TextUtils;
@@ -109,6 +110,7 @@ public final class MainActivity extends CardActivity {
     private final Runnable freshPicture = () -> {
         if (showing) HomeCover.take(getWindow());
     };
+    private final Runnable saver = () -> startActivity(new Intent(this, SaverActivity.class));
     private View panelShade;
     private boolean panelOpen;
     private TextView footer;
@@ -122,6 +124,9 @@ public final class MainActivity extends CardActivity {
     /** Long enough for the Home to be drawn, weather scene included. */
     private static final long FIRST_PICTURE_MS = 4000;
     private static final long FRESH_PICTURE_MS = 400;
+    private static final int SAVER_FALLBACK_MS = 300000;
+    private static final long SAVER_AHEAD_MS = 10000;
+    private static final long SAVER_SHORTEST_MS = 30000;
     private static final float JIGGLE_DEGREES = 0.5f;
     private static final long JIGGLE_TURN_MS = 130;
     private static final float JIGGLE_BOB_PX = 1f;
@@ -486,6 +491,15 @@ public final class MainActivity extends CardActivity {
     @Override public void onUserInteraction() {
         root.removeCallbacks(freshPicture);
         root.postDelayed(freshPicture, FRESH_PICTURE_MS);
+        waitForSaver();
+    }
+
+    /** A little before Fire OS's own turn: where it would start Ambient, or put the Stick to sleep. */
+    private void waitForSaver() {
+        root.removeCallbacks(saver);
+        if (!showing || !Look.ownSaver(this) || Settings.Secure.getInt(getContentResolver(), "screensaver_enabled", 1) != 1) return;
+        int after = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SAVER_FALLBACK_MS);
+        root.postDelayed(saver, Math.max(SAVER_SHORTEST_MS, after - SAVER_AHEAD_MS));
     }
 
     @Override protected void onResume() {
@@ -509,6 +523,7 @@ public final class MainActivity extends CardActivity {
             render(focus, apps);
         }
         Look.backHome(this);
+        waitForSaver();
         ticker.post(weatherCheck);
         weatherView.resume();
         root.postDelayed(offerStart, OFFER_START_MS);
@@ -604,6 +619,7 @@ public final class MainActivity extends CardActivity {
         HomeCover.take(getWindow());
         inFront = false;
         Look.leaveHome(this);
+        root.removeCallbacks(saver);
         ticker.removeCallbacks(weatherCheck);
         weatherView.pause();
         if (moving != null) stopMoving();

@@ -101,6 +101,10 @@
         <activity android:name=".FirstRunActivity" android:exported="false"
             android:theme="@style/UpdatePage"
             android:screenOrientation="landscape" android:launchMode="singleTask" />
+        <activity android:name=".SaverActivity" android:exported="true"
+            android:screenOrientation="landscape" android:launchMode="singleTask"
+            android:excludeFromRecents="true" android:taskAffinity=""
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
         <activity android:name=".ReenabledActivity" android:exported="false"
             android:screenOrientation="landscape" android:launchMode="singleInstance"
             android:excludeFromRecents="true" android:taskAffinity=""

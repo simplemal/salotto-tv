@@ -187,6 +187,12 @@ final class Look {
     static String saverFolder(Context context) { return prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER); }
     static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
+    /** Salotto's screensaver is the one chosen. */
+    static boolean ownSaver(Context context) {
+        String chosen = Settings.Secure.getString(context.getContentResolver(), "screensaver_components");
+        return chosen != null && chosen.startsWith(context.getPackageName() + "/");
+    }
+
     /** What the screensaver shows over its pictures. */
     static boolean saverTime(Context context) { return prefs(context).getBoolean("saver_time", true); }
     static void setSaverTime(Context context, boolean on) { prefs(context).edit().putBoolean("saver_time", on).apply(); }
