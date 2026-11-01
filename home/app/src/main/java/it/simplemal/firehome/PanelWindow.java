@@ -8,6 +8,9 @@ import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -16,8 +19,9 @@ import java.util.function.Consumer;
 
 /**
  * The control panel over an app: a window of TaskService and not a page, because a page would
- * pause whatever is playing. Only as big as the panel, so the video underneath keeps its own path
- * to the screen. Whoever opens it has to give it the windows of that service.
+ * pause whatever is playing. It never takes the focus of the screen either: Netflix pauses as soon
+ * as it loses that. So TaskService hands it the arrows, OK and Back from the remote, and volume and
+ * play stay with the app. Whoever opens it has to give it the windows of that service.
  */
 final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
     private final WindowManager windows;
@@ -25,6 +29,7 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
     private final Runnable closed;
     private FrameLayout root;
     private ControlPanel panel;
+    private boolean pressed;
 
     PanelWindow(Context words, WindowManager windows, Runnable closed) {
         super(words);
@@ -38,12 +43,58 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
         WindowManager.LayoutParams place = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT);
         place.gravity = Gravity.TOP | Gravity.END;
         windows.addView(root, place);
-        panel.openEmpty(null);
+        selectable(panel);
         panel.refresh();
+    }
+
+    /** A window without the focus of the screen counts as touched, and its views could not be selected. */
+    private static void selectable(View view) {
+        if (view.isFocusable()) view.setFocusableInTouchMode(true);
+        if (!(view instanceof ViewGroup)) return;
+        ViewGroup group = (ViewGroup) view;
+        for (int index = 0; index < group.getChildCount(); index++) selectable(group.getChildAt(index));
+    }
+
+    /** True if the key was the panel's. Nothing is selected until the first arrow. */
+    boolean key(KeyEvent event) {
+        boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        int code = event.getKeyCode();
+        int direction = direction(code);
+        if (direction != 0) {
+            if (down) move(direction);
+            return true;
+        }
+        boolean ok = code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER;
+        if (!ok && code != KeyEvent.KEYCODE_BACK) return false;
+        if (down) {
+            pressed = event.getRepeatCount() == 0 || pressed;
+        } else if (pressed) {
+            pressed = false;
+            View selected = root.findFocus();
+            if (!ok) close();
+            else if (selected != null) selected.performClick();
+        }
+        return true;
+    }
+
+    private static int direction(int code) {
+        switch (code) {
+            case KeyEvent.KEYCODE_DPAD_LEFT: return View.FOCUS_LEFT;
+            case KeyEvent.KEYCODE_DPAD_RIGHT: return View.FOCUS_RIGHT;
+            case KeyEvent.KEYCODE_DPAD_UP: return View.FOCUS_UP;
+            case KeyEvent.KEYCODE_DPAD_DOWN: return View.FOCUS_DOWN;
+            default: return 0;
+        }
+    }
+
+    private void move(int direction) {
+        View selected = root.findFocus();
+        View next = selected == null ? panel.first() : selected.focusSearch(direction);
+        if (next != null) next.requestFocus(direction);
     }
 
     void close() {

@@ -605,6 +605,7 @@ public final class TaskService extends AccessibilityService {
         int key = event.getKeyCode();
         boolean ok = key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
+        if (panelWindow != null && panelWindow.key(event)) return true;
         if (stopAnswer != null) return keyOnPreparedStop(key, ok, up);
         // Under a mask a press would move on a page nobody can see, a step from Reset or Uninstall.
         if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;

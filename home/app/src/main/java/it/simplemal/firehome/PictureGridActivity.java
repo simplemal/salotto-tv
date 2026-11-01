@@ -47,6 +47,8 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BUTTON_WIDTH = 170;
     private static final int BUTTON_GAP = 14;
     private static final int BUTTON_BOTTOM = 48;
+    /** A selected button grows a little, and would be cut at the edge of its row. */
+    private static final int BUTTON_ROOM = 8;
 
     private final List<ImageView> cells = new ArrayList<>();
     private List<String> pictures = new ArrayList<>();
@@ -189,7 +191,8 @@ public final class PictureGridActivity extends CardActivity {
         page.addView(note, corner);
         LinearLayout buttons = new LinearLayout(this);
         buttons.setGravity(Gravity.CENTER);
-        buttons.setClipChildren(false);
+        int room = dp(BUTTON_ROOM);
+        buttons.setPadding(room, room, room, room);
         TextView confirm = button(getString(R.string.card_confirm), BUTTON_SP, this::confirm);
         buttons.addView(confirm, new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2));
         LinearLayout.LayoutParams second = new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2);

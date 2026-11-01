@@ -32,12 +32,12 @@ final class Look {
     private static final int[] SIZE_LABELS = {R.string.look_size_small, R.string.look_size_medium, R.string.look_size_large};
     static final int[] SIZES = {64, 96, 132};
     static final String[] PRESET_NAMES = {"Notte", "Oceano", "Bosco", "Tramonto", "Grafite", "Aurora", "Prugna",
-        "Ambra", "Laguna", "Rubino", "Crepuscolo", "Ghiacciaio", "Inchiostro", "Petrolio", "Bottiglia", "Vinaccia"};
+        "Ambra", "Laguna", "Rubino", "Crepuscolo", "Ghiacciaio", "Nero", "Petrolio", "Bottiglia", "Vinaccia"};
     private static final int[] PRESET_LABELS = {R.string.first_backdrop_night, R.string.first_backdrop_ocean,
         R.string.first_backdrop_forest, R.string.first_backdrop_sunset, R.string.first_backdrop_graphite,
         R.string.first_backdrop_aurora, R.string.first_backdrop_plum, R.string.first_backdrop_amber,
         R.string.first_backdrop_lagoon, R.string.first_backdrop_ruby, R.string.first_backdrop_dusk,
-        R.string.first_backdrop_glacier, R.string.first_backdrop_ink, R.string.first_backdrop_petrol,
+        R.string.first_backdrop_glacier, R.string.first_backdrop_black, R.string.first_backdrop_petrol,
         R.string.first_backdrop_bottle, R.string.first_backdrop_wine};
     /** Three colours down the slant, then the light in the corner. */
     private static final int[][] PRESET_COLORS = {
@@ -53,13 +53,13 @@ final class Look {
         {0xff701e30, 0xff40121e, 0xff1a080e, 0x28f05060},
         {0xff3c3468, 0xff2a2048, 0xff100e24, 0x28f09070},
         {0xff5a7a90, 0xff2e4658, 0xff101c26, 0x28b8e0f0},
-        {0xff12161f, 0xff12161f, 0xff12161f, 0},
+        {0xff000000, 0xff000000, 0xff000000, 0},
         {0xff0f3340, 0xff0f3340, 0xff0f3340, 0},
         {0xff133a30, 0xff133a30, 0xff133a30, 0},
         {0xff4a1626, 0xff4a1626, 0xff4a1626, 0}
     };
     /** Behind every menu and page of Salotto: dark enough that only the words stand out. */
-    private static final int[] PAGE_COLORS = {0xff161920, 0xff0d0f13, 0xff07080b, 0};
+    private static final int[] PAGE_COLORS = {0xff0b0c10, 0xff07080a, 0xff040506, 0};
     static final String WEATHER = "Meteo dinamico";
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
