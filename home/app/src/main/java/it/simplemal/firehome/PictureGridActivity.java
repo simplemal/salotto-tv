@@ -189,6 +189,7 @@ public final class PictureGridActivity extends CardActivity {
         page.addView(note, corner);
         LinearLayout buttons = new LinearLayout(this);
         buttons.setGravity(Gravity.CENTER);
+        buttons.setClipChildren(false);
         TextView confirm = button(getString(R.string.card_confirm), BUTTON_SP, this::confirm);
         buttons.addView(confirm, new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2));
         LinearLayout.LayoutParams second = new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2);

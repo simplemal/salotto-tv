@@ -30,7 +30,7 @@ public final class AboutActivity extends CardActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         FrameLayout root = new FrameLayout(this);
-        Look.show(this, root::setBackground);
+        root.setBackground(Look.plainBackdrop());
         text = new LinearLayout(this);
         text.setOrientation(LinearLayout.VERTICAL);
         text.setPadding(0, dp(40), 0, dp(48));

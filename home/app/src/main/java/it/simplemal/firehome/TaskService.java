@@ -114,7 +114,7 @@ public final class TaskService extends AccessibilityService {
      * Home held shows as Fire OS sending its long press, whether or not its quick menu answers.
      */
     private static final String LOG_FILTER = "HOME_PRESSED|START.u0.*cat=.android.intent.category.HOME.*cmp="
-        + Fire.AMAZON_HOME + "|sendLongHomeBroadcast";
+        + Fire.AMAZON_HOME + "|sendLongHomeBroadcast|" + Fire.RECENTS_ACTION;
     private static final String HOME_LOG = "logcat -v brief -T 1 -e '" + LOG_FILTER + "'";
     private static final String HOME_PRESSED = "HOME_PRESSED";
     private static final String HOME_HELD = "sendLongHomeBroadcast";
@@ -543,6 +543,8 @@ public final class TaskService extends AccessibilityService {
         registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         cover = new HomeCover(this);
         showVeil();
+        // A restart forgets the screen's colour matrix.
+        if (Veil.warm(this) > 0) adb.post(this::connected);
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
         if (Updater.installed(this)) {
@@ -663,8 +665,13 @@ public final class TaskService extends AccessibilityService {
         long now = SystemClock.elapsedRealtime();
         if (now - recentsAt < QUICK_MENU_ONCE_MS) return;
         recentsAt = now;
-        cover.hold(front == null ? HomeCover.lastPicture() : BitmapFactory.decodeFile(RunningApps.picture(this, front).getPath()));
+        holdScreen();
         closePage(Fire.AMAZON_HOME, this::openTasks, PAGE_TRIES, PAGE_NO_BACK);
+    }
+
+    /** From the system log when it can be: Fire OS's page starts black, well before anyone hears of it. */
+    private void holdScreen() {
+        cover.hold(front == null ? HomeCover.lastPicture() : BitmapFactory.decodeFile(RunningApps.picture(this, front).getPath()));
     }
 
     /** What the task manager opened over, when Fire OS's page was in the way. */
@@ -829,6 +836,7 @@ public final class TaskService extends AccessibilityService {
             String fixer = run(Fire.FIXER_COMMAND + "state");
             rememberDoubleHome(this, fixer != null && fixer.contains(Fire.DOUBLE_HOME_ON));
             startHomeLog();
+            if (Veil.warm(this) > 0) run(Veil.WARM_ON);
             return true;
         } catch (IOException | GeneralSecurityException | SecurityException e) {
             Log.w(TAG, "No adb connection", e);
@@ -894,6 +902,8 @@ public final class TaskService extends AccessibilityService {
             if (SystemClock.elapsedRealtime() - started <= HOME_LOG_START_MS) continue;
             if (line.contains(HOME_HELD)) {
                 main.post(this::homeHeld);
+            } else if (line.contains(Fire.RECENTS_ACTION)) {
+                main.post(this::holdScreen);
             } else {
                 int side = line.contains(HOME_PRESSED) ? 1 : -1;
                 main.post(() -> {

@@ -5,24 +5,21 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 
 /**
- * The picture made dimmer and warmer. Fire OS has no night display on this Stick and nothing here
- * reaches the TV's backlight, so both are a single tinted window over everything, drawn once:
- * TaskService owns it. This class only says how much.
+ * The picture made dimmer, and its white warmer. Dimming is a tinted window over everything, drawn
+ * once: TaskService owns it. A window can only add colour, which turns blacks amber, so warmth is
+ * the screen's own colour matrix: Fire OS has no night display on this Stick, only the shell may
+ * set the matrix, and it lasts until the Stick restarts. This class says how much.
  */
 final class Veil {
     private static final String FILE = "veil";
     private static final String DIM = "dim";
     private static final String WARM = "warm";
     private static final float[] DIM_ALPHA = {0, 0.25f, 0.45f};
-    /**
-     * White goes to about 6000 K, then to D55, measured from a capture of the Stick's screen: the
-     * amber arrives there at about three quarters of its value, which these levels allow for.
-     * A window can only add its colour to the picture, not multiply it, so the amber is bright and
-     * thin to keep the light, and dark scenes still take more of the tint than white does.
-     */
-    private static final float[] WARM_ALPHA = {0, 0.08f, 0.157f};
-    private static final int AMBER_RED = 255;
-    private static final int AMBER_GREEN = 154;
+    private static final int WARM_LEVELS = 2;
+    private static final String COLOR_MATRIX = "service call SurfaceFlinger 1015 i32 ";
+    /** Red, green and blue scaled by what takes a D65 white to D55: black stays black. */
+    static final String WARM_ON = COLOR_MATRIX + "1 f 1 f 0 f 0 f 0 f 0 f 0.952 f 0 f 0 f 0 f 0 f 0.879 f 0 f 0 f 0 f 0 f 1";
+    static final String WARM_OFF = COLOR_MATRIX + "0";
     private static final int OPAQUE = 255;
 
     private Veil() {}
@@ -41,17 +38,14 @@ final class Veil {
     }
 
     static void nextDim(Context context) { next(context, DIM, DIM_ALPHA.length); }
-    static void nextWarm(Context context) { next(context, WARM, WARM_ALPHA.length); }
+    static void nextWarm(Context context) { next(context, WARM, WARM_LEVELS); }
     static int dim(Context context) { return level(context, DIM, DIM_ALPHA.length); }
-    static int warm(Context context) { return level(context, WARM, WARM_ALPHA.length); }
+    static int warm(Context context) { return level(context, WARM, WARM_LEVELS); }
 
-    /** One colour that does what the warm tint and then the dimming would do, in a single layer. */
+    /** What `service call` prints when the matrix was taken. */
+    static boolean accepted(String reply) { return reply != null && reply.contains("Parcel") && !reply.contains("Error"); }
+
     static int color(Context context) {
-        float dim = DIM_ALPHA[dim(context)];
-        float warm = WARM_ALPHA[warm(context)];
-        float alpha = 1 - (1 - dim) * (1 - warm);
-        if (alpha == 0) return Color.TRANSPARENT;
-        float amber = (1 - dim) * warm / alpha;
-        return Color.argb(Math.round(alpha * OPAQUE), Math.round(amber * AMBER_RED), Math.round(amber * AMBER_GREEN), 0);
+        return Color.argb(Math.round(DIM_ALPHA[dim(context)] * OPAQUE), 0, 0, 0);
     }
 }

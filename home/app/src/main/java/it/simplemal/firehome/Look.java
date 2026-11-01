@@ -58,6 +58,8 @@ final class Look {
         {0xff133a30, 0xff133a30, 0xff133a30, 0},
         {0xff4a1626, 0xff4a1626, 0xff4a1626, 0}
     };
+    /** Behind every menu and page of Salotto: dark enough that only the words stand out. */
+    private static final int[] PAGE_COLORS = {0xff161920, 0xff0d0f13, 0xff07080b, 0};
     static final String WEATHER = "Meteo dinamico";
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
@@ -278,12 +280,12 @@ final class Look {
 
     /** The backdrop by that name, when it is one of the plain ones. */
     static Drawable preset(String chosen) {
-        int preset = Math.max(0, Arrays.asList(PRESET_NAMES).indexOf(chosen));
-        return new Shade(PRESET_COLORS[preset]);
+        int preset = Arrays.asList(PRESET_NAMES).indexOf(chosen);
+        return new Shade(preset >= 0 ? PRESET_COLORS[preset] : PAGE_COLORS);
     }
 
-    /** The dark shading of the Settings, for pages that do not follow the chosen backdrop. */
-    static Drawable plainBackdrop() { return preset(PRESET_NAMES[0]); }
+    /** The dark shading of the Settings and of every page that does not follow the chosen backdrop. */
+    static Drawable plainBackdrop() { return new Shade(PAGE_COLORS); }
 
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {

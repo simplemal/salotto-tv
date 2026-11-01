@@ -23,7 +23,7 @@ public final class AppsActivity extends CardActivity {
         // Not a full-screen ScrollView: Fixer would take this for the main screen and swallow Back.
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        Look.show(this, root::setBackground);
+        root.setBackground(Look.plainBackdrop());
         hint = label("", 15);
         hint.setGravity(Gravity.CENTER);
         hint.setTextColor(Color.argb(170, 255, 255, 255));

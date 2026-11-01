@@ -77,8 +77,7 @@ final class PanelWindow extends ContextWrapper implements ControlPanel.Host {
     }
 
     @Override public void shell(String command, Consumer<String> done) {
-        if (TaskService.ready()) TaskService.shellAsked(command, done);
-        else done.accept(null);
+        TaskService.shellAsked(command, done);
     }
 
     @Override public void say(String text) { Toast.makeText(this, text, Toast.LENGTH_SHORT).show(); }

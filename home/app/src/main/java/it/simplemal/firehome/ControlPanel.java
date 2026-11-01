@@ -253,7 +253,7 @@ final class ControlPanel extends LinearLayout {
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(getContext())));
         Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
-            () -> change(() -> Veil.nextWarm(getContext())));
+            this::changeWarm);
 
         LinearLayout tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver()));
@@ -275,7 +275,7 @@ final class ControlPanel extends LinearLayout {
             timer.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
         });
         refreshers.add(() -> dim.level(Veil.dim(getContext())));
-        refreshers.add(() -> warm.level(Veil.warm(getContext())));
+        refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
 
     private LinearLayout row() {
@@ -393,6 +393,19 @@ final class ControlPanel extends LinearLayout {
         level.run();
         TaskService.veilChanged();
         refresh();
+    }
+
+    /** The matrix takes the shell: with a cable there is none, and a tint is not what this tile promises. */
+    private void changeWarm() {
+        if (wired() && !TaskService.ready()) {
+            host.sayLong(getContext().getString(R.string.card_needs_wifi));
+            return;
+        }
+        host.shell(Veil.warm(getContext()) == 0 ? Veil.WARM_ON : Veil.WARM_OFF, output -> {
+            if (Veil.accepted(output)) Veil.nextWarm(getContext());
+            else host.say(getContext().getString(R.string.panel_command_failed));
+            refresh();
+        });
     }
 
     private void nextTimer() {

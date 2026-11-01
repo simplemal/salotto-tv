@@ -237,7 +237,7 @@ public final class SettingsActivity extends CardActivity {
         DeviceInfo.prepare();
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        Look.show(this, root::setBackground);
+        root.setBackground(Look.plainBackdrop());
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
         previewNote = label(getString(R.string.first_preview), PREVIEW_SP);
         previewNote.setAlpha(0.7f);
@@ -492,7 +492,7 @@ public final class SettingsActivity extends CardActivity {
         mosaic.show(entry.mosaic);
         if (plain) root.setBackground(entry.preview);
         else if (pictures) root.setBackground(null);
-        else if (previewing) Look.show(this, root::setBackground);
+        else if (previewing) root.setBackground(Look.plainBackdrop());
         previewing = plain || pictures;
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
         picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
@@ -1367,7 +1367,7 @@ public final class SettingsActivity extends CardActivity {
                     try {
                         Backup.restore(this);
                         say(getString(R.string.settings_choices_restored));
-                        Look.show(this, root::setBackground);
+                        root.setBackground(Look.plainBackdrop());
                         refresh();
                     } catch (IOException | JSONException e) {
                         sayLong(getString(R.string.settings_nothing_to_restore));
@@ -1455,7 +1455,7 @@ public final class SettingsActivity extends CardActivity {
         Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
             getDrawable(R.drawable.ic_image), text, false, () -> {
                 Look.setBackdrop(this, name);
-                Look.show(this, root::setBackground);
+                root.setBackground(Look.plainBackdrop());
                 refresh();
             });
         entry.mark = 0;
