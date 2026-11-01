@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">चुने हुए स्थान के दिन के हर पल और हर मौसम के लिए अलग फ़ोटो, हमेशा स्थिर।</string>
     <string name="settings_backdrop_abstract_text">अमूर्त चित्र, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="settings_abstract_time">चित्र बदलने का समय</string>
-    <string name="settings_abstract_time_text">Abstract Illustrated और Nox City की हर तस्वीर स्क्रीन पर कितनी देर रहे।</string>
+    <string name="settings_abstract_time_text">Abstract Illustrated, Abstract 3D और Nox City की हर तस्वीर स्क्रीन पर कितनी देर रहे।</string>
     <string name="settings_backdrop_preset_text">Salotto का ग्रेडिएंट।</string>
     <string name="settings_backdrop_image_text">आपकी अपनी फ़ोटो, स्क्रीन के हिसाब से ढली हुई।</string>
     <string name="settings_clock">घड़ी</string>
@@ -289,4 +289,5 @@
         <item quantity="other">अभी का «ऑटो स्लीप», %1$d मिनट, स्क्रीनसेवर के विकल्पों को सीमित करता है।</item>
     </plurals>
     <string name="settings_backdrop_nox_text">रात में भविष्य के शहर के दृश्य, नियॉन और बारिश के बीच, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
+    <string name="settings_backdrop_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो अपने आप बदलती हैं, किसी भी क्रम में।</string>
 </resources>

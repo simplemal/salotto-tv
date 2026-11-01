@@ -258,7 +258,11 @@ public final class SettingsActivity extends CardActivity {
         });
         left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
         mosaic = new PictureMosaic(this);
-        scenePreview = new ScenePreview(picture);
+        scenePreview = new ScenePreview(this);
+        scenePreview.setVisibility(View.INVISIBLE);
+        scenePreview.setClipToOutline(true);
+        scenePreview.setOutlineProvider(picture.getOutlineProvider());
+        left.addView(scenePreview, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
         explanation = label("", EXPLANATION_SP);
         explanation.setGravity(Gravity.CENTER_HORIZONTAL);
         explanation.setLineSpacing(dp(3), 1f);
@@ -484,7 +488,7 @@ public final class SettingsActivity extends CardActivity {
         else if (previewing) Look.show(this, root::setBackground);
         previewing = plain || pictures;
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
-        picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
+        picture.setVisibility(pictures || entry.scenes ? View.INVISIBLE : View.VISIBLE);
     }
 
     private View row(Entry entry) {
@@ -1441,6 +1445,9 @@ public final class SettingsActivity extends CardActivity {
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text), false);
         drawn.mosaic = Look.ABSTRACT_FOLDER;
         others.add(drawn);
+        Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text), false);
+        shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
+        others.add(shapes);
         Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text), false);
         city.mosaic = Look.NOX_FOLDER;
         others.add(city);

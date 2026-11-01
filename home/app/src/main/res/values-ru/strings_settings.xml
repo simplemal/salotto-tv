@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">Своя фотография для каждого времени суток и каждой погоды выбранного места, без движения.</string>
     <string name="settings_backdrop_abstract_text">Абстрактные иллюстрации, которые сами меняются в случайном порядке.</string>
     <string name="settings_abstract_time">Менять картинку каждые</string>
-    <string name="settings_abstract_time_text">Сколько времени каждое изображение Abstract Illustrated и Nox City остаётся на экране.</string>
+    <string name="settings_abstract_time_text">Сколько времени каждое изображение Abstract Illustrated, Abstract 3D и Nox City остаётся на экране.</string>
     <string name="settings_backdrop_preset_text">Градиент Salotto.</string>
     <string name="settings_backdrop_image_text">Ваша картинка, подогнанная под экран.</string>
     <string name="settings_clock">Часы</string>
@@ -301,4 +301,5 @@
         <item quantity="other">«Автоотключение» через %1$d минуты ограничивает параметры заставки.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Виды города будущего ночью, в неоне и под дождём, которые сами меняются в случайном порядке.</string>
+    <string name="settings_backdrop_abstract3d_text">Абстрактные 3D-скульптуры на тёмном фоне, которые сами меняются в случайном порядке.</string>
 </resources>

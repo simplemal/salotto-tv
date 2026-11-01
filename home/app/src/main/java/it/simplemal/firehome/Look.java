@@ -44,10 +44,12 @@ final class Look {
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
     static final String ABSTRACT = "Abstract Illustrated";
+    static final String ABSTRACT_3D = "Abstract 3D";
     static final String NOX = "Nox City";
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
     static final String ABSTRACT_FOLDER = "astratti";
+    static final String ABSTRACT_3D_FOLDER = "astratti-3d";
     static final String NOX_FOLDER = "nox-city";
     static final int[] ABSTRACT_MINUTES = {1, 5, 15, 30, 60};
     private static final int ABSTRACT_DEFAULT = 5;
@@ -120,7 +122,9 @@ final class Look {
 
     private static String timedFolder(Context context) {
         String chosen = backdrop(context);
-        return ABSTRACT.equals(chosen) ? ABSTRACT_FOLDER : NOX.equals(chosen) ? NOX_FOLDER : null;
+        if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;
+        if (ABSTRACT_3D.equals(chosen)) return ABSTRACT_3D_FOLDER;
+        return NOX.equals(chosen) ? NOX_FOLDER : null;
     }
 
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
@@ -153,7 +157,15 @@ final class Look {
 
     static boolean weatherPhotos(Context context) { return PHOTOS.equals(backdrop(context)); }
 
-    static String backdrop(Context context) { return prefs(context).getString("backdrop", PICTURES); }
+    /** The weather's backdrops need a place: without one, or once it is gone, Nox City takes over. */
+    static String backdrop(Context context) {
+        String chosen = prefs(context).getString("backdrop", PICTURES);
+        boolean weather = WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen);
+        if (!weather || Weather.active(context)) return chosen;
+        setBackdrop(context, NOX);
+        return NOX;
+    }
+
     static void setBackdrop(Context context, String value) { prefs(context).edit().putString("backdrop", value).apply(); }
 
     /** Changes when the Home has to be drawn again. */

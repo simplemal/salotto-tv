@@ -212,7 +212,7 @@
     <string name="settings_backdrop_photos_text">A different photograph for every moment of the day and every kind of weather in the place you chose, always still.</string>
     <string name="settings_backdrop_abstract_text">Abstract illustrations that change on their own, in random order.</string>
     <string name="settings_abstract_time">Change image every</string>
-    <string name="settings_abstract_time_text">How long each Abstract Illustrated and Nox City picture stays on screen.</string>
+    <string name="settings_abstract_time_text">How long each Abstract Illustrated, Abstract 3D and Nox City picture stays on screen.</string>
     <string name="settings_backdrop_preset_text">A Salotto gradient.</string>
     <string name="settings_backdrop_image_text">Your own image, fitted to the screen.</string>
     <string name="settings_clock">Clock</string>
@@ -289,4 +289,5 @@
         <item quantity="other">The current Auto power-off, %1$d minutes, limits the screensaver options.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Views of a future city at night, all neon and rain, that change on their own, in random order.</string>
+    <string name="settings_backdrop_abstract3d_text">Abstract 3D sculptures on a dark background, changing on their own, in random order.</string>
 </resources>

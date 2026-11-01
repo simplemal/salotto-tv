@@ -103,6 +103,7 @@ public final class FirstRunActivity extends CardActivity {
         new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER)};
     private static final Choice[] OTHER_CHOICES = {
         new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER),
+        new Choice(Look.ABSTRACT_3D, 0, R.string.first_abstract3d_text, Look.ABSTRACT_3D_FOLDER),
         new Choice(Look.NOX, 0, R.string.first_nox_text, Look.NOX_FOLDER),
         new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null),
         new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null),
@@ -439,7 +440,7 @@ public final class FirstRunActivity extends CardActivity {
             LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
             if (first != null) size.topMargin = dp(ROW_GAP);
             rows.addView(row, size);
-            if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
+            if (first == null || !due(this) && choice.key.equals(Look.backdrop(this))) first = row;
         }
         ScrollView list = new ScrollView(this);
         hideFromFixer(list);
