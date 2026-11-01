@@ -32,7 +32,6 @@ final class NumberIcon extends Drawable {
         this.number = number;
         this.center = center;
         text.setColor(Color.WHITE);
-        text.setTextAlign(Paint.Align.CENTER);
         text.setTypeface(Typeface.create(FONT, Typeface.BOLD));
         text.setLetterSpacing(TRACKING);
         text.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
@@ -47,7 +46,9 @@ final class NumberIcon extends Drawable {
         text.setTextScaleX(1);
         text.setTextScaleX(Math.min(1, bounds.height() * ROOM_SHARE / text.measureText(number)));
         text.getTextBounds(number, 0, number.length(), ink);
-        canvas.drawText(number, bounds.exactCenterX(), bounds.top + bounds.height() * center - ink.exactCenterY(), text);
+        // On the digits as drawn: tracking and side bearings would push a whole line off centre.
+        canvas.drawText(number, bounds.exactCenterX() - ink.exactCenterX(),
+            bounds.top + bounds.height() * center - ink.exactCenterY(), text);
         canvas.restoreToCount(layer);
     }
 
