@@ -129,6 +129,10 @@
     <string name="device_free_of">%1$.1f من %2$.1f GB</string>
     <string name="device_uptime_hours">%1$d h %2$d min</string>
     <string name="device_uptime_minutes">%1$d min</string>
+    <string name="device_connection">الاتصال</string>
+    <string name="device_mask">قناع الشبكة الفرعية</string>
+    <string name="device_gateway">الموجّه</string>
+    <string name="device_mac">عنوان MAC</string>
     <string name="device_ip">عنوان IP</string>
     <string name="device_signal">الإشارة</string>
     <string name="device_speed">السرعة</string>

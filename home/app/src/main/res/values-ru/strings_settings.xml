@@ -151,6 +151,8 @@
     <string name="settings_usage_data">Отправлять данные об использовании</string>
     <string name="settings_usage_data_text">Статистика использования, которую Fire OS отправляет в Amazon.</string>
     <string name="settings_wifi_text">Без Wi-Fi у Stick нет интернета.</string>
+    <string name="settings_wifi_on_cable">Не используется</string>
+    <string name="settings_wifi_on_cable_text">Когда кабель подключён, Stick использует проводную сеть. Чтобы перейти на Wi-Fi, отключите кабель.</string>
     <string name="settings_wifi_networks">Сети Wi-Fi</string>
     <string name="settings_wifi_networks_text">Выберите сеть и подключитесь. Пароли хранятся на Stick.</string>
     <string name="settings_connection_state">Текущее состояние подключения.</string>

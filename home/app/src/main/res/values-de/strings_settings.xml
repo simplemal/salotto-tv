@@ -151,6 +151,8 @@
     <string name="settings_usage_data">Nutzungsdaten senden</string>
     <string name="settings_usage_data_text">Die Nutzungsstatistiken, die Fire OS an Amazon schickt.</string>
     <string name="settings_wifi_text">Ohne Wi-Fi hat der Stick kein Internet.</string>
+    <string name="settings_wifi_on_cable">Nicht verwendet</string>
+    <string name="settings_wifi_on_cable_text">Mit angeschlossenem Kabel nutzt der Stick das Kabelnetz. Um zum WLAN zu wechseln, zieh das Kabel ab.</string>
     <string name="settings_wifi_networks">Wi-Fi-Netzwerke</string>
     <string name="settings_wifi_networks_text">Wähle ein Netzwerk und verbinde dich. Die Passwörter bleiben auf dem Stick.</string>
     <string name="settings_connection_state">Aktueller Status der Verbindung.</string>

@@ -1188,7 +1188,19 @@ public final class SettingsActivity extends CardActivity {
         return entries;
     }
 
+    /** With a cable Wi-Fi stays on but idle, and neither its switch nor its networks would mean anything. */
+    private void showWiredNetwork() {
+        List<Entry> entries = infoRows(DeviceInfo.network(this), getDrawable(R.drawable.ic_ethernet), getString(R.string.settings_connection_state));
+        entries.add(new Entry("Wi-Fi", getString(R.string.settings_wifi_on_cable), getDrawable(R.drawable.ic_wifi),
+            getString(R.string.settings_wifi_on_cable_text), false, () -> { }));
+        show(getString(R.string.settings_network), entries);
+    }
+
     private void showNetwork() {
+        if (DeviceInfo.wired(this)) {
+            showWiredNetwork();
+            return;
+        }
         Drawable picture = getDrawable(R.drawable.ic_wifi);
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();

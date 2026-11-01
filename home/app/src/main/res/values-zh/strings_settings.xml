@@ -152,6 +152,8 @@
     <string name="settings_usage_data">发送使用数据</string>
     <string name="settings_usage_data_text">Fire OS 发送给 Amazon 的使用统计。</string>
     <string name="settings_wifi_text">没有 Wi-Fi，Stick 就无法上网。</string>
+    <string name="settings_wifi_on_cable">未使用</string>
+    <string name="settings_wifi_on_cable_text">连接网线时，Stick 使用有线网络。要切换到 Wi-Fi，请拔下网线。</string>
     <string name="settings_wifi_networks">Wi-Fi 网络</string>
     <string name="settings_wifi_networks_text">选择一个网络并连接。密码只保存在 Stick 上。</string>
     <string name="settings_connection_state">当前的连接状态。</string>

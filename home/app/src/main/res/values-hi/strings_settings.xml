@@ -151,6 +151,8 @@
     <string name="settings_usage_data">उपयोग का डेटा भेजें</string>
     <string name="settings_usage_data_text">उपयोग के वे आँकड़े जो Fire OS Amazon को भेजता है।</string>
     <string name="settings_wifi_text">Wi-Fi के बिना Stick पर इंटरनेट नहीं चलता।</string>
+    <string name="settings_wifi_on_cable">उपयोग में नहीं</string>
+    <string name="settings_wifi_on_cable_text">केबल जुड़े होने पर Stick वायर्ड नेटवर्क इस्तेमाल करता है। Wi-Fi पर जाने के लिए केबल निकालें।</string>
     <string name="settings_wifi_networks">Wi-Fi नेटवर्क</string>
     <string name="settings_wifi_networks_text">नेटवर्क चुनें और कनेक्ट करें। पासवर्ड Stick पर ही रहते हैं।</string>
     <string name="settings_connection_state">कनेक्शन की मौजूदा स्थिति।</string>

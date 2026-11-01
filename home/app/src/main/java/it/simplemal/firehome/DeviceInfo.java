@@ -7,6 +7,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
+import android.net.NetworkInfo;
+import android.net.RouteInfo;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiInfo;
@@ -15,10 +17,12 @@ import android.os.Build;
 import android.os.StatFs;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.Display;
 import android.view.WindowManager;
 import java.io.BufferedReader;
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -37,6 +41,8 @@ final class DeviceInfo {
     private static final long GB = 1024L * 1024 * 1024;
 
     private static final String DEVICE_NAME = "device_name";
+    private static final String ETHERNET = "Ethernet";
+    private static final String MAC_ADDRESS = "([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}";
     private static final String BLUETOOTH_NAME = "bluetooth_name";
 
     private static volatile String fireOs;
@@ -80,11 +86,8 @@ final class DeviceInfo {
 
     static List<String[]> network(Context context) {
         List<String[]> rows = new ArrayList<>();
-        String wired = wiredAddress(context);
-        if (wired != null) {
-            rows.add(new String[]{context.getString(R.string.device_ip), wired});
-            return rows;
-        }
+        LinkProperties wired = wiredLink(context);
+        if (wired != null) return wiredRows(context, wired);
         WifiManager wifi = context.getSystemService(WifiManager.class);
         WifiInfo info = wifi.getConnectionInfo();
         int address = info.getIpAddress();
@@ -95,17 +98,45 @@ final class DeviceInfo {
         return rows;
     }
 
-    private static String wiredAddress(Context context) {
+    static boolean wired(Context context) { return wiredLink(context) != null; }
+
+    private static LinkProperties wiredLink(Context context) {
         ConnectivityManager network = context.getSystemService(ConnectivityManager.class);
         Network active = network.getActiveNetwork();
         NetworkCapabilities link = network.getNetworkCapabilities(active);
         if (link == null || !link.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) return null;
-        LinkProperties properties = network.getLinkProperties(active);
-        if (properties == null) return null;
-        for (LinkAddress address : properties.getLinkAddresses()) {
-            if (address.getAddress() instanceof Inet4Address) return address.getAddress().getHostAddress();
+        return network.getLinkProperties(active);
+    }
+
+    /** Only what Android reports for sure: the speed it gives for a cable is a fixed guess. */
+    private static List<String[]> wiredRows(Context context, LinkProperties link) {
+        List<String[]> rows = new ArrayList<>();
+        rows.add(new String[]{context.getString(R.string.device_connection), ETHERNET});
+        for (LinkAddress address : link.getLinkAddresses()) {
+            if (!(address.getAddress() instanceof Inet4Address)) continue;
+            rows.add(new String[]{context.getString(R.string.device_ip), address.getAddress().getHostAddress()});
+            rows.add(new String[]{context.getString(R.string.device_mask), mask(address.getPrefixLength())});
         }
-        return null;
+        for (RouteInfo route : link.getRoutes()) {
+            if (route.isDefaultRoute() && route.getGateway() instanceof Inet4Address) {
+                rows.add(new String[]{context.getString(R.string.device_gateway), route.getGateway().getHostAddress()});
+            }
+        }
+        List<String> servers = new ArrayList<>();
+        for (InetAddress server : link.getDnsServers()) {
+            if (server instanceof Inet4Address) servers.add(server.getHostAddress());
+        }
+        if (!servers.isEmpty()) rows.add(new String[]{context.getString(R.string.device_dns), TextUtils.join(", ", servers)});
+        ConnectivityManager network = context.getSystemService(ConnectivityManager.class);
+        NetworkInfo info = network.getNetworkInfo(network.getActiveNetwork());
+        String hardware = info == null ? null : info.getExtraInfo();
+        if (hardware != null && hardware.matches(MAC_ADDRESS)) rows.add(new String[]{context.getString(R.string.device_mac), hardware});
+        return rows;
+    }
+
+    private static String mask(int bits) {
+        int mask = bits == 0 ? 0 : -1 << 32 - bits;
+        return String.format(Locale.ROOT, "%d.%d.%d.%d", mask >>> 24, mask >> 16 & 255, mask >> 8 & 255, mask & 255);
     }
 
     /** Fire OS keeps its version in a system property, without the build number it stays short. */

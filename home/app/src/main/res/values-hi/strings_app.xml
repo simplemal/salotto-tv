@@ -117,6 +117,10 @@
     <string name="device_free_of">%1$.1f / %2$.1f GB</string>
     <string name="device_uptime_hours">%1$d h %2$d min</string>
     <string name="device_uptime_minutes">%1$d min</string>
+    <string name="device_connection">कनेक्शन</string>
+    <string name="device_mask">सबनेट मास्क</string>
+    <string name="device_gateway">राउटर</string>
+    <string name="device_mac">MAC पता</string>
     <string name="device_ip">IP पता</string>
     <string name="device_signal">सिग्नल</string>
     <string name="device_speed">स्पीड</string>

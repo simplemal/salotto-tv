@@ -123,6 +123,10 @@
     <string name="device_free_of">%1$.1f из %2$.1f GB</string>
     <string name="device_uptime_hours">%1$d ч %2$d мин</string>
     <string name="device_uptime_minutes">%1$d мин</string>
+    <string name="device_connection">Подключение</string>
+    <string name="device_mask">Маска подсети</string>
+    <string name="device_gateway">Маршрутизатор</string>
+    <string name="device_mac">MAC-адрес</string>
     <string name="device_ip">IP-адрес</string>
     <string name="device_signal">Сигнал</string>
     <string name="device_speed">Скорость</string>

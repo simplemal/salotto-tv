@@ -151,6 +151,8 @@
     <string name="settings_usage_data">Envoyer des données d’utilisation</string>
     <string name="settings_usage_data_text">Les statistiques d’utilisation que Fire OS envoie à Amazon.</string>
     <string name="settings_wifi_text">Sans Wi-Fi, le Stick n’a pas Internet.</string>
+    <string name="settings_wifi_on_cable">Inutilisé</string>
+    <string name="settings_wifi_on_cable_text">Avec le câble branché, le Stick utilise le réseau filaire. Pour passer au Wi-Fi, débranchez le câble.</string>
     <string name="settings_wifi_networks">Réseaux Wi-Fi</string>
     <string name="settings_wifi_networks_text">Choisissez un réseau et connectez-vous. Les mots de passe restent sur le Stick.</string>
     <string name="settings_connection_state">État actuel de la connexion.</string>

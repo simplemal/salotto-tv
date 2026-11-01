@@ -117,6 +117,10 @@
     <string name="device_free_of">%1$.1f de %2$.1f GB</string>
     <string name="device_uptime_hours">%1$d h %2$d min</string>
     <string name="device_uptime_minutes">%1$d min</string>
+    <string name="device_connection">Conexión</string>
+    <string name="device_mask">Máscara de subred</string>
+    <string name="device_gateway">Router</string>
+    <string name="device_mac">Dirección MAC</string>
     <string name="device_ip">Dirección IP</string>
     <string name="device_signal">Señal</string>
     <string name="device_speed">Velocidad</string>
