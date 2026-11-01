@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Every picture of one set, or Salotto's own backdrops with no set named, four across and four down
- * at a time. OK shows one as the whole screen, as the Home would: left and right go through the
+ * at a time. OK shows one as the whole screen: left and right go through the
  * others there, Confirm keeps the one on show and Back returns to the grid.
  */
 public final class PictureGridActivity extends CardActivity {
@@ -225,7 +225,7 @@ public final class PictureGridActivity extends CardActivity {
         return arrow;
     }
 
-    /** The thumbnail at once, the real picture as soon as it is read, finished as on the Home. */
+    /** The thumbnail at once, the real picture as soon as it is read. */
     private void showPreview(int index) {
         previewIndex = index;
         ImageView cell = cells.get(index);
@@ -244,11 +244,8 @@ public final class PictureGridActivity extends CardActivity {
         Background.draw(() -> {
             // Going through them quickly leaves the ones already passed behind.
             if (shown != previews) return;
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inMutable = true;
-            Bitmap picture = decode(asset, options);
+            Bitmap picture = decode(asset, new BitmapFactory.Options());
             if (picture == null) return;
-            BottomBlur.apply(picture);
             runOnUiThread(() -> {
                 if (shown == previews && preview.getVisibility() == View.VISIBLE) full.setImageBitmap(picture);
             });
