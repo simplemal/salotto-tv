@@ -81,13 +81,7 @@ public final class PictureGridActivity extends CardActivity {
         pictures = folder == null ? Arrays.asList(Look.PRESET_NAMES) : pictures(folder);
         files = folder != null;
         setName = getIntent().getStringExtra(TITLE);
-        root = new FrameLayout(this) {
-            /** Before anything else in the window: a key that goes further may not come back. */
-            @Override public boolean dispatchKeyEventPreIme(KeyEvent event) {
-                android.util.Log.i("SalottoGrid", "preIme " + event);
-                return pageKey(event) || super.dispatchKeyEventPreIme(event);
-            }
-        };
+        root = new FrameLayout(this);
         root.setBackground(Look.plainBackdrop());
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
@@ -116,6 +110,8 @@ public final class PictureGridActivity extends CardActivity {
         scroll = new ScrollView(this);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
+        // FireStick Fixer takes a scrolling page of the launcher for the Home and keeps Back for itself.
+        scroll.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
         scroll.addView(rows);
         int shown = ROWS_SHOWN * dp(CELL_HEIGHT) + (ROWS_SHOWN - 1) * dp(GAP) + 2 * dp(SIDE_ROOM);
         page.addView(scroll, new LinearLayout.LayoutParams(-2, shown));
@@ -275,26 +271,19 @@ public final class PictureGridActivity extends CardActivity {
     }
 
     /** Back is decided here, and the arrows in a preview: its one button has the focus and stays. */
-    private boolean pageKey(KeyEvent event) {
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
         int code = event.getKeyCode();
         boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         boolean previewing = preview.getVisibility() == View.VISIBLE;
         if (code == KeyEvent.KEYCODE_BACK) {
-            android.util.Log.i("SalottoGrid", "back down=" + down + " preview=" + previewing);
             if (!down && previewing) closePreview();
             else if (!down) finish();
             return true;
         }
         int step = code == KeyEvent.KEYCODE_DPAD_LEFT ? -1 : code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : 0;
-        if (!previewing || step == 0) return false;
+        if (!previewing || step == 0) return super.dispatchKeyEvent(event);
         int next = previewIndex + step;
         if (down && next >= 0 && next < pictures.size()) showPreview(next);
         return true;
-    }
-
-    /** With nothing selected the key never passes through the page's own views. */
-    @Override public boolean dispatchKeyEvent(KeyEvent event) {
-        android.util.Log.i("SalottoGrid", "dispatch " + event);
-        return pageKey(event) || super.dispatchKeyEvent(event);
     }
 }
