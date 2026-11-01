@@ -14,10 +14,15 @@ final class Veil {
     private static final String DIM = "dim";
     private static final String WARM = "warm";
     private static final float[] DIM_ALPHA = {0, 0.25f, 0.45f};
-    private static final float[] WARM_ALPHA = {0, 0.16f, 0.30f};
-    /** Dark on purpose: a bright amber would turn the blacks brown. */
-    private static final int AMBER_RED = 80;
-    private static final int AMBER_GREEN = 40;
+    /**
+     * White goes to about 6000 K, then to D55, measured from a capture of the Stick's screen: the
+     * amber arrives there at about three quarters of its value, which these levels allow for.
+     * A window can only add its colour to the picture, not multiply it, so the amber is bright and
+     * thin to keep the light, and dark scenes still take more of the tint than white does.
+     */
+    private static final float[] WARM_ALPHA = {0, 0.08f, 0.157f};
+    private static final int AMBER_RED = 255;
+    private static final int AMBER_GREEN = 154;
     private static final int OPAQUE = 255;
 
     private Veil() {}
