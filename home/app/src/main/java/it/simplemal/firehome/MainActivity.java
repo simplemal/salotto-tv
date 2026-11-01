@@ -122,6 +122,8 @@ public final class MainActivity extends CardActivity {
     /** Long enough for the Home to be drawn, weather scene included. */
     private static final long FIRST_PICTURE_MS = 4000;
     private static final long FRESH_PICTURE_MS = 400;
+    private static final float JIGGLE_DEGREES = 0.5f;
+    private static final int JIGGLE_MS = 150;
     /** For the cover of a Home press: over the Home itself its picture has to be taken at once. */
     static volatile boolean showing;
     static final String OPEN_PANEL = "open_panel";
@@ -761,10 +763,8 @@ public final class MainActivity extends CardActivity {
         // A layer turns each frame into a cheap texture transform instead of a redraw.
         image.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         jiggle = new AnimatorSet();
-        // Unequal periods keep the two motions from looking like one mechanical beat.
-        jiggle.playTogether(
-            sway(ObjectAnimator.ofFloat(image, View.ROTATION, -1f, 1f), 700),
-            sway(ObjectAnimator.ofFloat(image, View.TRANSLATION_Y, -dp(1), dp(1)), 900));
+        // A small quick shiver, not a sway.
+        jiggle.playTogether(sway(ObjectAnimator.ofFloat(image, View.ROTATION, -JIGGLE_DEGREES, JIGGLE_DEGREES), JIGGLE_MS));
         jiggle.start();
     }
 
