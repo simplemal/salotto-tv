@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">酒红</string>
     <string name="first_backdrop_graphite">石墨</string>
     <string name="first_pictures_text">为一天中的每个时刻和你所在城市的每种天气准备一幅插画。</string>
+    <string name="first_backdrop_aerial">航拍天气</string>
+    <string name="first_aerial_text">为你所在城市的每种天气和温度配一张航拍图。</string>
     <string name="first_photos_text">为一天中的每个时段和你所在城市的每种天气准备一张照片。</string>
     <string name="first_abstract_text">抽象插画每 5 分钟自动更换一次，顺序随机。</string>
     <string name="first_plain_text">简单的渐变色，始终不变。</string>

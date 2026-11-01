@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Vinaccia</string>
     <string name="first_backdrop_graphite">Grafite</string>
     <string name="first_pictures_text">Un’illustrazione per ogni ora del giorno e per ogni meteo della tua città.</string>
+    <string name="first_backdrop_aerial">Meteo aereo</string>
+    <string name="first_aerial_text">Una veduta dall’alto per ogni meteo e temperatura della tua città.</string>
     <string name="first_photos_text">Una fotografia per ogni momento del giorno e per ogni meteo della tua città.</string>
     <string name="first_abstract_text">Illustrazioni astratte che cambiano da sole ogni 5 minuti, in ordine casuale.</string>
     <string name="first_plain_text">Una semplice sfumatura, sempre uguale.</string>

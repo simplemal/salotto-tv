@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">خمري</string>
     <string name="first_backdrop_graphite">جرافيت</string>
     <string name="first_pictures_text">رسم توضيحي لكل ساعة من اليوم ولكل حالة طقس في مدينتك.</string>
+    <string name="first_backdrop_aerial">طقس من الجو</string>
+    <string name="first_aerial_text">منظر جوي لكل طقس ودرجة حرارة في مدينتك.</string>
     <string name="first_photos_text">صورة فوتوغرافية لكل لحظة من اليوم ولكل حالة طقس في مدينتك.</string>
     <string name="first_abstract_text">رسوم تجريدية تتغير تلقائيًا كل 5 دقائق بترتيب عشوائي.</string>
     <string name="first_plain_text">تدرّج لوني بسيط، ثابت دائمًا.</string>

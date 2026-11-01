@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Wein</string>
     <string name="first_backdrop_graphite">Graphit</string>
     <string name="first_pictures_text">Eine Illustration für jede Tageszeit und jedes Wetter in deiner Stadt.</string>
+    <string name="first_backdrop_aerial">Wetter von oben</string>
+    <string name="first_aerial_text">Eine Luftaufnahme für jedes Wetter und jede Temperatur in deiner Stadt.</string>
     <string name="first_photos_text">Ein Foto für jeden Moment des Tages und jedes Wetter in deiner Stadt.</string>
     <string name="first_abstract_text">Abstrakte Illustrationen, die alle 5 Minuten von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="first_plain_text">Ein einfacher Farbverlauf, immer gleich.</string>

@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +48,9 @@ final class Weather {
     private static final String SCENE_TEST = "meteo-prova";
     private static final String PICTURES = "meteo-illustrato/";
     private static final String PHOTOS = "meteo-foto/";
+    private static final String AERIAL = "meteo-aereo/";
+    /** In the names of the aerial pictures: -32c- or -minus-7c-. */
+    private static final Pattern PICTURE_TEMPERATURE = Pattern.compile("-(minus-)?(\\d+)c-");
     private static final int PLACES = 12;
     private static final String PICTURE_TABLE = "tabella.properties";
     /** What tells an illustration from a scene to draw. */
@@ -104,8 +109,9 @@ final class Weather {
         if (Look.abstractPictures(context)) return Look.abstractPicture(context);
         SharedPreferences saved = prefs(context);
         boolean photos = Look.weatherPhotos(context);
-        String folder = photos ? PHOTOS : PICTURES;
-        String last = photos ? "photo" : "picture";
+        boolean aerial = Look.weatherAerial(context);
+        String folder = aerial ? AERIAL : photos ? PHOTOS : PICTURES;
+        String last = aerial ? "aerial" : photos ? "photo" : "picture";
         String key = testing(context) ? scene(context)
             : active(context) && saved.contains("code") ? phase(saved) + "/" + saved.getInt("code", 0) : null;
         String path = key == null ? null : file(context, folder, key);
@@ -121,7 +127,27 @@ final class Weather {
         String files = pictures(context, folder).getProperty(key);
         if (files == null) return null;
         String[] choices = TextUtils.split(files, ",");
-        return folder + choices[Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % choices.length];
+        String nearest = nearestTemperature(prefs(context), choices);
+        return folder + (nearest != null ? nearest : choices[Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % choices.length]);
+    }
+
+    /** The picture made for the temperature closest to the real one. Null if these were not made for one. */
+    private static String nearestTemperature(SharedPreferences saved, String[] files) {
+        float now = saved.getFloat("temperature", 0);
+        if (saved.getBoolean("fahrenheit", false)) now = (now - 32) * 5 / 9;
+        String nearest = null;
+        float closest = Float.MAX_VALUE;
+        for (String name : files) {
+            Matcher found = PICTURE_TEMPERATURE.matcher(name);
+            if (!found.find()) return null;
+            int degrees = Integer.parseInt(found.group(2));
+            float distance = Math.abs(now - (found.group(1) != null ? -degrees : degrees));
+            if (distance < closest) {
+                closest = distance;
+                nearest = name;
+            }
+        }
+        return nearest;
     }
 
     /** No place chosen yet: a clear sky for the hour, so the first start is not an empty screen. */

@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s Só funciona com um lugar definido em Clima.</string>
     <string name="settings_place_first">Escolha primeiro o lugar em Clima</string>
     <string name="settings_backdrop_pictures_text">Uma ilustração diferente para cada hora do dia e cada clima do lugar escolhido, sempre parada.</string>
+    <string name="settings_backdrop_aerial_text">Uma vista aérea diferente para cada clima e temperatura do local escolhido, sempre parada.</string>
     <string name="settings_backdrop_photos_text">Uma fotografia diferente para cada momento do dia e cada clima do lugar escolhido, sempre parada.</string>
     <string name="settings_backdrop_abstract_text">Ilustrações abstratas que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_abstract_time">Trocar de imagem a cada</string>

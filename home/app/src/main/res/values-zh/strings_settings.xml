@@ -215,6 +215,7 @@
     <string name="settings_weather_backdrop_text">%1$s 只有在“天气”中设置了地点后才会启用。</string>
     <string name="settings_place_first">请先在“天气”中选择地点</string>
     <string name="settings_backdrop_pictures_text">一天中的每个时刻、所选地点的每种天气，各有一幅插画，画面静止。</string>
+    <string name="settings_backdrop_aerial_text">为所选地点的每种天气和温度显示不同的航拍图，始终静止。</string>
     <string name="settings_backdrop_photos_text">一天中的每个时段、所选地点的每种天气，各有一张照片，画面静止。</string>
     <string name="settings_backdrop_abstract_text">抽象插画自动更换，顺序随机。</string>
     <string name="settings_abstract_time">更换图片间隔</string>

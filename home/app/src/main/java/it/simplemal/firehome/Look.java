@@ -63,11 +63,13 @@ final class Look {
     static final String WEATHER = "Meteo dinamico";
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
+    static final String AERIAL = "Meteo aereo";
     static final String ABSTRACT = "Abstract Illustrated";
     static final String ABSTRACT_3D = "Abstract 3D";
     static final String NOX = "Nox City";
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
+    static final String AERIAL_FOLDER = "meteo-aereo";
     static final String ABSTRACT_FOLDER = "astratti";
     static final String ABSTRACT_3D_FOLDER = "astratti-3d";
     static final String NOX_FOLDER = "nox-city";
@@ -102,6 +104,7 @@ final class Look {
         if (WEATHER.equals(key)) return context.getString(R.string.look_backdrop_weather);
         if (PICTURES.equals(key)) return context.getString(R.string.first_backdrop_pictures);
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
+        if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
         return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
@@ -142,7 +145,7 @@ final class Look {
 
     /** The ones drawn from a file of the app. The abstract ones follow no weather, only the clock. */
     static boolean weatherPictures(Context context) {
-        return PICTURES.equals(backdrop(context)) || weatherPhotos(context) || abstractPictures(context);
+        return PICTURES.equals(backdrop(context)) || weatherPhotos(context) || weatherAerial(context) || abstractPictures(context);
     }
 
     static boolean abstractPictures(Context context) { return timedFolder(context) != null || fixedPicture(context); }
@@ -235,6 +238,7 @@ final class Look {
     static void setSaverWeather(Context context, boolean on) { prefs(context).edit().putBoolean("saver_weather", on).apply(); }
 
     static boolean weatherPhotos(Context context) { return PHOTOS.equals(backdrop(context)); }
+    static boolean weatherAerial(Context context) { return AERIAL.equals(backdrop(context)); }
 
     /**
      * The weather's backdrops need a place: the default follows it, and a chosen one gives way to
@@ -244,7 +248,7 @@ final class Look {
         String chosen = prefs(context).getString("backdrop", null);
         boolean place = Weather.active(context);
         if (chosen == null) return place ? PICTURES : ABSTRACT_3D;
-        if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen)) return chosen;
+        if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
             setBackdrop(context, ABSTRACT_3D);
             return ABSTRACT_3D;

@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Вино</string>
     <string name="first_backdrop_graphite">Графит</string>
     <string name="first_pictures_text">Иллюстрация для каждого часа дня и любой погоды в вашем городе.</string>
+    <string name="first_backdrop_aerial">Погода с высоты</string>
+    <string name="first_aerial_text">Вид с высоты для любой погоды и температуры в вашем городе.</string>
     <string name="first_photos_text">Фотография для каждого времени суток и любой погоды в вашем городе.</string>
     <string name="first_abstract_text">Абстрактные иллюстрации, которые сами меняются каждые 5 минут в случайном порядке.</string>
     <string name="first_plain_text">Простой градиент, всегда один и тот же.</string>

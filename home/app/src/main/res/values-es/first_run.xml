@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Vino</string>
     <string name="first_backdrop_graphite">Grafito</string>
     <string name="first_pictures_text">Una ilustración para cada hora del día y cada tiempo de tu ciudad.</string>
+    <string name="first_backdrop_aerial">Tiempo aéreo</string>
+    <string name="first_aerial_text">Una vista aérea para cada tiempo y temperatura de tu ciudad.</string>
     <string name="first_photos_text">Una fotografía para cada momento del día y cada tiempo de tu ciudad.</string>
     <string name="first_abstract_text">Ilustraciones abstractas que cambian solas cada 5 minutos, en orden aleatorio.</string>
     <string name="first_plain_text">Un degradado sencillo, siempre igual.</string>

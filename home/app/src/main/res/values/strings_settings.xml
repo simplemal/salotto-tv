@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s Si attiva solo con un luogo impostato nel Meteo.</string>
     <string name="settings_place_first">Scegli prima il luogo nel Meteo</string>
     <string name="settings_backdrop_pictures_text">Un’illustrazione diversa per ogni ora del giorno e per ogni meteo del luogo scelto, sempre ferma.</string>
+    <string name="settings_backdrop_aerial_text">Una veduta dall’alto diversa per ogni meteo e temperatura del luogo scelto, sempre ferma.</string>
     <string name="settings_backdrop_photos_text">Una fotografia diversa per ogni momento del giorno e per ogni meteo del luogo scelto, sempre ferma.</string>
     <string name="settings_backdrop_abstract_text">Illustrazioni astratte che cambiano da sole, in ordine casuale.</string>
     <string name="settings_abstract_time">Cambia immagine ogni</string>

@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s यह तभी चालू होता है जब मौसम में कोई स्थान चुना हो।</string>
     <string name="settings_place_first">पहले मौसम में स्थान चुनें</string>
     <string name="settings_backdrop_pictures_text">चुने हुए स्थान के दिन के हर घंटे और हर मौसम के लिए अलग चित्र, हमेशा स्थिर।</string>
+    <string name="settings_backdrop_aerial_text">चुनी गई जगह के हर मौसम और तापमान के लिए अलग हवाई दृश्य, हमेशा स्थिर।</string>
     <string name="settings_backdrop_photos_text">चुने हुए स्थान के दिन के हर पल और हर मौसम के लिए अलग फ़ोटो, हमेशा स्थिर।</string>
     <string name="settings_backdrop_abstract_text">अमूर्त चित्र, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="settings_abstract_time">चित्र बदलने का समय</string>

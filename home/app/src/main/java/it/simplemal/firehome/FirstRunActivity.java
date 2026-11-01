@@ -105,7 +105,8 @@ public final class FirstRunActivity extends CardActivity {
 
     private static final Choice[] WEATHER_CHOICES = {
         new Choice(Look.PICTURES, R.string.first_backdrop_pictures, R.string.first_pictures_text, Look.PICTURES_FOLDER, R.drawable.ic_cloud),
-        new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER, R.drawable.ic_cloud)};
+        new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER, R.drawable.ic_cloud),
+        new Choice(Look.AERIAL, R.string.first_backdrop_aerial, R.string.first_aerial_text, Look.AERIAL_FOLDER, R.drawable.ic_cloud)};
     private static final Choice[] OTHER_CHOICES = {
         new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER, R.drawable.ic_restart),
         new Choice(Look.ABSTRACT_3D, 0, R.string.first_abstract3d_text, Look.ABSTRACT_3D_FOLDER, R.drawable.ic_restart),

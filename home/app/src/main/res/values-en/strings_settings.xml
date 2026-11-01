@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s It only works with a place set in Weather.</string>
     <string name="settings_place_first">Choose the place in Weather first</string>
     <string name="settings_backdrop_pictures_text">A different illustration for every hour of the day and every kind of weather in the place you chose, always still.</string>
+    <string name="settings_backdrop_aerial_text">A different aerial view for each weather and temperature of the chosen place, always still.</string>
     <string name="settings_backdrop_photos_text">A different photograph for every moment of the day and every kind of weather in the place you chose, always still.</string>
     <string name="settings_backdrop_abstract_text">Abstract illustrations that change on their own, in random order.</string>
     <string name="settings_abstract_time">Change image every</string>

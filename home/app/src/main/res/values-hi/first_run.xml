@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">वाइन</string>
     <string name="first_backdrop_graphite">ग्रेफ़ाइट</string>
     <string name="first_pictures_text">दिन के हर घंटे और आपके शहर के हर मौसम के लिए एक चित्र।</string>
+    <string name="first_backdrop_aerial">हवाई मौसम</string>
+    <string name="first_aerial_text">आपके शहर के हर मौसम और तापमान के लिए एक हवाई दृश्य।</string>
     <string name="first_photos_text">दिन के हर पल और आपके शहर के हर मौसम के लिए एक फ़ोटो।</string>
     <string name="first_abstract_text">अमूर्त चित्र, जो हर 5 मिनट में अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="first_plain_text">एक सादा ग्रेडिएंट, हमेशा एक जैसा।</string>

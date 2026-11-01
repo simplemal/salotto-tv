@@ -1486,6 +1486,11 @@ public final class SettingsActivity extends CardActivity {
         photos.mosaic = Look.PHOTOS_FOLDER;
         photos.mark = R.drawable.ic_cloud;
         weather.add(photos);
+        Entry aerial = weatherBackdrop(Look.AERIAL, R.drawable.ic_photo,
+            getString(R.string.settings_backdrop_aerial_text));
+        aerial.mosaic = Look.AERIAL_FOLDER;
+        aerial.mark = R.drawable.ic_cloud;
+        weather.add(aerial);
         List<Entry> timed = new ArrayList<>();
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
         drawn.mosaic = Look.ABSTRACT_FOLDER;

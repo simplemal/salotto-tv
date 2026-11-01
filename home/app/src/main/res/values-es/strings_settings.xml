@@ -215,6 +215,7 @@
     <string name="settings_weather_backdrop_text">%1$s Solo se activa si hay un lugar elegido en Tiempo.</string>
     <string name="settings_place_first">Elige antes el lugar en Tiempo</string>
     <string name="settings_backdrop_pictures_text">Una ilustración distinta para cada hora del día y cada tiempo del lugar elegido, siempre fija.</string>
+    <string name="settings_backdrop_aerial_text">Una vista aérea distinta para cada tiempo y temperatura del lugar elegido, siempre fija.</string>
     <string name="settings_backdrop_photos_text">Una fotografía distinta para cada momento del día y cada tiempo del lugar elegido, siempre fija.</string>
     <string name="settings_backdrop_abstract_text">Ilustraciones abstractas que cambian solas, en orden aleatorio.</string>
     <string name="settings_abstract_time">Cambiar de imagen cada</string>

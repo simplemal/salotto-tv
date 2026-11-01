@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s Wird nur aktiv, wenn im Wetter ein Ort gewählt ist.</string>
     <string name="settings_place_first">Wähle zuerst den Ort im Wetter</string>
     <string name="settings_backdrop_pictures_text">Eine andere Illustration für jede Tageszeit und jedes Wetter des gewählten Ortes, immer unbewegt.</string>
+    <string name="settings_backdrop_aerial_text">Eine eigene Luftaufnahme für jedes Wetter und jede Temperatur am gewählten Ort, immer unbewegt.</string>
     <string name="settings_backdrop_photos_text">Ein anderes Foto für jeden Moment des Tages und jedes Wetter des gewählten Ortes, immer unbewegt.</string>
     <string name="settings_backdrop_abstract_text">Abstrakte Illustrationen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_abstract_time">Bild wechselt alle</string>

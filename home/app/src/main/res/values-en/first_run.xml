@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Wine</string>
     <string name="first_backdrop_graphite">Graphite</string>
     <string name="first_pictures_text">An illustration for every hour of the day and every kind of weather in your city.</string>
+    <string name="first_backdrop_aerial">Aerial weather</string>
+    <string name="first_aerial_text">An aerial view for every weather and temperature in your city.</string>
     <string name="first_photos_text">A photograph for every moment of the day and every kind of weather in your city.</string>
     <string name="first_abstract_text">Abstract illustrations that change on their own every 5 minutes, in random order.</string>
     <string name="first_plain_text">A simple gradient, always the same.</string>

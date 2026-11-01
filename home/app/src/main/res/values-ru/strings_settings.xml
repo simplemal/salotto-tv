@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s Включается, только если в разделе «Погода» выбрано место.</string>
     <string name="settings_place_first">Сначала выберите место в разделе «Погода»</string>
     <string name="settings_backdrop_pictures_text">Своя иллюстрация для каждого часа дня и каждой погоды выбранного места, без движения.</string>
+    <string name="settings_backdrop_aerial_text">Свой вид с высоты для каждой погоды и температуры в выбранном месте, всегда неподвижный.</string>
     <string name="settings_backdrop_photos_text">Своя фотография для каждого времени суток и каждой погоды выбранного места, без движения.</string>
     <string name="settings_backdrop_abstract_text">Абстрактные иллюстрации, которые сами меняются в случайном порядке.</string>
     <string name="settings_abstract_time">Менять картинку каждые</string>

@@ -214,6 +214,7 @@
     <string name="settings_weather_backdrop_text">%1$s يعمل فقط مع مكان محدد في الطقس.</string>
     <string name="settings_place_first">اختر المكان أولًا في الطقس</string>
     <string name="settings_backdrop_pictures_text">رسم توضيحي مختلف لكل ساعة من اليوم ولكل حالة طقس في المكان المختار، ثابت دائمًا.</string>
+    <string name="settings_backdrop_aerial_text">منظر جوي مختلف لكل طقس ودرجة حرارة في المكان المختار، ثابت دائمًا.</string>
     <string name="settings_backdrop_photos_text">صورة فوتوغرافية مختلفة لكل لحظة من اليوم ولكل حالة طقس في المكان المختار، ثابتة دائمًا.</string>
     <string name="settings_backdrop_abstract_text">رسوم تجريدية تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_abstract_time">تتغير الصورة كل</string>

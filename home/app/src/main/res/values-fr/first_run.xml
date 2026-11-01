@@ -53,6 +53,8 @@
     <string name="first_backdrop_wine">Lie-de-vin</string>
     <string name="first_backdrop_graphite">Graphite</string>
     <string name="first_pictures_text">Une illustration pour chaque heure de la journée et chaque météo de votre ville.</string>
+    <string name="first_backdrop_aerial">Météo aérienne</string>
+    <string name="first_aerial_text">Une vue aérienne pour chaque météo et température de votre ville.</string>
     <string name="first_photos_text">Une photographie pour chaque moment de la journée et chaque météo de votre ville.</string>
     <string name="first_abstract_text">Des illustrations abstraites qui changent toutes seules toutes les 5 minutes, dans un ordre aléatoire.</string>
     <string name="first_plain_text">Un simple dégradé, toujours le même.</string>
