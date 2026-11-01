@@ -23,7 +23,7 @@ final class HomeCover {
     private static final int WIDTH = 960;
     private static final int HEIGHT = 540;
     /** Fixer lifts its black a moment after Salotto appears: this has to stay on top until then. */
-    private static final long AFTER_HOME_MS = 500;
+    private static final long AFTER_HOME_MS = 800;
     /** If Salotto never comes: a double press, for one, stays on Amazon's Home. */
     private static final long LIMIT_MS = 3000;
     private static final long DOUBLE_PRESS_MS = 900;
@@ -105,7 +105,8 @@ final class HomeCover {
         returning = again && !doubleHome;
         if (returning) main.postDelayed(bringBack, BRING_BACK_MS);
         if (again && doubleHome) hide();
-        else if (!again && MainActivity.showing && home != null) take(home, this::show);
+        // Taking a picture now is too late: Fixer's black is already up, half a second before it.
+        else if (picture == null && MainActivity.showing && home != null) take(home, this::show);
         else show();
     }
 

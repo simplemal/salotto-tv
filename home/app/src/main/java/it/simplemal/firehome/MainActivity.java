@@ -106,6 +106,9 @@ public final class MainActivity extends CardActivity {
     private ImageView controlButton;
     private ControlPanel panel;
     private WeatherView weatherView;
+    private final Runnable freshPicture = () -> {
+        if (showing) HomeCover.take(getWindow());
+    };
     private View panelShade;
     private boolean panelOpen;
     private TextView footer;
@@ -118,6 +121,7 @@ public final class MainActivity extends CardActivity {
     private static final int CORNER_ALPHA = 105;
     /** Long enough for the Home to be drawn, weather scene included. */
     private static final long FIRST_PICTURE_MS = 4000;
+    private static final long FRESH_PICTURE_MS = 400;
     /** For the cover of a Home press: over the Home itself its picture has to be taken at once. */
     static volatile boolean showing;
     static final String OPEN_PANEL = "open_panel";
@@ -474,6 +478,12 @@ public final class MainActivity extends CardActivity {
         panel.openEmpty(onCards ? from : firstCard());
     }
 
+    /** The cover needs the Home as it is now, and a press leaves no time to take it. */
+    @Override public void onUserInteraction() {
+        root.removeCallbacks(freshPicture);
+        root.postDelayed(freshPicture, FRESH_PICTURE_MS);
+    }
+
     @Override protected void onResume() {
         super.onResume();
         inFront = true;
@@ -555,6 +565,7 @@ public final class MainActivity extends CardActivity {
     /** Runs while the Home is in front: a TV can stay on it for hours. */
     private void checkWeather() {
         noteTime();
+        root.postDelayed(freshPicture, FRESH_PICTURE_MS);
         showWeather();
         showBackdrop();
         if (Weather.due(this)) {
@@ -592,18 +603,6 @@ public final class MainActivity extends CardActivity {
         ticker.removeCallbacks(weatherCheck);
         weatherView.pause();
         if (moving != null) stopMoving();
-    }
-
-    /**
-     * The backdrop goes only when the process is next in line to die. These Sticks are always short
-     * of memory, so at any lower level the Home would lose it on every trip into an app.
-     */
-    @Override public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        if (inFront || level < TRIM_MEMORY_COMPLETE) return;
-        weatherView.show(null);
-        root.setBackground(null);
-        plainBackdrop = null;
     }
 
     private String state(List<String> apps) {

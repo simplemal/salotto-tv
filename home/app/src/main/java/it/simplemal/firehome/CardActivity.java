@@ -85,8 +85,7 @@ abstract class CardActivity extends Activity {
 
     /** The system's usual levels never arrive: the accessibility service keeps this process in use. */
     protected boolean memoryShort(int level) {
-        return level >= TRIM_MEMORY_BACKGROUND || level == TRIM_MEMORY_RUNNING_LOW
-            || level == TRIM_MEMORY_RUNNING_CRITICAL;
+        return level == TRIM_MEMORY_RUNNING_CRITICAL;
     }
 
     @Override public void onTrimMemory(int level) {
