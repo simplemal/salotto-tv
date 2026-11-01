@@ -122,7 +122,7 @@
     <string name="settings_surround_best">सबसे अच्छा उपलब्ध</string>
     <string name="settings_surround_stereo">स्टीरियो</string>
     <string name="settings_dialogue">साफ़ डायलॉग</string>
-    <string name="settings_dialogue_text">संगीत और इफ़ेक्ट के ऊपर आवाज़ें उभारता है। यह Fire OS का अपना फ़िल्टर है, कोई दूसरा इफ़ेक्ट नहीं; अगर टीवी या साउंडबार में भी ऐसा कुछ है, तो उसे बंद रखें।</string>
+    <string name="settings_dialogue_text">संगीत और इफ़ेक्ट के ऊपर आवाज़ें उभारता है। यह Fire OS के मेन्यू वाली ही सुविधा है।</string>
     <string name="settings_leveler">एक जैसा वॉल्यूम</string>
     <string name="settings_leveler_text">तेज़ आवाज़ें और प्रोग्राम व विज्ञापन के बीच वॉल्यूम का उतार-चढ़ाव कम करता है।</string>
     <string name="settings_fire_refused">Fire OS ने यह चुनाव स्वीकार नहीं किया</string>

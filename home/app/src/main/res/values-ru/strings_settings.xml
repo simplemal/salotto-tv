@@ -122,7 +122,7 @@
     <string name="settings_surround_best">Лучший доступный</string>
     <string name="settings_surround_stereo">Стерео</string>
     <string name="settings_dialogue">Чёткая речь</string>
-    <string name="settings_dialogue_text">Выделяет голоса на фоне музыки и эффектов. Это встроенный фильтр Fire OS, а не второй эффект; если он есть у телевизора или саундбара, оставьте его выключенным.</string>
+    <string name="settings_dialogue_text">Выделяет голоса на фоне музыки и эффектов. Это та же функция, что и в меню Fire OS.</string>
     <string name="settings_leveler">Ровная громкость</string>
     <string name="settings_leveler_text">Приглушает резкие звуки и перепады громкости между передачами и рекламой.</string>
     <string name="settings_fire_refused">Fire OS не принял выбор</string>

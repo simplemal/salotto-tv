@@ -123,7 +123,7 @@
     <string name="settings_surround_best">最佳可用</string>
     <string name="settings_surround_stereo">立体声</string>
     <string name="settings_dialogue">更清晰的对白</string>
-    <string name="settings_dialogue_text">让人声在音乐和音效中更突出。这是 Fire OS 自带的滤镜，不是额外的效果；如果电视或条形音箱也有，请保持关闭。</string>
+    <string name="settings_dialogue_text">让人声在音乐和音效中更突出。这与 Fire OS 菜单中的功能相同。</string>
     <string name="settings_leveler">统一音量</string>
     <string name="settings_leveler_text">减弱刺耳的噪音，以及节目和广告之间的音量落差。</string>
     <string name="settings_fire_refused">Fire OS 未接受此选择</string>

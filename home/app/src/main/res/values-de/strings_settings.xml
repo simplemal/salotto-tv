@@ -122,7 +122,7 @@
     <string name="settings_surround_best">Bestmöglich</string>
     <string name="settings_surround_stereo">Stereo</string>
     <string name="settings_dialogue">Klarere Dialoge</string>
-    <string name="settings_dialogue_text">Hebt Stimmen von Musik und Effekten ab. Das ist der Filter von Fire OS, kein zweiter Effekt; hat dein Fernseher oder deine Soundbar einen, lass ihn aus.</string>
+    <string name="settings_dialogue_text">Hebt Stimmen von Musik und Effekten ab. Das ist dieselbe Funktion wie im Menü von Fire OS.</string>
     <string name="settings_leveler">Einheitliche Lautstärke</string>
     <string name="settings_leveler_text">Dämpft laute Geräusche und Lautstärkesprünge zwischen Sendungen und Werbung.</string>
     <string name="settings_fire_refused">Fire OS hat die Auswahl nicht angenommen</string>

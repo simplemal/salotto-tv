@@ -122,7 +122,7 @@
     <string name="settings_surround_best">الأفضل المتاح</string>
     <string name="settings_surround_stereo">ستيريو</string>
     <string name="settings_dialogue">حوارات أوضح</string>
-    <string name="settings_dialogue_text">يُبرز الأصوات البشرية فوق الموسيقى والمؤثرات. هو مرشّح Fire OS نفسه وليس تأثيرًا ثانيًا؛ وإذا كان في التلفزيون أو مكبّر الصوت مرشّح مثله فأبقه متوقفًا.</string>
+    <string name="settings_dialogue_text">يُبرز الأصوات البشرية فوق الموسيقى والمؤثرات. هذه هي الميزة نفسها الموجودة في قائمة Fire OS.</string>
     <string name="settings_leveler">مستوى صوت موحّد</string>
     <string name="settings_leveler_text">يخفّف الأصوات العالية وفروق المستوى بين البرامج والإعلانات.</string>
     <string name="settings_fire_refused">لم يقبل Fire OS هذا الاختيار</string>

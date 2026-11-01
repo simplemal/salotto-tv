@@ -123,7 +123,7 @@
     <string name="settings_surround_best">Mejor disponible</string>
     <string name="settings_surround_stereo">Estéreo</string>
     <string name="settings_dialogue">Diálogos más claros</string>
-    <string name="settings_dialogue_text">Hace destacar las voces sobre la música y los efectos. Es el filtro de Fire OS, no un segundo efecto; si la TV o la barra de sonido tienen uno, déjalo apagado.</string>
+    <string name="settings_dialogue_text">Hace destacar las voces sobre la música y los efectos. Es la misma función del menú de Fire OS.</string>
     <string name="settings_leveler">Volumen uniforme</string>
     <string name="settings_leveler_text">Reduce los ruidos fuertes y los saltos de volumen entre programas y anuncios.</string>
     <string name="settings_fire_refused">Fire OS no ha aceptado el cambio</string>
