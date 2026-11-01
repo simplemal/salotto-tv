@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">Connect a drive or a stick.</string>
     <string name="settings_weather_backdrop_text">%1$s It only works with a place set in Weather.</string>
     <string name="settings_place_first">Choose the place in Weather first</string>
-    <string name="settings_backdrop_weather_text">Sky, clouds, rain and snow follow the time and weather of the place you chose, with a light animation.</string>
     <string name="settings_backdrop_pictures_text">A different illustration for every hour of the day and every kind of weather in the place you chose, always still.</string>
     <string name="settings_backdrop_photos_text">A different photograph for every moment of the day and every kind of weather in the place you chose, always still.</string>
     <string name="settings_backdrop_abstract_text">Abstract illustrations that change on their own, in random order.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">The Amazon screensaver, with its own images.</string>
     <string name="settings_saver_choose">Choose</string>
     <string name="settings_saver_choose_text">Opens the Fire OS menu to pick between its screensavers: photos, style, speed. The start time that counts is the one chosen here in Salotto.</string>
-    <string name="settings_saver_own">Salotto screensaver</string>
-    <string name="settings_saver_own_text">Turns off the Fire OS one.</string>
-    <string name="settings_saver_coming">Coming soon</string>
-    <string name="settings_saver_not_ready">It’s not ready yet</string>
     <string name="settings_saver_wait_text">How long the Stick waits before starting the screensaver.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">TV</string>
@@ -290,4 +285,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">Views of a future city at night, all neon and rain, that change on their own, in random order.</string>
     <string name="settings_backdrop_abstract3d_text">Abstract 3D sculptures on a dark background, changing on their own, in random order.</string>
+    <string name="settings_saver_set_text">Its pictures take turns, with only the time and date.</string>
 </resources>

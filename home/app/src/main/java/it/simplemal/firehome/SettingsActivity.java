@@ -1,5 +1,7 @@
 package it.simplemal.firehome;
 
+import android.graphics.drawable.ColorDrawable;
+import android.content.res.ColorStateList;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -27,7 +29,6 @@ import android.os.Bundle;
 import android.os.Process;
 import android.os.storage.StorageManager;
 import android.provider.Settings;
-import android.service.dreams.DreamService;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.Formatter;
@@ -66,6 +67,11 @@ public final class SettingsActivity extends CardActivity {
     private static final String CHECK = "✓";
     private static final int COLUMN_TOP = 44;
     private static final int PICTURE_SIZE = 120;
+    private static final int NO_MARK = -1;
+    private static final int LABEL_SP = 15;
+    private static final int LABEL_ROOM = 6;
+    private static final int MARK_SIZE = 20;
+    private static final int MARK_GAP = 12;
     private static final int PREVIEW_SP = 12;
     private static final int PREVIEW_MARGIN = 24;
     /** As wide as a preview of the screen needs: an icon stays square in the middle. */
@@ -132,22 +138,19 @@ public final class SettingsActivity extends CardActivity {
     private static final int TABLE_ROW = 34;
     private static final int TABLE_PADDING = 14;
 
-    /** One of Salotto's own screensavers, in the list after Fire OS's. Without a service it is still to come. */
+    /** One of Salotto's own screensavers, in the list after Fire OS's: the same service with another set. */
     private static final class Saver {
-        final int name;
-        final int text;
-        final int preview;
-        final Class<? extends DreamService> service;
+        final String name;
+        final String folder;
 
-        Saver(int name, int text, int preview, Class<? extends DreamService> service) {
+        Saver(String name, String folder) {
             this.name = name;
-            this.text = text;
-            this.preview = preview;
-            this.service = service;
+            this.folder = folder;
         }
     }
 
-    private static final Saver[] SAVERS = {new Saver(R.string.settings_saver_own, R.string.settings_saver_own_text, R.drawable.ic_photo, null)};
+    private static final Saver[] SAVERS = {new Saver(Look.ABSTRACT, Look.ABSTRACT_FOLDER),
+        new Saver(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER), new Saver(Look.NOX, Look.NOX_FOLDER)};
 
     private static final class Entry {
         final String title;
@@ -170,8 +173,10 @@ public final class SettingsActivity extends CardActivity {
         Drawable preview;
         /** The pictures of this row: they become the page's background while it has the focus. */
         String mosaic;
-        /** Scenes of the dynamic weather, one after the other in place of the icon. */
-        boolean scenes;
+        /** A heading for the rows below it: not a row. */
+        boolean label;
+        /** Beside the title: what kind of backdrop it is. Zero keeps the room empty, to stay lined up. */
+        int mark = NO_MARK;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -203,7 +208,6 @@ public final class SettingsActivity extends CardActivity {
     private TextView heading;
     private ImageView picture;
     private PictureMosaic mosaic;
-    private ScenePreview scenePreview;
     private TextView previewNote;
     private boolean previewing;
     private TextView explanation;
@@ -258,11 +262,6 @@ public final class SettingsActivity extends CardActivity {
         });
         left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
         mosaic = new PictureMosaic(this);
-        scenePreview = new ScenePreview(this);
-        scenePreview.setVisibility(View.INVISIBLE);
-        scenePreview.setClipToOutline(true);
-        scenePreview.setOutlineProvider(picture.getOutlineProvider());
-        left.addView(scenePreview, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
         explanation = label("", EXPLANATION_SP);
         explanation.setGravity(Gravity.CENTER_HORIZONTAL);
         explanation.setLineSpacing(dp(3), 1f);
@@ -296,7 +295,10 @@ public final class SettingsActivity extends CardActivity {
         list.addView(tableHead, new LinearLayout.LayoutParams(-1, -2));
         list.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 55));
-        setContentView(root);
+        FrameLayout stage = new FrameLayout(this);
+        stage.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
+        stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(stage);
         FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
         corner.bottomMargin = dp(PREVIEW_MARGIN);
         corner.setMarginStart(dp(PREVIEW_MARGIN));
@@ -382,7 +384,8 @@ public final class SettingsActivity extends CardActivity {
         explanation.setTextSize(table ? 14 : EXPLANATION_SP);
         rows.removeAllViews();
         for (Entry entry : entries) {
-            rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
+            if (entry.label) rows.addView(label(entry));
+            else rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
         }
         if (note != null) {
             TextView line = label(note, 16);
@@ -397,7 +400,9 @@ public final class SettingsActivity extends CardActivity {
 
     /** A plain requestFocus fails after a touch, leaving no row selected and the old text on the left. */
     private void selectRow(int index) {
-        rows.getChildAt(Math.min(index, rows.getChildCount() - 1)).requestFocusFromTouch();
+        int row = Math.min(index, rows.getChildCount() - 1);
+        while (row < rows.getChildCount() - 1 && !rows.getChildAt(row).isFocusable()) row++;
+        rows.getChildAt(row).requestFocusFromTouch();
     }
 
     private void selectCurrent() {
@@ -481,14 +486,19 @@ public final class SettingsActivity extends CardActivity {
         boolean plain = entry.preview != null;
         boolean pictures = entry.mosaic != null;
         mosaic.show(entry.mosaic);
-        if (entry.scenes) scenePreview.start();
-        else scenePreview.stop();
         if (plain) root.setBackground(entry.preview);
-        else if (pictures) root.setBackground(mosaic);
+        else if (pictures) root.setBackground(null);
         else if (previewing) Look.show(this, root::setBackground);
         previewing = plain || pictures;
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
-        picture.setVisibility(pictures || entry.scenes ? View.INVISIBLE : View.VISIBLE);
+        picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
+    }
+
+    private View label(Entry entry) {
+        TextView label = label(entry.title, LABEL_SP);
+        label.setAlpha(0.7f);
+        label.setPadding(dp(20), dp(LABEL_ROOM), dp(16), dp(8));
+        return label;
     }
 
     private View row(Entry entry) {
@@ -498,6 +508,13 @@ public final class SettingsActivity extends CardActivity {
         TextView title = label(entry.title, 20);
         if (entry.family != null) title.setTypeface(Typeface.create(entry.family, Typeface.NORMAL));
         title.setSingleLine(true);
+        if (entry.mark != NO_MARK) {
+            Drawable mark = entry.mark == 0 ? new ColorDrawable(Color.TRANSPARENT) : getDrawable(entry.mark).mutate();
+            mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+            title.setCompoundDrawablesRelative(mark, null, null, null);
+            title.setCompoundDrawablePadding(dp(MARK_GAP));
+            title.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
+        }
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         boolean onOff = YES.equals(entry.value) || NO.equals(entry.value);
         ToggleView toggle = onOff ? new ToggleView(this, YES.equals(entry.value)) : null;
@@ -525,6 +542,7 @@ public final class SettingsActivity extends CardActivity {
             chevron.setTextColor(text);
             lock.setColorFilter(text);
             if (onOff) toggle.setRowFocused(focused);
+            title.setCompoundDrawableTintList(ColorStateList.valueOf(text));
         });
         if (entry.off) {
             row.setFocusable(false);
@@ -1096,7 +1114,6 @@ public final class SettingsActivity extends CardActivity {
     @Override protected void onDestroy() {
         stopSearch();
         mosaic.show(null);
-        scenePreview.stop();
         fire.close();
         super.onDestroy();
     }
@@ -1425,43 +1442,70 @@ public final class SettingsActivity extends CardActivity {
                 refresh();
             });
         if (preview) entry.preview = Look.preset(name);
+        entry.mark = 0;
         return entry;
     }
 
     private void showBackdrops() {
         List<Entry> weather = new ArrayList<>();
-        Entry scenes = weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud, getString(R.string.settings_backdrop_weather_text));
-        scenes.scenes = true;
-        weather.add(scenes);
         Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
             getString(R.string.settings_backdrop_pictures_text));
         pictures.mosaic = Look.PICTURES_FOLDER;
+        pictures.mark = R.drawable.ic_cloud;
         weather.add(pictures);
         Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
             getString(R.string.settings_backdrop_photos_text));
         photos.mosaic = Look.PHOTOS_FOLDER;
+        photos.mark = R.drawable.ic_cloud;
         weather.add(photos);
-        List<Entry> others = new ArrayList<>();
+        List<Entry> timed = new ArrayList<>();
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text), false);
         drawn.mosaic = Look.ABSTRACT_FOLDER;
-        others.add(drawn);
+        drawn.mark = R.drawable.ic_restart;
+        timed.add(drawn);
         Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text), false);
         shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
-        others.add(shapes);
+        shapes.mark = R.drawable.ic_restart;
+        timed.add(shapes);
         Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text), false);
         city.mosaic = Look.NOX_FOLDER;
-        others.add(city);
-        others.add(new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)), getDrawable(R.drawable.ic_timer),
-            getString(R.string.settings_abstract_time_text), true, () -> enter(this::showAbstractTimes)));
-        for (String name : Look.PRESET_NAMES) others.add(plainBackdrop(name, getString(R.string.settings_backdrop_preset_text), true));
-        for (File image : Look.images(this)) {
-            others.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text), false));
-        }
-        List<Entry> entries = new ArrayList<>();
+        city.mark = R.drawable.ic_restart;
+        timed.add(city);
         boolean weatherFirst = Weather.active(this);
-        entries.addAll(weatherFirst ? weather : others);
-        entries.addAll(weatherFirst ? others : weather);
+        List<Entry> entries = new ArrayList<>();
+        entries.add(groupLabel(R.string.first_backdrop_dynamic));
+        entries.add(paceEntry());
+        entries.addAll(weatherFirst ? weather : timed);
+        entries.addAll(weatherFirst ? timed : weather);
+        entries.add(groupLabel(R.string.first_backdrop_static));
+        for (String name : Look.PRESET_NAMES) {
+            entries.add(plainBackdrop(name, getString(R.string.settings_backdrop_preset_text), true));
+        }
+        for (File image : Look.images(this)) {
+            entries.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text), false));
+        }
+        // Arriving, the selection starts on what is in use.
+        Level level = levels.peek();
+        if (level.focus == 0) {
+            for (int index = 0; index < entries.size(); index++) {
+                if (CHECK.equals(entries.get(index).value)) level.focus = index;
+            }
+        }
         show(getString(R.string.settings_backdrop), entries);
+    }
+
+    private Entry groupLabel(int name) {
+        Entry entry = new Entry(getString(name), null, null, "", false, () -> { });
+        entry.label = true;
+        return entry;
+    }
+
+    private Entry paceEntry() {
+        Entry pace = new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)),
+            getDrawable(R.drawable.ic_timer), getString(R.string.settings_abstract_time_text), true,
+            () -> enter(this::showAbstractTimes));
+        pace.mark = 0;
+        return pace;
     }
 
     private void showAbstractTimes() {
@@ -1617,7 +1661,7 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_saver_active), on ? YES : NO, picture,
                 getString(R.string.settings_saver_active_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry(getString(R.string.settings_saver_kind), own ? "Salotto" : "Fire OS", getDrawable(R.drawable.ic_photo),
+            new Entry(getString(R.string.settings_saver_kind), own ? ownSaverName() : "Fire OS", getDrawable(R.drawable.ic_photo),
                 getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
             new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
             new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
@@ -1635,18 +1679,26 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
+        if (own) entries.add(paceEntry());
         show(getString(R.string.settings_saver_kind), entries);
     }
 
     private Entry saverEntry(Saver saver) {
-        if (saver.service == null) {
-            return new Entry(getString(saver.name), getString(R.string.settings_saver_coming), getDrawable(saver.preview), getString(saver.text), false,
-                () -> say(getString(R.string.settings_saver_not_ready)));
+        boolean chosen = ownSaver() && saver.folder.equals(Look.saverFolder(this));
+        Entry entry = new Entry(saver.name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_saver_set_text), false, () -> {
+                Look.setSaverFolder(this, saver.folder);
+                chooseSaver(new ComponentName(this, SaverService.class).flattenToShortString());
+            });
+        entry.mosaic = saver.folder;
+        return entry;
+    }
+
+    private String ownSaverName() {
+        for (Saver saver : SAVERS) {
+            if (saver.folder.equals(Look.saverFolder(this))) return saver.name;
         }
-        String name = new ComponentName(this, saver.service).flattenToShortString();
-        String chosen = Settings.Secure.getString(getContentResolver(), SAVER_CHOSEN);
-        return new Entry(getString(saver.name), name.equals(chosen) ? CHECK : null, getDrawable(saver.preview), getString(saver.text), false,
-            () -> chooseSaver(name));
+        return Brand.NAME;
     }
 
     private void chooseSaver(String name) {

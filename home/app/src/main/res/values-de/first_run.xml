@@ -49,4 +49,6 @@
     <string name="first_remote_note">Beim ersten Mal fragt der Fernseher vielleicht nach kabellosem Debugging: Wähle Zulassen.</string>
     <string name="first_nox_text">Ansichten einer Zukunftsstadt bei Nacht, mit Neon und Regen, die alle 5 Minuten von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="first_abstract3d_text">Abstrakte 3D-Skulpturen auf dunklem Grund, die alle 5 Minuten von selbst wechseln, in zufälliger Reihenfolge.</string>
+    <string name="first_backdrop_dynamic">Dynamischer Hintergrund</string>
+    <string name="first_backdrop_static">Statischer Hintergrund</string>
 </resources>

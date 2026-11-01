@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">Conecte um disco ou pen drive.</string>
     <string name="settings_weather_backdrop_text">%1$s Só funciona com um lugar definido em Clima.</string>
     <string name="settings_place_first">Escolha primeiro o lugar em Clima</string>
-    <string name="settings_backdrop_weather_text">Céu, nuvens, chuva e neve seguem a hora e o clima do lugar escolhido, com uma animação leve.</string>
     <string name="settings_backdrop_pictures_text">Uma ilustração diferente para cada hora do dia e cada clima do lugar escolhido, sempre parada.</string>
     <string name="settings_backdrop_photos_text">Uma fotografia diferente para cada momento do dia e cada clima do lugar escolhido, sempre parada.</string>
     <string name="settings_backdrop_abstract_text">Ilustrações abstratas que mudam sozinhas, em ordem aleatória.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">O protetor de tela da Amazon, com as imagens dele.</string>
     <string name="settings_saver_choose">Escolher</string>
     <string name="settings_saver_choose_text">Abre o menu do Fire OS para escolher entre os protetores de tela dele: fotos, estilo, velocidade. O tempo de início que vale é o escolhido aqui, no Salotto.</string>
-    <string name="settings_saver_own">Protetor de tela do Salotto</string>
-    <string name="settings_saver_own_text">Desliga o do Fire OS.</string>
-    <string name="settings_saver_coming">Em breve</string>
-    <string name="settings_saver_not_ready">Ainda não está pronto</string>
     <string name="settings_saver_wait_text">Quanto tempo o Stick espera antes de iniciar o protetor de tela.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">TV</string>
@@ -290,4 +285,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">Vistas de uma cidade futura à noite, entre neon e chuva, que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_backdrop_abstract3d_text">Esculturas abstratas em 3D sobre fundo escuro, que mudam sozinhas, em ordem aleatória.</string>
+    <string name="settings_saver_set_text">As imagens se alternam, só com a hora e a data.</string>
 </resources>

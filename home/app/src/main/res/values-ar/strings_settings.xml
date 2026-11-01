@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">صِل قرصًا أو محرك فلاش.</string>
     <string name="settings_weather_backdrop_text">%1$s يعمل فقط مع مكان محدد في الطقس.</string>
     <string name="settings_place_first">اختر المكان أولًا في الطقس</string>
-    <string name="settings_backdrop_weather_text">السماء والغيوم والمطر والثلج تتبع الوقت وطقس المكان المختار، بحركة خفيفة.</string>
     <string name="settings_backdrop_pictures_text">رسم توضيحي مختلف لكل ساعة من اليوم ولكل حالة طقس في المكان المختار، ثابت دائمًا.</string>
     <string name="settings_backdrop_photos_text">صورة فوتوغرافية مختلفة لكل لحظة من اليوم ولكل حالة طقس في المكان المختار، ثابتة دائمًا.</string>
     <string name="settings_backdrop_abstract_text">رسوم تجريدية تتغير تلقائيًا بترتيب عشوائي.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">شاشة التوقف من Amazon، بصورها.</string>
     <string name="settings_saver_choose">اختيار</string>
     <string name="settings_saver_choose_text">يفتح قائمة Fire OS للاختيار بين شاشات التوقف فيه: الصور والنمط والسرعة. وقت البدء المعتمد هو ما تختاره هنا في Salotto.</string>
-    <string name="settings_saver_own">شاشة توقف Salotto</string>
-    <string name="settings_saver_own_text">يوقف شاشة توقف Fire OS.</string>
-    <string name="settings_saver_coming">قريبًا</string>
-    <string name="settings_saver_not_ready">ليست جاهزة بعد</string>
     <string name="settings_saver_wait_text">كم ينتظر جهاز Stick قبل تشغيل شاشة التوقف.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">التلفزيون</string>
@@ -314,4 +309,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">مشاهد لمدينة مستقبلية في الليل بين النيون والمطر، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_backdrop_abstract3d_text">منحوتات تجريدية ثلاثية الأبعاد على خلفية داكنة، تتغير تلقائيًا بترتيب عشوائي.</string>
+    <string name="settings_saver_set_text">تتناوب صوره مع عرض الوقت والتاريخ فقط.</string>
 </resources>

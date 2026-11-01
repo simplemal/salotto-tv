@@ -3,26 +3,24 @@ package it.simplemal.firehome;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
-import android.graphics.Matrix;
+import android.graphics.Outline;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -38,12 +36,13 @@ import java.util.Random;
 /**
  * Large pictures of one set, behind a page: they run off the top, the bottom and the left, and fade
  * into the page's own background before the rows on the right, which must stay readable. Every two
- * seconds one tile turns round on its vertical axis and another dissolves, and
- * between changes nothing is drawn. Weather pictures open with a good and a bad day and a good and
- * a bad night, on the tiles most in view; after that chance picks a moment of the day and a kind of
+ * seconds one tile turns round on its vertical axis and another dissolves. Each tile is a view of its
+ * own: this GPU cannot repaint the whole screen sixty times a second, but it can repaint two tiles.
+ * Between changes nothing is drawn. Weather pictures open with a good and a bad day and a good and a
+ * bad night, on the tiles most in view; after that chance picks a moment of the day and a kind of
  * weather, or it would be mostly drizzle.
  */
-final class PictureMosaic extends Drawable {
+final class PictureMosaic extends FrameLayout {
     private static final int COLUMNS = 3;
     private static final int ROWS = 5;
     private static final float TILE_SHARE = 0.25f;
@@ -61,10 +60,11 @@ final class PictureMosaic extends Drawable {
     private static final long DISSOLVE_MS = 1000;
     /** Then it stays still, in case nobody is looking any more. */
     private static final long RUNS_FOR_MS = 300000;
-    private static final float CAMERA_DISTANCE = -40;
-    private static final float HALF_TURN = 180;
-    /** Enough for white words to stay readable over any picture. */
-    private static final int VEIL = Color.argb(120, 0, 0, 0);
+    private static final float CAMERA_DISTANCE_DP = 2400;
+    private static final float QUARTER_TURN = 90;
+    /** How much of the page lies over the pictures on the left: white words stay readable on any of them. */
+    private static final int VEIL_ALPHA = 120;
+    private static final int VEIL_SCALE = 2;
     /** As shares of the screen: solid up to here, and gone just before the rows begin. */
     private static final float FADE_FROM = 0.2f;
     private static final float FADE_TO = 0.455f;
@@ -75,58 +75,151 @@ final class PictureMosaic extends Drawable {
     private static final String BAD = "/bad";
     private static final String DAY = "day";
     private static final String NIGHT = "night";
+    private static final String ARABIC = "ar";
 
-    private static final class Tile {
-        final RectF place = new RectF();
-        BitmapShader shown;
-        BitmapShader coming;
-        boolean turns;
-        boolean loading;
-        long since;
+    private final class Tile {
+        final FrameLayout frame = new FrameLayout(getContext());
+        final ImageView shown = picture();
+        final ImageView coming = picture();
+        final float centerX;
+        final float centerY;
+        boolean filled;
+        boolean busy;
+
+        Tile(float left, float top, int width, int height, float radius) {
+            centerX = left + width / 2f;
+            centerY = top + height / 2f;
+            frame.addView(shown);
+            frame.addView(coming);
+            coming.setVisibility(GONE);
+            frame.setTranslationX(left);
+            frame.setTranslationY(top);
+            frame.setCameraDistance(CAMERA_DISTANCE_DP * getResources().getDisplayMetrics().density);
+            frame.setClipToOutline(true);
+            frame.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+                }
+            });
+            grid.addView(frame, new LayoutParams(width, height));
+        }
+
+        private ImageView picture() {
+            ImageView view = new ImageView(getContext());
+            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            return view;
+        }
+
+        void dissolve(Bitmap picture) {
+            coming.setImageBitmap(picture);
+            coming.setAlpha(0f);
+            coming.setVisibility(VISIBLE);
+            coming.animate().alpha(1f).setDuration(DISSOLVE_MS).withEndAction(() -> {
+                shown.setImageBitmap(picture);
+                coming.setVisibility(GONE);
+                filled = true;
+                busy = false;
+            }).start();
+        }
+
+        /** Edge-on is the moment to change the picture: it never reads mirrored. */
+        void turn(Bitmap picture) {
+            AccelerateDecelerateInterpolator ease = new AccelerateDecelerateInterpolator();
+            frame.animate().rotationY(QUARTER_TURN).setDuration(TURN_MS / 2).setInterpolator(ease).withEndAction(() -> {
+                shown.setImageBitmap(picture);
+                frame.setRotationY(-QUARTER_TURN);
+                frame.animate().rotationY(0).setDuration(TURN_MS / 2).setInterpolator(ease)
+                    .withEndAction(() -> busy = false).start();
+            }).start();
+        }
+
+        void clear() {
+            coming.animate().cancel();
+            frame.animate().cancel();
+            frame.setRotationY(0);
+            shown.setImageDrawable(null);
+            coming.setImageDrawable(null);
+            coming.setVisibility(GONE);
+            filled = false;
+            busy = false;
+        }
     }
 
-    private final Context context;
-    private final Handler main = new Handler(Looper.getMainLooper());
     private final Runnable change = this::change;
     private final List<Tile> tiles = new ArrayList<>();
     private final Map<String, List<String>> moments = new HashMap<>();
     private final List<String> opening = new ArrayList<>();
     private final Random chance = new Random();
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
-    private final Paint fade = new Paint();
     private final Drawable base = Look.plainBackdrop();
-    private final Camera camera = new Camera();
-    private final Matrix turn = new Matrix();
+    private final FrameLayout grid;
     private List<String> files = new ArrayList<>();
     private String folder;
     private int next;
     private long started;
-    private float radius;
-    private float fadeEnd;
 
     PictureMosaic(Context context) {
-        this.context = context.getApplicationContext();
-        camera.setLocation(0, 0, CAMERA_DISTANCE);
-        for (int index = 0; index < COLUMNS * ROWS; index++) tiles.add(new Tile());
-        placeTiles(this.context.getResources().getDisplayMetrics());
+        super(context);
+        setBackground(Look.plainBackdrop());
+        setVisibility(GONE);
+        DisplayMetrics screen = getResources().getDisplayMetrics();
+        int shown = Math.round(screen.widthPixels * FADE_TO);
+        grid = new FrameLayout(context);
+        addView(grid, new LayoutParams(shown, -1, Gravity.TOP | Gravity.LEFT));
+        placeTiles(screen);
+        ImageView veil = new ImageView(context);
+        veil.setScaleType(ImageView.ScaleType.FIT_XY);
+        veil.setImageBitmap(veil(screen, shown));
+        grid.addView(veil, new LayoutParams(-1, -1));
+    }
+
+    /** The page itself, more and more opaque towards the rows: it is what the pictures fade into. */
+    private Bitmap veil(DisplayMetrics screen, int shown) {
+        int width = shown / VEIL_SCALE;
+        int height = screen.heightPixels / VEIL_SCALE;
+        Bitmap made = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        base.setBounds(0, 0, width, height);
+        base.draw(canvas);
+        Paint mask = new Paint();
+        mask.setShader(new LinearGradient(screen.widthPixels * FADE_FROM / VEIL_SCALE, 0, width, 0,
+            Color.argb(VEIL_ALPHA, 0, 0, 0), Color.BLACK, Shader.TileMode.CLAMP));
+        mask.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        canvas.drawRect(0, 0, width, height, mask);
+        return made;
+    }
+
+    /** Always the whole screen. The tiles most in view come first, for the weather's opening. */
+    private void placeTiles(DisplayMetrics screen) {
+        int width = Math.round(screen.widthPixels * TILE_SHARE);
+        int height = width * 9 / 16;
+        float gap = screen.widthPixels * GAP_SHARE;
+        float radius = screen.widthPixels * RADIUS_SHARE;
+        float middleX = screen.widthPixels * MIDDLE_COLUMN;
+        float middleY = screen.heightPixels / 2f;
+        for (int index = 0; index < COLUMNS * ROWS; index++) {
+            int column = index / ROWS;
+            float left = middleX - width / 2f + (column - 1) * (width + gap);
+            float top = height * (START_Y + (column % 2) * COLUMN_STEP_Y) + index % ROWS * (height + gap);
+            tiles.add(new Tile(left, top, width, height, radius));
+        }
+        tiles.sort(Comparator.comparingDouble(tile -> Math.abs(tile.centerX - middleX) + Math.abs(tile.centerY - middleY)));
     }
 
     /** Null stops it and lets the pictures go. */
     void show(String wanted) {
         if (wanted == null ? folder == null : wanted.equals(folder)) return;
         folder = wanted;
-        main.removeCallbacks(change);
+        removeCallbacks(change);
         files = new ArrayList<>();
         moments.clear();
         opening.clear();
         next = 0;
-        for (Tile tile : tiles) {
-            tile.shown = null;
-            tile.coming = null;
-            tile.loading = false;
-        }
+        for (Tile tile : tiles) tile.clear();
+        setVisibility(wanted == null ? GONE : VISIBLE);
         if (wanted == null) return;
-        sortMoments(Weather.pictures(context, wanted + "/"), wanted);
+        // The rows change sides for Arabic, so the pictures do as well.
+        setScaleX(ARABIC.equals(Language.code(getContext())) ? -1 : 1);
+        sortMoments(Weather.pictures(getContext(), wanted + "/"), wanted);
         if (moments.isEmpty()) {
             try {
                 collect(wanted);
@@ -137,8 +230,7 @@ final class PictureMosaic extends Drawable {
         }
         started = SystemClock.uptimeMillis();
         for (Tile tile : tiles) load(tile, false);
-        main.postDelayed(change, EVERY_MS);
-        invalidateSelf();
+        postDelayed(change, EVERY_MS);
     }
 
     private void sortMoments(Properties table, String wanted) {
@@ -162,7 +254,7 @@ final class PictureMosaic extends Drawable {
 
     /** The illustrations sit in a folder for each moment of the day. */
     private void collect(String path) throws IOException {
-        for (String name : context.getAssets().list(path)) {
+        for (String name : getContext().getAssets().list(path)) {
             String file = path + "/" + name;
             if (name.endsWith(Weather.PICTURE_FILE)) files.add(file);
             else if (name.indexOf('.') < 0) collect(file);
@@ -184,33 +276,35 @@ final class PictureMosaic extends Drawable {
         if (folder == null || SystemClock.uptimeMillis() - started > RUNS_FOR_MS) return;
         List<Tile> free = new ArrayList<>();
         for (Tile tile : tiles) {
-            if (tile.shown != null && tile.coming == null && !tile.loading) free.add(tile);
+            if (tile.filled && !tile.busy) free.add(tile);
         }
         Collections.shuffle(free);
         if (free.size() > 0) load(free.get(0), true);
         if (free.size() > 1) load(free.get(1), false);
-        main.postDelayed(change, EVERY_MS);
+        postDelayed(change, EVERY_MS);
     }
 
     private void load(Tile tile, boolean turns) {
-        tile.loading = true;
+        tile.busy = true;
         String file = nextFile();
         String asked = folder;
+        Context context = getContext().getApplicationContext();
         Background.draw(() -> {
-            Bitmap picture = decode(file);
-            main.post(() -> {
+            Bitmap picture = decode(context, file);
+            post(() -> {
                 if (!asked.equals(folder)) return;
-                tile.loading = false;
-                if (picture == null) return;
-                tile.coming = shader(picture, tile.place);
-                tile.turns = turns;
-                tile.since = 0;
-                invalidateSelf();
+                if (picture == null) {
+                    tile.busy = false;
+                } else if (turns) {
+                    tile.turn(picture);
+                } else {
+                    tile.dissolve(picture);
+                }
             });
         });
     }
 
-    private Bitmap decode(String file) {
+    private static Bitmap decode(Context context, String file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = SAMPLE;
         options.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -220,99 +314,4 @@ final class PictureMosaic extends Drawable {
             return null;
         }
     }
-
-    private static BitmapShader shader(Bitmap picture, RectF place) {
-        BitmapShader shader = new BitmapShader(picture, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        Matrix fit = new Matrix();
-        fit.setScale(place.width() / picture.getWidth(), place.height() / picture.getHeight());
-        fit.postTranslate(place.left, place.top);
-        shader.setLocalMatrix(fit);
-        return shader;
-    }
-
-    /** Always the whole screen. The tiles most in view come first, for the weather's opening. */
-    private void placeTiles(DisplayMetrics screen) {
-        fadeEnd = screen.widthPixels * FADE_TO;
-        fade.setShader(new LinearGradient(screen.widthPixels * FADE_FROM, 0, fadeEnd, 0, Color.BLACK, Color.TRANSPARENT,
-            Shader.TileMode.CLAMP));
-        fade.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        float width = screen.widthPixels * TILE_SHARE;
-        float height = width * 9 / 16;
-        float gap = screen.widthPixels * GAP_SHARE;
-        radius = screen.widthPixels * RADIUS_SHARE;
-        for (int index = 0; index < tiles.size(); index++) {
-            int column = index / ROWS;
-            float left = screen.widthPixels * MIDDLE_COLUMN - width / 2 + (column - 1) * (width + gap);
-            float top = height * (START_Y + (column % 2) * COLUMN_STEP_Y) + index % ROWS * (height + gap);
-            tiles.get(index).place.set(left, top, left + width, top + height);
-        }
-        float middle = screen.heightPixels / 2f;
-        tiles.sort(Comparator.comparingDouble(tile ->
-            Math.abs(tile.place.centerX() - screen.widthPixels * MIDDLE_COLUMN) + Math.abs(tile.place.centerY() - middle)));
-    }
-
-    @Override protected void onBoundsChange(Rect bounds) { base.setBounds(bounds); }
-
-    @Override public void draw(Canvas canvas) {
-        base.draw(canvas);
-        int bottom = getBounds().height();
-        int faded = canvas.saveLayer(0, 0, fadeEnd, bottom, null);
-        long now = SystemClock.uptimeMillis();
-        boolean moving = false;
-        for (Tile tile : tiles) {
-            if (tile.coming == null) {
-                if (tile.shown != null) paint(canvas, tile, tile.shown, 255);
-                continue;
-            }
-            if (tile.since == 0) tile.since = now;
-            boolean turning = tile.turns && tile.shown != null;
-            float linear = Math.min(1, (now - tile.since) / (float) (turning ? TURN_MS : DISSOLVE_MS));
-            float eased = linear * linear * (3 - 2 * linear);
-            if (turning) turn(canvas, tile, eased);
-            else dissolve(canvas, tile, eased);
-            if (linear >= 1) {
-                tile.shown = tile.coming;
-                tile.coming = null;
-            } else {
-                moving = true;
-            }
-        }
-        canvas.drawColor(VEIL);
-        canvas.drawRect(0, 0, fadeEnd, bottom, fade);
-        canvas.restoreToCount(faded);
-        if (moving) invalidateSelf();
-    }
-
-    private void dissolve(Canvas canvas, Tile tile, float eased) {
-        if (tile.shown != null) paint(canvas, tile, tile.shown, 255);
-        paint(canvas, tile, tile.coming, Math.round(eased * 255));
-    }
-
-    /** Past the edge-on moment the new picture is on the face, and it must not read mirrored. */
-    private void turn(Canvas canvas, Tile tile, float eased) {
-        float angle = eased * HALF_TURN;
-        boolean first = angle < HALF_TURN / 2;
-        camera.save();
-        camera.rotateY(first ? angle : angle - HALF_TURN);
-        camera.getMatrix(turn);
-        camera.restore();
-        turn.preTranslate(-tile.place.centerX(), -tile.place.centerY());
-        turn.postTranslate(tile.place.centerX(), tile.place.centerY());
-        canvas.save();
-        canvas.concat(turn);
-        paint(canvas, tile, first ? tile.shown : tile.coming, 255);
-        canvas.restore();
-    }
-
-    private void paint(Canvas canvas, Tile tile, BitmapShader picture, int alpha) {
-        paint.setShader(picture);
-        paint.setAlpha(alpha);
-        canvas.drawRoundRect(tile.place, radius, radius, paint);
-    }
-
-    @Override public void setAlpha(int alpha) { }
-
-    @Override public void setColorFilter(ColorFilter filter) { }
-
-    @Override public int getOpacity() { return PixelFormat.OPAQUE; }
 }

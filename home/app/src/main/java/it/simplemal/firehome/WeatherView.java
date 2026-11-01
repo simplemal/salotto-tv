@@ -9,6 +9,7 @@ import android.graphics.Shader;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.View;
+import java.util.function.Consumer;
 
 /**
  * Shows a weather scene behind the Home. It moves at full speed for three seconds each time the
@@ -42,6 +43,7 @@ final class WeatherView extends View {
     private double fadeStart;
     private float scroll;
     private Runnable onShown;
+    private Consumer<Boolean> onFade;
 
     WeatherView(Context context) {
         super(context);
@@ -49,6 +51,9 @@ final class WeatherView extends View {
     }
 
     void setOnShown(Runnable action) { onShown = action; }
+
+    /** Hears when a picture starts and ends fading over another: two whole screens, the most this GPU can do. */
+    void setOnFade(Consumer<Boolean> action) { onFade = action; }
 
     private static double now() { return SystemClock.uptimeMillis() / 1000.0; }
 
@@ -117,6 +122,7 @@ final class WeatherView extends View {
         release(previous);
         previous = scene;
         scene = loaded;
+        if (previous != null && onFade != null) onFade.accept(true);
         double time = now();
         fadeStart = time;
         if (previous == null) enteredAt = time;
@@ -145,6 +151,7 @@ final class WeatherView extends View {
                 Scene gone = previous;
                 previous = null;
                 post(gone::release);
+                if (onFade != null) post(() -> onFade.accept(false));
             } else {
                 previous.draw(canvas, entered, scroll, 1);
             }

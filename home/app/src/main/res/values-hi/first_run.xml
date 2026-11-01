@@ -49,4 +49,6 @@
     <string name="first_remote_note">पहली बार टीवी वायरलेस डीबगिंग की अनुमति मांग सकता है: «अनुमति दें» चुनें।</string>
     <string name="first_nox_text">रात में भविष्य के शहर के दृश्य, नियॉन और बारिश के बीच, जो हर 5 मिनट में अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="first_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो हर 5 मिनट में अपने आप बदलती हैं, किसी भी क्रम में।</string>
+    <string name="first_backdrop_dynamic">डायनामिक बैकग्राउंड</string>
+    <string name="first_backdrop_static">स्टैटिक बैकग्राउंड</string>
 </resources>

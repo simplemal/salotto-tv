@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">Подключите диск или флешку.</string>
     <string name="settings_weather_backdrop_text">%1$s Включается, только если в разделе «Погода» выбрано место.</string>
     <string name="settings_place_first">Сначала выберите место в разделе «Погода»</string>
-    <string name="settings_backdrop_weather_text">Небо, облака, дождь и снег соответствуют времени и погоде выбранного места, с лёгкой анимацией.</string>
     <string name="settings_backdrop_pictures_text">Своя иллюстрация для каждого часа дня и каждой погоды выбранного места, без движения.</string>
     <string name="settings_backdrop_photos_text">Своя фотография для каждого времени суток и каждой погоды выбранного места, без движения.</string>
     <string name="settings_backdrop_abstract_text">Абстрактные иллюстрации, которые сами меняются в случайном порядке.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">Заставка Amazon с её изображениями.</string>
     <string name="settings_saver_choose">Выбрать</string>
     <string name="settings_saver_choose_text">Открывает меню Fire OS, где можно выбрать заставку: фото, стиль, скорость. Учитывается время запуска, выбранное здесь, в Salotto.</string>
-    <string name="settings_saver_own">Заставка Salotto</string>
-    <string name="settings_saver_own_text">Отключает заставку Fire OS.</string>
-    <string name="settings_saver_coming">Скоро</string>
-    <string name="settings_saver_not_ready">Ещё не готово</string>
     <string name="settings_saver_wait_text">Сколько Stick ждёт, прежде чем запустить заставку.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">Телевизор</string>
@@ -302,4 +297,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">Виды города будущего ночью, в неоне и под дождём, которые сами меняются в случайном порядке.</string>
     <string name="settings_backdrop_abstract3d_text">Абстрактные 3D-скульптуры на тёмном фоне, которые сами меняются в случайном порядке.</string>
+    <string name="settings_saver_set_text">Изображения сменяют друг друга, на экране только время и дата.</string>
 </resources>

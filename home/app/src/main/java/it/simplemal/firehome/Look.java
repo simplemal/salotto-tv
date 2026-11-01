@@ -141,29 +141,45 @@ final class Look {
         long now = System.currentTimeMillis();
         long since = now - saved.getLong("abstract_at", 0);
         if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        String picked = anyPicture(context, folder, shown);
+        if (picked == null) return shown;
+        saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
+        return picked;
+    }
+
+    /** Any but the one on show. Null if the set cannot be read. */
+    static String anyPicture(Context context, String folder, String shown) {
         List<String> files = new ArrayList<>();
         try {
             for (String name : context.getAssets().list(folder)) {
                 if (!(folder + "/" + name).equals(shown)) files.add(folder + "/" + name);
             }
         } catch (IOException e) {
-            return shown;
+            return null;
         }
-        if (files.isEmpty()) return shown;
-        String picked = files.get(new Random().nextInt(files.size()));
-        saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
-        return picked;
+        return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
     }
+
+    /** Which set Salotto's screensaver shows. */
+    static String saverFolder(Context context) { return prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER); }
+    static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
     static boolean weatherPhotos(Context context) { return PHOTOS.equals(backdrop(context)); }
 
-    /** The weather's backdrops need a place: without one, or once it is gone, Nox City takes over. */
+    /**
+     * The weather's backdrops need a place: the default follows it, and a chosen one gives way to
+     * Abstract 3D once the place is gone. The dynamic weather is no longer offered.
+     */
     static String backdrop(Context context) {
-        String chosen = prefs(context).getString("backdrop", PICTURES);
-        boolean weather = WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen);
-        if (!weather || Weather.active(context)) return chosen;
-        setBackdrop(context, NOX);
-        return NOX;
+        String chosen = prefs(context).getString("backdrop", null);
+        boolean place = Weather.active(context);
+        if (chosen == null) return place ? PICTURES : ABSTRACT_3D;
+        if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen)) return chosen;
+        if (!place) {
+            setBackdrop(context, ABSTRACT_3D);
+            return ABSTRACT_3D;
+        }
+        return WEATHER.equals(chosen) ? PICTURES : chosen;
     }
 
     static void setBackdrop(Context context, String value) { prefs(context).edit().putString("backdrop", value).apply(); }

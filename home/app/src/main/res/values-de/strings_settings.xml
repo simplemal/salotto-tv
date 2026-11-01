@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">Schließe ein Laufwerk an.</string>
     <string name="settings_weather_backdrop_text">%1$s Wird nur aktiv, wenn im Wetter ein Ort gewählt ist.</string>
     <string name="settings_place_first">Wähle zuerst den Ort im Wetter</string>
-    <string name="settings_backdrop_weather_text">Himmel, Wolken, Regen und Schnee folgen Uhrzeit und Wetter des gewählten Ortes, mit einer leichten Animation.</string>
     <string name="settings_backdrop_pictures_text">Eine andere Illustration für jede Tageszeit und jedes Wetter des gewählten Ortes, immer unbewegt.</string>
     <string name="settings_backdrop_photos_text">Ein anderes Foto für jeden Moment des Tages und jedes Wetter des gewählten Ortes, immer unbewegt.</string>
     <string name="settings_backdrop_abstract_text">Abstrakte Illustrationen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">Der Bildschirmschoner von Amazon, mit seinen Bildern.</string>
     <string name="settings_saver_choose">Wählen</string>
     <string name="settings_saver_choose_text">Öffnet das Menü von Fire OS, um zwischen seinen Bildschirmschonern zu wählen: Fotos, Stil, Tempo. Es zählt die Startzeit, die du hier in Salotto wählst.</string>
-    <string name="settings_saver_own">Bildschirmschoner von Salotto</string>
-    <string name="settings_saver_own_text">Schaltet den von Fire OS aus.</string>
-    <string name="settings_saver_coming">Bald verfügbar</string>
-    <string name="settings_saver_not_ready">Noch nicht fertig</string>
     <string name="settings_saver_wait_text">Wie lange der Stick wartet, bevor der Bildschirmschoner startet.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">Fernseher</string>
@@ -290,4 +285,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">Ansichten einer Zukunftsstadt bei Nacht, mit Neon und Regen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_backdrop_abstract3d_text">Abstrakte 3D-Skulpturen auf dunklem Grund, die von selbst wechseln, in zufälliger Reihenfolge.</string>
+    <string name="settings_saver_set_text">Die Bilder wechseln sich ab, nur mit Uhrzeit und Datum.</string>
 </resources>

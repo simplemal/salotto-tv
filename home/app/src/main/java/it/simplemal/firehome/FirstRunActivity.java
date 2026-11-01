@@ -1,5 +1,7 @@
 package it.simplemal.firehome;
 
+import android.graphics.drawable.Drawable;
+import android.content.res.ColorStateList;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -52,6 +54,7 @@ public final class FirstRunActivity extends CardActivity {
     private static final int TITLE_SP = 30;
     private static final int TEXT_SP = 17;
     private static final int EXPLAINED_SP = 15;
+    private static final int MARK_SIZE = 20;
     private static final int VALUE_SP = 26;
     private static final int BUTTON_SP = 17;
     private static final int TEXT_WIDTH = 720;
@@ -89,27 +92,29 @@ public final class FirstRunActivity extends CardActivity {
         final int name;
         final int text;
         final String folder;
+        final int mark;
 
-        Choice(String key, int name, int text, String folder) {
+        Choice(String key, int name, int text, String folder, int mark) {
             this.key = key;
             this.name = name;
             this.text = text;
             this.folder = folder;
+            this.mark = mark;
         }
     }
 
     private static final Choice[] WEATHER_CHOICES = {
-        new Choice(Look.PICTURES, R.string.first_backdrop_pictures, R.string.first_pictures_text, Look.PICTURES_FOLDER),
-        new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER)};
+        new Choice(Look.PICTURES, R.string.first_backdrop_pictures, R.string.first_pictures_text, Look.PICTURES_FOLDER, R.drawable.ic_cloud),
+        new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER, R.drawable.ic_cloud)};
     private static final Choice[] OTHER_CHOICES = {
-        new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER),
-        new Choice(Look.ABSTRACT_3D, 0, R.string.first_abstract3d_text, Look.ABSTRACT_3D_FOLDER),
-        new Choice(Look.NOX, 0, R.string.first_nox_text, Look.NOX_FOLDER),
-        new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null),
-        new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null),
-        new Choice(Look.PRESET_NAMES[2], R.string.first_backdrop_forest, R.string.first_plain_text, null),
-        new Choice(Look.PRESET_NAMES[3], R.string.first_backdrop_sunset, R.string.first_plain_text, null),
-        new Choice(Look.PRESET_NAMES[4], R.string.first_backdrop_graphite, R.string.first_plain_text, null)};
+        new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER, R.drawable.ic_restart),
+        new Choice(Look.ABSTRACT_3D, 0, R.string.first_abstract3d_text, Look.ABSTRACT_3D_FOLDER, R.drawable.ic_restart),
+        new Choice(Look.NOX, 0, R.string.first_nox_text, Look.NOX_FOLDER, R.drawable.ic_restart),
+        new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null, 0),
+        new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null, 0),
+        new Choice(Look.PRESET_NAMES[2], R.string.first_backdrop_forest, R.string.first_plain_text, null, 0),
+        new Choice(Look.PRESET_NAMES[3], R.string.first_backdrop_sunset, R.string.first_plain_text, null, 0),
+        new Choice(Look.PRESET_NAMES[4], R.string.first_backdrop_graphite, R.string.first_plain_text, null, 0)};
 
     private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity,
         this::showBackdrop, this::showRemote};
@@ -139,6 +144,7 @@ public final class FirstRunActivity extends CardActivity {
         root = new FrameLayout(this);
         root.setBackground(Look.plainBackdrop());
         mosaic = new PictureMosaic(this);
+        root.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
         page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -426,21 +432,34 @@ public final class FirstRunActivity extends CardActivity {
         explained.setGravity(Gravity.CENTER);
         explained.setAlpha(0.85f);
         View first = null;
+        rows.addView(groupLabel(R.string.first_backdrop_dynamic));
+        boolean statics = false;
         for (Choice choice : choices) {
+            if (choice.folder == null && !statics) {
+                statics = true;
+                rows.addView(groupLabel(R.string.first_backdrop_static));
+            }
             String name = choice.name == 0 ? choice.key : words(choice.name);
-            View row = button(name, BUTTON_SP, () -> {
+            TextView row = button(name, BUTTON_SP, () -> {
                 Look.setBackdrop(this, choice.key);
                 next();
             });
             View.OnFocusChangeListener style = row.getOnFocusChangeListener();
             row.setOnFocusChangeListener((view, focused) -> {
                 style.onFocusChange(view, focused);
+                row.setCompoundDrawableTintList(ColorStateList.valueOf(focused ? Fire.INK : Color.WHITE));
                 if (focused) preview(choice, explained);
             });
+            if (choice.mark != 0) {
+                Drawable mark = getDrawable(choice.mark).mutate();
+                mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+                row.setCompoundDrawablesRelative(mark, null, null, null);
+                row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
+            }
             LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
-            if (first != null) size.topMargin = dp(ROW_GAP);
+            size.bottomMargin = dp(ROW_GAP);
             rows.addView(row, size);
-            if (first == null || !due(this) && choice.key.equals(Look.backdrop(this))) first = row;
+            if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
         }
         ScrollView list = new ScrollView(this);
         hideFromFixer(list);
@@ -461,10 +480,17 @@ public final class FirstRunActivity extends CardActivity {
         first.requestFocus();
     }
 
+    private TextView groupLabel(int name) {
+        TextView label = label(words(name), TEXT_SP - 2);
+        label.setAlpha(0.7f);
+        label.setPaddingRelative(dp(ROW_GAP), dp(ROW_GAP), 0, dp(ROW_GAP));
+        return label;
+    }
+
     private void preview(Choice choice, TextView explained) {
         explained.setText(words(choice.text));
         mosaic.show(choice.folder);
-        root.setBackground(choice.folder != null ? mosaic : Look.preset(choice.key));
+        if (choice.folder == null) root.setBackground(Look.preset(choice.key));
         previewNote.setText(words(R.string.first_preview));
         previewNote.setVisibility(choice.folder != null ? View.GONE : View.VISIBLE);
     }

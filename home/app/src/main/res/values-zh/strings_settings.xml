@@ -208,7 +208,6 @@
     <string name="settings_usb_none_text">请连接硬盘或 U 盘。</string>
     <string name="settings_weather_backdrop_text">%1$s 只有在“天气”中设置了地点后才会启用。</string>
     <string name="settings_place_first">请先在“天气”中选择地点</string>
-    <string name="settings_backdrop_weather_text">天空、云、雨和雪会跟随所选地点的时间和天气，并带有轻柔的动画。</string>
     <string name="settings_backdrop_pictures_text">一天中的每个时刻、所选地点的每种天气，各有一幅插画，画面静止。</string>
     <string name="settings_backdrop_photos_text">一天中的每个时段、所选地点的每种天气，各有一张照片，画面静止。</string>
     <string name="settings_backdrop_abstract_text">抽象插画自动更换，顺序随机。</string>
@@ -254,10 +253,6 @@
     <string name="settings_saver_fire_text">Amazon 的屏保，使用它自己的图片。</string>
     <string name="settings_saver_choose">选择</string>
     <string name="settings_saver_choose_text">打开 Fire OS 的菜单，在它的屏保中选择：照片、样式、速度。启动时间以这里 Salotto 中设置的为准。</string>
-    <string name="settings_saver_own">Salotto 屏保</string>
-    <string name="settings_saver_own_text">关闭 Fire OS 的屏保。</string>
-    <string name="settings_saver_coming">即将推出</string>
-    <string name="settings_saver_not_ready">还没有准备好</string>
     <string name="settings_saver_wait_text">Stick 等多久才启动屏保。</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">电视</string>
@@ -285,4 +280,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">夜色中的未来城市，霓虹与雨水交织，自动更换，顺序随机。</string>
     <string name="settings_backdrop_abstract3d_text">深色背景上的抽象 3D 雕塑，自动更换，顺序随机。</string>
+    <string name="settings_saver_set_text">图片轮流显示，只显示时间和日期。</string>
 </resources>

@@ -240,6 +240,8 @@ public final class MainActivity extends CardActivity {
         page = page();
         scroll.addView(page);
         root.addView(scroll);
+        // While the backdrop fades the cards cost one picture, instead of all their shadows and glass.
+        weatherView.setOnFade(fading -> scroll.setLayerType(fading ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null));
 
         root.addView(pill(), pillPlace());
         footer = footer();

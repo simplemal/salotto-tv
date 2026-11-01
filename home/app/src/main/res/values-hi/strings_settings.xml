@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">कोई डिस्क या पेन ड्राइव लगाएं।</string>
     <string name="settings_weather_backdrop_text">%1$s यह तभी चालू होता है जब मौसम में कोई स्थान चुना हो।</string>
     <string name="settings_place_first">पहले मौसम में स्थान चुनें</string>
-    <string name="settings_backdrop_weather_text">आसमान, बादल, बारिश और बर्फ़ चुने हुए स्थान के समय और मौसम के साथ चलते हैं, हल्के एनिमेशन के साथ।</string>
     <string name="settings_backdrop_pictures_text">चुने हुए स्थान के दिन के हर घंटे और हर मौसम के लिए अलग चित्र, हमेशा स्थिर।</string>
     <string name="settings_backdrop_photos_text">चुने हुए स्थान के दिन के हर पल और हर मौसम के लिए अलग फ़ोटो, हमेशा स्थिर।</string>
     <string name="settings_backdrop_abstract_text">अमूर्त चित्र, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">Amazon का स्क्रीनसेवर, उसकी अपनी तस्वीरों के साथ।</string>
     <string name="settings_saver_choose">चुनें</string>
     <string name="settings_saver_choose_text">Fire OS का मेनू खोलता है, जहाँ उसके स्क्रीनसेवर चुने जा सकते हैं: फ़ोटो, स्टाइल, स्पीड। शुरू होने का जो समय मायने रखता है, वह यहाँ Salotto में चुना हुआ है।</string>
-    <string name="settings_saver_own">Salotto का स्क्रीनसेवर</string>
-    <string name="settings_saver_own_text">Fire OS वाला बंद कर देता है।</string>
-    <string name="settings_saver_coming">जल्द आ रहा है</string>
-    <string name="settings_saver_not_ready">अभी तैयार नहीं है</string>
     <string name="settings_saver_wait_text">स्क्रीनसेवर शुरू होने से पहले कितनी देर इंतज़ार होता है।</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">टीवी</string>
@@ -290,4 +285,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">रात में भविष्य के शहर के दृश्य, नियॉन और बारिश के बीच, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="settings_backdrop_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो अपने आप बदलती हैं, किसी भी क्रम में।</string>
+    <string name="settings_saver_set_text">इसकी तस्वीरें बारी-बारी से बदलती हैं, साथ में सिर्फ़ समय और तारीख़।</string>
 </resources>

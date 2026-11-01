@@ -207,7 +207,6 @@
     <string name="settings_usb_none_text">Connectez un disque ou une clé.</string>
     <string name="settings_weather_backdrop_text">%1$s Ne s’active que si un lieu est défini dans Météo.</string>
     <string name="settings_place_first">Choisissez d’abord le lieu dans Météo</string>
-    <string name="settings_backdrop_weather_text">Ciel, nuages, pluie et neige suivent l’heure et la météo du lieu choisi, avec une animation légère.</string>
     <string name="settings_backdrop_pictures_text">Une illustration différente pour chaque heure du jour et chaque météo du lieu choisi, toujours fixe.</string>
     <string name="settings_backdrop_photos_text">Une photographie différente pour chaque moment de la journée et chaque météo du lieu choisi, toujours fixe.</string>
     <string name="settings_backdrop_abstract_text">Des illustrations abstraites qui changent toutes seules, dans un ordre aléatoire.</string>
@@ -253,10 +252,6 @@
     <string name="settings_saver_fire_text">L’économiseur d’écran d’Amazon, avec ses images.</string>
     <string name="settings_saver_choose">Choisir</string>
     <string name="settings_saver_choose_text">Ouvre le menu de Fire OS pour choisir parmi ses économiseurs d’écran : photos, style, vitesse. Le délai de démarrage qui compte est celui choisi ici dans Salotto.</string>
-    <string name="settings_saver_own">Économiseur d’écran de Salotto</string>
-    <string name="settings_saver_own_text">Désactive celui de Fire OS.</string>
-    <string name="settings_saver_coming">Bientôt</string>
-    <string name="settings_saver_not_ready">Pas encore prêt</string>
     <string name="settings_saver_wait_text">Le temps que le Stick attend avant de lancer l’économiseur d’écran.</string>
     <string name="settings_table_stick">Stick</string>
     <string name="settings_table_tv">TV</string>
@@ -290,4 +285,5 @@
     </plurals>
     <string name="settings_backdrop_nox_text">Des vues d’une ville future la nuit, entre néons et pluie, qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_backdrop_abstract3d_text">Des sculptures abstraites en 3D sur fond sombre, qui changent toutes seules, dans un ordre aléatoire.</string>
+    <string name="settings_saver_set_text">Ses images se succèdent, avec seulement l’heure et la date.</string>
 </resources>
