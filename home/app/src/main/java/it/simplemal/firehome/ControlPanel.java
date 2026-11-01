@@ -56,7 +56,7 @@ final class ControlPanel extends LinearLayout {
     private static final float TIMER_CENTER = 0.545f;
     private static final long TIMER_TICK_MS = 5000;
     /** Solid enough to hide the backdrop, and still dark enough to carry white. */
-    private static final int TILE_OFF = Color.argb(175, 92, 96, 104);
+    private static final int TILE_OFF = Color.argb(191, 92, 96, 104);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
     /** The icon of a connection in use. */
     static final int LINKED = Color.rgb(125, 205, 255);
