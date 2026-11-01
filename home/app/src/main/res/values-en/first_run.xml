@@ -33,4 +33,18 @@
     <string name="first_does_panel">Control center</string>
     <string name="first_does_settings">Settings</string>
     <string name="first_start">Get started</string>
+    <string name="first_backdrop_title">Choose a backdrop</string>
+    <string name="first_preview">Preview</string>
+    <string name="first_backdrop_pictures">Illustrated weather</string>
+    <string name="first_backdrop_photos">Photographic weather</string>
+    <string name="first_backdrop_night">Night</string>
+    <string name="first_backdrop_ocean">Ocean</string>
+    <string name="first_backdrop_forest">Forest</string>
+    <string name="first_backdrop_sunset">Sunset</string>
+    <string name="first_backdrop_graphite">Graphite</string>
+    <string name="first_pictures_text">An illustration for every hour of the day and every kind of weather in your city.</string>
+    <string name="first_photos_text">A photograph for every moment of the day and every kind of weather in your city.</string>
+    <string name="first_abstract_text">Abstract illustrations that change on their own every 5 minutes, in random order.</string>
+    <string name="first_plain_text">A simple gradient, always the same.</string>
+    <string name="first_remote_note">The first time, the TV may ask to allow wireless debugging: choose Allow.</string>
 </resources>

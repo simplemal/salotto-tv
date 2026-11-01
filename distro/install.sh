@@ -211,6 +211,8 @@ apply_privacy() {
 finish() {
   say "8. Avvio e controllo"
   # Not KEYCODE_HOME: pressed right after an install it counts as a double Home and stays on Amazon's.
+  W shell am start -n io.github.jqssun.airplay/.MainActivity || true
+  [[ $PREVIEW == 1 ]] || sleep 3
   W shell am start -n "$SALOTTO/.MainActivity"
   if [[ $PREVIEW == 1 ]]; then echo; echo "Anteprima finita: nessuna modifica eseguita."; return; fi
   sleep 3

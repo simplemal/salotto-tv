@@ -100,6 +100,7 @@ final class Weather {
      * does a moment without data. With meteo-prova, phase/condition or phase/code.
      */
     static String picture(Context context) {
+        if (Look.abstractPictures(context)) return Look.abstractPicture(context);
         SharedPreferences saved = prefs(context);
         boolean photos = Look.weatherPhotos(context);
         String folder = photos ? PHOTOS : PICTURES;
@@ -130,7 +131,7 @@ final class Weather {
         return file(context, folder, phase + "/0");
     }
 
-    private static Properties pictures(Context context, String folder) {
+    static Properties pictures(Context context, String folder) {
         Properties known = PICTURE_TABLES.get(folder);
         if (known != null) return known;
         Properties table = new Properties();

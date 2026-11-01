@@ -33,4 +33,18 @@
     <string name="first_does_panel">Centro de control</string>
     <string name="first_does_settings">Ajustes</string>
     <string name="first_start">Empezar</string>
+    <string name="first_backdrop_title">Elige un fondo</string>
+    <string name="first_preview">Vista previa</string>
+    <string name="first_backdrop_pictures">Tiempo ilustrado</string>
+    <string name="first_backdrop_photos">Tiempo fotográfico</string>
+    <string name="first_backdrop_night">Noche</string>
+    <string name="first_backdrop_ocean">Océano</string>
+    <string name="first_backdrop_forest">Bosque</string>
+    <string name="first_backdrop_sunset">Atardecer</string>
+    <string name="first_backdrop_graphite">Grafito</string>
+    <string name="first_pictures_text">Una ilustración para cada hora del día y cada tiempo de tu ciudad.</string>
+    <string name="first_photos_text">Una fotografía para cada momento del día y cada tiempo de tu ciudad.</string>
+    <string name="first_abstract_text">Ilustraciones abstractas que cambian solas cada 5 minutos, en orden aleatorio.</string>
+    <string name="first_plain_text">Un degradado sencillo, siempre igual.</string>
+    <string name="first_remote_note">La primera vez, la TV puede pedir permiso para la depuración inalámbrica: elige Permitir.</string>
 </resources>

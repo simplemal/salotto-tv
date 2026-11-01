@@ -33,4 +33,18 @@
     <string name="first_does_panel">Centre de contrôle</string>
     <string name="first_does_settings">Réglages</string>
     <string name="first_start">Commencer</string>
+    <string name="first_backdrop_title">Choisissez un fond d’écran</string>
+    <string name="first_preview">Aperçu</string>
+    <string name="first_backdrop_pictures">Météo illustrée</string>
+    <string name="first_backdrop_photos">Météo photographique</string>
+    <string name="first_backdrop_night">Nuit</string>
+    <string name="first_backdrop_ocean">Océan</string>
+    <string name="first_backdrop_forest">Forêt</string>
+    <string name="first_backdrop_sunset">Coucher de soleil</string>
+    <string name="first_backdrop_graphite">Graphite</string>
+    <string name="first_pictures_text">Une illustration pour chaque heure de la journée et chaque météo de votre ville.</string>
+    <string name="first_photos_text">Une photographie pour chaque moment de la journée et chaque météo de votre ville.</string>
+    <string name="first_abstract_text">Des illustrations abstraites qui changent toutes seules toutes les 5 minutes, dans un ordre aléatoire.</string>
+    <string name="first_plain_text">Un simple dégradé, toujours le même.</string>
+    <string name="first_remote_note">La première fois, la TV peut demander d’autoriser le débogage sans fil : choisissez Autoriser.</string>
 </resources>

@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +50,8 @@ public final class FirstRunActivity extends CardActivity {
     private static final String FALLBACK = "en";
     private static final String RIGHT_TO_LEFT = "ar";
     private static final String NO_NAME = "<unknown ssid>";
-    private static final int PAGES = 5;
+    private static final int PAGES = 6;
+    private static final int NETWORK_PAGE = 2;
     private static final int LOGO = 92;
     private static final int NAME_SP = 30;
     private static final int VERSION_SP = 9;
@@ -68,6 +70,13 @@ public final class FirstRunActivity extends CardActivity {
     private static final int RESULTS = 5;
     private static final int LIST_ROOM = 8;
     private static final int NETWORK_ICON = 56;
+    private static final int NOTE_SP = 12;
+    private static final int LIST_WIDTH = 330;
+    private static final int LIST_HEIGHT = 340;
+    private static final int SIDE_WIDTH = 500;
+    private static final int STRIP_HEIGHT = 170;
+    private static final int PREVIEW_SP = 12;
+    private static final int PREVIEW_MARGIN = 24;
     private static final int GUIDE_WIDTH = 680;
     private static final int GUIDE_HEIGHT = 246;
     private static final int DOT = 7;
@@ -75,7 +84,36 @@ public final class FirstRunActivity extends CardActivity {
     private static final int DOTS_BOTTOM = 26;
     private static final int DOT_OFF = Color.argb(70, 255, 255, 255);
 
-    private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity, this::showRemote};
+    /** A backdrop to choose: with a folder it shows its pictures, without it the page itself turns into it. */
+    private static final class Choice {
+        final String key;
+        final int name;
+        final int text;
+        final String folder;
+
+        Choice(String key, int name, int text, String folder) {
+            this.key = key;
+            this.name = name;
+            this.text = text;
+            this.folder = folder;
+        }
+    }
+
+    private static final Choice[] WEATHER_CHOICES = {
+        new Choice(Look.PICTURES, R.string.first_backdrop_pictures, R.string.first_pictures_text, Look.PICTURES_FOLDER),
+        new Choice(Look.PHOTOS, R.string.first_backdrop_photos, R.string.first_photos_text, Look.PHOTOS_FOLDER)};
+    private static final Choice[] OTHER_CHOICES = {
+        new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER),
+        new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null),
+        new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null),
+        new Choice(Look.PRESET_NAMES[2], R.string.first_backdrop_forest, R.string.first_plain_text, null),
+        new Choice(Look.PRESET_NAMES[3], R.string.first_backdrop_sunset, R.string.first_plain_text, null),
+        new Choice(Look.PRESET_NAMES[4], R.string.first_backdrop_graphite, R.string.first_plain_text, null)};
+
+    private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity,
+        this::showBackdrop, this::showRemote};
+    private FrameLayout root;
+    private TextView previewNote;
     private LinearLayout page;
     private LinearLayout dots;
     private TextView note;
@@ -94,7 +132,7 @@ public final class FirstRunActivity extends CardActivity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.setBackground(Look.plainBackdrop());
         page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
@@ -104,6 +142,13 @@ public final class FirstRunActivity extends CardActivity {
         FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         place.bottomMargin = dp(DOTS_BOTTOM);
         root.addView(dots, place);
+        previewNote = label("", PREVIEW_SP);
+        previewNote.setAlpha(0.7f);
+        previewNote.setVisibility(View.GONE);
+        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.END);
+        corner.bottomMargin = dp(PREVIEW_MARGIN);
+        corner.setMarginEnd(dp(PREVIEW_MARGIN));
+        root.addView(previewNote, corner);
         setContentView(root);
         speak(prefs(this).getString(LANGUAGE, startLanguage()));
         go(0);
@@ -112,7 +157,7 @@ public final class FirstRunActivity extends CardActivity {
     /** Back from the Settings the network may be another. */
     @Override protected void onRestart() {
         super.onRestart();
-        if (at == 2) showNetwork();
+        if (at == NETWORK_PAGE) showNetwork();
     }
 
     @Override public void onBackPressed() { back.run(); }
@@ -135,6 +180,8 @@ public final class FirstRunActivity extends CardActivity {
     private void go(int index) {
         at = index;
         back = index == 0 ? () -> { } : () -> go(index - 1);
+        root.setBackground(Look.plainBackdrop());
+        previewNote.setVisibility(View.GONE);
         pages[index].run();
         dots.removeAllViews();
         for (int dot = 0; dot < PAGES; dot++) {
@@ -342,13 +389,78 @@ public final class FirstRunActivity extends CardActivity {
         first.requestFocus();
     }
 
+    private void showBackdrop() {
+        heading(words(R.string.first_backdrop_title), null);
+        List<Choice> choices = new ArrayList<>();
+        if (Weather.place(this) != null) choices.addAll(Arrays.asList(WEATHER_CHOICES));
+        choices.addAll(Arrays.asList(OTHER_CHOICES));
+        LinearLayout rows = new LinearLayout(this);
+        rows.setOrientation(LinearLayout.VERTICAL);
+        rows.setPadding(dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM), dp(LIST_ROOM));
+        rows.setClipChildren(false);
+        rows.setClipToPadding(false);
+        LinearLayout side = new LinearLayout(this);
+        side.setOrientation(LinearLayout.VERTICAL);
+        TextView explained = label("", TEXT_SP);
+        explained.setAlpha(0.85f);
+        PictureStrip strip = new PictureStrip(this);
+        View first = null;
+        for (Choice choice : choices) {
+            String name = choice.name == 0 ? choice.key : words(choice.name);
+            View row = button(name, BUTTON_SP, () -> {
+                Look.setBackdrop(this, choice.key);
+                next();
+            });
+            View.OnFocusChangeListener style = row.getOnFocusChangeListener();
+            row.setOnFocusChangeListener((view, focused) -> {
+                style.onFocusChange(view, focused);
+                if (focused) preview(choice, explained, strip);
+            });
+            LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
+            if (first != null) size.topMargin = dp(ROW_GAP);
+            rows.addView(row, size);
+            if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
+        }
+        ScrollView list = new ScrollView(this);
+        hideFromFixer(list);
+        list.setVerticalScrollBarEnabled(false);
+        list.addView(rows);
+        LinearLayout columns = new LinearLayout(this);
+        columns.setGravity(Gravity.CENTER_VERTICAL);
+        columns.addView(list, new LinearLayout.LayoutParams(dp(LIST_WIDTH), dp(LIST_HEIGHT)));
+        side.addView(explained, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams stripPlace = new LinearLayout.LayoutParams(-1, dp(STRIP_HEIGHT));
+        stripPlace.topMargin = dp(18);
+        side.addView(strip, stripPlace);
+        LinearLayout.LayoutParams sidePlace = new LinearLayout.LayoutParams(dp(SIDE_WIDTH), -2);
+        sidePlace.setMarginStart(dp(24));
+        columns.addView(side, sidePlace);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(18);
+        page.addView(columns, under);
+        first.requestFocus();
+    }
+
+    private void preview(Choice choice, TextView explained, PictureStrip strip) {
+        explained.setText(words(choice.text));
+        strip.show(choice.folder);
+        strip.setVisibility(choice.folder != null ? View.VISIBLE : View.INVISIBLE);
+        root.setBackground(choice.folder != null ? Look.plainBackdrop() : Look.preset(choice.key));
+        previewNote.setText(words(R.string.first_preview));
+        previewNote.setVisibility(choice.folder != null ? View.GONE : View.VISIBLE);
+    }
+
     private void showRemote() {
         heading(words(R.string.first_remote_title), words(R.string.first_remote_text));
         LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(GUIDE_WIDTH), dp(GUIDE_HEIGHT));
         place.topMargin = dp(24);
         page.addView(new Guide(this), place);
+        TextView quiet = label(words(R.string.first_remote_note), NOTE_SP);
+        quiet.setGravity(Gravity.CENTER);
+        quiet.setAlpha(0.55f);
+        page.addView(quiet, new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2));
         View start = button(words(R.string.first_start), BUTTON_SP, this::next);
-        page.addView(start, place(WIDE, 24));
+        page.addView(start, place(WIDE, 14));
         start.requestFocus();
     }
 

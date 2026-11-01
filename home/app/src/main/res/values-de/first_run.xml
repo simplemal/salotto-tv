@@ -33,4 +33,18 @@
     <string name="first_does_panel">Kontrollzentrum</string>
     <string name="first_does_settings">Einstellungen</string>
     <string name="first_start">Los geht’s</string>
+    <string name="first_backdrop_title">Wähle einen Hintergrund</string>
+    <string name="first_preview">Vorschau</string>
+    <string name="first_backdrop_pictures">Illustriertes Wetter</string>
+    <string name="first_backdrop_photos">Fotografisches Wetter</string>
+    <string name="first_backdrop_night">Nacht</string>
+    <string name="first_backdrop_ocean">Ozean</string>
+    <string name="first_backdrop_forest">Wald</string>
+    <string name="first_backdrop_sunset">Sonnenuntergang</string>
+    <string name="first_backdrop_graphite">Graphit</string>
+    <string name="first_pictures_text">Eine Illustration für jede Tageszeit und jedes Wetter in deiner Stadt.</string>
+    <string name="first_photos_text">Ein Foto für jeden Moment des Tages und jedes Wetter in deiner Stadt.</string>
+    <string name="first_abstract_text">Abstrakte Illustrationen, die alle 5 Minuten von selbst wechseln, in zufälliger Reihenfolge.</string>
+    <string name="first_plain_text">Ein einfacher Farbverlauf, immer gleich.</string>
+    <string name="first_remote_note">Beim ersten Mal fragt der Fernseher vielleicht nach kabellosem Debugging: Wähle Zulassen.</string>
 </resources>

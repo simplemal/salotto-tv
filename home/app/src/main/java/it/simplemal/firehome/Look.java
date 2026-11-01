@@ -11,9 +11,11 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /** The saved appearance of the Home: grid, clock and backdrop. Only the weather backdrop changes on its own. */
@@ -38,6 +40,13 @@ final class Look {
     static final String WEATHER = "Meteo dinamico";
     static final String PICTURES = "Meteo illustrato";
     static final String PHOTOS = "Meteo fotografico";
+    static final String ABSTRACT = "Abstract Illustrated";
+    static final String PICTURES_FOLDER = "meteo-illustrato";
+    static final String PHOTOS_FOLDER = "meteo-foto";
+    static final String ABSTRACT_FOLDER = "astratti";
+    static final int[] ABSTRACT_MINUTES = {1, 5, 15, 30, 60};
+    private static final int ABSTRACT_DEFAULT = 5;
+    private static final long MINUTE_MS = 60 * 1000L;
     private static final String FILE = "look";
     private static final String FOLDER = "sfondi";
     private static final int WIDE = 1920;
@@ -78,7 +87,38 @@ final class Look {
         return WEATHER.equals(backdrop(context)) || weatherPictures(context);
     }
 
-    static boolean weatherPictures(Context context) { return PICTURES.equals(backdrop(context)) || weatherPhotos(context); }
+    /** The ones drawn from a file of the app. The abstract ones follow no weather, only the clock. */
+    static boolean weatherPictures(Context context) {
+        return PICTURES.equals(backdrop(context)) || weatherPhotos(context) || abstractPictures(context);
+    }
+
+    static boolean abstractPictures(Context context) { return ABSTRACT.equals(backdrop(context)); }
+
+    static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
+    static void setAbstractMinutes(Context context, int value) {
+        prefs(context).edit().putInt("abstract_minutes", value).apply();
+    }
+
+    /** The one on show until its time is up, then any other: nothing is decided ahead. */
+    static String abstractPicture(Context context) {
+        SharedPreferences saved = prefs(context);
+        String shown = saved.getString("abstract", null);
+        long now = System.currentTimeMillis();
+        long since = now - saved.getLong("abstract_at", 0);
+        if (shown != null && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        List<String> files = new ArrayList<>();
+        try {
+            for (String name : context.getAssets().list(ABSTRACT_FOLDER)) {
+                if (!(ABSTRACT_FOLDER + "/" + name).equals(shown)) files.add(ABSTRACT_FOLDER + "/" + name);
+            }
+        } catch (IOException e) {
+            return shown;
+        }
+        if (files.isEmpty()) return shown;
+        String picked = files.get(new Random().nextInt(files.size()));
+        saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
+        return picked;
+    }
 
     static boolean weatherPhotos(Context context) { return PHOTOS.equals(backdrop(context)); }
 
@@ -104,7 +144,8 @@ final class Look {
         return images;
     }
 
-    private static Drawable preset(String chosen) {
+    /** The backdrop by that name, when it is one of the plain ones. */
+    static Drawable preset(String chosen) {
         int preset = Math.max(0, Arrays.asList(PRESET_NAMES).indexOf(chosen));
         return new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, PRESET_COLORS[preset]);
     }

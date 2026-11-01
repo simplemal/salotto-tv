@@ -33,4 +33,18 @@
     <string name="first_does_panel">Central de controle</string>
     <string name="first_does_settings">Configurações</string>
     <string name="first_start">Começar</string>
+    <string name="first_backdrop_title">Escolha um fundo</string>
+    <string name="first_preview">Prévia</string>
+    <string name="first_backdrop_pictures">Clima ilustrado</string>
+    <string name="first_backdrop_photos">Clima fotográfico</string>
+    <string name="first_backdrop_night">Noite</string>
+    <string name="first_backdrop_ocean">Oceano</string>
+    <string name="first_backdrop_forest">Floresta</string>
+    <string name="first_backdrop_sunset">Pôr do sol</string>
+    <string name="first_backdrop_graphite">Grafite</string>
+    <string name="first_pictures_text">Uma ilustração para cada hora do dia e cada clima da sua cidade.</string>
+    <string name="first_photos_text">Uma fotografia para cada momento do dia e cada clima da sua cidade.</string>
+    <string name="first_abstract_text">Ilustrações abstratas que mudam sozinhas a cada 5 minutos, em ordem aleatória.</string>
+    <string name="first_plain_text">Um degradê simples, sempre igual.</string>
+    <string name="first_remote_note">Na primeira vez, a TV pode pedir para permitir a depuração sem fio: escolha Permitir.</string>
 </resources>

@@ -33,4 +33,18 @@
     <string name="first_does_panel">控制中心</string>
     <string name="first_does_settings">设置</string>
     <string name="first_start">开始</string>
+    <string name="first_backdrop_title">选择背景</string>
+    <string name="first_preview">预览</string>
+    <string name="first_backdrop_pictures">插画天气</string>
+    <string name="first_backdrop_photos">摄影天气</string>
+    <string name="first_backdrop_night">夜晚</string>
+    <string name="first_backdrop_ocean">海洋</string>
+    <string name="first_backdrop_forest">森林</string>
+    <string name="first_backdrop_sunset">日落</string>
+    <string name="first_backdrop_graphite">石墨</string>
+    <string name="first_pictures_text">为一天中的每个时刻和你所在城市的每种天气准备一幅插画。</string>
+    <string name="first_photos_text">为一天中的每个时段和你所在城市的每种天气准备一张照片。</string>
+    <string name="first_abstract_text">抽象插画每 5 分钟自动更换一次，顺序随机。</string>
+    <string name="first_plain_text">简单的渐变色，始终不变。</string>
+    <string name="first_remote_note">首次使用时，电视可能会询问是否允许无线调试：请选择“允许”。</string>
 </resources>

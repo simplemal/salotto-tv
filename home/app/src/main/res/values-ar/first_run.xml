@@ -33,4 +33,18 @@
     <string name="first_does_panel">مركز التحكم</string>
     <string name="first_does_settings">الإعدادات</string>
     <string name="first_start">ابدأ</string>
+    <string name="first_backdrop_title">اختر خلفية</string>
+    <string name="first_preview">معاينة</string>
+    <string name="first_backdrop_pictures">طقس مرسوم</string>
+    <string name="first_backdrop_photos">طقس فوتوغرافي</string>
+    <string name="first_backdrop_night">ليل</string>
+    <string name="first_backdrop_ocean">محيط</string>
+    <string name="first_backdrop_forest">غابة</string>
+    <string name="first_backdrop_sunset">غروب</string>
+    <string name="first_backdrop_graphite">جرافيت</string>
+    <string name="first_pictures_text">رسم توضيحي لكل ساعة من اليوم ولكل حالة طقس في مدينتك.</string>
+    <string name="first_photos_text">صورة فوتوغرافية لكل لحظة من اليوم ولكل حالة طقس في مدينتك.</string>
+    <string name="first_abstract_text">رسوم تجريدية تتغير تلقائيًا كل 5 دقائق بترتيب عشوائي.</string>
+    <string name="first_plain_text">تدرّج لوني بسيط، ثابت دائمًا.</string>
+    <string name="first_remote_note">في المرة الأولى قد يطلب التلفزيون السماح بتصحيح الأخطاء اللاسلكي: اختر «سماح».</string>
 </resources>

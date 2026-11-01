@@ -33,4 +33,18 @@
     <string name="first_does_panel">Центр управления</string>
     <string name="first_does_settings">Настройки</string>
     <string name="first_start">Начать</string>
+    <string name="first_backdrop_title">Выберите фон</string>
+    <string name="first_preview">Предпросмотр</string>
+    <string name="first_backdrop_pictures">Иллюстрированная погода</string>
+    <string name="first_backdrop_photos">Погода на фото</string>
+    <string name="first_backdrop_night">Ночь</string>
+    <string name="first_backdrop_ocean">Океан</string>
+    <string name="first_backdrop_forest">Лес</string>
+    <string name="first_backdrop_sunset">Закат</string>
+    <string name="first_backdrop_graphite">Графит</string>
+    <string name="first_pictures_text">Иллюстрация для каждого часа дня и любой погоды в вашем городе.</string>
+    <string name="first_photos_text">Фотография для каждого времени суток и любой погоды в вашем городе.</string>
+    <string name="first_abstract_text">Абстрактные иллюстрации, которые сами меняются каждые 5 минут в случайном порядке.</string>
+    <string name="first_plain_text">Простой градиент, всегда один и тот же.</string>
+    <string name="first_remote_note">В первый раз телевизор может запросить разрешение на беспроводную отладку: выберите «Разрешить».</string>
 </resources>

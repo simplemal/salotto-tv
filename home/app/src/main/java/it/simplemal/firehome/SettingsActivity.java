@@ -64,6 +64,8 @@ public final class SettingsActivity extends CardActivity {
     private static final String CHECK = "✓";
     private static final int COLUMN_TOP = 44;
     private static final int PICTURE_SIZE = 120;
+    private static final int PREVIEW_SP = 12;
+    private static final int PREVIEW_MARGIN = 24;
     /** As wide as a preview of the screen needs: an icon stays square in the middle. */
     private static final int PICTURE_WIDTH = 213;
     private static final int LOCK_SIZE = 16;
@@ -161,6 +163,10 @@ public final class SettingsActivity extends CardActivity {
         boolean locked;
         /** Shown but not to be chosen: the focus skips it. */
         boolean off;
+        /** The backdrop this row would give: the page turns into it while the row has the focus. */
+        Drawable preview;
+        /** The pictures of this row, going by in place of the icon. */
+        String strip;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -191,6 +197,9 @@ public final class SettingsActivity extends CardActivity {
     private LinearLayout root;
     private TextView heading;
     private ImageView picture;
+    private PictureStrip strip;
+    private TextView previewNote;
+    private boolean previewing;
     private TextView explanation;
     private LinearLayout rows;
     private ScrollView scroll;
@@ -216,6 +225,9 @@ public final class SettingsActivity extends CardActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         Look.show(this, root::setBackground);
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
+        previewNote = label("Anteprima", PREVIEW_SP);
+        previewNote.setAlpha(0.7f);
+        previewNote.setVisibility(View.GONE);
 
         LinearLayout panes = new LinearLayout(this);
         root.addView(panes, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -238,6 +250,9 @@ public final class SettingsActivity extends CardActivity {
             }
         });
         left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
+        strip = new PictureStrip(this);
+        strip.setVisibility(View.GONE);
+        left.addView(strip, placed(-1, dp(PICTURE_SIZE), PICTURE_TOP));
         explanation = label("", EXPLANATION_SP);
         explanation.setGravity(Gravity.CENTER_HORIZONTAL);
         explanation.setLineSpacing(dp(3), 1f);
@@ -272,6 +287,10 @@ public final class SettingsActivity extends CardActivity {
         list.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 55));
         setContentView(root);
+        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
+        corner.bottomMargin = dp(PREVIEW_MARGIN);
+        corner.setMarginEnd(dp(PREVIEW_MARGIN));
+        addContentView(previewNote, corner);
         // A mouse click puts the window in touch mode, which drops the selection: take it back.
         root.getViewTreeObserver().addOnTouchModeChangeListener(touching -> {
             if (touching) rows.post(this::selectCurrent);
@@ -427,9 +446,22 @@ public final class SettingsActivity extends CardActivity {
             if (focused) {
                 levels.peek().focus = rows.indexOfChild(view);
                 picture.setImageDrawable(entry.pkg != null ? appIcon(entry.pkg) : entry.picture);
+                showPreview(entry);
                 explanation.setText(Brand.mark(this, entry.text));
             }
         });
+    }
+
+    private void showPreview(Entry entry) {
+        boolean plain = entry.preview != null;
+        if (plain) root.setBackground(entry.preview);
+        else if (previewing) Look.show(this, root::setBackground);
+        previewing = plain;
+        previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
+        boolean pictures = entry.strip != null;
+        strip.show(entry.strip);
+        strip.setVisibility(pictures ? View.VISIBLE : View.GONE);
+        picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
     }
 
     private View row(Entry entry) {
@@ -1248,7 +1280,7 @@ public final class SettingsActivity extends CardActivity {
                 "Rivedi le pagine del primo avvio, con la spiegazione del telecomando.", false,
                 () -> open(new Intent(this, FirstRunActivity.class))),
             new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
-                "Ricevi video da iPhone, iPad e Mac. Dopo ogni riavvio va aperto una volta.",
+                "Ricevi video da iPhone, iPad e Mac. Parte da solo all’accensione: si cambia nelle sue impostazioni.",
                 false, () -> openPackage(Fire.AIRPLAY)),
             new Entry("FireStick Fixer", null, appIcon(Fire.FIXER),
                 "Porta il tasto Home e l’accensione della Stick su Salotto.",
@@ -1303,28 +1335,52 @@ public final class SettingsActivity extends CardActivity {
             });
     }
 
+    private Entry plainBackdrop(String name, String text, boolean preview) {
+        Entry entry = new Entry(name, name.equals(Look.backdrop(this)) ? CHECK : null, getDrawable(R.drawable.ic_image), text, false, () -> {
+            Look.setBackdrop(this, name);
+            Look.show(this, root::setBackground);
+            refresh();
+        });
+        if (preview) entry.preview = Look.preset(name);
+        return entry;
+    }
+
     private void showBackdrops() {
-        List<String> names = new ArrayList<>(Arrays.asList(Look.PRESET_NAMES));
-        int presets = names.size();
-        for (File image : Look.images(this)) names.add(image.getName());
-        String chosen = Look.backdrop(this);
-        List<Entry> entries = new ArrayList<>();
-        entries.add(weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud,
+        List<Entry> weather = new ArrayList<>();
+        weather.add(weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud,
             "Cielo, nuvole, pioggia e neve seguono l’ora e il meteo del luogo scelto, con un’animazione leggera."));
-        entries.add(weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
-            "Un’illustrazione diversa per ogni ora del giorno e per ogni meteo del luogo scelto, sempre ferma."));
-        entries.add(weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
-            "Una fotografia diversa per ogni momento del giorno e per ogni meteo del luogo scelto, sempre ferma."));
-        for (int index = 0; index < names.size(); index++) {
-            String name = names.get(index);
-            String text = index < presets ? "Sfumatura di Salotto." : "Immagine personale, adattata allo schermo.";
-            entries.add(new Entry(name, name.equals(chosen) ? CHECK : null, getDrawable(R.drawable.ic_image), text, false, () -> {
-                Look.setBackdrop(this, name);
-                Look.show(this, root::setBackground);
+        Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
+            "Un’illustrazione diversa per ogni ora del giorno e per ogni meteo del luogo scelto, sempre ferma.");
+        pictures.strip = Look.PICTURES_FOLDER;
+        weather.add(pictures);
+        Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
+            "Una fotografia diversa per ogni momento del giorno e per ogni meteo del luogo scelto, sempre ferma.");
+        photos.strip = Look.PHOTOS_FOLDER;
+        weather.add(photos);
+        List<Entry> others = new ArrayList<>();
+        Entry drawn = plainBackdrop(Look.ABSTRACT, "Illustrazioni astratte che cambiano da sole, in ordine casuale.", false);
+        drawn.strip = Look.ABSTRACT_FOLDER;
+        others.add(drawn);
+        others.add(new Entry("Cambia immagine ogni", minutes(Look.abstractMinutes(this)), getDrawable(R.drawable.ic_timer),
+            "Quanto resta sullo schermo ogni illustrazione astratta.", true, () -> enter(this::showAbstractTimes)));
+        for (String name : Look.PRESET_NAMES) others.add(plainBackdrop(name, "Sfumatura di Salotto.", true));
+        for (File image : Look.images(this)) {
+            others.add(plainBackdrop(image.getName(), "Immagine personale, adattata allo schermo.", false));
+        }
+        List<Entry> entries = new ArrayList<>();
+        boolean weatherFirst = Weather.active(this);
+        entries.addAll(weatherFirst ? weather : others);
+        entries.addAll(weatherFirst ? others : weather);
+        show("Sfondo", entries);
+    }
+
+    private void showAbstractTimes() {
+        show("Cambia immagine ogni", choices(minuteNames(Look.ABSTRACT_MINUTES),
+            indexOf(Look.ABSTRACT_MINUTES, Look.abstractMinutes(this)), R.drawable.ic_timer,
+            "Quanto resta sullo schermo ogni illustrazione astratta.", index -> {
+                Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
                 refresh();
             }));
-        }
-        show("Sfondo", entries);
     }
 
     private void showClock() {
