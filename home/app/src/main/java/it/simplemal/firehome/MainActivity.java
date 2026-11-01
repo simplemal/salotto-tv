@@ -183,6 +183,7 @@ public final class MainActivity extends CardActivity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         TaskService.keysByDefault(this);
+        TaskService.quickAnimationsByDefault(this);
         TaskService.keepAdbKey(this);
         if (FirstRunActivity.due(this)) {
             startActivity(new Intent(this, FirstRunActivity.class));

@@ -46,7 +46,7 @@ final class PictureMosaic extends FrameLayout {
     private static final int COLUMNS = 3;
     private static final int ROWS = 5;
     private static final float TILE_SHARE = 0.25f;
-    private static final float GAP_SHARE = 0.008f;
+    private static final float GAP_SHARE = 0.024f;
     private static final float RADIUS_SHARE = 0.008f;
     /** The middle column stands under the title of the page, with half a column on either side. */
     private static final float MIDDLE_COLUMN = 0.24f;

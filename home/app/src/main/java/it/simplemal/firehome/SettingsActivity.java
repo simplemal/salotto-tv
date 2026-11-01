@@ -126,7 +126,7 @@ public final class SettingsActivity extends CardActivity {
     private static final String CEC_TV_OFF = "hdmi_control_auto_device_off_enabled";
     private static final String ADS_LIMITED = "amz_limit_ad_tracking";
     private static final String USAGE_METRICS = "USAGE_METRICS_UPLOAD_ENABLED";
-    private static final float QUICK_SCALE = 0.5f;
+    static final float QUICK_SCALE = 0.5f;
     private static final String LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final int[] WIFI_STRENGTHS = {R.string.settings_wifi_weak, R.string.settings_wifi_weak,
         R.string.settings_wifi_medium, R.string.settings_quality_good, R.string.settings_wifi_strong};

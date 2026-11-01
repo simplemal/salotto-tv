@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Every picture of one set, or Salotto's own backdrops with no set named, four across and four down
+ * Every picture of one set, or Salotto's own backdrops with no set named, four across and three down
  * at a time. OK shows one as the whole screen: left and right go through the
  * others there, Confirm keeps the one on show and Back returns to the grid.
  */
@@ -33,8 +33,9 @@ public final class PictureGridActivity extends CardActivity {
     static final String TITLE = "title";
 
     private static final int COLUMNS = 4;
-    private static final int CELL_WIDTH = 172;
-    private static final int CELL_HEIGHT = 97;
+    private static final int ROWS_SHOWN = 3;
+    private static final int CELL_WIDTH = 216;
+    private static final int CELL_HEIGHT = 122;
     private static final int GAP = 12;
     private static final int RADIUS = 10;
     private static final int EDGE = 2;
@@ -80,11 +81,17 @@ public final class PictureGridActivity extends CardActivity {
         pictures = folder == null ? Arrays.asList(Look.PRESET_NAMES) : pictures(folder);
         files = folder != null;
         setName = getIntent().getStringExtra(TITLE);
-        root = new FrameLayout(this);
+        root = new FrameLayout(this) {
+            /** Before anything else in the window: a key that goes further may not come back. */
+            @Override public boolean dispatchKeyEventPreIme(KeyEvent event) {
+                android.util.Log.i("SalottoGrid", "preIme " + event);
+                return pageKey(event) || super.dispatchKeyEventPreIme(event);
+            }
+        };
         root.setBackground(Look.plainBackdrop());
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
-        page.setGravity(Gravity.CENTER_HORIZONTAL);
+        page.setGravity(Gravity.CENTER);
         title = label(setName, TITLE_SP);
         title.setPadding(0, dp(TITLE_TOP), 0, dp(TITLE_BOTTOM));
         page.addView(title, new LinearLayout.LayoutParams(-2, -2));
@@ -110,7 +117,8 @@ public final class PictureGridActivity extends CardActivity {
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
         scroll.addView(rows);
-        page.addView(scroll, new LinearLayout.LayoutParams(-2, 0, 1));
+        int shown = ROWS_SHOWN * dp(CELL_HEIGHT) + (ROWS_SHOWN - 1) * dp(GAP) + 2 * dp(SIDE_ROOM);
+        page.addView(scroll, new LinearLayout.LayoutParams(-2, shown));
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));
         preview = previewPage();
         root.addView(preview, new FrameLayout.LayoutParams(-1, -1));
@@ -267,19 +275,26 @@ public final class PictureGridActivity extends CardActivity {
     }
 
     /** Back is decided here, and the arrows in a preview: its one button has the focus and stays. */
-    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+    private boolean pageKey(KeyEvent event) {
         int code = event.getKeyCode();
         boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         boolean previewing = preview.getVisibility() == View.VISIBLE;
         if (code == KeyEvent.KEYCODE_BACK) {
+            android.util.Log.i("SalottoGrid", "back down=" + down + " preview=" + previewing);
             if (!down && previewing) closePreview();
             else if (!down) finish();
             return true;
         }
         int step = code == KeyEvent.KEYCODE_DPAD_LEFT ? -1 : code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : 0;
-        if (!previewing || step == 0) return super.dispatchKeyEvent(event);
+        if (!previewing || step == 0) return false;
         int next = previewIndex + step;
         if (down && next >= 0 && next < pictures.size()) showPreview(next);
         return true;
+    }
+
+    /** With nothing selected the key never passes through the page's own views. */
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        android.util.Log.i("SalottoGrid", "dispatch " + event);
+        return pageKey(event) || super.dispatchKeyEvent(event);
     }
 }

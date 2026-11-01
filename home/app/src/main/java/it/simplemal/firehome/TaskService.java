@@ -87,6 +87,7 @@ public final class TaskService extends AccessibilityService {
     private static final String KEY_LIFETIME = "adb_allowed_connection_time";
     private static final String KEYS_FILE = "keys";
     private static final String KEYS_CHOSEN = "chosen";
+    private static final String QUICK_CHOSEN = "quick_animations";
     private static final long FIRST_PICTURE_MS = 3000;
     private static final long PICTURE_EVERY_MS = 20000;
     /** Protected video never gives a picture: the capture is asked for less and less while it plays. */
@@ -729,6 +730,19 @@ public final class TaskService extends AccessibilityService {
             first.edit().putBoolean(KEYS_CHOSEN, true).apply();
         } catch (SecurityException e) {
             Log.w(TAG, "No permission yet for the keys", e);
+        }
+    }
+
+    /** On from the first start, as with the keys. Whoever turns them off in the Settings keeps that. */
+    static void quickAnimationsByDefault(Context context) {
+        SharedPreferences first = context.getSharedPreferences(KEYS_FILE, Context.MODE_PRIVATE);
+        if (first.getBoolean(QUICK_CHOSEN, false)) return;
+        try {
+            Settings.Global.putFloat(context.getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, SettingsActivity.QUICK_SCALE);
+            Settings.Global.putFloat(context.getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, SettingsActivity.QUICK_SCALE);
+            first.edit().putBoolean(QUICK_CHOSEN, true).apply();
+        } catch (SecurityException e) {
+            Log.w(TAG, "No permission yet for the animations", e);
         }
     }
 
