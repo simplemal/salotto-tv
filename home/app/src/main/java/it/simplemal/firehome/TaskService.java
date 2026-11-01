@@ -95,6 +95,7 @@ public final class TaskService extends AccessibilityService {
     private static final long RETRY_EVERY_MS = Fire.MINUTE_MS;
     private static final long MASK_LIMIT_MS = 30000;
     private static final String MASK_WINDOW = "android.widget.FrameLayout";
+    private static final String ANDROID_CLASS = "android.";
     private static final String PACKAGE_NAME = "[A-Za-z0-9._]+";
     /** Protected video reaches a capture as a black frame: the card art is better than that. */
     private static final int BLACK_LEVEL = 10;
@@ -568,9 +569,10 @@ public final class TaskService extends AccessibilityService {
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || pkg == null) return;
         String name = pkg.toString();
         String page = String.valueOf(event.getClassName());
-        // Salotto's own windows open over the app, which stays where it was.
-        if (name.equals(getPackageName()) && MASK_WINDOW.equals(page)) return;
-        if (panelWindow != null && !name.equals(panelApp)
+        // Masks, the veil and messages are windows of Android's own classes, not pages: the app under them stays.
+        boolean realPage = !page.startsWith(ANDROID_CLASS);
+        if (name.equals(getPackageName()) && !realPage) return;
+        if (panelWindow != null && realPage && !name.equals(panelApp)
             && (HomeApps.isHome(this, name) || HomeApps.isUserApp(this, name))) panelWindow.close();
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
         // The mask is a window too, and it would take itself for whatever comes next.
