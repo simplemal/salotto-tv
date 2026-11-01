@@ -631,6 +631,7 @@ public final class TaskService extends AccessibilityService {
 
     /** Stopped this early, Fire OS's menu never reaches the screen. It starts again next time. */
     private void homeHeld() {
+        if (front == null) front = appOnScreen();
         panelApp = front;
         if (client != null) {
             adb.post(() -> run("cmd activity force-stop " + Fire.QUICK_MENU));
@@ -640,6 +641,13 @@ public final class TaskService extends AccessibilityService {
         cover.overQuickMenu();
         if (overHome()) openPanel();
         else main.postDelayed(panelAnyway, PANEL_WAIT_MS);
+    }
+
+    /** Salotto may have restarted under an app, and then nothing has said which one it is. */
+    private String appOnScreen() {
+        AccessibilityNodeInfo active = getRootInActiveWindow();
+        CharSequence pkg = active == null ? null : active.getPackageName();
+        return pkg != null && HomeApps.isUserApp(this, pkg.toString()) ? pkg.toString() : null;
     }
 
     /** Over an app the page has to go first: the panel's window would take the Back that closes it. */
