@@ -92,6 +92,7 @@ public final class TaskService extends AccessibilityService {
     private static final long PICTURE_WAIT_MS = 600;
     private static final long RETRY_EVERY_MS = Fire.MINUTE_MS;
     private static final long MASK_LIMIT_MS = 30000;
+    private static final String MASK_WINDOW = "android.widget.FrameLayout";
     private static final String PACKAGE_NAME = "[A-Za-z0-9._]+";
     /** Protected video reaches a capture as a black frame: the card art is better than that. */
     private static final int BLACK_LEVEL = 10;
@@ -141,6 +142,8 @@ public final class TaskService extends AccessibilityService {
     private boolean waitsAnswer;
     private boolean keyFired;
     private FireSteps fireSteps;
+    private FrameLayout uninstallMask;
+    private final Runnable uncover = this::uncoverUninstall;
     private FrameLayout installMask;
     private IntConsumer stopAnswer;
     private volatile boolean stopReady;
@@ -339,6 +342,20 @@ public final class TaskService extends AccessibilityService {
         mask.addView(middle, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
         addMask(mask);
         return mask;
+    }
+
+    /** Android's page for an uninstall is white and lasts two seconds. It closes by itself. */
+    private void coverUninstall() {
+        if (uninstallMask != null) return;
+        uninstallMask = mask(getString(R.string.task_uninstalling), HomeCover.lastPicture());
+        main.postDelayed(uncover, MASK_LIMIT_MS);
+    }
+
+    private void uncoverUninstall() {
+        main.removeCallbacks(uncover);
+        FrameLayout mask = uninstallMask;
+        uninstallMask = null;
+        if (mask != null && mask.isAttachedToWindow()) getSystemService(WindowManager.class).removeView(mask);
     }
 
     /** Over Android's question, the update page as it was: nothing seems to change. */
@@ -543,6 +560,10 @@ public final class TaskService extends AccessibilityService {
         CharSequence pkg = event.getPackageName();
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || pkg == null) return;
         String name = pkg.toString();
+        String page = String.valueOf(event.getClassName());
+        if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
+        // The mask is a window too, and it would take itself for whatever comes next.
+        else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
         if (name.equals(Fire.AMAZON_HOME) && homeLog == null) cover.pressed();
         if (name.equals(Fire.QUICK_MENU) && client == null) quickMenuShown();
         // It closes by itself once something else comes in front.

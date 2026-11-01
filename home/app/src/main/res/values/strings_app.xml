@@ -73,6 +73,7 @@
     <string name="task_closing">Sto chiudendo %1$s</string>
     <string name="task_restart_confirm">Confermi il riavvio? Premi OK</string>
     <string name="task_restart_again">Premi OK ancora una volta</string>
+    <string name="task_uninstalling">Disinstallazione…</string>
     <string name="task_restarting">Riavvio della Stick</string>
 
     <!-- What Fire OS turned back on -->

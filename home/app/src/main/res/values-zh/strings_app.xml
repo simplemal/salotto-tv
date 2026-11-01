@@ -49,6 +49,7 @@
     <string name="task_closing">正在关闭 %1$s</string>
     <string name="task_restart_confirm">确认重启？请按 OK 键</string>
     <string name="task_restart_again">请再按一次 OK 键</string>
+    <string name="task_uninstalling">正在卸载…</string>
     <string name="task_restarting">正在重启 Stick</string>
 
     <string name="reenabled_quick_menu">Fire OS 侧边菜单</string>

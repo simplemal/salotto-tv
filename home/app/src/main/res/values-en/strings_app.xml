@@ -50,6 +50,7 @@
     <string name="task_closing">Closing %1$s</string>
     <string name="task_restart_confirm">Sure you want to restart? Press OK</string>
     <string name="task_restart_again">Press OK one more time</string>
+    <string name="task_uninstalling">Uninstalling…</string>
     <string name="task_restarting">Restarting the Stick</string>
 
     <string name="reenabled_quick_menu">Fire OS side menu</string>

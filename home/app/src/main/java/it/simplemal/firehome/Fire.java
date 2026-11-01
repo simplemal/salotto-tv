@@ -19,6 +19,7 @@ final class Fire {
     static final String AMAZON_HOME = "com.amazon.tv.launcher";
     static final String QUICK_MENU = "com.amazon.tv.quicksettings.ui";
     static final String SETTINGS = "com.amazon.tv.settings.v2";
+    static final String UNINSTALL_PROGRESS = ".television.UninstallAppProgress";
     static final String INSTALLER = "com.android.packageinstaller";
     static final String INSTALL_BUTTON = "android:id/button1";
     static final String DEVICE_PAGE = "com.amazon.device.settings.action.DEVICE";

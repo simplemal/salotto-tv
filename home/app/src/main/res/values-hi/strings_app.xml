@@ -50,6 +50,7 @@
     <string name="task_closing">%1$s को बंद कर रहे हैं</string>
     <string name="task_restart_confirm">रीस्टार्ट पक्का करें? OK दबाएं</string>
     <string name="task_restart_again">OK एक बार और दबाएं</string>
+    <string name="task_uninstalling">अनइंस्टॉल हो रहा है…</string>
     <string name="task_restarting">Stick रीस्टार्ट हो रहा है</string>
 
     <string name="reenabled_quick_menu">Fire OS का साइड मेनू</string>

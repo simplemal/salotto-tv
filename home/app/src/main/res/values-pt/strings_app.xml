@@ -50,6 +50,7 @@
     <string name="task_closing">Fechando %1$s</string>
     <string name="task_restart_confirm">Confirma a reinicialização? Pressione OK</string>
     <string name="task_restart_again">Pressione OK mais uma vez</string>
+    <string name="task_uninstalling">Desinstalando…</string>
     <string name="task_restarting">Reiniciando o Stick</string>
 
     <string name="reenabled_quick_menu">Menu lateral do Fire OS</string>

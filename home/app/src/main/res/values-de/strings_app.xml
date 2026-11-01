@@ -50,6 +50,7 @@
     <string name="task_closing">%1$s wird geschlossen</string>
     <string name="task_restart_confirm">Neustart bestätigen? Drücke OK</string>
     <string name="task_restart_again">Drücke noch einmal OK</string>
+    <string name="task_uninstalling">Wird deinstalliert…</string>
     <string name="task_restarting">Der Stick startet neu</string>
 
     <string name="reenabled_quick_menu">Seitenmenü von Fire OS</string>
