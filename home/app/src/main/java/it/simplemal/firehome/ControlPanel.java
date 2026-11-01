@@ -45,6 +45,7 @@ final class ControlPanel extends LinearLayout {
     private static final int WIDE = 2 * UNIT + GAP;
     /** On the Home it ends over the weather, with three times the room the weather has over the dock. */
     private static final int HEIGHT = 2 * PADDING + 4 * UNIT + 3 * GAP;
+    private static final int WIDTH = 2 * PADDING + 2 * WIDE + GAP;
     private static final int RADIUS = 10;
     private static final int PANEL_RADIUS = 20;
     private static final int BIG_ICON = 56;
@@ -54,8 +55,8 @@ final class ControlPanel extends LinearLayout {
     private static final float SUN_CENTER = 0.5f;
     private static final float TIMER_CENTER = 0.545f;
     private static final long TIMER_TICK_MS = 5000;
-    /** Dark enough to carry white on a bright backdrop. */
-    private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
+    /** A shade lighter than the panel under it. */
+    private static final int TILE_OFF = Color.argb(30, 255, 255, 255);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
     /** The icon of a connection in use. */
     static final int LINKED = Color.rgb(125, 205, 255);
@@ -159,7 +160,11 @@ final class ControlPanel extends LinearLayout {
         hint.setBackground(fill);
         hint.setVisibility(GONE);
         int top = pill ? TOP : TOP_OVER_APP;
-        root.addView(hint, place(host, top + HEIGHT + 6));
+        FrameLayout line = new FrameLayout(host.context());
+        line.addView(hint, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER_HORIZONTAL));
+        FrameLayout.LayoutParams under = place(host, top + HEIGHT + 6);
+        under.width = host.dp(WIDTH);
+        root.addView(line, under);
         ControlPanel panel = new ControlPanel(host, opener, hint);
         root.addView(panel, place(host, top));
         return panel;
