@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">महासागर</string>
     <string name="first_backdrop_forest">जंगल</string>
     <string name="first_backdrop_sunset">सूर्यास्त</string>
+    <string name="first_backdrop_aurora">अरोरा</string>
+    <string name="first_backdrop_plum">आलूबुखारा</string>
+    <string name="first_backdrop_amber">अंबर</string>
+    <string name="first_backdrop_lagoon">लैगून</string>
+    <string name="first_backdrop_ruby">माणिक</string>
+    <string name="first_backdrop_dusk">गोधूलि</string>
+    <string name="first_backdrop_glacier">हिमनद</string>
+    <string name="first_backdrop_ink">स्याही</string>
+    <string name="first_backdrop_petrol">पेट्रोल</string>
+    <string name="first_backdrop_bottle">बोतल हरा</string>
+    <string name="first_backdrop_wine">वाइन</string>
     <string name="first_backdrop_graphite">ग्रेफ़ाइट</string>
     <string name="first_pictures_text">दिन के हर घंटे और आपके शहर के हर मौसम के लिए एक चित्र।</string>
     <string name="first_photos_text">दिन के हर पल और आपके शहर के हर मौसम के लिए एक फ़ोटो।</string>

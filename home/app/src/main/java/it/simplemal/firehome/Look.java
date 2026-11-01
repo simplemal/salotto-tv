@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -31,15 +31,32 @@ final class Look {
     static final int NAMES_ALWAYS = 1;
     private static final int[] SIZE_LABELS = {R.string.look_size_small, R.string.look_size_medium, R.string.look_size_large};
     static final int[] SIZES = {64, 96, 132};
-    static final String[] PRESET_NAMES = {"Notte", "Oceano", "Bosco", "Tramonto", "Grafite"};
+    static final String[] PRESET_NAMES = {"Notte", "Oceano", "Bosco", "Tramonto", "Grafite", "Aurora", "Prugna",
+        "Ambra", "Laguna", "Rubino", "Crepuscolo", "Ghiacciaio", "Inchiostro", "Petrolio", "Bottiglia", "Vinaccia"};
     private static final int[] PRESET_LABELS = {R.string.first_backdrop_night, R.string.first_backdrop_ocean,
-        R.string.first_backdrop_forest, R.string.first_backdrop_sunset, R.string.first_backdrop_graphite};
+        R.string.first_backdrop_forest, R.string.first_backdrop_sunset, R.string.first_backdrop_graphite,
+        R.string.first_backdrop_aurora, R.string.first_backdrop_plum, R.string.first_backdrop_amber,
+        R.string.first_backdrop_lagoon, R.string.first_backdrop_ruby, R.string.first_backdrop_dusk,
+        R.string.first_backdrop_glacier, R.string.first_backdrop_ink, R.string.first_backdrop_petrol,
+        R.string.first_backdrop_bottle, R.string.first_backdrop_wine};
+    /** Three colours down the slant, then the light in the corner. */
     private static final int[][] PRESET_COLORS = {
-        {Color.rgb(44, 50, 62), Color.rgb(10, 12, 16)},
-        {Color.rgb(24, 66, 120), Color.rgb(6, 14, 30)},
-        {Color.rgb(24, 84, 76), Color.rgb(8, 22, 26)},
-        {Color.rgb(128, 72, 92), Color.rgb(30, 20, 50)},
-        {Color.rgb(72, 74, 80), Color.rgb(20, 20, 24)}
+        {0xff3a4252, 0xff1c2029, 0xff0a0c10, 0x286e86b4},
+        {0xff18487c, 0xff0d2a4e, 0xff060e1e, 0x2e3aa0d8},
+        {0xff1c5a4e, 0xff0f3330, 0xff08161a, 0x285cc08a},
+        {0xff8a4c5e, 0xff4a2a4e, 0xff1e1432, 0x34ff9a5c},
+        {0xff4c4e54, 0xff2c2d32, 0xff141418, 0x1ea0a4ac},
+        {0xff14504e, 0xff1a2a52, 0xff0c0e24, 0x305ce0b0},
+        {0xff5a2a5e, 0xff341a40, 0xff140c20, 0x28c070d0},
+        {0xff6e4a1c, 0xff3e2812, 0xff18100a, 0x2ef0b050},
+        {0xff126a72, 0xff0c3c4c, 0xff061a24, 0x2a50d8d8},
+        {0xff701e30, 0xff40121e, 0xff1a080e, 0x28f05060},
+        {0xff3c3468, 0xff2a2048, 0xff100e24, 0x28f09070},
+        {0xff5a7a90, 0xff2e4658, 0xff101c26, 0x28b8e0f0},
+        {0xff12161f, 0xff12161f, 0xff12161f, 0},
+        {0xff0f3340, 0xff0f3340, 0xff0f3340, 0},
+        {0xff133a30, 0xff133a30, 0xff133a30, 0},
+        {0xff4a1626, 0xff4a1626, 0xff4a1626, 0}
     };
     static final String WEATHER = "Meteo dinamico";
     static final String PICTURES = "Meteo illustrato";
@@ -83,8 +100,15 @@ final class Look {
         if (WEATHER.equals(key)) return context.getString(R.string.look_backdrop_weather);
         if (PICTURES.equals(key)) return context.getString(R.string.first_backdrop_pictures);
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
+        if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
         return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
+    }
+
+    /** From the file: 001-marea-obliqua.webp is Marea obliqua. */
+    private static String pictureName(String path) {
+        String words = path.substring(path.lastIndexOf('/') + 1).replaceAll("^\\d+-|(-4k)?\\.webp$", "").replace('-', ' ');
+        return words.isEmpty() ? path : words.substring(0, 1).toUpperCase(Locale.getDefault()) + words.substring(1);
     }
 
     static int columns(Context context) { return prefs(context).getInt("columns", 6); }
@@ -119,7 +143,10 @@ final class Look {
         return PICTURES.equals(backdrop(context)) || weatherPhotos(context) || abstractPictures(context);
     }
 
-    static boolean abstractPictures(Context context) { return timedFolder(context) != null; }
+    static boolean abstractPictures(Context context) { return timedFolder(context) != null || fixedPicture(context); }
+
+    /** One picture of a set, chosen and kept: the backdrop is then that file. */
+    static boolean fixedPicture(Context context) { return backdrop(context).endsWith(Weather.PICTURE_FILE); }
 
     private static String timedFolder(Context context) {
         String chosen = backdrop(context);
@@ -135,6 +162,7 @@ final class Look {
 
     /** The one on show until its time is up, then any other: nothing is decided ahead. */
     static String abstractPicture(Context context) {
+        if (fixedPicture(context)) return backdrop(context);
         SharedPreferences saved = prefs(context);
         String folder = timedFolder(context);
         String shown = saved.getString("abstract", null);
@@ -251,7 +279,7 @@ final class Look {
     /** The backdrop by that name, when it is one of the plain ones. */
     static Drawable preset(String chosen) {
         int preset = Math.max(0, Arrays.asList(PRESET_NAMES).indexOf(chosen));
-        return new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, PRESET_COLORS[preset]);
+        return new Shade(PRESET_COLORS[preset]);
     }
 
     /** The dark shading of the Settings, for pages that do not follow the chosen backdrop. */

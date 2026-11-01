@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">تأكيد</string>
     <string name="card_cancel">إلغاء</string>
     <string name="card_close">إغلاق</string>
     <string name="card_needs_wifi">مع كابل الشبكة لا يسمح Android بهذه الميزة: تحتاج إلى Wi-Fi.</string>

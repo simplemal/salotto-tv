@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">海洋</string>
     <string name="first_backdrop_forest">森林</string>
     <string name="first_backdrop_sunset">日落</string>
+    <string name="first_backdrop_aurora">极光</string>
+    <string name="first_backdrop_plum">梅紫</string>
+    <string name="first_backdrop_amber">琥珀</string>
+    <string name="first_backdrop_lagoon">泻湖</string>
+    <string name="first_backdrop_ruby">红宝石</string>
+    <string name="first_backdrop_dusk">暮色</string>
+    <string name="first_backdrop_glacier">冰川</string>
+    <string name="first_backdrop_ink">墨色</string>
+    <string name="first_backdrop_petrol">石油蓝</string>
+    <string name="first_backdrop_bottle">瓶绿</string>
+    <string name="first_backdrop_wine">酒红</string>
     <string name="first_backdrop_graphite">石墨</string>
     <string name="first_pictures_text">为一天中的每个时刻和你所在城市的每种天气准备一幅插画。</string>
     <string name="first_photos_text">为一天中的每个时段和你所在城市的每种天气准备一张照片。</string>

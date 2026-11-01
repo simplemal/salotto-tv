@@ -3,7 +3,9 @@ package it.simplemal.firehome;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -51,6 +53,8 @@ final class HomeCover {
     private boolean twice;
     private long lastHeard;
     private int unmatched;
+    private boolean holding;
+    private Bitmap held;
 
     /** A window takes long to add and a frame to show, so it is always there, hidden. */
     HomeCover(AccessibilityService service) {
@@ -126,6 +130,24 @@ final class HomeCover {
         });
     }
 
+    /** Stays until letGo: `still` over a Fire OS page on its way out, black if there is nothing to show. */
+    void hold(Bitmap still) {
+        holding = true;
+        held = still;
+        if (still != null) view.setImageBitmap(still);
+        else view.setImageDrawable(new ColorDrawable(Color.BLACK));
+        view.invalidate();
+        view.setVisibility(View.VISIBLE);
+        main.removeCallbacks(hide);
+        main.postDelayed(hide, LIMIT_MS);
+    }
+
+    Bitmap held() { return held; }
+
+    void letGo() {
+        if (holding) hide();
+    }
+
     private void show() {
         if (picture == null) return;
         view.setImageBitmap(picture);
@@ -144,6 +166,8 @@ final class HomeCover {
     }
 
     private void hide() {
+        holding = false;
+        held = null;
         main.removeCallbacks(hide);
         view.setVisibility(View.GONE);
     }

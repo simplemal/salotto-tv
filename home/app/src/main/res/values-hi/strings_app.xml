@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">पुष्टि करें</string>
     <string name="card_cancel">रद्द करें</string>
     <string name="card_close">बंद करें</string>
     <string name="card_needs_wifi">नेटवर्क केबल पर Android यह सुविधा नहीं देता: Wi-Fi चाहिए।</string>

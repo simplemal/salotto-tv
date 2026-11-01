@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">Ozean</string>
     <string name="first_backdrop_forest">Wald</string>
     <string name="first_backdrop_sunset">Sonnenuntergang</string>
+    <string name="first_backdrop_aurora">Polarlicht</string>
+    <string name="first_backdrop_plum">Pflaume</string>
+    <string name="first_backdrop_amber">Bernstein</string>
+    <string name="first_backdrop_lagoon">Lagune</string>
+    <string name="first_backdrop_ruby">Rubin</string>
+    <string name="first_backdrop_dusk">Dämmerung</string>
+    <string name="first_backdrop_glacier">Gletscher</string>
+    <string name="first_backdrop_ink">Tinte</string>
+    <string name="first_backdrop_petrol">Petrol</string>
+    <string name="first_backdrop_bottle">Flaschengrün</string>
+    <string name="first_backdrop_wine">Wein</string>
     <string name="first_backdrop_graphite">Graphit</string>
     <string name="first_pictures_text">Eine Illustration für jede Tageszeit und jedes Wetter in deiner Stadt.</string>
     <string name="first_photos_text">Ein Foto für jeden Moment des Tages und jedes Wetter in deiner Stadt.</string>

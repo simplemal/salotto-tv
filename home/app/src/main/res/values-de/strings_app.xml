@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">Bestätigen</string>
     <string name="card_cancel">Abbrechen</string>
     <string name="card_close">Schließen</string>
     <string name="card_needs_wifi">Mit Netzwerkkabel erlaubt Android diese Funktion nicht: Sie braucht WLAN.</string>

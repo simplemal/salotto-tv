@@ -140,6 +140,9 @@
     <string name="settings_press_to_pair">Нажмите OK для сопряжения.</string>
     <string name="settings_pairing_failed">Не удалось выполнить сопряжение</string>
     <string name="settings_pairing_mode">Переведите устройство в режим сопряжения.</string>
+    <string name="settings_backdrop_standard">Стандартные</string>
+    <string name="settings_backdrop_standard_text">Градиенты и сплошные цвета Salotto.</string>
+    <string name="settings_backdrop_pick_text">Выберите картинку в сетке: она останется, пока вы её не смените.</string>
     <string name="settings_notifications_text">Уведомления от Fire OS и приложений.</string>
     <string name="settings_notification_count">Число уведомлений</string>
     <string name="settings_notification_count_text">Показывает в центре управления, сколько уведомлений. Salotto их только считает, не читая текст.</string>
@@ -213,7 +216,6 @@
     <string name="settings_backdrop_abstract_text">Абстрактные иллюстрации, которые сами меняются в случайном порядке.</string>
     <string name="settings_abstract_time">Менять картинку каждые</string>
     <string name="settings_abstract_time_text">Сколько времени каждое изображение Abstract Illustrated, Abstract 3D и Nox City остаётся на экране.</string>
-    <string name="settings_backdrop_preset_text">Градиент Salotto.</string>
     <string name="settings_backdrop_image_text">Ваша картинка, подогнанная под экран.</string>
     <string name="settings_clock">Часы</string>
     <string name="settings_clock_value">%1$s, %2$s</string>

@@ -140,6 +140,9 @@
     <string name="settings_press_to_pair">पेयर करने के लिए OK दबाएं।</string>
     <string name="settings_pairing_failed">पेयरिंग नहीं हो सकी</string>
     <string name="settings_pairing_mode">डिवाइस को पेयरिंग मोड में रखें।</string>
+    <string name="settings_backdrop_standard">मानक</string>
+    <string name="settings_backdrop_standard_text">Salotto के ग्रेडिएंट और ठोस रंग।</string>
+    <string name="settings_backdrop_pick_text">ग्रिड से एक चित्र चुनें: वह तब तक रहेगा जब तक आप उसे नहीं बदलते।</string>
     <string name="settings_notifications_text">Fire OS और ऐप्स के नोटिफ़िकेशन।</string>
     <string name="settings_notification_count">नोटिफ़िकेशन की संख्या</string>
     <string name="settings_notification_count_text">कंट्रोल सेंटर में दिखाता है कि कितने नोटिफ़िकेशन हैं। Salotto उन्हें सिर्फ़ गिनता है, उनका टेक्स्ट नहीं पढ़ता।</string>
@@ -213,7 +216,6 @@
     <string name="settings_backdrop_abstract_text">अमूर्त चित्र, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
     <string name="settings_abstract_time">चित्र बदलने का समय</string>
     <string name="settings_abstract_time_text">Abstract Illustrated, Abstract 3D और Nox City की हर तस्वीर स्क्रीन पर कितनी देर रहे।</string>
-    <string name="settings_backdrop_preset_text">Salotto का ग्रेडिएंट।</string>
     <string name="settings_backdrop_image_text">आपकी अपनी फ़ोटो, स्क्रीन के हिसाब से ढली हुई।</string>
     <string name="settings_clock">घड़ी</string>
     <string name="settings_clock_value">%1$s, %2$s</string>

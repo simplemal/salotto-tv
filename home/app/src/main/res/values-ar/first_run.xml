@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">محيط</string>
     <string name="first_backdrop_forest">غابة</string>
     <string name="first_backdrop_sunset">غروب</string>
+    <string name="first_backdrop_aurora">شفق</string>
+    <string name="first_backdrop_plum">برقوق</string>
+    <string name="first_backdrop_amber">كهرمان</string>
+    <string name="first_backdrop_lagoon">بحيرة</string>
+    <string name="first_backdrop_ruby">ياقوت</string>
+    <string name="first_backdrop_dusk">غسق</string>
+    <string name="first_backdrop_glacier">نهر جليدي</string>
+    <string name="first_backdrop_ink">حبر</string>
+    <string name="first_backdrop_petrol">نفطي</string>
+    <string name="first_backdrop_bottle">أخضر داكن</string>
+    <string name="first_backdrop_wine">خمري</string>
     <string name="first_backdrop_graphite">جرافيت</string>
     <string name="first_pictures_text">رسم توضيحي لكل ساعة من اليوم ولكل حالة طقس في مدينتك.</string>
     <string name="first_photos_text">صورة فوتوغرافية لكل لحظة من اليوم ولكل حالة طقس في مدينتك.</string>

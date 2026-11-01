@@ -140,6 +140,9 @@
     <string name="settings_press_to_pair">Premi OK per associarlo.</string>
     <string name="settings_pairing_failed">Associazione non riuscita</string>
     <string name="settings_pairing_mode">Metti il dispositivo in associazione.</string>
+    <string name="settings_backdrop_standard">Standard</string>
+    <string name="settings_backdrop_standard_text">Sfumature e colori pieni di Salotto.</string>
+    <string name="settings_backdrop_pick_text">Scegli un’immagine dalla griglia: resta fissa finché non la cambi.</string>
     <string name="settings_notifications_text">Le notifiche ricevute da Fire OS e dalle app.</string>
     <string name="settings_notification_count">Numero delle notifiche</string>
     <string name="settings_notification_count_text">Mostra nel centro di controllo quante notifiche ci sono. Salotto le conta soltanto, senza leggerne il testo.</string>
@@ -213,7 +216,6 @@
     <string name="settings_backdrop_abstract_text">Illustrazioni astratte che cambiano da sole, in ordine casuale.</string>
     <string name="settings_abstract_time">Cambia immagine ogni</string>
     <string name="settings_abstract_time_text">Quanto resta sullo schermo ogni immagine di Abstract Illustrated, Abstract 3D e Nox City.</string>
-    <string name="settings_backdrop_preset_text">Sfumatura di Salotto.</string>
     <string name="settings_backdrop_image_text">Immagine personale, adattata allo schermo.</string>
     <string name="settings_clock">Orologio</string>
     <string name="settings_clock_value">%1$s, %2$s</string>

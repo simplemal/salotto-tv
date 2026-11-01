@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">Océan</string>
     <string name="first_backdrop_forest">Forêt</string>
     <string name="first_backdrop_sunset">Coucher de soleil</string>
+    <string name="first_backdrop_aurora">Aurore</string>
+    <string name="first_backdrop_plum">Prune</string>
+    <string name="first_backdrop_amber">Ambre</string>
+    <string name="first_backdrop_lagoon">Lagon</string>
+    <string name="first_backdrop_ruby">Rubis</string>
+    <string name="first_backdrop_dusk">Crépuscule</string>
+    <string name="first_backdrop_glacier">Glacier</string>
+    <string name="first_backdrop_ink">Encre</string>
+    <string name="first_backdrop_petrol">Pétrole</string>
+    <string name="first_backdrop_bottle">Bouteille</string>
+    <string name="first_backdrop_wine">Lie-de-vin</string>
     <string name="first_backdrop_graphite">Graphite</string>
     <string name="first_pictures_text">Une illustration pour chaque heure de la journée et chaque météo de votre ville.</string>
     <string name="first_photos_text">Une photographie pour chaque moment de la journée et chaque météo de votre ville.</string>

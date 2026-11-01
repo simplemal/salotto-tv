@@ -140,6 +140,9 @@
     <string name="settings_press_to_pair">اضغط OK لإقرانه.</string>
     <string name="settings_pairing_failed">فشل الإقران</string>
     <string name="settings_pairing_mode">ضع الجهاز في وضع الإقران.</string>
+    <string name="settings_backdrop_standard">قياسي</string>
+    <string name="settings_backdrop_standard_text">تدرّجات وألوان سادة من Salotto.</string>
+    <string name="settings_backdrop_pick_text">اختر صورة من الشبكة: تبقى حتى تغيّرها.</string>
     <string name="settings_notifications_text">إشعارات Fire OS والتطبيقات.</string>
     <string name="settings_notification_count">عدد الإشعارات</string>
     <string name="settings_notification_count_text">يعرض في مركز التحكم عدد الإشعارات. يعدّها Salotto فقط دون قراءة نصها.</string>
@@ -213,7 +216,6 @@
     <string name="settings_backdrop_abstract_text">رسوم تجريدية تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_abstract_time">تتغير الصورة كل</string>
     <string name="settings_abstract_time_text">المدة التي تبقى فيها كل صورة من Abstract Illustrated, Abstract 3D وNox City على الشاشة.</string>
-    <string name="settings_backdrop_preset_text">تدرّج لوني من Salotto.</string>
     <string name="settings_backdrop_image_text">صورة شخصية، مُلائمة للشاشة.</string>
     <string name="settings_clock">الساعة</string>
     <string name="settings_clock_value">%1$s، %2$s</string>

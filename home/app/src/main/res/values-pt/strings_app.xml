@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">Confirmar</string>
     <string name="card_cancel">Cancelar</string>
     <string name="card_close">Fechar</string>
     <string name="card_needs_wifi">Com cabo de rede, o Android não permite esta função: é preciso Wi-Fi.</string>

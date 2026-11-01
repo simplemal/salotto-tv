@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">Подтвердить</string>
     <string name="card_cancel">Отмена</string>
     <string name="card_close">Закрыть</string>
     <string name="card_needs_wifi">При подключении кабелем Android не разрешает эту функцию: нужен Wi-Fi.</string>

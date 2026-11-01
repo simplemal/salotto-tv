@@ -137,13 +137,14 @@ public final class TasksActivity extends CardActivity {
     private void reveal(Bitmap frame) {
         if (revealed) return;
         revealed = true;
-        if (frame == null) {
+        Bitmap behind = frame != null ? frame : TaskService.heldPicture();
+        if (behind == null) {
             Look.show(this, backdropView::setImageDrawable);
         } else {
-            Bitmap small = Bitmap.createScaledBitmap(frame, BLUR_WIDTH, BLUR_HEIGHT, true);
-            backdropView.setImageBitmap(Bitmap.createScaledBitmap(small, frame.getWidth(), frame.getHeight(), true));
+            Bitmap small = Bitmap.createScaledBitmap(behind, BLUR_WIDTH, BLUR_HEIGHT, true);
+            backdropView.setImageBitmap(Bitmap.createScaledBitmap(small, behind.getWidth(), behind.getHeight(), true));
         }
-        root.animate().alpha(1).setDuration(FADE_MS).start();
+        root.animate().alpha(1).setDuration(FADE_MS).withEndAction(TaskService::tasksShown).start();
     }
 
     @Override protected void onResume() {

@@ -3,12 +3,11 @@ package it.simplemal.firehome;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
@@ -23,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,8 +59,8 @@ final class ControlPanel extends LinearLayout {
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
 
     private final class Tile {
-        final LinearLayout view = new LinearLayout(host);
-        final ImageView icon = new ImageView(host);
+        final LinearLayout view = new LinearLayout(getContext());
+        final ImageView icon = new ImageView(getContext());
         final GradientDrawable fill = new GradientDrawable();
         final TextView title;
         final TextView value;
@@ -105,7 +105,7 @@ final class ControlPanel extends LinearLayout {
         void level(int level) {
             number.setText(String.valueOf(level));
             number.setVisibility(level > 0 ? VISIBLE : GONE);
-            show(level > 0 ? host.getString(R.string.panel_level, level) : host.getString(R.string.panel_off), level > 0);
+            show(level > 0 ? getContext().getString(R.string.panel_level, level) : getContext().getString(R.string.panel_off), level > 0);
         }
 
         void link(boolean on) {
@@ -121,7 +121,21 @@ final class ControlPanel extends LinearLayout {
         }
     }
 
-    private final CardActivity host;
+    /** What the panel needs from a page of Salotto, or from the window it has over an app. */
+    interface Host {
+        Context context();
+        TextView label(String text, int sp);
+        int dp(int value);
+        void open(Intent intent);
+        void shell(String command, Consumer<String> done);
+        void say(String text);
+        void sayLong(String text);
+        void runOnUiThread(Runnable run);
+        /** On the Home nothing happens: the panel stays until the focus leaves it. */
+        void panelDone();
+    }
+
+    private final Host host;
     private FireSettings fire;
     private final View opener;
     private final TextView hint;
@@ -135,7 +149,7 @@ final class ControlPanel extends LinearLayout {
     private String wifiName;
 
     /** Adds the panel and the line under it to `root`: under the pill if the Home shows one. */
-    static ControlPanel addTo(CardActivity host, FrameLayout root, View opener, boolean pill) {
+    static ControlPanel addTo(Host host, FrameLayout root, View opener, boolean pill) {
         TextView hint = host.label("", 11);
         hint.setPadding(host.dp(10), host.dp(3), host.dp(10), host.dp(3));
         GradientDrawable fill = new GradientDrawable();
@@ -150,15 +164,15 @@ final class ControlPanel extends LinearLayout {
         return panel;
     }
 
-    private static FrameLayout.LayoutParams place(CardActivity host, int top) {
+    private static FrameLayout.LayoutParams place(Host host, int top) {
         FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END);
         place.topMargin = host.dp(top);
         place.rightMargin = host.dp(EDGE);
         return place;
     }
 
-    private ControlPanel(CardActivity host, View opener, TextView hint) {
-        super(host);
+    private ControlPanel(Host host, View opener, TextView hint) {
+        super(host.context());
         this.host = host;
         this.opener = opener;
         this.hint = hint;
@@ -167,10 +181,10 @@ final class ControlPanel extends LinearLayout {
         setPadding(room, room, room, room);
         // In the background: a foreground would stop at the padding, inside the tiles' margin.
         int corner = host.dp(PANEL_RADIUS);
-        setBackground(new LayerDrawable(new Drawable[]{host.glass(corner), host.glassEdge(corner)}));
+        setBackground(GlassRim.panel(corner, host.dp(1)));
         setClickable(true);
         build();
-        rest = new View(host);
+        rest = new View(getContext());
         rest.setOnFocusChangeListener((view, focused) -> {
             if (!focused) view.setFocusable(false);
         });
@@ -219,12 +233,12 @@ final class ControlPanel extends LinearLayout {
     }
 
     private void build() {
-        LinearLayout upper = new LinearLayout(host);
+        LinearLayout upper = new LinearLayout(getContext());
         addView(upper);
-        Tile power = big(R.drawable.ic_power, host.getString(R.string.panel_standby), TaskService::standby);
+        Tile power = big(R.drawable.ic_power, getContext().getString(R.string.panel_standby), TaskService::standby);
         upper.addView(power.view, size(WIDE, WIDE, 0, 0));
         first = power.view;
-        LinearLayout side = new LinearLayout(host);
+        LinearLayout side = new LinearLayout(getContext());
         side.setOrientation(VERTICAL);
         Tile wifi = wide(R.drawable.ic_wifi, "Wi-Fi", () -> settings(SettingsActivity.NETWORK));
         side.addView(wifi.view, size(WIDE, UNIT, 0, 0));
@@ -236,33 +250,36 @@ final class ControlPanel extends LinearLayout {
         LinearLayout modes = row();
         audioSwitch(modes, R.drawable.ic_s_voice, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
         audioSwitch(modes, R.drawable.ic_s_equalizer, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
-        Tile dim = small(modes, R.drawable.ic_brightness, host.getString(R.string.panel_brightness), GAP,
-            () -> change(() -> Veil.nextDim(host)));
-        Tile warm = small(modes, R.drawable.ic_eye, host.getString(R.string.panel_blue_filter), GAP,
-            () -> change(() -> Veil.nextWarm(host)));
+        Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
+            () -> change(() -> Veil.nextDim(getContext())));
+        Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
+            () -> change(() -> Veil.nextWarm(getContext())));
 
         LinearLayout tools = row();
-        small(tools, R.drawable.ic_image, host.getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver()));
-        Tile timer = small(tools, R.drawable.ic_timer, host.getString(R.string.panel_timer), GAP, () -> {
+        small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver()));
+        Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), GAP, () -> {
             nextTimer();
             refresh();
         });
-        small(tools, R.drawable.ic_tasks, host.getString(R.string.first_does_tasks), GAP,
-            () -> host.open(new Intent(host, TasksActivity.class)));
-        small(tools, R.drawable.ic_restart, host.getString(R.string.panel_restart), GAP, TaskService::restart);
+        small(tools, R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks), GAP,
+            () -> host.open(new Intent(getContext(), TasksActivity.class)));
+        small(tools, R.drawable.ic_restart, getContext().getString(R.string.panel_restart), GAP, () -> {
+            host.panelDone();
+            TaskService.restart();
+        });
 
         refreshers.add(() -> showNetwork(wifi));
         refreshers.add(() -> showBluetooth(bluetooth));
         refreshers.add(() -> {
             int left = TaskService.sleepMinutesLeft();
-            timer.show(left > 0 ? host.getString(R.string.panel_timer_left, left) : host.getString(R.string.panel_off), left > 0);
+            timer.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
         });
-        refreshers.add(() -> dim.level(Veil.dim(host)));
-        refreshers.add(() -> warm.level(Veil.warm(host)));
+        refreshers.add(() -> dim.level(Veil.dim(getContext())));
+        refreshers.add(() -> warm.level(Veil.warm(getContext())));
     }
 
     private LinearLayout row() {
-        LinearLayout row = new LinearLayout(host);
+        LinearLayout row = new LinearLayout(getContext());
         LayoutParams place = new LayoutParams(-2, -2);
         place.topMargin = host.dp(GAP);
         addView(row, place);
@@ -283,7 +300,7 @@ final class ControlPanel extends LinearLayout {
         Tile tile = new Tile(picture, name);
         tile.view.setPadding(host.dp(8), 0, host.dp(5), 0);
         tile.view.addView(tile.icon, new LayoutParams(host.dp(WIDE_ICON), host.dp(WIDE_ICON)));
-        LinearLayout text = new LinearLayout(host);
+        LinearLayout text = new LinearLayout(getContext());
         text.setOrientation(VERTICAL);
         text.setPadding(host.dp(6), 0, 0, 0);
         tile.title.setLineSpacing(0, 0.9f);
@@ -313,7 +330,7 @@ final class ControlPanel extends LinearLayout {
     /** Fire OS's setting takes a moment to read or write, so the tile answers the press at once. */
     private void audioSwitch(LinearLayout row, int picture, int name, int startGap, String id) {
         Tile[] tile = new Tile[1];
-        tile[0] = small(row, picture, host.getString(name), startGap, () -> flip(tile[0], id));
+        tile[0] = small(row, picture, getContext().getString(name), startGap, () -> flip(tile[0], id));
         refreshers.add(() -> {
             FireSettings settings = fire();
             Background.run(() -> {
@@ -330,30 +347,30 @@ final class ControlPanel extends LinearLayout {
         Background.run(() -> {
             if (settings.write(FireSettings.AUDIO, id, String.valueOf(on))) return;
             host.runOnUiThread(() -> {
-                host.sayLong(host.getString(R.string.settings_fire_refused));
+                host.sayLong(getContext().getString(R.string.settings_fire_refused));
                 showSwitch(tile, !on);
             });
         });
     }
 
     private void showSwitch(Tile tile, boolean on) {
-        tile.show(host.getString(on ? R.string.panel_on : R.string.panel_off), on);
+        tile.show(getContext().getString(on ? R.string.panel_on : R.string.panel_off), on);
     }
 
     private FireSettings fire() {
-        if (fire == null) fire = new FireSettings(host);
+        if (fire == null) fire = new FireSettings(getContext());
         return fire;
     }
 
     private void describe(Tile tile) {
         CharSequence state = tile.value.getText();
         hint.setText(state.length() == 0 ? tile.title.getText()
-            : host.getString(R.string.panel_tile_state, tile.title.getText(), state));
+            : getContext().getString(R.string.panel_tile_state, tile.title.getText(), state));
     }
 
     private void shell(String command) {
         host.shell(command, output -> {
-            if (output == null) host.say(host.getString(R.string.panel_command_failed));
+            if (output == null) host.say(getContext().getString(R.string.panel_command_failed));
         });
     }
 
@@ -364,13 +381,13 @@ final class ControlPanel extends LinearLayout {
     }
 
     private void settings(String section) {
-        host.open(new Intent(host, SettingsActivity.class).putExtra(SettingsActivity.SECTION, section));
+        host.open(new Intent(getContext(), SettingsActivity.class).putExtra(SettingsActivity.SECTION, section));
     }
 
     /** The levels go round, and the last one is off. */
     private void change(Runnable level) {
         if (!TaskService.running()) {
-            host.say(host.getString(R.string.panel_no_service));
+            host.say(getContext().getString(R.string.panel_no_service));
             return;
         }
         level.run();
@@ -391,7 +408,7 @@ final class ControlPanel extends LinearLayout {
     }
 
     private boolean wired() {
-        ConnectivityManager network = host.getSystemService(ConnectivityManager.class);
+        ConnectivityManager network = getContext().getSystemService(ConnectivityManager.class);
         NetworkCapabilities link = network.getNetworkCapabilities(network.getActiveNetwork());
         return link != null && link.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
     }
@@ -402,14 +419,14 @@ final class ControlPanel extends LinearLayout {
         tile.title.setText(wired ? "Ethernet" : "Wi-Fi");
         if (wired) {
             tile.link(true);
-            tile.show(host.getString(R.string.panel_connected), false);
+            tile.show(getContext().getString(R.string.panel_connected), false);
             return;
         }
-        int rssi = host.getSystemService(WifiManager.class).getConnectionInfo().getRssi();
+        int rssi = getContext().getSystemService(WifiManager.class).getConnectionInfo().getRssi();
         int level = WifiManager.calculateSignalLevel(rssi, LEVELS + 1);
         tile.link(level > 0);
-        tile.show(level == 0 ? host.getString(R.string.panel_not_connected)
-            : wifiName != null ? wifiName : host.getString(R.string.panel_connected), false);
+        tile.show(level == 0 ? getContext().getString(R.string.panel_not_connected)
+            : wifiName != null ? wifiName : getContext().getString(R.string.panel_connected), false);
         if (level == 0 || !TaskService.ready()) return;
         TaskService.shell("cmd wifi status", output -> {
             Matcher match = WIFI_NAME.matcher(output == null ? "" : output);
@@ -425,7 +442,7 @@ final class ControlPanel extends LinearLayout {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter == null || !adapter.isEnabled()) {
             tile.link(false);
-            tile.show(host.getString(R.string.panel_bluetooth_off), false);
+            tile.show(getContext().getString(R.string.panel_bluetooth_off), false);
             return;
         }
         int devices = 0;
@@ -433,8 +450,8 @@ final class ControlPanel extends LinearLayout {
             if (Fire.connected(device) && !Fire.remote(device)) devices++;
         }
         tile.link(devices > 0);
-        tile.show(devices == 0 ? host.getString(R.string.panel_bluetooth_none)
-            : host.getResources().getQuantityString(R.plurals.panel_bluetooth_connected, devices, devices), false);
+        tile.show(devices == 0 ? getContext().getString(R.string.panel_bluetooth_none)
+            : getContext().getResources().getQuantityString(R.plurals.panel_bluetooth_connected, devices, devices), false);
     }
 
     /** Back leaves the panel; the rest of the keys are the Home's. */
@@ -449,7 +466,7 @@ final class ControlPanel extends LinearLayout {
         backPressed = false;
         View to = backTo != null ? backTo : opener;
         if (to != null) to.requestFocus();
-        else host.finish();
+        else host.panelDone();
         return true;
     }
 }

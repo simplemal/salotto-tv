@@ -10,6 +10,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 
 /**
  * The delicate line of light on liquid glass: bright along the top, fainter along the bottom,
@@ -33,6 +35,17 @@ final class GlassRim extends Drawable {
 
     GlassRim(int radius, int thickness, int light) {
         this(radius, thickness, light, SIDE_SHARE, 1);
+    }
+
+    /** The whole body of the control panel: glass, a sheen from above and this line. */
+    static Drawable panel(int radius, int thickness) {
+        GradientDrawable glass = new GradientDrawable();
+        glass.setColor(Color.argb(46, 255, 255, 255));
+        glass.setCornerRadius(radius);
+        GradientDrawable sheen = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+            new int[]{Color.argb(54, 255, 255, 255), Color.TRANSPARENT, Color.TRANSPARENT});
+        sheen.setCornerRadius(radius);
+        return new LayerDrawable(new Drawable[]{glass, sheen, new GlassRim(radius, thickness, 235)});
     }
 
     /** All round, and sinking `depth` pixels into the glass as it dies out: past that, nothing. */

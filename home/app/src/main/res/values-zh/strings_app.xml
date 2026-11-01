@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="card_confirm">确认</string>
     <string name="card_cancel">取消</string>
     <string name="card_close">关闭</string>
     <string name="card_needs_wifi">使用网线时 Android 不允许此功能：需要 Wi-Fi。</string>

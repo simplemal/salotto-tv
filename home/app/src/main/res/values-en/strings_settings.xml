@@ -140,6 +140,9 @@
     <string name="settings_press_to_pair">Press OK to pair it.</string>
     <string name="settings_pairing_failed">Pairing failed</string>
     <string name="settings_pairing_mode">Put the device in pairing mode.</string>
+    <string name="settings_backdrop_standard">Standard</string>
+    <string name="settings_backdrop_standard_text">Salotto’s gradients and solid colours.</string>
+    <string name="settings_backdrop_pick_text">Pick a picture from the grid: it stays until you change it.</string>
     <string name="settings_notifications_text">Notifications from Fire OS and your apps.</string>
     <string name="settings_notification_count">Notification count</string>
     <string name="settings_notification_count_text">Shows in the control center how many notifications there are. Salotto only counts them, without reading their text.</string>
@@ -213,7 +216,6 @@
     <string name="settings_backdrop_abstract_text">Abstract illustrations that change on their own, in random order.</string>
     <string name="settings_abstract_time">Change image every</string>
     <string name="settings_abstract_time_text">How long each Abstract Illustrated, Abstract 3D and Nox City picture stays on screen.</string>
-    <string name="settings_backdrop_preset_text">A Salotto gradient.</string>
     <string name="settings_backdrop_image_text">Your own image, fitted to the screen.</string>
     <string name="settings_clock">Clock</string>
     <string name="settings_clock_value">%1$s, %2$s</string>

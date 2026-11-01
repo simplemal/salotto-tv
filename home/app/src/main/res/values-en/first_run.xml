@@ -41,6 +41,17 @@
     <string name="first_backdrop_ocean">Ocean</string>
     <string name="first_backdrop_forest">Forest</string>
     <string name="first_backdrop_sunset">Sunset</string>
+    <string name="first_backdrop_aurora">Aurora</string>
+    <string name="first_backdrop_plum">Plum</string>
+    <string name="first_backdrop_amber">Amber</string>
+    <string name="first_backdrop_lagoon">Lagoon</string>
+    <string name="first_backdrop_ruby">Ruby</string>
+    <string name="first_backdrop_dusk">Dusk</string>
+    <string name="first_backdrop_glacier">Glacier</string>
+    <string name="first_backdrop_ink">Ink</string>
+    <string name="first_backdrop_petrol">Petrol</string>
+    <string name="first_backdrop_bottle">Bottle green</string>
+    <string name="first_backdrop_wine">Wine</string>
     <string name="first_backdrop_graphite">Graphite</string>
     <string name="first_pictures_text">An illustration for every hour of the day and every kind of weather in your city.</string>
     <string name="first_photos_text">A photograph for every moment of the day and every kind of weather in your city.</string>

@@ -141,6 +141,9 @@
     <string name="settings_press_to_pair">Pulsa OK para emparejarlo.</string>
     <string name="settings_pairing_failed">No se ha podido emparejar</string>
     <string name="settings_pairing_mode">Pon el dispositivo en modo de emparejamiento.</string>
+    <string name="settings_backdrop_standard">Estándar</string>
+    <string name="settings_backdrop_standard_text">Degradados y colores sólidos de Salotto.</string>
+    <string name="settings_backdrop_pick_text">Elige una imagen de la cuadrícula: se queda hasta que la cambies.</string>
     <string name="settings_notifications_text">Las notificaciones de Fire OS y de las apps.</string>
     <string name="settings_notification_count">Número de notificaciones</string>
     <string name="settings_notification_count_text">Muestra en el Centro de control cuántas notificaciones hay. Salotto solo las cuenta, sin leer su texto.</string>
@@ -214,7 +217,6 @@
     <string name="settings_backdrop_abstract_text">Ilustraciones abstractas que cambian solas, en orden aleatorio.</string>
     <string name="settings_abstract_time">Cambiar de imagen cada</string>
     <string name="settings_abstract_time_text">Cuánto tiempo se queda en pantalla cada imagen de Abstract Illustrated, Abstract 3D y Nox City.</string>
-    <string name="settings_backdrop_preset_text">Degradado de Salotto.</string>
     <string name="settings_backdrop_image_text">Imagen personal, adaptada a la pantalla.</string>
     <string name="settings_clock">Reloj</string>
     <string name="settings_clock_value">%1$s, %2$s</string>

@@ -40,7 +40,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /** The tvOS-like cards and app launching shared by the Salotto screens. */
-abstract class CardActivity extends Activity {
+abstract class CardActivity extends Activity implements ControlPanel.Host {
+    @Override public Context context() { return this; }
+    @Override public void panelDone() { }
+
     private String removing;
     protected static final int BANNER = 0;
     protected static final int ICON = 1;
@@ -484,7 +487,7 @@ abstract class CardActivity extends Activity {
         return fill;
     }
 
-    protected TextView label(String text, int sp) {
+    @Override public TextView label(String text, int sp) {
         TextView view = new TextView(this);
         view.setText(Brand.mark(this, text));
         view.setTextSize(sp);
@@ -513,13 +516,13 @@ abstract class CardActivity extends Activity {
             .show();
     }
 
-    protected void say(String text) { Toast.makeText(this, text, Toast.LENGTH_SHORT).show(); }
+    @Override public void say(String text) { Toast.makeText(this, text, Toast.LENGTH_SHORT).show(); }
 
-    protected void sayLong(String text) { Toast.makeText(this, text, Toast.LENGTH_LONG).show(); }
+    @Override public void sayLong(String text) { Toast.makeText(this, text, Toast.LENGTH_LONG).show(); }
 
     /** False, with a word on screen, while the connection to the shell is not there. */
     /** What a normal app may not do goes through TaskService. Done runs with the output. */
-    protected void shell(String command, Consumer<String> done) {
+    @Override public void shell(String command, Consumer<String> done) {
         if (!TaskService.ready() && onCable()) {
             sayLong(getString(R.string.card_needs_wifi));
             done.accept(null);
@@ -582,12 +585,12 @@ abstract class CardActivity extends Activity {
         else say(getString(R.string.card_app_unavailable));
     }
 
-    protected void open(Intent intent) {
+    @Override public void open(Intent intent) {
         try { startActivity(intent); }
         catch (ActivityNotFoundException | SecurityException e) {
             say(getString(R.string.card_cannot_open));
         }
     }
 
-    protected int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
+    @Override public int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
 }

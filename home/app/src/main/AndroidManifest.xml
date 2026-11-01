@@ -90,11 +90,9 @@
             android:screenOrientation="landscape" />
         <activity android:name=".SettingsActivity" android:exported="false"
             android:screenOrientation="landscape" />
+        <activity android:name=".PictureGridActivity" android:exported="false"
+            android:screenOrientation="landscape" />
         <activity android:name=".TasksActivity" android:exported="true"
-            android:screenOrientation="landscape" android:launchMode="singleInstance"
-            android:excludeFromRecents="true" android:taskAffinity=""
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
-        <activity android:name=".PanelActivity" android:exported="true"
             android:screenOrientation="landscape" android:launchMode="singleInstance"
             android:excludeFromRecents="true" android:taskAffinity=""
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />

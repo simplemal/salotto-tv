@@ -1451,14 +1451,13 @@ public final class SettingsActivity extends CardActivity {
             });
     }
 
-    private Entry plainBackdrop(String name, String text, boolean preview) {
+    private Entry plainBackdrop(String name, String text) {
         Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
             getDrawable(R.drawable.ic_image), text, false, () -> {
                 Look.setBackdrop(this, name);
                 Look.show(this, root::setBackground);
                 refresh();
             });
-        if (preview) entry.preview = Look.preset(name);
         entry.mark = 0;
         return entry;
     }
@@ -1476,15 +1475,15 @@ public final class SettingsActivity extends CardActivity {
         photos.mark = R.drawable.ic_cloud;
         weather.add(photos);
         List<Entry> timed = new ArrayList<>();
-        Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text), false);
+        Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
         drawn.mosaic = Look.ABSTRACT_FOLDER;
         drawn.mark = R.drawable.ic_restart;
         timed.add(drawn);
-        Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text), false);
+        Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text));
         shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
         shapes.mark = R.drawable.ic_restart;
         timed.add(shapes);
-        Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text), false);
+        Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text));
         city.mosaic = Look.NOX_FOLDER;
         city.mark = R.drawable.ic_restart;
         timed.add(city);
@@ -1495,20 +1494,48 @@ public final class SettingsActivity extends CardActivity {
         entries.addAll(weatherFirst ? weather : timed);
         entries.addAll(weatherFirst ? timed : weather);
         entries.add(groupLabel(R.string.first_backdrop_static));
-        for (String name : Look.PRESET_NAMES) {
-            entries.add(plainBackdrop(name, getString(R.string.settings_backdrop_preset_text), true));
-        }
+        entries.add(standardSet());
+        entries.add(pictureSet(Look.ABSTRACT, Look.ABSTRACT_FOLDER));
+        entries.add(pictureSet(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER));
+        entries.add(pictureSet(Look.NOX, Look.NOX_FOLDER));
         for (File image : Look.images(this)) {
-            entries.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text), false));
+            entries.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text)));
         }
-        // Arriving, the selection starts on what is in use.
+        showFromChosen(getString(R.string.settings_backdrop), entries);
+    }
+
+    /** Arriving, the selection starts on what is in use. */
+    private void showFromChosen(String title, List<Entry> entries) {
         Level level = levels.peek();
         if (level.focus == 0) {
             for (int index = 0; index < entries.size(); index++) {
                 if (CHECK.equals(entries.get(index).value)) level.focus = index;
             }
         }
-        show(getString(R.string.settings_backdrop), entries);
+        show(title, entries);
+    }
+
+    private Entry standardSet() {
+        boolean chosen = Arrays.asList(Look.PRESET_NAMES).contains(Look.backdrop(this));
+        Entry entry = new Entry(getString(R.string.settings_backdrop_standard), chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_backdrop_standard_text), true,
+            () -> open(new Intent(this, PictureGridActivity.class)
+                .putExtra(PictureGridActivity.TITLE, getString(R.string.settings_backdrop_standard))));
+        entry.preview = Look.preset(Look.backdrop(this));
+        entry.mark = 0;
+        return entry;
+    }
+
+    /** One line for a set: its pictures open as a grid, and the one chosen stays. */
+    private Entry pictureSet(String name, String folder) {
+        boolean chosen = Look.backdrop(this).startsWith(folder + "/");
+        Entry entry = new Entry(name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_backdrop_pick_text), true,
+            () -> open(new Intent(this, PictureGridActivity.class)
+                .putExtra(PictureGridActivity.FOLDER, folder).putExtra(PictureGridActivity.TITLE, name)));
+        entry.mosaic = folder;
+        entry.mark = 0;
+        return entry;
     }
 
     private Entry groupLabel(int name) {

@@ -81,10 +81,12 @@ public final class TaskService extends AccessibilityService {
     private static final long QUICK_MENU_ONCE_MS = 2000;
     private static final long QUICK_MENU_CLOSE_MS = 250;
     private static final long QUICK_MENU_FOCUS_MS = 400;
-    private static final int RECENTS_TRIES = 50;
-    private static final long RECENTS_TRY_MS = 20;
-    private static final int RECENTS_BACK_EVERY = 12;
-    private static final int RECENTS_NO_BACK = -1;
+    private static final int PAGE_TRIES = 50;
+    private static final long PAGE_TRY_MS = 20;
+    private static final int PAGE_BACK_EVERY = 12;
+    private static final int PAGE_NO_BACK = -1;
+    /** Without adb Fire OS's page normally comes within a second of Home held. */
+    private static final long PANEL_WAIT_MS = 1500;
     private static final String ENABLED_SERVICES = Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES;
     private static final String KEY_LIFETIME = "adb_allowed_connection_time";
     private static final String KEYS_FILE = "keys";
@@ -134,6 +136,7 @@ public final class TaskService extends AccessibilityService {
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
             setSleepTimer(0);
+            if (panelWindow != null) panelWindow.close();
         }
     };
     private HandlerThread worker;
@@ -154,6 +157,10 @@ public final class TaskService extends AccessibilityService {
     private int stopLeaving;
     private long quickMenuAt;
     private long recentsAt;
+    private PanelWindow panelWindow;
+    /** The app under the panel: seeing it again says nothing has changed. */
+    private String panelApp;
+    private final Runnable panelAnyway = this::openPanel;
     private String front;
     private View veil;
     private HomeCover cover;
@@ -548,6 +555,7 @@ public final class TaskService extends AccessibilityService {
     @Override public void onDestroy() {
         running = null;
         sleepAt = 0;
+        if (panelWindow != null) panelWindow.close();
         unregisterReceiver(screenOff);
         main.removeCallbacksAndMessages(null);
         if (cover != null) cover.close();
@@ -566,13 +574,17 @@ public final class TaskService extends AccessibilityService {
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || pkg == null) return;
         String name = pkg.toString();
         String page = String.valueOf(event.getClassName());
+        // Salotto's own windows open over the app, which stays where it was.
+        if (name.equals(getPackageName()) && MASK_WINDOW.equals(page)) return;
+        if (panelWindow != null && !name.equals(panelApp)
+            && (HomeApps.isHome(this, name) || HomeApps.isUserApp(this, name))) panelWindow.close();
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
         // The mask is a window too, and it would take itself for whatever comes next.
         else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
         if (name.equals(Fire.AMAZON_HOME) && homeLog == null) cover.pressed();
         if (name.equals(Fire.QUICK_MENU) && client == null) quickMenuShown();
         // It closes by itself once something else comes in front.
-        if (Fire.HOME_HELD_PAGE.contentEquals(String.valueOf(event.getClassName()))) openPanel();
+        if (Fire.HOME_HELD_PAGE.contentEquals(String.valueOf(event.getClassName()))) homePageShown();
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
@@ -597,7 +609,7 @@ public final class TaskService extends AccessibilityService {
         if (ok && up && fireSteps != null) fireSteps.okPressed();
         if (key != KeyEvent.KEYCODE_MENU && key != KeyEvent.KEYCODE_BACK) return false;
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (event.getRepeatCount() == 0 && !TasksActivity.showing && !PanelActivity.showing) {
+            if (event.getRepeatCount() == 0 && !TasksActivity.showing && panelWindow == null) {
                 keyFired = false;
                 main.postDelayed(key == KeyEvent.KEYCODE_MENU ? holdMenu : holdBack, HOLD_MS);
             }
@@ -616,9 +628,23 @@ public final class TaskService extends AccessibilityService {
 
     /** Stopped this early, Fire OS's menu never reaches the screen. It starts again next time. */
     private void homeHeld() {
-        if (client != null) adb.post(() -> run("cmd activity force-stop " + Fire.QUICK_MENU));
-        else cover.overQuickMenu();
-        openPanel();
+        panelApp = front;
+        if (client != null) {
+            adb.post(() -> run("cmd activity force-stop " + Fire.QUICK_MENU));
+            openPanel();
+            return;
+        }
+        cover.overQuickMenu();
+        if (overHome()) openPanel();
+        else main.postDelayed(panelAnyway, PANEL_WAIT_MS);
+    }
+
+    /** Over an app the page has to go first: the panel's window would take the Back that closes it. */
+    private void homePageShown() {
+        main.removeCallbacks(panelAnyway);
+        if (panelApp == null) panelApp = front;
+        if (overHome()) openPanel();
+        else closePage(Fire.SETTINGS, this::openPanel, PAGE_TRIES, PAGE_NO_BACK);
     }
 
     /** Without adb the menu can only be closed once it is up: it shows for a moment. */
@@ -628,7 +654,8 @@ public final class TaskService extends AccessibilityService {
         quickMenuAt = now;
         // Sooner than this the menu does not have the focus yet, and Back would miss it.
         main.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_BACK), QUICK_MENU_FOCUS_MS);
-        if (homeLog == null) main.postDelayed(this::openPanel, QUICK_MENU_FOCUS_MS + QUICK_MENU_CLOSE_MS);
+        main.removeCallbacks(panelAnyway);
+        if (homeLog == null || !overHome()) main.postDelayed(this::openPanel, QUICK_MENU_FOCUS_MS + QUICK_MENU_CLOSE_MS);
     }
 
     /** Left under the task manager, the page would come back when that closes. */
@@ -636,34 +663,55 @@ public final class TaskService extends AccessibilityService {
         long now = SystemClock.elapsedRealtime();
         if (now - recentsAt < QUICK_MENU_ONCE_MS) return;
         recentsAt = now;
-        closeRecentsPage(RECENTS_TRIES, RECENTS_NO_BACK);
+        cover.hold(front == null ? HomeCover.lastPicture() : BitmapFactory.decodeFile(RunningApps.picture(this, front).getPath()));
+        closePage(Fire.AMAZON_HOME, this::openTasks, PAGE_TRIES, PAGE_NO_BACK);
+    }
+
+    /** What the task manager opened over, when Fire OS's page was in the way. */
+    static Bitmap heldPicture() {
+        TaskService service = running;
+        return service == null ? null : service.cover.held();
+    }
+
+    static void tasksShown() {
+        TaskService service = running;
+        if (service != null) service.cover.letGo();
     }
 
     /**
      * Back before the page has the focus would go to the app under it, and a page just opened can
      * ignore its first one. `sinceBack` counts the tries since the last Back.
      */
-    private void closeRecentsPage(int tries, int sinceBack) {
+    private void closePage(String pkg, Runnable then, int tries, int sinceBack) {
         AccessibilityNodeInfo active = getRootInActiveWindow();
-        boolean there = active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
-        boolean asked = sinceBack != RECENTS_NO_BACK;
+        boolean there = active != null && pkg.contentEquals(active.getPackageName());
+        boolean asked = sinceBack != PAGE_NO_BACK;
         if (tries == 0 || asked && !there) {
-            openTasks();
+            then.run();
             return;
         }
-        boolean back = there && (!asked || sinceBack >= RECENTS_BACK_EVERY);
+        boolean back = there && (!asked || sinceBack >= PAGE_BACK_EVERY);
         if (back) performGlobalAction(GLOBAL_ACTION_BACK);
-        int next = back ? 0 : asked ? sinceBack + 1 : RECENTS_NO_BACK;
-        main.postDelayed(() -> closeRecentsPage(tries - 1, next), RECENTS_TRY_MS);
+        int next = back ? 0 : asked ? sinceBack + 1 : PAGE_NO_BACK;
+        main.postDelayed(() -> closePage(pkg, then, tries - 1, next), PAGE_TRY_MS);
     }
 
+    /** Fire OS's own page may already have paused the Home: `front` still says where this was. */
+    private boolean overHome() { return MainActivity.showing || panelApp == null && front == null; }
+
     private void openPanel() {
-        // Fire OS's own page may already have paused the Home: `front` still says where this was.
-        // Over an app the panel itself clears `front`, and without adb Fire OS's page comes after it.
-        Intent panel = !PanelActivity.open && (MainActivity.showing || front == null)
-            ? new Intent(this, MainActivity.class).putExtra(MainActivity.OPEN_PANEL, true)
-            : new Intent(this, PanelActivity.class);
-        startActivity(panel.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        if (panelWindow != null) return;
+        if (overHome()) {
+            startActivity(new Intent(this, MainActivity.class).putExtra(MainActivity.OPEN_PANEL, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            return;
+        }
+        panelWindow = new PanelWindow(Language.apply(getBaseContext()), getSystemService(WindowManager.class),
+            () -> {
+                panelWindow = null;
+                panelApp = null;
+            });
+        panelWindow.open();
     }
 
     static boolean keysOn(Context context) {

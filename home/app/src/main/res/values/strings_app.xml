@@ -5,6 +5,8 @@
 -->
 <resources>
     <!-- Shared by the screens -->
+    <string name="grid_title" translatable="false">%1$s · %2$s</string>
+    <string name="card_confirm">Conferma</string>
     <string name="card_cancel">Annulla</string>
     <string name="card_close">Chiudi</string>
     <string name="card_needs_wifi">Con il cavo di rete Android non permette questa funzione: serve il Wi-Fi.</string>

@@ -141,6 +141,9 @@
     <string name="settings_press_to_pair">按 OK 键配对。</string>
     <string name="settings_pairing_failed">配对失败</string>
     <string name="settings_pairing_mode">请让设备进入配对模式。</string>
+    <string name="settings_backdrop_standard">标准</string>
+    <string name="settings_backdrop_standard_text">Salotto 的渐变和纯色。</string>
+    <string name="settings_backdrop_pick_text">从网格中选择一张图片：它会一直保留，直到您更换。</string>
     <string name="settings_notifications_text">来自 Fire OS 和应用的通知。</string>
     <string name="settings_notification_count">通知数量</string>
     <string name="settings_notification_count_text">在控制中心显示有多少条通知。Salotto 只计数，不会读取内容。</string>
@@ -214,7 +217,6 @@
     <string name="settings_backdrop_abstract_text">抽象插画自动更换，顺序随机。</string>
     <string name="settings_abstract_time">更换图片间隔</string>
     <string name="settings_abstract_time_text">Abstract Illustrated, Abstract 3D 和 Nox City 的每张图片在屏幕上停留的时间。</string>
-    <string name="settings_backdrop_preset_text">Salotto 的渐变色。</string>
     <string name="settings_backdrop_image_text">你自己的图片，自动适应屏幕。</string>
     <string name="settings_clock">时钟</string>
     <string name="settings_clock_value">%1$s，%2$s</string>
