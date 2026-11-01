@@ -12,13 +12,14 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
-/** A picture of the control panel with a number in it: cut out of it, or drawn inside its outline. */
+/** A solid picture of the control panel with a number cut out of it. */
 final class NumberIcon extends Drawable {
     /** Bold and narrow: what stays readable at this size. */
     private static final String FONT = "sans-serif-condensed";
-    private static final float TEXT_SHARE = 0.5f;
+    private static final float TEXT_SHARE = 0.47f;
+    private static final float TRACKING = -0.05f;
     /** The room inside the circle: a longer number gets narrower, not shorter. */
-    private static final float ROOM_SHARE = 0.54f;
+    private static final float ROOM_SHARE = 0.56f;
 
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Rect ink = new Rect();
@@ -26,14 +27,15 @@ final class NumberIcon extends Drawable {
     private final String number;
     private final float center;
 
-    NumberIcon(Drawable picture, String number, float center, boolean cut) {
+    NumberIcon(Drawable picture, String number, float center) {
         this.picture = picture;
         this.number = number;
         this.center = center;
         text.setColor(Color.WHITE);
         text.setTextAlign(Paint.Align.CENTER);
         text.setTypeface(Typeface.create(FONT, Typeface.BOLD));
-        if (cut) text.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+        text.setLetterSpacing(TRACKING);
+        text.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
     }
 
     @Override public void draw(Canvas canvas) {

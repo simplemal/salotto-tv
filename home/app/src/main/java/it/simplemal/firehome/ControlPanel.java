@@ -286,7 +286,7 @@ final class ControlPanel extends LinearLayout {
         refreshers.add(() -> {
             int left = TaskService.sleepMinutesLeft();
             timer.icon.setImageDrawable(left == 0 ? getContext().getDrawable(R.drawable.ic_timer) : new NumberIcon(
-                getContext().getDrawable(R.drawable.ic_timer_empty), String.valueOf(left), TIMER_CENTER, false));
+                getContext().getDrawable(R.drawable.ic_timer_full), String.valueOf(left), TIMER_CENTER));
             timer.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
         });
         refreshers.add(() -> showDim(dim));
@@ -426,7 +426,7 @@ final class ControlPanel extends LinearLayout {
     private void showDim(Tile tile) {
         int level = Veil.dim(getContext());
         tile.icon.setImageDrawable(level == 0 ? getContext().getDrawable(R.drawable.ic_brightness) : new NumberIcon(
-            getContext().getDrawable(R.drawable.ic_brightness_level), String.valueOf(level), SUN_CENTER, true));
+            getContext().getDrawable(R.drawable.ic_brightness_level), String.valueOf(level), SUN_CENTER));
         tile.show(level > 0 ? getContext().getString(R.string.panel_level, level) : getContext().getString(R.string.panel_off), level > 0);
     }
 

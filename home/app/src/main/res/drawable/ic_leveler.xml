@@ -1,7 +1,7 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
     <!-- A limiter on a sound wave: what reaches past the line shows only as a trace. -->
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" android:pathData="M9.00,4.10 L9.00,7.4 M15.00,5.10 L15.00,7.4" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2" android:strokeLineCap="round" android:pathData="M3.00,11.10 L3.00,16.10 M6.00,7.60 L6.00,19.60 M9.00,8.5 L9.00,23.10 M12.00,8.60 L12.00,18.60 M15.00,8.5 L15.00,22.10 M18.00,9.60 L18.00,17.60 M21.00,11.80 L21.00,15.40" />
-    <path android:fillColor="#FFFFFFFF" android:pathData="M1,6.7 h22 v1.4 h-22 Z" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="0.9" android:strokeLineCap="round" android:pathData="M8.00,4.10 L8.00,9.6 M12.00,7.60 L12.00,9.6 M16.00,5.10 L16.00,9.6" />
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2.3" android:strokeLineCap="round" android:pathData="M4.00,10.60 L4.00,16.60 M8.00,10.9 L8.00,23.10 M12.00,10.9 L12.00,19.60 M16.00,10.9 L16.00,22.10 M20.00,11.10 L20.00,16.10" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M1,8.9 h22 v1.4 h-22 Z" />
 </vector>
