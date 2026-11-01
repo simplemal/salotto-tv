@@ -1,0 +1,6 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <!-- The sun with room in it for a number. -->
+    <path android:fillColor="#FFFFFF" android:pathData="M12,4.6 a7.4,7.4 0 1 0 0,14.8 a7.4,7.4 0 1 0 0,-14.8 Z" />
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="1.5" android:strokeLineCap="round" android:pathData="M21.30,12.00 L23.30,12.00 M18.58,18.58 L19.99,19.99 M12.00,21.30 L12.00,23.30 M5.42,18.58 L4.01,19.99 M2.70,12.00 L0.70,12.00 M5.42,5.42 L4.01,4.01 M12.00,2.70 L12.00,0.70 M18.58,5.42 L19.99,4.01" />
+</vector>

@@ -50,6 +50,9 @@ final class ControlPanel extends LinearLayout {
     private static final int BIG_ICON = 56;
     private static final int WIDE_ICON = 24;
     private static final int SMALL_ICON = 28;
+    /** Where the number goes in each picture, as a share of its height. */
+    private static final float SUN_CENTER = 0.5f;
+    private static final float TIMER_CENTER = 0.545f;
     /** Dark enough to carry white on a bright backdrop. */
     private static final int TILE_OFF = Color.argb(72, 0, 0, 0);
     private static final int TILE_ACTIVE = Color.argb(205, 255, 255, 255);
@@ -65,7 +68,6 @@ final class ControlPanel extends LinearLayout {
         final GradientDrawable fill = new GradientDrawable();
         final TextView title;
         final TextView value;
-        final TextView number;
         boolean active;
         boolean small;
         boolean linked;
@@ -77,10 +79,6 @@ final class ControlPanel extends LinearLayout {
             value = host.label("", 9);
             value.setSingleLine(true);
             value.setEllipsize(TextUtils.TruncateAt.END);
-            number = host.label("", 12);
-            number.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-            number.setPadding(host.dp(3), 0, 0, 0);
-            number.setVisibility(GONE);
             view.setGravity(Gravity.CENTER);
             view.setFocusable(true);
             view.setClickable(true);
@@ -101,14 +99,6 @@ final class ControlPanel extends LinearLayout {
             icon.setColorFilter(!lit && linked ? LINKED : ink);
             title.setTextColor(ink);
             value.setTextColor(lit ? Color.BLACK : Color.argb(180, 255, 255, 255));
-            number.setTextColor(ink);
-        }
-
-        /** Zero is off: only a level in use takes room beside the icon. */
-        void level(int level) {
-            number.setText(String.valueOf(level));
-            number.setVisibility(level > 0 ? VISIBLE : GONE);
-            show(level > 0 ? getContext().getString(R.string.panel_level, level) : getContext().getString(R.string.panel_off), level > 0);
         }
 
         void link(boolean on) {
@@ -295,9 +285,11 @@ final class ControlPanel extends LinearLayout {
         refreshers.add(() -> showBluetooth(bluetooth));
         refreshers.add(() -> {
             int left = TaskService.sleepMinutesLeft();
+            timer.icon.setImageDrawable(left == 0 ? getContext().getDrawable(R.drawable.ic_timer) : new NumberIcon(
+                getContext().getDrawable(R.drawable.ic_timer_empty), String.valueOf(left), TIMER_CENTER, false));
             timer.show(left > 0 ? getContext().getString(R.string.panel_timer_left, left) : getContext().getString(R.string.panel_off), left > 0);
         });
-        refreshers.add(() -> dim.level(Veil.dim(getContext())));
+        refreshers.add(() -> showDim(dim));
         refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
 
@@ -339,7 +331,6 @@ final class ControlPanel extends LinearLayout {
         Tile tile = new Tile(picture, name);
         tile.small = true;
         tile.view.addView(tile.icon, new LayoutParams(host.dp(SMALL_ICON), host.dp(SMALL_ICON)));
-        tile.view.addView(tile.number);
         tile.view.setOnFocusChangeListener((changed, focused) -> {
             tile.paint();
             describe(tile);
@@ -429,6 +420,14 @@ final class ControlPanel extends LinearLayout {
             else host.say(getContext().getString(R.string.panel_command_failed));
             refresh();
         });
+    }
+
+    /** Zero is off. A level in use is cut out of the sun. */
+    private void showDim(Tile tile) {
+        int level = Veil.dim(getContext());
+        tile.icon.setImageDrawable(level == 0 ? getContext().getDrawable(R.drawable.ic_brightness) : new NumberIcon(
+            getContext().getDrawable(R.drawable.ic_brightness_level), String.valueOf(level), SUN_CENTER, true));
+        tile.show(level > 0 ? getContext().getString(R.string.panel_level, level) : getContext().getString(R.string.panel_off), level > 0);
     }
 
     private void nextTimer() {
