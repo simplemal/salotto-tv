@@ -123,7 +123,9 @@ public final class MainActivity extends CardActivity {
     private static final long FIRST_PICTURE_MS = 4000;
     private static final long FRESH_PICTURE_MS = 400;
     private static final float JIGGLE_DEGREES = 0.5f;
-    private static final int JIGGLE_MS = 150;
+    private static final long JIGGLE_TURN_MS = 130;
+    private static final float JIGGLE_BOB_PX = 1f;
+    private static final long JIGGLE_BOB_MS = 170;
     /** For the cover of a Home press: over the Home itself its picture has to be taken at once. */
     static volatile boolean showing;
     static final String OPEN_PANEL = "open_panel";
@@ -763,8 +765,10 @@ public final class MainActivity extends CardActivity {
         // A layer turns each frame into a cheap texture transform instead of a redraw.
         image.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         jiggle = new AnimatorSet();
-        // A small quick shiver, not a sway.
-        jiggle.playTogether(sway(ObjectAnimator.ofFloat(image, View.ROTATION, -JIGGLE_DEGREES, JIGGLE_DEGREES), JIGGLE_MS));
+        // As on iOS: a tiny quick turn, and a smaller bob on another beat so it never looks mechanical.
+        jiggle.playTogether(
+            sway(ObjectAnimator.ofFloat(image, View.ROTATION, -JIGGLE_DEGREES, JIGGLE_DEGREES), JIGGLE_TURN_MS),
+            sway(ObjectAnimator.ofFloat(image, View.TRANSLATION_Y, -JIGGLE_BOB_PX, JIGGLE_BOB_PX), JIGGLE_BOB_MS));
         jiggle.start();
     }
 
