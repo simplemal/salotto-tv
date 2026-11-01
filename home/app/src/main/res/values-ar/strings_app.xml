@@ -2,13 +2,11 @@
 <resources>
     <string name="card_cancel">إلغاء</string>
     <string name="card_close">إغلاق</string>
+    <string name="card_needs_wifi">مع كابل الشبكة لا يسمح Android بهذه الميزة: تحتاج إلى Wi-Fi.</string>
     <string name="card_tv_may_ask">إذا طلب التلفزيون ذلك، فأكّد</string>
     <string name="card_home_stays">Salotto هو الرئيسية ويبقى مثبّتًا</string>
-    <string name="card_uninstall_title">إلغاء تثبيت %1$s؟</string>
-    <string name="card_uninstall_text">سيُحذف التطبيق وبياناته.</string>
     <string name="card_uninstall">إلغاء التثبيت</string>
     <string name="card_app_removed">تم إلغاء تثبيت التطبيق</string>
-    <string name="card_cannot_remove">لا يسمح Fire OS بإلغاء تثبيته</string>
     <string name="card_app_unavailable">التطبيق غير متاح</string>
     <string name="card_cannot_open">تعذّر فتح التطبيق</string>
     <string name="card_add_to_home">إضافة إلى الرئيسية</string>

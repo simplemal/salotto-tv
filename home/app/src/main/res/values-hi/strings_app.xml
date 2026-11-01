@@ -2,13 +2,11 @@
 <resources>
     <string name="card_cancel">रद्द करें</string>
     <string name="card_close">बंद करें</string>
+    <string name="card_needs_wifi">नेटवर्क केबल पर Android यह सुविधा नहीं देता: Wi-Fi चाहिए।</string>
     <string name="card_tv_may_ask">अगर टीवी पूछे, तो पुष्टि करें</string>
     <string name="card_home_stays">Salotto ही होम है और इंस्टॉल रहेगा</string>
-    <string name="card_uninstall_title">%1$s को अनइंस्टॉल करें?</string>
-    <string name="card_uninstall_text">ऐप और उसका डेटा मिट जाएगा।</string>
     <string name="card_uninstall">अनइंस्टॉल करें</string>
     <string name="card_app_removed">ऐप अनइंस्टॉल हुआ</string>
-    <string name="card_cannot_remove">Fire OS इसे अनइंस्टॉल नहीं करने देता</string>
     <string name="card_app_unavailable">ऐप उपलब्ध नहीं</string>
     <string name="card_cannot_open">ऐप नहीं खुल सका</string>
     <string name="card_add_to_home">होम में जोड़ें</string>

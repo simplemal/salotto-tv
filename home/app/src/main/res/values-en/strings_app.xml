@@ -2,13 +2,11 @@
 <resources>
     <string name="card_cancel">Cancel</string>
     <string name="card_close">Close</string>
+    <string name="card_needs_wifi">Over a network cable Android does not allow this: it needs Wi-Fi.</string>
     <string name="card_tv_may_ask">If the TV asks, confirm</string>
     <string name="card_home_stays">Salotto is the Home and stays installed</string>
-    <string name="card_uninstall_title">Uninstall %1$s?</string>
-    <string name="card_uninstall_text">The app and its data will be deleted.</string>
     <string name="card_uninstall">Uninstall</string>
     <string name="card_app_removed">App uninstalled</string>
-    <string name="card_cannot_remove">Fire OS doesn’t allow uninstalling it</string>
     <string name="card_app_unavailable">App not available</string>
     <string name="card_cannot_open">Can’t open the app</string>
     <string name="card_add_to_home">Add to Home</string>

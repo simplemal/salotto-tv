@@ -2,13 +2,11 @@
 <resources>
     <string name="card_cancel">Отмена</string>
     <string name="card_close">Закрыть</string>
+    <string name="card_needs_wifi">При подключении кабелем Android не разрешает эту функцию: нужен Wi-Fi.</string>
     <string name="card_tv_may_ask">Если телевизор спросит, подтвердите</string>
     <string name="card_home_stays">Salotto — это главный экран, он остаётся установленным</string>
-    <string name="card_uninstall_title">Удалить %1$s?</string>
-    <string name="card_uninstall_text">Приложение и его данные будут удалены.</string>
     <string name="card_uninstall">Удалить</string>
     <string name="card_app_removed">Приложение удалено</string>
-    <string name="card_cannot_remove">Fire OS не позволяет его удалить</string>
     <string name="card_app_unavailable">Приложение недоступно</string>
     <string name="card_cannot_open">Не удаётся открыть приложение</string>
     <string name="card_add_to_home">Добавить на главный экран</string>

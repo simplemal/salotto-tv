@@ -7,14 +7,12 @@
     <!-- Shared by the screens -->
     <string name="card_cancel">Annulla</string>
     <string name="card_close">Chiudi</string>
+    <string name="card_needs_wifi">Con il cavo di rete Android non permette questa funzione: serve il Wi-Fi.</string>
     <string name="card_tv_may_ask">Se la TV lo chiede, conferma</string>
     <string name="card_home_stays">Salotto è la Home e resta installata</string>
     <!-- %1$s is the name of an app -->
-    <string name="card_uninstall_title">Disinstallare %1$s?</string>
-    <string name="card_uninstall_text">L’app e i suoi dati verranno cancellati.</string>
     <string name="card_uninstall">Disinstalla</string>
     <string name="card_app_removed">App disinstallata</string>
-    <string name="card_cannot_remove">Fire OS non permette di disinstallarla</string>
     <string name="card_app_unavailable">App non disponibile</string>
     <string name="card_cannot_open">Impossibile aprire l’app</string>
     <string name="card_add_to_home">Aggiungi alla Home</string>

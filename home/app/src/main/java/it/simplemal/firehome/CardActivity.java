@@ -1,9 +1,9 @@
 package it.simplemal.firehome;
 
-import android.app.AlertDialog;
 import android.app.Activity;
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,6 +17,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.LruCache;
@@ -38,6 +41,7 @@ import java.util.function.Consumer;
 
 /** The tvOS-like cards and app launching shared by the Salotto screens. */
 abstract class CardActivity extends Activity {
+    private String removing;
     protected static final int BANNER = 0;
     protected static final int ICON = 1;
     protected static final int SHADED = 2;
@@ -517,11 +521,23 @@ abstract class CardActivity extends Activity {
     /** False, with a word on screen, while the connection to the shell is not there. */
     /** What a normal app may not do goes through TaskService. Done runs with the output. */
     protected void shell(String command, Consumer<String> done) {
+        if (!TaskService.ready() && onCable()) {
+            sayLong(getString(R.string.card_needs_wifi));
+            done.accept(null);
+            return;
+        }
         if (!TaskService.ready()) sayLong(getString(R.string.card_tv_may_ask));
         TaskService.shellAsked(command, done);
     }
 
-    /** Through the shell, so that nothing leaves Salotto. Salotto itself stays: it is the Home. */
+    /** Android starts wireless debugging only on Wi-Fi, and everything here that needs a shell goes through it. */
+    private boolean onCable() {
+        ConnectivityManager network = getSystemService(ConnectivityManager.class);
+        NetworkCapabilities active = network.getNetworkCapabilities(network.getActiveNetwork());
+        return active != null && active.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);
+    }
+
+    /** Android's own dialog asks, and it needs no shell, so it works on a cable too. Salotto itself stays: it is the Home. */
     protected void uninstall(String pkg) {
         if (pkg.equals(getPackageName())) {
             sayLong(getString(R.string.card_home_stays));
@@ -531,16 +547,22 @@ abstract class CardActivity extends Activity {
             sayLong(getString(R.string.card_fixer_stays));
             return;
         }
-        confirm(getString(R.string.card_uninstall_title, HomeApps.label(this, pkg)), getString(R.string.card_uninstall_text),
-            getString(R.string.card_uninstall), () -> removeApp(pkg));
+        removing = pkg;
+        open(new Intent(Intent.ACTION_DELETE, Uri.parse("package:" + pkg)));
     }
 
-    private void removeApp(String pkg) {
-        shell("pm uninstall " + pkg, output -> {
-            boolean removed = output != null && output.contains("Success");
-            sayLong(getString(removed ? R.string.card_app_removed : R.string.card_cannot_remove));
-            if (removed) appRemoved();
-        });
+    /** Back from Android's dialog: nothing is said if the person chose to keep the app. */
+    @Override protected void onResume() {
+        super.onResume();
+        String pkg = removing;
+        removing = null;
+        if (pkg == null) return;
+        try {
+            getPackageManager().getPackageInfo(pkg, 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            sayLong(getString(R.string.card_app_removed));
+            appRemoved();
+        }
     }
 
     /** Lists of apps are built once: they have to be built again. */

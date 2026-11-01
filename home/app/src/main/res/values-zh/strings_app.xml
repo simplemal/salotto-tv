@@ -2,13 +2,11 @@
 <resources>
     <string name="card_cancel">取消</string>
     <string name="card_close">关闭</string>
+    <string name="card_needs_wifi">使用网线时 Android 不允许此功能：需要 Wi-Fi。</string>
     <string name="card_tv_may_ask">如果电视询问，请确认</string>
     <string name="card_home_stays">Salotto 是主页，会一直保留</string>
-    <string name="card_uninstall_title">卸载 %1$s？</string>
-    <string name="card_uninstall_text">这个应用及其数据都会被删除。</string>
     <string name="card_uninstall">卸载</string>
     <string name="card_app_removed">应用已卸载</string>
-    <string name="card_cannot_remove">Fire OS 不允许卸载</string>
     <string name="card_app_unavailable">应用不可用</string>
     <string name="card_cannot_open">无法打开应用</string>
     <string name="card_add_to_home">加入主页</string>
