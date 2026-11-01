@@ -494,6 +494,7 @@ public final class MainActivity extends CardActivity {
             applyLook();
             render(focus, apps);
         }
+        Look.backHome(this);
         ticker.post(weatherCheck);
         weatherView.resume();
         root.postDelayed(offerStart, OFFER_START_MS);
@@ -587,15 +588,19 @@ public final class MainActivity extends CardActivity {
         root.removeCallbacks(offerStart);
         HomeCover.take(getWindow());
         inFront = false;
+        Look.leaveHome(this);
         ticker.removeCallbacks(weatherCheck);
         weatherView.pause();
         if (moving != null) stopMoving();
     }
 
-    /** Behind an app, what can be rebuilt on the way back goes first. */
+    /**
+     * The backdrop goes only when the process is next in line to die. These Sticks are always short
+     * of memory, so at any lower level the Home would lose it on every trip into an app.
+     */
     @Override public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        if (inFront || !memoryShort(level)) return;
+        if (inFront || level < TRIM_MEMORY_COMPLETE) return;
         weatherView.show(null);
         root.setBackground(null);
         plainBackdrop = null;

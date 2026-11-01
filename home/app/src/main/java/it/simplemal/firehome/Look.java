@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -145,6 +146,28 @@ final class Look {
         if (picked == null) return shown;
         saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
         return picked;
+    }
+
+    /** Time away from the Home does not count: a picture changes under the eyes, never on the way back. */
+    static void leaveHome(Context context) {
+        prefs(context).edit().putLong("home_left", System.currentTimeMillis()).apply();
+    }
+
+    static void backHome(Context context) {
+        SharedPreferences saved = prefs(context);
+        long left = saved.getLong("home_left", 0);
+        long away = System.currentTimeMillis() - left;
+        if (left == 0 || away <= 0 || !saved.contains("abstract_at")) return;
+        saved.edit().putLong("abstract_at", saved.getLong("abstract_at", 0) + away).apply();
+    }
+
+    /** True once per power-on, for the picture that fades in with the Home. */
+    static boolean firstSinceBoot(Context context) {
+        int boot = Settings.Global.getInt(context.getContentResolver(), Settings.Global.BOOT_COUNT, 0);
+        SharedPreferences saved = prefs(context);
+        if (saved.getInt("faded_boot", -1) == boot) return false;
+        saved.edit().putInt("faded_boot", boot).apply();
+        return true;
     }
 
     /** Any but the one on show. Null if the set cannot be read. */

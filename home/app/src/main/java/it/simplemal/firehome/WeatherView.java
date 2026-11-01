@@ -124,7 +124,9 @@ final class WeatherView extends View {
         scene = loaded;
         if (previous != null && onFade != null) onFade.accept(true);
         double time = now();
-        fadeStart = time;
+        // Only the first picture since power-on comes in slowly. Reloaded later, it is simply there.
+        boolean quiet = previous == null && !Look.firstSinceBoot(getContext());
+        fadeStart = quiet ? time - FADE_S : time;
         if (previous == null) enteredAt = time;
         unflatten();
         setVisibility(VISIBLE);
