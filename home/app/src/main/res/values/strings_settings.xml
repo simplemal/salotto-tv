@@ -247,6 +247,16 @@
     <string name="settings_saver_date">Data</string>
     <string name="settings_saver_weather">Meteo</string>
     <string name="settings_saver_shows_text">Se mostrarlo sul salvaschermo.</string>
+    <string name="settings_saver_place">Posizione dell\'ora</string>
+    <string name="settings_saver_place_text">Dove stanno ora, data e meteo.</string>
+    <string-array name="settings_saver_places">
+        <item>Cambia da sola</item>
+        <item>In alto a sinistra</item>
+        <item>In alto a destra</item>
+        <item>In basso a sinistra</item>
+        <item>In basso a destra</item>
+        <item>Al centro</item>
+    </string-array>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Quale salvaschermo usare.</string>
     <string name="settings_saver_after">Si avvia dopo</string>

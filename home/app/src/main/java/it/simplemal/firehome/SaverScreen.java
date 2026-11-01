@@ -35,6 +35,9 @@ final class SaverScreen {
     private static final int SHADOW_COLOR = Color.argb(170, 0, 0, 0);
     private static final int[] CORNERS = {Gravity.BOTTOM | Gravity.LEFT, Gravity.BOTTOM | Gravity.RIGHT,
         Gravity.TOP | Gravity.LEFT, Gravity.TOP | Gravity.RIGHT};
+    /** In the order of the choice in the Settings, after «moves with each picture». */
+    private static final int[] PLACES = {0, Gravity.TOP | Gravity.LEFT, Gravity.TOP | Gravity.RIGHT,
+        Gravity.BOTTOM | Gravity.LEFT, Gravity.BOTTOM | Gravity.RIGHT, Gravity.CENTER};
 
     private final Context context;
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -44,6 +47,7 @@ final class SaverScreen {
     private final ImageView below;
     private final ImageView above;
     private final LinearLayout clock;
+    private final int fixed;
     private String shown;
 
     SaverScreen(Context context) {
@@ -71,7 +75,10 @@ final class SaverScreen {
             line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);
             clock.addView(line);
         }
-        root.addView(clock, corner(CORNERS[0]));
+        int place = Look.saverPlace(context);
+        fixed = place > 0 && place < PLACES.length ? PLACES[place] : 0;
+        if (fixed == Gravity.CENTER) clock.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.addView(clock, corner(fixed != 0 ? fixed : CORNERS[0]));
     }
 
     View view() { return root; }
@@ -128,7 +135,7 @@ final class SaverScreen {
 
     private void arrive(String file, Bitmap picture) {
         shown = file;
-        clock.setLayoutParams(corner(CORNERS[chance.nextInt(CORNERS.length)]));
+        if (fixed == 0) clock.setLayoutParams(corner(CORNERS[chance.nextInt(CORNERS.length)]));
         above.setImageBitmap(picture);
         above.setAlpha(0f);
         above.setVisibility(View.VISIBLE);

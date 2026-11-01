@@ -248,6 +248,16 @@
     <string name="settings_saver_date">Fecha</string>
     <string name="settings_saver_weather">Tiempo</string>
     <string name="settings_saver_shows_text">Si se muestra en el salvapantallas.</string>
+    <string name="settings_saver_place">Posición de la hora</string>
+    <string name="settings_saver_place_text">Dónde van la hora, la fecha y el tiempo.</string>
+    <string-array name="settings_saver_places">
+        <item>Cambia sola</item>
+        <item>Arriba a la izquierda</item>
+        <item>Arriba a la derecha</item>
+        <item>Abajo a la izquierda</item>
+        <item>Abajo a la derecha</item>
+        <item>En el centro</item>
+    </string-array>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Qué salvapantallas usar.</string>
     <string name="settings_saver_after">Se inicia tras</string>

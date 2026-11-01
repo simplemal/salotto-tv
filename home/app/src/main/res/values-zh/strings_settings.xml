@@ -248,6 +248,16 @@
     <string name="settings_saver_date">日期</string>
     <string name="settings_saver_weather">天气</string>
     <string name="settings_saver_shows_text">是否在屏保上显示。</string>
+    <string name="settings_saver_place">时钟位置</string>
+    <string name="settings_saver_place_text">时间、日期和天气的显示位置。</string>
+    <string-array name="settings_saver_places">
+        <item>自动更换</item>
+        <item>左上角</item>
+        <item>右上角</item>
+        <item>左下角</item>
+        <item>右下角</item>
+        <item>居中</item>
+    </string-array>
     <string name="settings_saver_kind">类型</string>
     <string name="settings_saver_kind_text">使用哪种屏保。</string>
     <string name="settings_saver_after">多久后启动</string>

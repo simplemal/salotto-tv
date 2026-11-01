@@ -247,6 +247,16 @@
     <string name="settings_saver_date">Data</string>
     <string name="settings_saver_weather">Clima</string>
     <string name="settings_saver_shows_text">Se aparece no protetor de tela.</string>
+    <string name="settings_saver_place">Posição da hora</string>
+    <string name="settings_saver_place_text">Onde ficam a hora, a data e o clima.</string>
+    <string-array name="settings_saver_places">
+        <item>Muda sozinha</item>
+        <item>Em cima à esquerda</item>
+        <item>Em cima à direita</item>
+        <item>Embaixo à esquerda</item>
+        <item>Embaixo à direita</item>
+        <item>No centro</item>
+    </string-array>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Qual protetor de tela usar.</string>
     <string name="settings_saver_after">Inicia depois de</string>

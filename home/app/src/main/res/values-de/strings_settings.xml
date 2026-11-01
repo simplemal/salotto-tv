@@ -247,6 +247,16 @@
     <string name="settings_saver_date">Datum</string>
     <string name="settings_saver_weather">Wetter</string>
     <string name="settings_saver_shows_text">Ob es auf dem Bildschirmschoner erscheint.</string>
+    <string name="settings_saver_place">Position der Uhr</string>
+    <string name="settings_saver_place_text">Wo Uhrzeit, Datum und Wetter stehen.</string>
+    <string-array name="settings_saver_places">
+        <item>Wechselt von selbst</item>
+        <item>Oben links</item>
+        <item>Oben rechts</item>
+        <item>Unten links</item>
+        <item>Unten rechts</item>
+        <item>Mitte</item>
+    </string-array>
     <string name="settings_saver_kind">Art</string>
     <string name="settings_saver_kind_text">Welcher Bildschirmschoner genutzt wird.</string>
     <string name="settings_saver_after">Startet nach</string>

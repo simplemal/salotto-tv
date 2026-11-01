@@ -247,6 +247,16 @@
     <string name="settings_saver_date">Дата</string>
     <string name="settings_saver_weather">Погода</string>
     <string name="settings_saver_shows_text">Показывать ли на заставке.</string>
+    <string name="settings_saver_place">Положение часов</string>
+    <string name="settings_saver_place_text">Где показывать время, дату и погоду.</string>
+    <string-array name="settings_saver_places">
+        <item>Меняется само</item>
+        <item>Вверху слева</item>
+        <item>Вверху справа</item>
+        <item>Внизу слева</item>
+        <item>Внизу справа</item>
+        <item>По центру</item>
+    </string-array>
     <string name="settings_saver_kind">Тип</string>
     <string name="settings_saver_kind_text">Какую заставку использовать.</string>
     <string name="settings_saver_after">Запускается через</string>

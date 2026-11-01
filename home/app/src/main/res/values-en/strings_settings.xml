@@ -247,6 +247,16 @@
     <string name="settings_saver_date">Date</string>
     <string name="settings_saver_weather">Weather</string>
     <string name="settings_saver_shows_text">Whether to show it on the screensaver.</string>
+    <string name="settings_saver_place">Clock position</string>
+    <string name="settings_saver_place_text">Where the time, date and weather go.</string>
+    <string-array name="settings_saver_places">
+        <item>Moves by itself</item>
+        <item>Top left</item>
+        <item>Top right</item>
+        <item>Bottom left</item>
+        <item>Bottom right</item>
+        <item>Centre</item>
+    </string-array>
     <string name="settings_saver_kind">Type</string>
     <string name="settings_saver_kind_text">Which screensaver to use.</string>
     <string name="settings_saver_after">Starts after</string>

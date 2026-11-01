@@ -198,6 +198,9 @@ final class Look {
     static void setSaverTime(Context context, boolean on) { prefs(context).edit().putBoolean("saver_time", on).apply(); }
     static boolean saverDate(Context context) { return prefs(context).getBoolean("saver_date", true); }
     static void setSaverDate(Context context, boolean on) { prefs(context).edit().putBoolean("saver_date", on).apply(); }
+    /** 0 moves with each picture, then the four corners and the centre. */
+    static int saverPlace(Context context) { return prefs(context).getInt("saver_place", 0); }
+    static void setSaverPlace(Context context, int place) { prefs(context).edit().putInt("saver_place", place).apply(); }
     static boolean saverWeather(Context context) { return prefs(context).getBoolean("saver_weather", false); }
     static void setSaverWeather(Context context, boolean on) { prefs(context).edit().putBoolean("saver_weather", on).apply(); }
 

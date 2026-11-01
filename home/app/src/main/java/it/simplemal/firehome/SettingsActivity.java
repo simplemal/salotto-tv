@@ -1661,15 +1661,36 @@ public final class SettingsActivity extends CardActivity {
         boolean on = saverOn();
         boolean own = ownSaver();
         Drawable picture = getDrawable(R.drawable.ic_image);
-        show(getString(R.string.settings_saver), Arrays.asList(
+        List<Entry> entries = new ArrayList<>(Arrays.asList(
             new Entry(getString(R.string.settings_saver_active), on ? YES : NO, picture,
                 getString(R.string.settings_saver_active_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
             new Entry(getString(R.string.settings_saver_kind), own ? ownSaverName() : "Fire OS", getDrawable(R.drawable.ic_photo),
                 getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
-            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
-            new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
-                () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver()))));
+            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes))));
+        if (own) {
+            entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
+            entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
+            entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
+            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
+        }
+        entries.add(new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
+            () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver())));
+        show(getString(R.string.settings_saver), entries);
+    }
+
+    private String[] saverPlaces() {
+        return getResources().getStringArray(R.array.settings_saver_places);
+    }
+
+    private void showSaverPlaces() {
+        Level level = levels.peek();
+        show(getString(R.string.settings_saver_place), choices(saverPlaces(), Look.saverPlace(this), R.drawable.ic_clock,
+            getString(R.string.settings_saver_place_text), index -> {
+                Look.setSaverPlace(this, index);
+                backFrom(level);
+            }));
     }
 
     /** Only one screensaver runs at a time: choosing ours is what turns off Fire OS's. */
@@ -1690,12 +1711,7 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
-        if (own) {
-            entries.add(paceEntry());
-            entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
-            entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
-            entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
-        }
+        if (own) entries.add(paceEntry());
         show(getString(R.string.settings_saver_kind), entries);
     }
 

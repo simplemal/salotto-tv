@@ -247,6 +247,16 @@
     <string name="settings_saver_date">التاريخ</string>
     <string name="settings_saver_weather">الطقس</string>
     <string name="settings_saver_shows_text">إظهاره على شاشة التوقف أو إخفاؤه.</string>
+    <string name="settings_saver_place">موضع الساعة</string>
+    <string name="settings_saver_place_text">مكان الوقت والتاريخ والطقس.</string>
+    <string-array name="settings_saver_places">
+        <item>يتغير تلقائيًا</item>
+        <item>أعلى اليسار</item>
+        <item>أعلى اليمين</item>
+        <item>أسفل اليسار</item>
+        <item>أسفل اليمين</item>
+        <item>في الوسط</item>
+    </string-array>
     <string name="settings_saver_kind">النوع</string>
     <string name="settings_saver_kind_text">أي شاشة توقف تُستخدم.</string>
     <string name="settings_saver_after">تبدأ بعد</string>
