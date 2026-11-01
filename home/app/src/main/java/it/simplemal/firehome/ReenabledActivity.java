@@ -39,8 +39,7 @@ public final class ReenabledActivity extends CardActivity {
     @Override public void onBackPressed() { back.run(); }
 
     private void showReenabled(ArrayList<String> names) {
-        heading("Fire OS ha riattivato alcune parti",
-            "Probabilmente con un aggiornamento. Avevi spento queste funzioni:");
+        heading(getString(R.string.reenabled_title), getString(R.string.reenabled_text));
         back = this::finish;
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
@@ -54,15 +53,17 @@ public final class ReenabledActivity extends CardActivity {
             list.addView(line);
         }
         if (names.size() > shown) {
-            TextView more = label(shown == 0 ? names.size() + " parti di Fire OS" : "e altre " + (names.size() - shown) + " parti di Fire OS", 14);
+            int left = names.size() - shown;
+            TextView more = label(getResources().getQuantityString(
+                shown == 0 ? R.plurals.reenabled_parts : R.plurals.reenabled_more_parts, left, left), 14);
             more.setGravity(Gravity.CENTER);
             more.setAlpha(0.7f);
             list.addView(more);
         }
         page.addView(list);
-        TextView off = button("Spegnili", BUTTON_SP, () -> warnBeforeTurningOff(names));
+        TextView off = button(getString(R.string.reenabled_turn_off), BUTTON_SP, () -> warnBeforeTurningOff(names));
         page.addView(off, wide(26));
-        page.addView(button("Lasciali attivi", BUTTON_SP, () -> leaveOn(names)), wide(10));
+        page.addView(button(getString(R.string.reenabled_leave_on), BUTTON_SP, () -> leaveOn(names)), wide(10));
         off.requestFocus();
     }
 
@@ -72,17 +73,16 @@ public final class ReenabledActivity extends CardActivity {
     }
 
     private void warnBeforeTurningOff(ArrayList<String> names) {
-        heading("Prima di spegnerli",
-            "La TV chiederà «Consenti debug wireless su questa rete?».\nRispondi Consenti: è una domanda di Android.");
+        heading(getString(R.string.reenabled_before), getString(R.string.reenabled_before_text));
         back = () -> showReenabled(names);
-        TextView go = button("Continua", BUTTON_SP, () -> turnOff(names));
+        TextView go = button(getString(R.string.reenabled_continue), BUTTON_SP, () -> turnOff(names));
         page.addView(go, wide(26));
-        page.addView(button("Annulla", BUTTON_SP, () -> showReenabled(names)), wide(10));
+        page.addView(button(getString(R.string.card_cancel), BUTTON_SP, () -> showReenabled(names)), wide(10));
         go.requestFocus();
     }
 
     private void turnOff(ArrayList<String> names) {
-        heading("Li sto spegnendo", "Un attimo.");
+        heading(getString(R.string.reenabled_working), getString(R.string.reenabled_moment));
         back = () -> { };
         ProgressBar wheel = new ProgressBar(this);
         wheel.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
@@ -94,9 +94,9 @@ public final class ReenabledActivity extends CardActivity {
                 finish();
                 return;
             }
-            heading("Non è stato possibile", "Se la TV ha chiesto il permesso, serve rispondere Consenti.");
+            heading(getString(R.string.reenabled_failed), getString(R.string.reenabled_failed_text));
             back = this::finish;
-            TextView close = button("Chiudi", BUTTON_SP, this::finish);
+            TextView close = button(getString(R.string.card_close), BUTTON_SP, this::finish);
             page.addView(close, wide(26));
             close.requestFocus();
         });

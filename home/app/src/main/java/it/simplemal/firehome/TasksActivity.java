@@ -108,7 +108,7 @@ public final class TasksActivity extends CardActivity {
         column.addView(title, new LinearLayout.LayoutParams(-1, -2));
         button = label("✕", 13);
         button.setGravity(Gravity.CENTER);
-        button.setContentDescription("Chiudi");
+        button.setContentDescription(getString(R.string.card_close));
         button.setOnClickListener(view -> stopSelected());
         buttonFill.setShape(GradientDrawable.OVAL);
         button.setBackground(buttonFill);
@@ -251,8 +251,7 @@ public final class TasksActivity extends CardActivity {
         title.setVisibility(any ? View.VISIBLE : View.INVISIBLE);
         button.setVisibility(any ? View.VISIBLE : View.INVISIBLE);
         if (!any) {
-            message.setText(usageAllowed ? "Nessuna app aperta"
-                : "Per vedere le app aperte, Salotto ha bisogno del permesso sui dati di utilizzo.");
+            message.setText(usageAllowed ? R.string.tasks_none : R.string.tasks_no_permission);
             return;
         }
         title.setText(apps.get(index).label);
@@ -302,7 +301,7 @@ public final class TasksActivity extends CardActivity {
             stopping = false;
             if (isFinishing()) return;
             if (!stopped) {
-                sayLong("Non è stato possibile chiuderla: da qui si chiude con Forza arresto");
+                sayLong(getString(R.string.tasks_stop_failed));
                 appInfo(pkg);
             } else if (latest) {
                 open(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));

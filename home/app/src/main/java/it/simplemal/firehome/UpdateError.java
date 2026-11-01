@@ -1,5 +1,8 @@
 package it.simplemal.firehome;
 
+import android.content.Context;
+import java.util.Locale;
+
 /**
  * Everything that can go wrong in an update. F is before anything changes, C during the
  * installation, R while going back. distro/tools/genera-errori.py builds ERRORI.md from this list,
@@ -72,14 +75,20 @@ enum UpdateError {
 
     String code() { return "SAL-" + name(); }
 
+    /** The title in the TV's language. The Italian one above stays for the public page. */
+    String title(Context context) {
+        String key = "update_error_" + name().toLowerCase(Locale.ROOT);
+        return context.getString(context.getResources().getIdentifier(key, "string", context.getPackageName()));
+    }
+
     /** What people need to know first: what became of Salotto. */
-    String outcome() {
+    String outcome(Context context) {
         switch (this) {
-            case C202: return "Salotto è rimasta alla versione precedente";
-            case C203: case C204: case C205: case C206: return "Salotto è tornata alla versione precedente";
-            case R302: return "Salotto non è tornata alla versione precedente";
-            case R303: return "Stato di Salotto sconosciuto";
-            default: return "Salotto non è stata modificata";
+            case C202: return context.getString(R.string.update_outcome_stayed);
+            case C203: case C204: case C205: case C206: return context.getString(R.string.update_outcome_back);
+            case R302: return context.getString(R.string.update_outcome_not_back);
+            case R303: return context.getString(R.string.update_outcome_unknown);
+            default: return context.getString(R.string.update_outcome_untouched);
         }
     }
 

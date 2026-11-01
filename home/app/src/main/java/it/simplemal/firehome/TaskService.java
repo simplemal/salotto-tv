@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -133,6 +134,8 @@ public final class TaskService extends AccessibilityService {
     private volatile AdbClient client;
     private volatile Runnable homeLog;
     private boolean refused;
+    private String wordsLanguage;
+    private Resources words;
     private boolean waitsAnswer;
     private boolean keyFired;
     private FireSteps fireSteps;
@@ -197,8 +200,8 @@ public final class TaskService extends AccessibilityService {
         }
         String name = HomeApps.label(service, pkg);
         Intent page = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
-        service.onFirePage(page, new String[][]{Fire.FORCE_STOP}, new String[]{"Premi OK per chiudere " + name},
-            "Sto chiudendo " + name, done);
+        service.onFirePage(page, new String[][]{Fire.FORCE_STOP}, new String[]{service.getString(R.string.task_press_to_close, name)},
+            service.getString(R.string.task_closing, name), done);
     }
 
     /**
@@ -218,7 +221,7 @@ public final class TaskService extends AccessibilityService {
     }
 
     private void coverForStop(Bitmap picture, String pkg, IntConsumer answer) {
-        FrameLayout cover = mask("Sto chiudendo " + HomeApps.label(this, pkg), picture);
+        FrameLayout cover = mask(getString(R.string.task_closing, HomeApps.label(this, pkg)), picture);
         View working = cover.findViewWithTag(MASK_WORKING);
         working.setVisibility(View.GONE);
         cover.findViewWithTag(MASK_DIM).setVisibility(View.GONE);
@@ -262,7 +265,8 @@ public final class TaskService extends AccessibilityService {
         TaskService service = running;
         if (service == null) return;
         service.onFirePage(new Intent(Fire.DEVICE_PAGE), new String[][]{Fire.RESTART, Fire.RESTART},
-            new String[]{"Confermi il riavvio? Premi OK", "Premi OK ancora una volta"}, "Riavvio della Stick", null);
+            new String[]{service.getString(R.string.task_restart_confirm), service.getString(R.string.task_restart_again)},
+            service.getString(R.string.task_restarting), null);
     }
 
     /** `done` null: what comes next is the end of the screen, so the mask stays. Back gives up. */
@@ -478,6 +482,20 @@ public final class TaskService extends AccessibilityService {
             service.refused = false;
             service.connected();
         });
+    }
+
+    @Override protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Language.apply(base));
+    }
+
+    /** A service outlives a change of language: its words are looked up each time. */
+    @Override public Resources getResources() {
+        String code = Language.code(getBaseContext());
+        if (!code.equals(wordsLanguage)) {
+            wordsLanguage = code;
+            words = Language.apply(getBaseContext()).getResources();
+        }
+        return words;
     }
 
     @Override protected void onServiceConnected() {

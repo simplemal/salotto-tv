@@ -12,9 +12,6 @@ import java.util.List;
 
 /** Every installed app, opened from the Home's small band; holding OK edits the Home list. */
 public final class AppsActivity extends CardActivity {
-    private static final String ADD_HINT = "Tieni premuto OK per aggiungerla alla Home";
-    private static final String REMOVE_HINT = "Questa app è già nella Home. Tieni premuto OK per toglierla";
-
     private TextView hint;
     private LinearLayout page;
     private List<String> home;
@@ -89,14 +86,15 @@ public final class AppsActivity extends CardActivity {
     @Override protected void appRemoved() { render(focusedTag()); }
 
     @Override protected void onCardFocus(View tile) {
-        hint.setText(home.contains(tile.getTag()) ? REMOVE_HINT : ADD_HINT);
+        hint.setText(home.contains(tile.getTag()) ? R.string.apps_remove_hint : R.string.apps_add_hint);
     }
 
     private void showMenu(HomeApps.App app) {
         boolean listed = home.contains(app.pkg);
         dialog()
             .setTitle(app.label)
-            .setItems(new String[]{listed ? "Togli dalla Home" : "Aggiungi alla Home", "Informazioni app", "Disinstalla"},
+            .setItems(new String[]{getString(listed ? R.string.card_remove_from_home : R.string.card_add_to_home),
+                    getString(R.string.card_app_info), getString(R.string.card_uninstall)},
                 (dialog, choice) -> {
                     if (choice == 1) {
                         appInfo(app.pkg);

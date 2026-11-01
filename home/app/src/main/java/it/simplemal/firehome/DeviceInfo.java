@@ -61,14 +61,14 @@ final class DeviceInfo {
 
     static List<String[]> system(Context context) {
         List<String[]> rows = new ArrayList<>();
-        rows.add(new String[]{"Nome", name(context)});
-        rows.add(new String[]{"Modello", Build.MODEL});
-        rows.add(new String[]{"Sistema", fireOs()});
+        rows.add(new String[]{context.getString(R.string.device_name), name(context)});
+        rows.add(new String[]{context.getString(R.string.device_model), Build.MODEL});
+        rows.add(new String[]{context.getString(R.string.device_system), fireOs()});
         rows.add(new String[]{"Android", Build.VERSION.RELEASE});
-        rows.add(new String[]{"Schermo", screen(context)});
-        rows.add(new String[]{"Memoria libera", memory(context)});
-        rows.add(new String[]{"Spazio libero", storage(context)});
-        rows.add(new String[]{"Accesa da", uptime()});
+        rows.add(new String[]{context.getString(R.string.device_screen), screen(context)});
+        rows.add(new String[]{context.getString(R.string.device_memory), memory(context)});
+        rows.add(new String[]{context.getString(R.string.device_storage), storage(context)});
+        rows.add(new String[]{context.getString(R.string.device_on_for), uptime(context)});
         return rows;
     }
 
@@ -77,10 +77,10 @@ final class DeviceInfo {
         WifiManager wifi = context.getSystemService(WifiManager.class);
         WifiInfo info = wifi.getConnectionInfo();
         int address = info.getIpAddress();
-        rows.add(new String[]{"Indirizzo IP", address == 0 ? "Non collegato" : String.format(Locale.ROOT, "%d.%d.%d.%d",
-            address & 255, address >> 8 & 255, address >> 16 & 255, address >> 24 & 255)});
-        rows.add(new String[]{"Segnale", address == 0 ? "—" : info.getRssi() + " dBm"});
-        rows.add(new String[]{"Velocità", address == 0 ? "—" : info.getLinkSpeed() + " Mbps"});
+        rows.add(new String[]{context.getString(R.string.device_ip), address == 0 ? context.getString(R.string.panel_not_connected)
+            : String.format(Locale.ROOT, "%d.%d.%d.%d", address & 255, address >> 8 & 255, address >> 16 & 255, address >> 24 & 255)});
+        rows.add(new String[]{context.getString(R.string.device_signal), address == 0 ? "—" : info.getRssi() + " dBm"});
+        rows.add(new String[]{context.getString(R.string.device_speed), address == 0 ? "—" : info.getLinkSpeed() + " Mbps"});
         return rows;
     }
 
@@ -115,17 +115,18 @@ final class DeviceInfo {
     private static String memory(Context context) {
         ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
         context.getSystemService(ActivityManager.class).getMemoryInfo(memory);
-        return String.format(Locale.ITALIAN, "%.1f di %.1f GB", (double) memory.availMem / GB, (double) memory.totalMem / GB);
+        return context.getString(R.string.device_free_of, (double) memory.availMem / GB, (double) memory.totalMem / GB);
     }
 
     private static String storage(Context context) {
         StatFs disk = new StatFs(context.getFilesDir().getPath());
-        return String.format(Locale.ITALIAN, "%.1f di %.1f GB", (double) disk.getAvailableBytes() / GB,
+        return context.getString(R.string.device_free_of, (double) disk.getAvailableBytes() / GB,
             (double) disk.getTotalBytes() / GB);
     }
 
-    private static String uptime() {
+    private static String uptime(Context context) {
         long minutes = SystemClock.elapsedRealtime() / Fire.MINUTE_MS;
-        return minutes >= 60 ? minutes / 60 + " h " + minutes % 60 + " min" : minutes + " min";
+        return minutes >= 60 ? context.getString(R.string.device_uptime_hours, minutes / 60, minutes % 60)
+            : context.getString(R.string.device_uptime_minutes, minutes);
     }
 }

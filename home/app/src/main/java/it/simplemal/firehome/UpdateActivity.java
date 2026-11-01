@@ -54,10 +54,10 @@ public final class UpdateActivity extends CardActivity {
     private static final int BAR_HEIGHT = 5;
     private static final long PAGE_DRAWN_MS = 100;
 
-    private static final List<String> STEPS = Arrays.asList(
-        "Cerco la nuova versione", "Controllo spazio e collegamento", "Scarico l’aggiornamento",
-        "Verifico che il file sia integro e firmato", "Salvo le tue scelte", "Salvo la versione attuale",
-        "Installo la nuova versione", "Controllo che tutto funzioni");
+    private static final int[] STEPS = {
+        R.string.update_step_check, R.string.update_step_room, R.string.update_step_download,
+        R.string.update_step_verify, R.string.update_step_choices, R.string.update_step_copy,
+        R.string.update_step_install, R.string.update_step_health};
     private static final List<String> UNFINISHED = Arrays.asList("installing", OLD_SCRIPT, "rollback");
     private static final int CHECK = 0;
     private static final int ROOM = 1;
@@ -130,8 +130,8 @@ public final class UpdateActivity extends CardActivity {
 
     private void look() {
         clear();
-        title.setText(Brand.mark(this, "Aggiornamento di Salotto"));
-        line = text("Cerco una nuova versione…", 19, false);
+        title.setText(Brand.mark(this, getString(R.string.update_title)));
+        line = text(getString(R.string.update_looking), 19, false);
         body.addView(line);
         background(() -> {
             Updater.Release found = Updater.check(this);
@@ -144,15 +144,15 @@ public final class UpdateActivity extends CardActivity {
 
     private void showCurrent() {
         clear();
-        title.setText(Brand.mark(this, "Salotto è aggiornata"));
-        body.addView(text("Hai l’ultima versione disponibile.", 19, false));
-        actions(action("Chiudi", this::finish));
+        title.setText(Brand.mark(this, getString(R.string.update_current)));
+        body.addView(text(getString(R.string.update_current_text), 19, false));
+        actions(action(getString(R.string.card_close), this::finish));
     }
 
     private void showOffer(Updater.Release found) {
         release = found;
         clear();
-        title.setText(Brand.mark(this, "È disponibile Salotto " + found.versionName));
+        title.setText(Brand.mark(this, getString(R.string.update_available, found.versionName)));
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
         list.setPadding(dp(20), dp(2), dp(15), dp(2));
@@ -175,8 +175,8 @@ public final class UpdateActivity extends CardActivity {
         // Up reaches the list only when there is more of it to see.
         box.post(() -> box.setFocusable(box.canScrollVertically(1)));
         body.addView(box, new LinearLayout.LayoutParams(-1, -1));
-        View later = action("Più tardi", this::finish);
-        actions(action("Aggiorna", this::start), later);
+        View later = action(getString(R.string.update_later), this::finish);
+        actions(action(getString(R.string.update_start), this::start), later);
         // This page opens by itself: an OK meant for something else must not start an update.
         later.requestFocusFromTouch();
     }
@@ -191,13 +191,13 @@ public final class UpdateActivity extends CardActivity {
 
     private void showSteps() {
         clear();
-        title.setText(Brand.mark(this, "Aggiornamento a Salotto " + (release != null ? release.versionName : BuildVersion.name(this))));
+        title.setText(Brand.mark(this, getString(R.string.update_to, release != null ? release.versionName : BuildVersion.name(this))));
         LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(24), dp(18), dp(24), dp(18));
         paintBox(panel);
-        for (String step : STEPS) {
-            TextView view = label("○  " + step, STEP_SP);
+        for (int step : STEPS) {
+            TextView view = label("○  " + getString(step), STEP_SP);
             view.setAlpha(0.55f);
             view.setPadding(0, dp(3), 0, dp(3));
             stepViews.add(view);
@@ -235,10 +235,10 @@ public final class UpdateActivity extends CardActivity {
             for (int index = 0; index < stepViews.size(); index++) {
                 TextView view = stepViews.get(index);
                 boolean done = index < step;
-                view.setText((done ? "✓  " : index == step ? "●  " : "○  ") + STEPS.get(index));
+                view.setText((done ? "✓  " : index == step ? "●  " : "○  ") + getString(STEPS[index]));
                 view.setAlpha(index <= step ? 1f : 0.55f);
             }
-            bar.setProgress((step * 100) / STEPS.size());
+            bar.setProgress((step * 100) / STEPS.length);
             line.setText(detail);
         });
     }
@@ -259,22 +259,22 @@ public final class UpdateActivity extends CardActivity {
         busy = true;
         showSteps();
         background(() -> {
-            step(CHECK, "Controllo che la nuova versione sia autentica.");
+            step(CHECK, getString(R.string.update_detail_check));
             release = Updater.check(this);
             if (release == null) throw new Updater.Failure(UpdateError.F105);
-            step(ROOM, "Controllo che ci sia spazio e che nulla sia in riproduzione.");
+            step(ROOM, getString(R.string.update_detail_room));
             Updater.checkIdle(this);
             Updater.checkRoom(this, release);
-            step(DOWNLOAD, "Sto scaricando il file. Salotto continua a funzionare come prima.");
+            step(DOWNLOAD, getString(R.string.update_detail_download));
             File apk = Updater.download(this, release, done -> main.post(() -> {
-                bar.setProgress((DOWNLOAD * 100 + done) / STEPS.size());
-                line.setText("Sto scaricando il file: " + done + "%.");
+                bar.setProgress((DOWNLOAD * 100 + done) / STEPS.length);
+                line.setText(getString(R.string.update_detail_percent, done));
             }));
-            step(VERIFY, "Controllo impronta, firma e versione del file.");
+            step(VERIFY, getString(R.string.update_detail_verify));
             Updater.inspect(this, apk, release);
-            step(CHOICES, "Salvo app, aspetto e meteo in una copia di sicurezza.");
+            step(CHOICES, getString(R.string.update_detail_choices));
             saveChoices();
-            step(COPY, "Fin qui non è cambiato nulla. Ora conservo la versione attuale per poterci tornare.");
+            step(COPY, getString(R.string.update_detail_copy));
             Updater.keepCurrent(this);
             allowInstalling();
             Updater.recheck(apk, release);
@@ -285,7 +285,7 @@ public final class UpdateActivity extends CardActivity {
     /** Given at installation: only a Stick set up by an older version comes through here, once. */
     private void allowInstalling() throws Updater.Failure {
         if (getPackageManager().canRequestPackageInstalls()) return;
-        step(COPY, "La TV può chiedere se consentire il debug: rispondi Consenti. Serve solo questa volta.");
+        step(COPY, getString(R.string.update_detail_allow));
         waitForConnection();
         TaskService.shell("appops set " + getPackageName() + " REQUEST_INSTALL_PACKAGES allow", output -> { });
         long limit = System.currentTimeMillis() + ALLOW_WAIT_MS;
@@ -324,7 +324,7 @@ public final class UpdateActivity extends CardActivity {
     private void install(File apk) throws Updater.Failure {
         Updater.setTarget(this, release.versionCode);
         Updater.write(Updater.state(this), "installing");
-        step(INSTALL, "Sto installando. Mancano pochi secondi.");
+        step(INSTALL, getString(R.string.update_detail_install));
         main.postDelayed(() -> {
             Cover.keepPage(page);
             background(() -> replace(apk));
@@ -365,7 +365,7 @@ public final class UpdateActivity extends CardActivity {
     }
 
     private void confirmHealth() {
-        step(HEALTH, "La nuova versione è installata. Controllo che tutto funzioni.");
+        step(HEALTH, getString(R.string.update_detail_health));
         background(() -> {
             long limit = System.currentTimeMillis() + HEALTH_WAIT_MS;
             String verdict = "good";
@@ -395,7 +395,7 @@ public final class UpdateActivity extends CardActivity {
     }
 
     private void goBack(String verdict) {
-        step(HEALTH, "Qualcosa non va: torno alla versione precedente. Se la TV lo chiede, rispondi Consenti.");
+        step(HEALTH, getString(R.string.update_detail_back_ask));
         background(() -> {
             try {
                 waitForConnection();
@@ -438,7 +438,7 @@ public final class UpdateActivity extends CardActivity {
         } else if (expired() || !UNFINISHED.contains(kind)) {
             showError(UpdateError.R303);
         } else {
-            if (kind.equals("rollback")) step(HEALTH, "Qualcosa non va: torno alla versione precedente.");
+            if (kind.equals("rollback")) step(HEALTH, getString(R.string.update_detail_back));
             main.postDelayed(() -> finishFrom(Updater.read(Updater.state(this))), POLL_MS);
         }
     }
@@ -454,8 +454,8 @@ public final class UpdateActivity extends CardActivity {
     private void showDone() {
         busy = false;
         clear();
-        title.setText("Aggiornamento completato");
-        body.addView(text("Ora hai Salotto " + BuildVersion.name(this) + ".", 19, false));
+        title.setText(getString(R.string.update_done));
+        body.addView(text(getString(R.string.update_done_text, BuildVersion.name(this)), 19, false));
         forget();
         main.postDelayed(this::home, HOME_AFTER_MS);
     }
@@ -471,19 +471,19 @@ public final class UpdateActivity extends CardActivity {
         busy = false;
         forget();
         clear();
-        title.setText(error.outcome());
-        TextView problem = text(error.title + " (" + error.code() + ")", ERROR_SP, false);
+        title.setText(error.outcome(this));
+        TextView problem = text(getString(R.string.update_problem_line, error.title(this), error.code()), ERROR_SP, false);
         problem.setPadding(0, 0, 0, dp(16));
         body.addView(problem);
         ImageView code = new ImageView(this);
         code.setImageResource(R.drawable.qr_errori);
         body.addView(code, new LinearLayout.LayoutParams(-2, -2));
-        TextView help = text("Inquadralo con il telefono per saperne di più", CHANGE_SP, false);
+        TextView help = text(getString(R.string.update_scan_help), CHANGE_SP, false);
         help.setPadding(0, dp(12), 0, 0);
         body.addView(help);
         // Reopened by the install script, this page has nothing of Salotto beneath it.
         boolean alone = getIntent().getBooleanExtra(EXTRA_AFTER, false);
-        actions(action("Chiudi", alone ? this::home : this::finish));
+        actions(action(getString(R.string.card_close), alone ? this::home : this::finish));
     }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {

@@ -21,15 +21,18 @@ import java.util.function.Consumer;
 /** The saved appearance of the Home: grid, clock and backdrop. Only the weather backdrop changes on its own. */
 final class Look {
     static final int[] COLUMN_CHOICES = {5, 6};
-    static final String[] FONT_NAMES = {"Sottile", "Leggero", "Normale", "Medio", "Serif", "Monospazio", "Corsivo"};
+    private static final int[] FONT_LABELS = {R.string.look_font_thin, R.string.look_font_light, R.string.look_font_normal,
+        R.string.look_font_medium, R.string.look_font_serif, R.string.look_font_mono, R.string.look_font_cursive};
     static final String[] FONT_FAMILIES = {"sans-serif-thin", "sans-serif-light", "sans-serif",
         "sans-serif-medium", "serif", "monospace", "cursive"};
-    static final String[] NAME_MODES = {"Solo sulla selezionata", "Sempre", "Mai"};
+    private static final int[] NAME_MODE_LABELS = {R.string.look_names_on_focus, R.string.look_names_always, R.string.look_names_never};
     static final int NAMES_ON_FOCUS = 0;
     static final int NAMES_ALWAYS = 1;
-    static final String[] SIZE_NAMES = {"Piccolo", "Medio", "Grande"};
+    private static final int[] SIZE_LABELS = {R.string.look_size_small, R.string.look_size_medium, R.string.look_size_large};
     static final int[] SIZES = {64, 96, 132};
     static final String[] PRESET_NAMES = {"Notte", "Oceano", "Bosco", "Tramonto", "Grafite"};
+    private static final int[] PRESET_LABELS = {R.string.first_backdrop_night, R.string.first_backdrop_ocean,
+        R.string.first_backdrop_forest, R.string.first_backdrop_sunset, R.string.first_backdrop_graphite};
     private static final int[][] PRESET_COLORS = {
         {Color.rgb(44, 50, 62), Color.rgb(10, 12, 16)},
         {Color.rgb(24, 66, 120), Color.rgb(6, 14, 30)},
@@ -58,6 +61,25 @@ final class Look {
 
     private static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
+    }
+
+    private static String[] words(Context context, int[] labels) {
+        String[] words = new String[labels.length];
+        for (int index = 0; index < labels.length; index++) words[index] = context.getString(labels[index]);
+        return words;
+    }
+
+    static String[] fontNames(Context context) { return words(context, FONT_LABELS); }
+    static String[] nameModes(Context context) { return words(context, NAME_MODE_LABELS); }
+    static String[] sizeNames(Context context) { return words(context, SIZE_LABELS); }
+
+    /** What a backdrop is called on screen. The key stays what is saved; a file keeps its own name. */
+    static String backdropName(Context context, String key) {
+        if (WEATHER.equals(key)) return context.getString(R.string.look_backdrop_weather);
+        if (PICTURES.equals(key)) return context.getString(R.string.first_backdrop_pictures);
+        if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
+        int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
+        return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
     }
 
     static int columns(Context context) { return prefs(context).getInt("columns", 6); }

@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,7 +97,7 @@ final class HomeApps {
 
     /** Alphabetical order for the Home, with Settings kept at the end. */
     static void sort(Context context, List<String> apps) {
-        Collator order = Collator.getInstance(Locale.ITALIAN);
+        Collator order = Collator.getInstance();
         Collections.sort(apps, (a, b) -> {
             if (SETTINGS.equals(a)) return 1;
             if (SETTINGS.equals(b)) return -1;
@@ -135,7 +134,7 @@ final class HomeApps {
                 }
             }
         }
-        Collator order = Collator.getInstance(Locale.ITALIAN);
+        Collator order = Collator.getInstance();
         Collections.sort(apps, (a, b) -> order.compare(a.label, b.label));
         return apps;
     }

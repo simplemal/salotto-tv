@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.format.DateFormat;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONException;
@@ -190,8 +192,9 @@ public final class MainActivity extends CardActivity {
         clock.setShadowLayer(dp(6), 0, dp(2), Color.argb(120, 0, 0, 0));
         hero.addView(clock);
         date = new TextClock(this);
-        date.setFormat24Hour("EEEE d MMMM");
-        date.setFormat12Hour("EEEE d MMMM");
+        String longDate = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM");
+        date.setFormat24Hour(longDate);
+        date.setFormat12Hour(longDate);
         date.setTextSize(20);
         date.setTextColor(Color.WHITE);
         // Thin letters over a detailed picture: only a tight, dark shadow keeps them apart from it.
@@ -248,7 +251,7 @@ public final class MainActivity extends CardActivity {
         panel.setVisibility(View.GONE);
         panel.leadDownTo(this::firstCard);
         root.getViewTreeObserver().addOnGlobalFocusChangeListener((before, after) -> followFocus(after));
-        hint = label("Sposta con le frecce, poi premi OK", 16);
+        hint = label(getString(R.string.main_move_hint), 16);
         hint.setVisibility(View.GONE);
         hint.setShadowLayer(dp(4), 0, dp(1), Color.argb(160, 0, 0, 0));
         FrameLayout.LayoutParams top = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
@@ -280,8 +283,9 @@ public final class MainActivity extends CardActivity {
         pillRow.setClipToPadding(false);
         pillRow.setClipChildren(false);
         pillDate = new TextClock(this);
-        pillDate.setFormat24Hour("EEE d MMM");
-        pillDate.setFormat12Hour("EEE d MMM");
+        String shortDate = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEdMMM");
+        pillDate.setFormat24Hour(shortDate);
+        pillDate.setFormat12Hour(shortDate);
         pillDate.setTextSize(16);
         pillDate.setTextColor(Color.WHITE);
         pillDate.setPadding(0, 0, dp(10), 0);
@@ -298,9 +302,9 @@ public final class MainActivity extends CardActivity {
         pillTime.setTextColor(Color.WHITE);
         pillTime.setPadding(0, 0, dp(10), 0);
         pillRow.addView(pillTime);
-        ImageView settings = pillIcon(R.drawable.ic_settings, "Impostazioni");
+        ImageView settings = pillIcon(R.drawable.ic_settings, getString(R.string.first_does_settings));
         settings.setOnClickListener(v -> open(new Intent(this, SettingsActivity.class)));
-        controlButton = pillIcon(R.drawable.ic_control, "Centro di controllo");
+        controlButton = pillIcon(R.drawable.ic_control, getString(R.string.first_does_panel));
         // A mouse moves no focus, so here the click is what opens and closes the panel.
         controlButton.setOnClickListener(v -> {
             if (v.isInTouchMode()) showPanel(!panelOpen);
@@ -395,7 +399,7 @@ public final class MainActivity extends CardActivity {
 
     /** The last thing on the page, so that no row of cards can ever reach it. The glass comes with the focus. */
     private TextView footer() {
-        TextView view = label("Salotto, ver " + BuildVersion.full(this) + " - credits", FOOTER_SP);
+        TextView view = label(getString(R.string.main_footer, BuildVersion.full(this)), FOOTER_SP);
         view.setAllCaps(true);
         view.setLetterSpacing(FOOTER_SPACING);
         view.setTextColor(FOOTER_INK);
@@ -712,7 +716,7 @@ public final class MainActivity extends CardActivity {
 
     private View homeCard(LinearLayout row, String pkg, int width) {
         if (HomeApps.SETTINGS.equals(pkg)) {
-            return card(row, pkg, "Impostazioni", getDrawable(R.drawable.ic_settings), null, SHADED, width,
+            return card(row, pkg, getString(R.string.first_does_settings), getDrawable(R.drawable.ic_settings), null, SHADED, width,
                 () -> open(new Intent(this, SettingsActivity.class)), () -> showMenu(pkg));
         }
         return appCard(row, HomeApps.label(this, pkg), pkg, width, () -> showMenu(pkg));
@@ -720,7 +724,7 @@ public final class MainActivity extends CardActivity {
 
     /** Pinned last: it cannot be moved or removed, so every app stays reachable. */
     private View allAppsCard(LinearLayout row, int width) {
-        return card(row, ALL_APPS, "Tutte le app", getDrawable(R.drawable.ic_apps), null, GLASS, width,
+        return card(row, ALL_APPS, getString(R.string.main_all_apps), getDrawable(R.drawable.ic_apps), null, GLASS, width,
             () -> open(new Intent(this, AppsActivity.class)), null);
     }
 
@@ -773,9 +777,10 @@ public final class MainActivity extends CardActivity {
 
     private void showMenu(String pkg) {
         boolean removable = !HomeApps.SETTINGS.equals(pkg);
-        String title = removable ? HomeApps.label(this, pkg) : "Impostazioni";
-        String[] choices = removable ? new String[]{"Sposta", "Togli dalla Home", "Informazioni app", "Disinstalla"}
-            : new String[]{"Sposta"};
+        String title = removable ? HomeApps.label(this, pkg) : getString(R.string.first_does_settings);
+        String[] choices = removable ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
+                getString(R.string.card_app_info), getString(R.string.card_uninstall)}
+            : new String[]{getString(R.string.main_move)};
         dialog()
             .setTitle(title)
             .setItems(choices, (dialog, choice) -> {

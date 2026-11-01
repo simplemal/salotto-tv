@@ -3,7 +3,6 @@ package it.simplemal.firehome;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import org.json.JSONException;
 
 /**
@@ -40,14 +38,9 @@ import org.json.JSONException;
 public final class FirstRunActivity extends CardActivity {
     private static final String FILE = "first_run";
     private static final String DONE = "done";
-    private static final String LANGUAGE = "language";
     /** What the guide that came before left behind: a Stick that has seen it needs no introduction. */
     private static final String OLD_FILE = "welcome";
     private static final String OLD_DONE = "greeted";
-    private static final String[] LANGUAGES = {"it", "en", "es", "fr", "de", "pt", "ru", "ar", "hi", "zh"};
-    private static final String[] LANGUAGE_NAMES = {"italiano", "English", "español", "français", "Deutsch",
-        "português", "русский", "العربية", "हिन्दी", "中文"};
-    private static final String FALLBACK = "en";
     private static final String RIGHT_TO_LEFT = "ar";
     private static final String NO_NAME = "<unknown ssid>";
     private static final int PAGES = 6;
@@ -150,7 +143,7 @@ public final class FirstRunActivity extends CardActivity {
         corner.setMarginEnd(dp(PREVIEW_MARGIN));
         root.addView(previewNote, corner);
         setContentView(root);
-        speak(prefs(this).getString(LANGUAGE, startLanguage()));
+        speak();
         go(0);
     }
 
@@ -162,16 +155,9 @@ public final class FirstRunActivity extends CardActivity {
 
     @Override public void onBackPressed() { back.run(); }
 
-    private String startLanguage() {
-        String stick = Locale.getDefault().getLanguage();
-        return Arrays.asList(LANGUAGES).contains(stick) ? stick : FALLBACK;
-    }
-
-    private void speak(String language) {
-        Configuration config = new Configuration(getResources().getConfiguration());
-        config.setLocale(new Locale(language));
-        words = createConfigurationContext(config);
-        getWindow().getDecorView().setLayoutDirection(RIGHT_TO_LEFT.equals(language)
+    private void speak() {
+        words = Language.apply(getBaseContext());
+        getWindow().getDecorView().setLayoutDirection(RIGHT_TO_LEFT.equals(Language.code(this))
             ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
     }
 
@@ -224,8 +210,7 @@ public final class FirstRunActivity extends CardActivity {
         LinearLayout.LayoutParams line = new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2);
         line.topMargin = dp(26);
         page.addView(welcome, line);
-        String language = prefs(this).getString(LANGUAGE, startLanguage());
-        page.addView(button(LANGUAGE_NAMES[Arrays.asList(LANGUAGES).indexOf(language)], BUTTON_SP, this::showLanguages), place(WIDE, 26));
+        page.addView(button(Language.name(this), BUTTON_SP, this::showLanguages), place(WIDE, 26));
         View next = button(words(R.string.first_next), BUTTON_SP, this::next);
         page.addView(next, place(WIDE, 10));
         next.requestFocus();
@@ -234,21 +219,21 @@ public final class FirstRunActivity extends CardActivity {
     private void showLanguages() {
         heading(words(R.string.first_language), null);
         back = () -> go(0);
-        String chosen = prefs(this).getString(LANGUAGE, startLanguage());
+        String chosen = Language.code(this);
         LinearLayout columns = new LinearLayout(this);
         columns.setGravity(Gravity.CENTER);
         columns.setClipChildren(false);
         View selected = null;
-        for (int column = 0; column < LANGUAGES.length / LANGUAGE_ROWS; column++) {
+        for (int column = 0; column < Language.CODES.length / LANGUAGE_ROWS; column++) {
             LinearLayout rows = new LinearLayout(this);
             rows.setOrientation(LinearLayout.VERTICAL);
             rows.setClipChildren(false);
             for (int row = 0; row < LANGUAGE_ROWS; row++) {
                 int index = column * LANGUAGE_ROWS + row;
-                String language = LANGUAGES[index];
-                View choice = button(LANGUAGE_NAMES[index], BUTTON_SP, () -> {
-                    prefs(this).edit().putString(LANGUAGE, language).apply();
-                    speak(language);
+                String language = Language.CODES[index];
+                View choice = button(Language.NAMES[index], BUTTON_SP, () -> {
+                    Language.set(this, language);
+                    speak();
                     go(0);
                 });
                 rows.addView(choice, place(LANGUAGE_WIDTH, row == 0 ? 0 : ROW_GAP));
@@ -347,7 +332,7 @@ public final class FirstRunActivity extends CardActivity {
         note.setText(words(R.string.first_searching));
         Background.run(() -> {
             try {
-                List<Weather.Place> places = Weather.search(name);
+                List<Weather.Place> places = Weather.search(this, name);
                 runOnUiThread(() -> {
                     if (places.isEmpty()) note.setText(words(R.string.first_no_place));
                     else showPlaces(places);

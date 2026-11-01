@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import java.io.BufferedReader;
@@ -210,8 +211,8 @@ final class Weather {
         SharedPreferences saved = prefs(context);
         if (!recent(context)) return null;
         int code = saved.getInt("code", 0);
-        return String.format(Locale.ITALIAN, "%s  %d°  %s · %s", symbol(code),
-            Math.round(saved.getFloat("temperature", 0)), description(code), place(context));
+        return String.format(Locale.getDefault(), "%s  %d°  %s · %s", symbol(code),
+            Math.round(saved.getFloat("temperature", 0)), description(context, code), place(context));
     }
 
     /** Tomorrow's forecast for the Home, or null when there is nothing recent to show. */
@@ -219,9 +220,9 @@ final class Weather {
         SharedPreferences saved = prefs(context);
         if (!recent(context) || !saved.contains("tomorrow_code")) return null;
         int code = saved.getInt("tomorrow_code", 0);
-        return String.format(Locale.ITALIAN, "Domani  %s  %d° / %d°  %s", symbol(code),
+        return context.getString(R.string.weather_tomorrow, symbol(code),
             Math.round(saved.getFloat("tomorrow_max", 0)), Math.round(saved.getFloat("tomorrow_min", 0)),
-            description(code));
+            description(context, code));
     }
 
     /** Blocking: call it away from the main thread. A failure keeps the last reading. */
@@ -260,13 +261,14 @@ final class Weather {
      * The service ranks the whole world by size, so a town of ours can come 91st for the first letters
      * of its name. It is asked for everything it has, and the places of the Stick's own country go first.
      */
-    static List<Place> search(String name) throws IOException, JSONException {
-        String url = "https://geocoding-api.open-meteo.com/v1/search?count=100&language=it&format=json&name="
+    static List<Place> search(Context context, String name) throws IOException, JSONException {
+        String url = "https://geocoding-api.open-meteo.com/v1/search?count=100&language=" + Language.code(context) + "&format=json&name="
             + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
         JSONArray results = new JSONObject(get(url)).optJSONArray("results");
         List<Place> places = new ArrayList<>();
         if (results == null) return places;
-        String country = Locale.getDefault().getCountry();
+        // The Stick's own: Salotto's language says nothing about where it is.
+        String country = Resources.getSystem().getConfiguration().getLocales().get(0).getCountry();
         int ours = 0;
         for (int index = 0; index < results.length(); index++) {
             JSONObject found = results.getJSONObject(index);
@@ -297,18 +299,18 @@ final class Weather {
     }
 
     /** WMO weather codes, as Open-Meteo reports them. */
-    private static String description(int code) {
-        if (code == 0) return "Sereno";
-        if (code == 1) return "Quasi sereno";
-        if (code == 2) return "Poco nuvoloso";
-        if (code == 3) return "Coperto";
-        if (code <= 48) return "Nebbia";
-        if (code <= 57) return "Pioviggine";
-        if (code <= 67) return "Pioggia";
-        if (code <= 77) return "Neve";
-        if (code <= 82) return "Rovesci";
-        if (code <= 86) return "Rovesci di neve";
-        return "Temporale";
+    private static String description(Context context, int code) {
+        if (code == 0) return context.getString(R.string.weather_clear);
+        if (code == 1) return context.getString(R.string.weather_mostly_clear);
+        if (code == 2) return context.getString(R.string.weather_partly_cloudy);
+        if (code == 3) return context.getString(R.string.weather_overcast);
+        if (code <= 48) return context.getString(R.string.weather_fog);
+        if (code <= 57) return context.getString(R.string.weather_drizzle);
+        if (code <= 67) return context.getString(R.string.weather_rain);
+        if (code <= 77) return context.getString(R.string.weather_snow);
+        if (code <= 82) return context.getString(R.string.weather_showers);
+        if (code <= 86) return context.getString(R.string.weather_snow_showers);
+        return context.getString(R.string.weather_thunderstorm);
     }
 
     private static String symbol(int code) {

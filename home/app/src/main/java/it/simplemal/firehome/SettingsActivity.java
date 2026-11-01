@@ -76,30 +76,30 @@ public final class SettingsActivity extends CardActivity {
     private static final int EXPLANATION_SP = 15;
     private static final String RESOLUTION = "pq_video_resolution";
     private static final String[] RESOLUTIONS = {"-1", "97", "96", "16", "31", "4", "19"};
-    private static final String[] RESOLUTION_NAMES = {"Automatica", "4K a 60 Hz", "4K a 50 Hz", "1080p a 60 Hz",
-        "1080p a 50 Hz", "720p a 60 Hz", "720p a 50 Hz"};
+    private static final int[] RESOLUTION_NAMES = {R.string.settings_resolution_auto, R.string.settings_resolution_4k_60,
+        R.string.settings_resolution_4k_50, R.string.settings_resolution_1080_60, R.string.settings_resolution_1080_50,
+        R.string.settings_resolution_720_60, R.string.settings_resolution_720_50};
     private static final int RESOLUTION_WAIT_S = 15;
-    private static final String RESOLUTION_TEXT = "Se l’immagine sparisce, entro " + RESOLUTION_WAIT_S
-        + " secondi Salotto torna da sola alla precedente.";
     private static final String RANGE = "pq_dynamic_range";
     private static final String[] RANGES = {"adaptive", "forced", "forcedsdr"};
-    private static final String[] RANGE_NAMES = {"Adattivo", "Sempre HDR", "Sempre SDR"};
+    private static final int[] RANGE_NAMES = {R.string.settings_range_adaptive, R.string.settings_range_hdr,
+        R.string.settings_range_sdr};
     private static final String COLOR_FORMAT = "pq_color_format";
     private static final String[] COLOR_FORMATS = {"auto", "rgb", "ycbcr"};
-    private static final String[] COLOR_FORMAT_NAMES = {"Automatico", "RGB", "YCbCr"};
     private static final String COLOR_DEPTH = "pq_color_depth";
     private static final String[] COLOR_DEPTHS = {"8", "10", "12"};
-    private static final String[] COLOR_DEPTH_NAMES = {"8 bit", "10 bit", "12 bit"};
+    private static final int[] COLOR_DEPTH_NAMES = {R.string.settings_color_depth_8, R.string.settings_color_depth_10,
+        R.string.settings_color_depth_12};
     private static final String SURROUND = "aq_surround_sound";
     private static final String[] SURROUNDS = {"BEST_AVAILABLE", "STEREO", "DD_PLUS_ALWAYS", "DD_ALWAYS"};
-    private static final String[] SURROUND_NAMES = {"Migliore disponibile", "Stereo", "Dolby Digital Plus", "Dolby Digital"};
     /** In the order of encoded_surround_output: 0 to 3. */
     private static final String SURROUND_MODE = "encoded_surround_output";
     private static final String LEVELER = "aq_volume_leveler";
     private static final String DIALOGUE = "aq_dialogue_enhancer";
     private boolean doubleHome;
     private static final String VIDEO_QUALITY = "com.amazon.tv.settings.VIDEO_QUALITY";
-    private static final String[] VIDEO_QUALITY_NAMES = {"Buona", "Migliore", "Ottima"};
+    private static final int[] VIDEO_QUALITY_NAMES = {R.string.settings_quality_good,
+        R.string.settings_video_quality_better, R.string.settings_video_quality_best};
     private static final String YES = "Sì";
     private static final String NO = "No";
     private static final String WIFI_ON = "wifi-on";
@@ -119,24 +119,25 @@ public final class SettingsActivity extends CardActivity {
     private static final String USAGE_METRICS = "USAGE_METRICS_UPLOAD_ENABLED";
     private static final float QUICK_SCALE = 0.5f;
     private static final String LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    private static final String[] WIFI_STRENGTHS = {"Debole", "Debole", "Media", "Buona", "Forte"};
+    private static final int[] WIFI_STRENGTHS = {R.string.settings_wifi_weak, R.string.settings_wifi_weak,
+        R.string.settings_wifi_medium, R.string.settings_quality_good, R.string.settings_wifi_strong};
     private static final long WIFI_SCAN_MS = 3000;
     private static final long WIFI_JOIN_MS = 6000;
     private static final int ROW_ROOM = 14;
-    private static final String STANDARDS = "Standard audio e video";
-    private static final String[] TABLE_COLUMNS = {"Stick", "TV", "In uso"};
+    private static final int[] TABLE_COLUMNS = {R.string.settings_table_stick, R.string.settings_table_tv,
+        R.string.settings_table_in_use};
     private static final int[] TABLE_WIDTHS = {96, 96, 112};
     private static final int TABLE_ROW = 34;
     private static final int TABLE_PADDING = 14;
 
     /** One of Salotto's own screensavers, in the list after Fire OS's. Without a service it is still to come. */
     private static final class Saver {
-        final String name;
-        final String text;
+        final int name;
+        final int text;
         final int preview;
         final Class<? extends DreamService> service;
 
-        Saver(String name, String text, int preview, Class<? extends DreamService> service) {
+        Saver(int name, int text, int preview, Class<? extends DreamService> service) {
             this.name = name;
             this.text = text;
             this.preview = preview;
@@ -144,7 +145,7 @@ public final class SettingsActivity extends CardActivity {
         }
     }
 
-    private static final Saver[] SAVERS = {new Saver("Salvaschermo di Salotto", "Spegne quello di Fire OS.", R.drawable.ic_photo, null)};
+    private static final Saver[] SAVERS = {new Saver(R.string.settings_saver_own, R.string.settings_saver_own_text, R.drawable.ic_photo, null)};
 
     private static final class Entry {
         final String title;
@@ -219,13 +220,14 @@ public final class SettingsActivity extends CardActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
         fire = new FireSettings(this);
         DeviceInfo.prepare();
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         Look.show(this, root::setBackground);
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
-        previewNote = label("Anteprima", PREVIEW_SP);
+        previewNote = label(getString(R.string.first_preview), PREVIEW_SP);
         previewNote.setAlpha(0.7f);
         previewNote.setVisibility(View.GONE);
 
@@ -282,7 +284,7 @@ public final class SettingsActivity extends CardActivity {
         tableHead = new LinearLayout(this);
         tableHead.setPadding(dp(8 + TABLE_PADDING), dp(COLUMN_TOP - 20), dp(8 + TABLE_PADDING), 0);
         tableHead.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
-        for (TextView name : addColumns(tableHead, TABLE_COLUMNS, 12)) name.setAlpha(0.6f);
+        for (TextView name : addColumns(tableHead, strings(TABLE_COLUMNS), 12)) name.setAlpha(0.6f);
         list.addView(tableHead, new LinearLayout.LayoutParams(-1, -2));
         list.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 55));
@@ -308,6 +310,21 @@ public final class SettingsActivity extends CardActivity {
         super.onResume();
         if (resumedOnce) refresh();
         resumedOnce = true;
+    }
+
+    private String[] strings(int[] ids) {
+        String[] texts = new String[ids.length];
+        for (int index = 0; index < ids.length; index++) texts[index] = getString(ids[index]);
+        return texts;
+    }
+
+    private String[] colorFormatNames() {
+        return new String[]{getString(R.string.settings_color_format_auto), "RGB", "YCbCr"};
+    }
+
+    private String[] surroundNames() {
+        return new String[]{getString(R.string.settings_surround_best), getString(R.string.settings_surround_stereo),
+            "Dolby Digital Plus", "Dolby Digital"};
     }
 
     private void enter(Runnable show) {
@@ -522,63 +539,80 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showRoot() {
-        show("Impostazioni", Arrays.asList(
-            new Entry("Aspetto", Look.backdrop(this), getDrawable(R.drawable.ic_s_palette),
-                "Sfondo, griglia e nomi delle app sulla Home.", true, () -> enter(this::showLook)),
-            new Entry("Orologio e data", clockValue(), getDrawable(R.drawable.ic_clock),
-                "Carattere, dimensione e formato dell’ora, e la data sotto l’orologio.",
+        show(getString(R.string.settings_title), Arrays.asList(
+            new Entry(getString(R.string.settings_look), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_palette),
+                getString(R.string.settings_look_text), true, () -> enter(this::showLook)),
+            new Entry(getString(R.string.settings_clock_and_date), clockValue(), getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_clock_and_date_text),
                 true, () -> enter(this::showClock)),
-            new Entry("Meteo", weatherValue(), getDrawable(R.drawable.ic_cloud),
-                "Temperatura e tempo sulla Home, per il luogo che scegli. Salotto usa Internet solo per questo e per gli aggiornamenti.",
+            new Entry(getString(R.string.settings_weather), weatherValue(), getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_weather_text),
                 true, () -> enter(this::showWeather)),
-            new Entry("App", null, getDrawable(R.drawable.ic_apps),
-                "Tutte le app installate, l’ordine della Home e la gestione di Fire TV.",
+            new Entry(getString(R.string.settings_apps), null, getDrawable(R.drawable.ic_apps),
+                getString(R.string.settings_apps_text),
                 true, () -> enter(this::showApps)),
-            new Entry("Schermo e audio", saverValue(), getDrawable(R.drawable.ic_s_tv),
-                "Salvaschermo, spegnimento automatico, collegamento con la TV, video e audio.",
+            new Entry(getString(R.string.settings_screen), saverValue(), getDrawable(R.drawable.ic_s_tv),
+                getString(R.string.settings_screen_text),
                 true, () -> enter(this::showScreen)),
-            new Entry("Rete", null, getDrawable(R.drawable.ic_s_language),
-                "Stato della connessione e impostazioni della rete.", true, () -> enter(this::showNetwork)),
-            new Entry("Telecomandi e Bluetooth", null, getDrawable(R.drawable.ic_s_settings_remote),
-                "Telecomandi, controller e dispositivi Bluetooth.",
+            new Entry(getString(R.string.settings_language), Language.name(this), getDrawable(R.drawable.ic_s_language),
+                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
+            new Entry(getString(R.string.settings_network), null, getDrawable(R.drawable.ic_s_language),
+                getString(R.string.settings_network_text), true, () -> enter(this::showNetwork)),
+            new Entry(getString(R.string.settings_remotes), null, getDrawable(R.drawable.ic_s_settings_remote),
+                getString(R.string.settings_remotes_text),
                 true, () -> enter(this::showRemotes)),
-            new Entry("Dispositivo", null, getDrawable(R.drawable.ic_s_developer_board),
-                "Modello, sistema, memoria e spazio disponibile.", true, () -> enter(this::showDevice)),
-            new Entry("Privacy", null, getDrawable(R.drawable.ic_s_privacy),
-                "Tracciamento pubblicitario e dati di utilizzo.", true, () -> enter(this::showPrivacy)),
-            new Entry("Backup", null, getDrawable(R.drawable.ic_s_backup),
-                "Salva e ripristina le scelte di Salotto.", true, () -> enter(this::showBackup)),
-            new Entry("Strumenti", null, getDrawable(R.drawable.ic_s_build),
-                "AirPlay e FireStick Fixer.", true, () -> enter(this::showTools)),
-            new Entry("Aggiornamento", BuildVersion.name(this), getDrawable(R.drawable.ic_s_update),
-                "Cerca una nuova versione di Salotto. Controlla tutto prima di toccare qualcosa.",
+            new Entry(getString(R.string.settings_device), null, getDrawable(R.drawable.ic_s_developer_board),
+                getString(R.string.settings_device_text), true, () -> enter(this::showDevice)),
+            new Entry(getString(R.string.settings_privacy), null, getDrawable(R.drawable.ic_s_privacy),
+                getString(R.string.settings_privacy_text), true, () -> enter(this::showPrivacy)),
+            new Entry(getString(R.string.settings_backup), null, getDrawable(R.drawable.ic_s_backup),
+                getString(R.string.settings_backup_text), true, () -> enter(this::showBackup)),
+            new Entry(getString(R.string.settings_tools), null, getDrawable(R.drawable.ic_s_build),
+                getString(R.string.settings_tools_text), true, () -> enter(this::showTools)),
+            new Entry(getString(R.string.settings_update), BuildVersion.name(this), getDrawable(R.drawable.ic_s_update),
+                getString(R.string.settings_update_text),
                 false, () -> open(new Intent(this, UpdateActivity.class))),
-            new Entry("Informazioni su Salotto", BuildVersion.name(this), getDrawable(R.drawable.ic_s_info),
-                "Il progetto, la licenza e il software di altri che usa.", true,
+            new Entry(getString(R.string.settings_about), BuildVersion.name(this), getDrawable(R.drawable.ic_s_info),
+                getString(R.string.settings_about_text), true,
                 () -> open(new Intent(this, AboutActivity.class))),
-            new Entry("Impostazioni Fire TV", null, getDrawable(R.drawable.ic_s_open),
-                "Ciò che Salotto non può fare: account Amazon, controllo genitori, nuovo telecomando Alexa, opzioni del salvaschermo Amazon.",
+            new Entry(getString(R.string.settings_fire), null, getDrawable(R.drawable.ic_s_open),
+                getString(R.string.settings_fire_text),
                 false, () -> {
                     TaskService.wantFireSettings();
                     open(fireOsSettings());
                 })));
     }
 
+    /** A word in the middle of a sentence: German keeps its capital. */
+    private String inSentence(String word) {
+        return "de".equals(Language.code(this)) ? word : word.toLowerCase(Locale.getDefault());
+    }
+
+    private void showLanguages() {
+        show(getString(R.string.settings_language), choices(Language.NAMES, Arrays.asList(Language.CODES).indexOf(Language.code(this)),
+            R.drawable.ic_s_language, getString(R.string.settings_language_text), index -> {
+                Language.set(this, Language.CODES[index]);
+                startActivity(new Intent(this, MainActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            }));
+    }
+
     private String clockValue() {
-        return Look.clock(this)
-            ? Look.FONT_NAMES[Look.font(this)] + ", " + Look.SIZE_NAMES[Look.size(this)].toLowerCase() : "Nascosto";
+        if (!Look.clock(this)) return getString(R.string.settings_hidden);
+        return getString(R.string.settings_clock_value, Look.fontNames(this)[Look.font(this)],
+            inSentence(Look.sizeNames(this)[Look.size(this)]));
     }
 
     private void showLook() {
-        show("Aspetto", Arrays.asList(
-            new Entry("Sfondo", Look.backdrop(this), getDrawable(R.drawable.ic_s_wallpaper),
-                "Lo sfondo della Home. Resta quello che scegli tu; solo gli sfondi meteo cambiano da soli, con il tempo e l’ora.",
+        show(getString(R.string.settings_look), Arrays.asList(
+            new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_wallpaper),
+                getString(R.string.settings_backdrop_text),
                 true, () -> enter(this::showBackdrops)),
-            new Entry("Griglia", Look.columns(this) + " app per fila", getDrawable(R.drawable.ic_s_grid),
-                "Quante app stanno in ogni fila. La prima fila è il dock.",
+            new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), getDrawable(R.drawable.ic_s_grid),
+                getString(R.string.settings_grid_text),
                 true, () -> enter(this::showColumns)),
-            new Entry("Nomi delle app", Look.NAME_MODES[Look.names(this)], getDrawable(R.drawable.ic_s_label),
-                "Quando mostrare il nome sotto le card. Nel dock non compare mai.",
+            new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
+                getString(R.string.settings_app_names_text),
                 true, () -> enter(this::showNames))));
     }
 
@@ -597,7 +631,9 @@ public final class SettingsActivity extends CardActivity {
         return choices(names, chosen, picture, index -> text, choose);
     }
 
-    private static String minutes(int count) { return count + (count == 1 ? " minuto" : " minuti"); }
+    private String minutes(int count) { return getResources().getQuantityString(R.plurals.settings_minutes, count, count); }
+
+    private String appsPerRow(int count) { return getResources().getQuantityString(R.plurals.settings_apps_per_row, count, count); }
 
     private String[] minuteNames(int[] minutes) {
         String[] names = new String[minutes.length];
@@ -613,44 +649,43 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showNames() {
-        show("Nomi delle app", choices(Look.NAME_MODES, Look.names(this), R.drawable.ic_apps,
-            "Quando mostrare il nome sotto le card. Nel dock non compare mai.", index -> {
+        show(getString(R.string.settings_app_names), choices(Look.nameModes(this), Look.names(this), R.drawable.ic_apps,
+            getString(R.string.settings_app_names_text), index -> {
                 Look.setNames(this, index);
                 refresh();
             }));
     }
 
     private void showApps() {
-        show("App", Arrays.asList(
-            new Entry("Tutte le app", null, getDrawable(R.drawable.ic_apps),
-                "Tenendo premuto OK su un’app puoi aggiungerla alla Home, vederne i dettagli o disinstallarla.",
+        show(getString(R.string.settings_apps), Arrays.asList(
+            new Entry(getString(R.string.settings_all_apps), null, getDrawable(R.drawable.ic_apps),
+                getString(R.string.settings_all_apps_text),
                 false, () -> open(new Intent(this, AppsActivity.class))),
-            new Entry("Task manager", null, getDrawable(R.drawable.ic_tasks),
-                "Le app usate da quando hai acceso la Stick, da riaprire o chiudere.",
+            new Entry(getString(R.string.settings_task_manager), null, getDrawable(R.drawable.ic_tasks),
+                getString(R.string.settings_task_manager_text),
                 false, () -> open(new Intent(this, TasksActivity.class))),
-            new Entry("Tasti tenuti premuti", TaskService.keysOn(this) ? YES : NO, getDrawable(R.drawable.ic_s_menu),
-                "Indietro apre il task manager, Home il centro di controllo, Menu le Impostazioni. "
-                    + "Per Home e per chiudere le app con un clic serve anche una conferma una tantum sulla TV.",
+            new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, getDrawable(R.drawable.ic_s_menu),
+                getString(R.string.settings_held_keys_text),
                 false, () -> changeSystem(() -> TaskService.setKeys(this, !TaskService.keysOn(this)))),
-            new Entry("Ordina la Home dalla A alla Z", null, getDrawable(R.drawable.ic_s_sort),
-                "Rimette le app della Home in ordine alfabetico.", false, () -> {
+            new Entry(getString(R.string.settings_sort_home), null, getDrawable(R.drawable.ic_s_sort),
+                getString(R.string.settings_sort_home_text), false, () -> {
                     HomeApps.sort(this, HomeApps.load(this));
-                    say("Home in ordine alfabetico");
+                    say(getString(R.string.settings_home_sorted));
                 }),
-            new Entry("Gestione app", null, getDrawable(R.drawable.ic_s_widgets),
-                "Spazio occupato, chiusura e disinstallazione di ogni app.",
+            new Entry(getString(R.string.settings_manage_apps), null, getDrawable(R.drawable.ic_s_widgets),
+                getString(R.string.settings_manage_apps_text),
                 true, () -> enter(this::showManageApps))));
     }
 
     private void showManageApps() {
         List<Entry> entries = new ArrayList<>();
         for (HomeApps.App app : HomeApps.installed(this)) {
-            Entry entry = new Entry(app.label, null, null, "Spazio occupato, chiusura e disinstallazione.",
+            Entry entry = new Entry(app.label, null, null, getString(R.string.settings_manage_app_text),
                 true, () -> enter(() -> showApp(app.pkg)));
             entry.pkg = app.pkg;
             entries.add(entry);
         }
-        show("Gestione app", entries);
+        show(getString(R.string.settings_manage_apps), entries);
     }
 
     private String appVersion(String pkg) {
@@ -691,25 +726,25 @@ public final class SettingsActivity extends CardActivity {
     private void listApp(String pkg, Level level, StorageStats size) {
         Drawable picture = appIcon(pkg);
         List<Entry> entries = new ArrayList<>();
-        String text = "Le informazioni di questa app.";
-        entries.add(new Entry("Versione", appVersion(pkg), picture, text, false, () -> { }));
-        entries.add(new Entry("App", sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
-        entries.add(new Entry("Dati", sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
-        entries.add(new Entry("Cache", sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+        String text = getString(R.string.settings_app_info_text);
+        entries.add(new Entry(getString(R.string.settings_app_version), appVersion(pkg), picture, text, false, () -> { }));
+        entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
+        entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
+        entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
         if (launchIntent(pkg) != null) {
-            entries.add(new Entry("Apri", null, picture, "Apre l’app.", false, () -> openPackage(pkg)));
+            entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
         }
-        entries.add(new Entry("Chiudi", null, picture, "Ferma l’app. Si riapre normalmente quando la lanci.", false,
-            () -> TaskService.stop(pkg, stopped -> say(stopped ? "App chiusa" : "Non è stato possibile chiuderla"))));
-        entries.add(new Entry("Cancella i dati", null, picture, "Riporta l’app come appena installata: accessi e scelte si perdono.",
-            false, () -> confirm("Cancellare i dati di " + HomeApps.label(this, pkg) + "?",
-                "Accessi e scelte di questa app si perdono.", "Cancella",
+        entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
+            () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
+        entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+            false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
+                getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
                 () -> shell("pm clear " + pkg, output -> {
-                    sayLong(output != null && output.contains("Success") ? "Dati cancellati"
-                        : "Fire OS non permette di cancellarli");
+                    sayLong(output != null && output.contains("Success") ? getString(R.string.settings_data_cleared)
+                        : getString(R.string.settings_data_not_cleared));
                     refreshIf(level);
                 }))));
-        entries.add(new Entry("Disinstalla", null, picture, "Toglie l’app dalla Stick.", false, () -> {
+        entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, getString(R.string.settings_uninstall_text), false, () -> {
             uninstalling = level;
             uninstall(pkg);
         }));
@@ -724,31 +759,31 @@ public final class SettingsActivity extends CardActivity {
         boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
         boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
         Drawable picture = getDrawable(R.drawable.ic_image);
-        show("Schermo e audio", Arrays.asList(
-            new Entry("Salvaschermo", saverValue(), getDrawable(R.drawable.ic_image),
-                "Se attivarlo e dopo quanto tempo.", true, () -> enter(this::showSaver)),
-            new Entry("Spegnimento automatico", sleepMinutes() + " minuti", getDrawable(R.drawable.ic_timer),
-                "Dopo quanto la Stick va in standby se non la usi.", true, () -> enter(this::showSleepTimes)),
-            new Entry("Controllo della TV (HDMI-CEC)", cec ? YES : NO, getDrawable(R.drawable.ic_s_hdmi),
-                "Permette alla Stick e alla TV di comandarsi a vicenda attraverso il cavo HDMI.", false,
+        show(getString(R.string.settings_screen), Arrays.asList(
+            new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
+                getString(R.string.settings_saver_text), true, () -> enter(this::showSaver)),
+            new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), getDrawable(R.drawable.ic_timer),
+                getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)),
+            new Entry(getString(R.string.settings_cec), cec ? YES : NO, getDrawable(R.drawable.ic_s_hdmi),
+                getString(R.string.settings_cec_text), false,
                 () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_ENABLED, cec ? 0 : 1))),
-            new Entry("Spegni la TV con la Stick", tvOff ? YES : NO, getDrawable(R.drawable.ic_power),
-                "Quando la Stick va in standby, spegne anche la TV. Funziona se la TV supporta HDMI-CEC.", false,
+            new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, getDrawable(R.drawable.ic_power),
+                getString(R.string.settings_tv_off_text), false,
                 () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))),
-            new Entry("Suoni dell’interfaccia", clicks ? YES : NO, getDrawable(R.drawable.ic_s_music),
-                "Il suono dei tasti mentre ti muovi nei menu.", false,
+            new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, getDrawable(R.drawable.ic_s_music),
+                getString(R.string.settings_sounds_text), false,
                 () -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
                     Settings.System.SOUND_EFFECTS_ENABLED, clicks ? 0 : 1))),
-            new Entry("Animazioni veloci", quick ? YES : NO, getDrawable(R.drawable.ic_s_speed),
-                "Dimezza la durata delle transizioni tra una schermata e l’altra.", false,
+            new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, getDrawable(R.drawable.ic_s_speed),
+                getString(R.string.settings_quick_animations_text), false,
                 () -> changeSystem(() -> {
                     float scale = quick ? 1 : QUICK_SCALE;
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, scale);
                 })),
-            new Entry("Video", null, getDrawable(R.drawable.ic_s_movie), "Risoluzione, HDR, colore e qualità dei video.", true, () -> enter(this::showVideo)),
-            new Entry("Audio", null, getDrawable(R.drawable.ic_s_volume), "Audio surround e volume uniforme.", true, () -> enter(this::showAudio)),
-            new Entry("Standard audio e video", null, getDrawable(R.drawable.ic_s_standards), "Cosa sanno fare la Stick e la TV, e cosa è in uso adesso.",
+            new Entry(getString(R.string.settings_video), null, getDrawable(R.drawable.ic_s_movie), getString(R.string.settings_video_text), true, () -> enter(this::showVideo)),
+            new Entry(getString(R.string.settings_audio), null, getDrawable(R.drawable.ic_s_volume), getString(R.string.settings_audio_text), true, () -> enter(this::showAudio)),
+            new Entry(getString(R.string.settings_standards), null, getDrawable(R.drawable.ic_s_standards), getString(R.string.settings_standards_text),
                 true, () -> enter(this::showStandards))));
     }
 
@@ -756,14 +791,14 @@ public final class SettingsActivity extends CardActivity {
     private void showStandards() {
         Level level = levels.peek();
         int focus = level.focus;
-        showWaiting(STANDARDS);
+        showWaiting(getString(R.string.settings_standards));
         Background.run(() -> {
             AvStandards.Chosen chosen = new AvStandards.Chosen();
-            chosen.resolution = nameOf(RESOLUTIONS, RESOLUTION_NAMES, fire.read(FireSettings.PICTURE, RESOLUTION));
-            chosen.range = nameOf(RANGES, RANGE_NAMES, fire.read(FireSettings.PICTURE, RANGE));
-            chosen.colorFormat = nameOf(COLOR_FORMATS, COLOR_FORMAT_NAMES, fire.read(FireSettings.PICTURE, COLOR_FORMAT));
-            chosen.colorDepth = nameOf(COLOR_DEPTHS, COLOR_DEPTH_NAMES, fire.read(FireSettings.PICTURE, COLOR_DEPTH));
-            chosen.surround = nameOf(SURROUNDS, SURROUND_NAMES, surroundNow());
+            chosen.resolution = nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), fire.read(FireSettings.PICTURE, RESOLUTION));
+            chosen.range = nameOf(RANGES, strings(RANGE_NAMES), fire.read(FireSettings.PICTURE, RANGE));
+            chosen.colorFormat = nameOf(COLOR_FORMATS, colorFormatNames(), fire.read(FireSettings.PICTURE, COLOR_FORMAT));
+            chosen.colorDepth = nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), fire.read(FireSettings.PICTURE, COLOR_DEPTH));
+            chosen.surround = nameOf(SURROUNDS, surroundNames(), surroundNow());
             List<AvStandards.Line> lines = AvStandards.read(this, chosen);
             runOnUiThread(() -> {
                 if (levels.peek() != level) return;
@@ -776,7 +811,7 @@ public final class SettingsActivity extends CardActivity {
                     entries.add(entry);
                 }
                 level.focus = focus;
-                show(STANDARDS, entries);
+                show(getString(R.string.settings_standards), entries);
             });
         });
     }
@@ -789,14 +824,14 @@ public final class SettingsActivity extends CardActivity {
     /** The only row of this page takes the focus: the place in the real page has to survive it. */
     private void showWaiting(String title) {
         int focus = levels.peek().focus;
-        show(title, Arrays.asList(new Entry("Leggo le impostazioni…", null, getDrawable(R.drawable.ic_image),
-            "Serve un attimo.", false, () -> { })));
+        show(title, Arrays.asList(new Entry(getString(R.string.settings_reading), null, getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_a_moment), false, () -> { })));
         levels.peek().focus = focus;
     }
 
     private void showVideo() {
         Level level = levels.peek();
-        showWaiting("Video");
+        showWaiting(getString(R.string.settings_video));
         Background.run(() -> {
             String resolution = fire.read(FireSettings.PICTURE, RESOLUTION);
             String range = fire.read(FireSettings.PICTURE, RANGE);
@@ -806,29 +841,29 @@ public final class SettingsActivity extends CardActivity {
                 if (levels.peek() != level) return;
                 Drawable picture = getDrawable(R.drawable.ic_image);
                 List<Entry> entries = new ArrayList<>();
-                entries.add(new Entry("Risoluzione", nameOf(RESOLUTIONS, RESOLUTION_NAMES, resolution), getDrawable(R.drawable.ic_s_aspect),
-                    RESOLUTION_TEXT, true, () -> enter(() -> showResolutions(resolution))));
-                entries.add(new Entry("HDR", nameOf(RANGES, RANGE_NAMES, range), getDrawable(R.drawable.ic_s_hdr),
-                    "Quando usare l’alta gamma dinamica.", true,
-                    () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, RANGE_NAMES, range))));
-                entries.add(new Entry("Formato colore", nameOf(COLOR_FORMATS, COLOR_FORMAT_NAMES, format), getDrawable(R.drawable.ic_s_palette),
-                    "Lascia Automatico, se la TV non mostra colori sbagliati.", true,
-                    () -> enter(() -> showChoices("Formato colore", FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, COLOR_FORMAT_NAMES, format))));
+                entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), getDrawable(R.drawable.ic_s_aspect),
+                    resolutionText(), true, () -> enter(() -> showResolutions(resolution))));
+                entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), getDrawable(R.drawable.ic_s_hdr),
+                    getString(R.string.settings_hdr_text), true,
+                    () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range))));
+                entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), getDrawable(R.drawable.ic_s_palette),
+                    getString(R.string.settings_color_format_text), true,
+                    () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format))));
                 if (depth != null && !depth.isEmpty()) {
-                    entries.add(new Entry("Profondità colore", nameOf(COLOR_DEPTHS, COLOR_DEPTH_NAMES, depth), getDrawable(R.drawable.ic_s_gradient),
-                        "Più bit, sfumature più morbide, se la TV li supporta.", true,
-                        () -> enter(() -> showChoices("Profondità colore", FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, COLOR_DEPTH_NAMES, depth))));
+                    entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), getDrawable(R.drawable.ic_s_gradient),
+                        getString(R.string.settings_color_depth_text), true,
+                        () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth))));
                 }
-                entries.add(new Entry("Qualità video", VIDEO_QUALITY_NAMES[videoQuality()], getDrawable(R.drawable.ic_s_quality),
-                    "La qualità dei video di Amazon: più è alta, più dati consuma.", true, () -> enter(this::showVideoQuality)));
-                show("Video", entries);
+                entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), getDrawable(R.drawable.ic_s_quality),
+                    getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality)));
+                show(getString(R.string.settings_video), entries);
             });
         });
     }
 
     private void showAudio() {
         Level level = levels.peek();
-        showWaiting("Audio");
+        showWaiting(getString(R.string.settings_audio));
         Background.run(() -> {
             String leveler = fire.read(FireSettings.AUDIO, LEVELER);
             String dialogue = fire.read(FireSettings.AUDIO, DIALOGUE);
@@ -838,15 +873,15 @@ public final class SettingsActivity extends CardActivity {
                 boolean even = "true".equals(leveler);
                 boolean clear = "true".equals(dialogue);
                 String surround = surroundNow();
-                show("Audio", Arrays.asList(
-                    new Entry("Audio surround", nameOf(SURROUNDS, SURROUND_NAMES, surround), getDrawable(R.drawable.ic_s_surround),
-                        "Migliore disponibile va bene quasi sempre. Stereo, se soundbar o TV non hanno audio.", true,
-                        () -> enter(() -> showChoices("Audio surround", FireSettings.AUDIO, SURROUND, SURROUNDS, SURROUND_NAMES, surround))),
-                    new Entry("Dialoghi più chiari", clear ? YES : NO, getDrawable(R.drawable.ic_s_voice),
-                        "Fa risaltare le voci su musica ed effetti. È già il filtro di Fire OS, non un secondo effetto; se TV o soundbar ne hanno uno, tienilo spento.", false,
+                show(getString(R.string.settings_audio), Arrays.asList(
+                    new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), getDrawable(R.drawable.ic_s_surround),
+                        getString(R.string.settings_surround_text), true,
+                        () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
+                    new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, getDrawable(R.drawable.ic_s_voice),
+                        getString(R.string.settings_dialogue_text), false,
                         () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
-                    new Entry("Volume uniforme", even ? YES : NO, getDrawable(R.drawable.ic_s_equalizer),
-                        "Riduce i rumori forti e gli sbalzi di volume tra programmi e pubblicità.", false,
+                    new Entry(getString(R.string.settings_leveler), even ? YES : NO, getDrawable(R.drawable.ic_s_equalizer),
+                        getString(R.string.settings_leveler_text), false,
                         () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level)))));
             });
         });
@@ -862,7 +897,7 @@ public final class SettingsActivity extends CardActivity {
         Background.run(() -> {
             boolean written = fire.write(provider, id, action);
             runOnUiThread(() -> {
-                if (!written) sayLong("Fire OS non ha accettato la scelta");
+                if (!written) sayLong(getString(R.string.settings_fire_refused));
                 done.run();
             });
         });
@@ -871,13 +906,21 @@ public final class SettingsActivity extends CardActivity {
     private void showChoices(String title, String provider, String id, String[] actions, String[] names, String current) {
         Level level = levels.peek();
         show(title, choices(names, Arrays.asList(actions).indexOf(current), R.drawable.ic_image,
-            "Se la TV non lo supporta, Fire OS lo rifiuta.",
+            getString(R.string.settings_fire_may_refuse),
             index -> writeFire(provider, id, actions[index], () -> backFrom(level))));
     }
 
+    private String resolutionText() {
+        return getResources().getQuantityString(R.plurals.settings_resolution_text, RESOLUTION_WAIT_S, RESOLUTION_WAIT_S);
+    }
+
+    private String resolutionCountdown(int seconds) {
+        return getResources().getQuantityString(R.plurals.settings_resolution_countdown, seconds, seconds);
+    }
+
     private void showResolutions(String current) {
-        show("Risoluzione", choices(RESOLUTION_NAMES, Arrays.asList(RESOLUTIONS).indexOf(current), R.drawable.ic_image,
-            RESOLUTION_TEXT, index -> {
+        show(getString(R.string.settings_resolution), choices(strings(RESOLUTION_NAMES), Arrays.asList(RESOLUTIONS).indexOf(current), R.drawable.ic_image,
+            resolutionText(), index -> {
                 if (!RESOLUTIONS[index].equals(current)) changeResolution(current, RESOLUTIONS[index]);
             }));
     }
@@ -888,10 +931,10 @@ public final class SettingsActivity extends CardActivity {
         writeFire(FireSettings.PICTURE, RESOLUTION, next, () -> {
             int[] left = {RESOLUTION_WAIT_S};
             AlertDialog dialog = dialog()
-                .setTitle("Si vede bene?").setMessage("Torno alla risoluzione precedente tra " + left[0] + " secondi.")
+                .setTitle(getString(R.string.settings_resolution_question)).setMessage(resolutionCountdown(left[0]))
                 .setCancelable(false)
-                .setNegativeButton("Torna indietro", null)
-                .setPositiveButton("Mantieni", null)
+                .setNegativeButton(getString(R.string.settings_resolution_go_back), null)
+                .setPositiveButton(getString(R.string.settings_resolution_keep), null)
                 .create();
             Runnable[] count = new Runnable[1];
             Runnable goBack = () -> {
@@ -904,7 +947,7 @@ public final class SettingsActivity extends CardActivity {
                     goBack.run();
                     return;
                 }
-                dialog.setMessage("Torno alla risoluzione precedente tra " + left[0] + " secondi.");
+                dialog.setMessage(resolutionCountdown(left[0]));
                 rows.postDelayed(count[0], 1000);
             };
             dialog.setOnShowListener(shown -> {
@@ -929,9 +972,9 @@ public final class SettingsActivity extends CardActivity {
     private void showVideoQuality() {
         int last = VIDEO_QUALITY_NAMES.length - 1;
         String[] names = new String[last + 1];
-        for (int index = 0; index <= last; index++) names[index] = VIDEO_QUALITY_NAMES[last - index];
-        show("Qualità video", choices(names, last - videoQuality(), R.drawable.ic_image,
-            "La qualità dei video di Amazon: più è alta, più dati consuma.",
+        for (int index = 0; index <= last; index++) names[index] = getString(VIDEO_QUALITY_NAMES[last - index]);
+        show(getString(R.string.settings_video_quality), choices(names, last - videoQuality(), R.drawable.ic_image,
+            getString(R.string.settings_video_quality_text),
             index -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), VIDEO_QUALITY, last - index))));
     }
 
@@ -941,29 +984,29 @@ public final class SettingsActivity extends CardActivity {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         List<Entry> entries = new ArrayList<>();
         if (adapter == null || !adapter.isEnabled()) {
-            entries.add(new Entry("Bluetooth spento", null, picture, "Il Bluetooth non è attivo.", false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_bluetooth_off), null, picture, getString(R.string.settings_bluetooth_off_text), false, () -> { }));
             show("Bluetooth", entries);
             return;
         }
-        entries.add(new Entry("Cerca dispositivi", null, picture,
-            "Metti il dispositivo in associazione e aspetta che compaia. Per un nuovo telecomando Alexa serve la pagina Amazon.",
+        entries.add(new Entry(getString(R.string.settings_find_devices), null, picture,
+            getString(R.string.settings_find_devices_text),
             true, () -> enter(this::showBluetoothSearch)));
         for (BluetoothDevice device : adapter.getBondedDevices()) {
             String name = device.getName() != null ? device.getName() : device.getAddress();
-            entries.add(new Entry(name, Fire.connected(device) ? "Collegato" : "Associato", picture, "Premi OK per dimenticarlo.", false,
-                () -> forgetBluetooth(device, name)));
+            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), picture,
+                getString(R.string.settings_press_to_forget_device), false, () -> forgetBluetooth(device, name)));
         }
         show("Bluetooth", entries);
     }
 
     /** Hidden in the SDK, though open to apps. The remote in use may be the one being removed. */
     private void forgetBluetooth(BluetoothDevice device, String name) {
-        confirm("Dimenticare " + name + "?", "Se è il telecomando che stai usando, smetterà di funzionare finché non lo associ di nuovo.",
-            "Dimentica", () -> {
+        confirm(getString(R.string.settings_forget_question, name), getString(R.string.settings_forget_device_warning),
+            getString(R.string.settings_forget), () -> {
                 try {
                     device.getClass().getMethod("removeBond").invoke(device);
                 } catch (ReflectiveOperationException e) {
-                    sayLong("Fire OS non lo permette");
+                    sayLong(getString(R.string.settings_fire_forbids));
                 }
                 refreshLater(WIFI_SCAN_MS);
             });
@@ -988,15 +1031,15 @@ public final class SettingsActivity extends CardActivity {
             List<Entry> entries = new ArrayList<>();
             for (BluetoothDevice device : found.values()) {
                 String name = device.getName();
-                entries.add(new Entry(name, null, picture, "Premi OK per associarlo.", false, () -> {
+                entries.add(new Entry(name, null, picture, getString(R.string.settings_press_to_pair), false, () -> {
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
-                    sayLong(device.createBond() ? "Associo " + name + "…" : "Associazione non riuscita");
+                    sayLong(device.createBond() ? getString(R.string.settings_pairing, name) : getString(R.string.settings_pairing_failed));
                 }));
             }
             if (entries.isEmpty()) {
-                entries.add(new Entry("Cerco…", null, picture, "Metti il dispositivo in associazione.", false, () -> { }));
+                entries.add(new Entry(getString(R.string.first_searching), null, picture, getString(R.string.settings_pairing_mode), false, () -> { }));
             }
-            show("Cerca dispositivi", entries);
+            show(getString(R.string.settings_find_devices), entries);
         };
         draw.run();
         BroadcastReceiver listener = new BroadcastReceiver() {
@@ -1032,7 +1075,7 @@ public final class SettingsActivity extends CardActivity {
         String component = new ComponentName(this, NotificationCounter.class).flattenToString();
         shell("cmd notification " + (on ? "disallow_listener " : "allow_listener ") + component, output -> {
             if (output == null) {
-                sayLong("Fire OS non ha accettato la scelta");
+                sayLong(getString(R.string.settings_fire_refused));
                 refreshIf(level);
             } else {
                 waitCounter(on, level, COUNTER_TRIES);
@@ -1051,15 +1094,15 @@ public final class SettingsActivity extends CardActivity {
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
         boolean counted = NotificationCounter.allowed(this);
         Drawable picture = getDrawable(R.drawable.ic_settings);
-        show("Privacy", Arrays.asList(
-            new Entry("Numero delle notifiche", counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
-                "Mostra nel centro di controllo quante notifiche ci sono. Salotto le conta soltanto, senza leggerne il testo.", false,
+        show(getString(R.string.settings_privacy), Arrays.asList(
+            new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
+                getString(R.string.settings_notification_count_text), false,
                 () -> changeCounter(counted)),
-            new Entry("Limita il tracciamento pubblicitario", adsLimited ? YES : NO, getDrawable(R.drawable.ic_s_ads),
-                "Chiede alle app di non usare la tua attività per la pubblicità.", false,
+            new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, getDrawable(R.drawable.ic_s_ads),
+                getString(R.string.settings_limit_ads_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
-            new Entry("Invia dati di utilizzo", metrics ? YES : NO, getDrawable(R.drawable.ic_s_chart),
-                "Le statistiche d’uso che Fire OS manda ad Amazon.", false,
+            new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, getDrawable(R.drawable.ic_s_chart),
+                getString(R.string.settings_usage_data_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), USAGE_METRICS, metrics ? 0 : 1)))));
     }
 
@@ -1068,8 +1111,8 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showSleepTimes() {
-        show("Spegnimento automatico", choices(minuteNames(SLEEP_MINUTES), indexOf(SLEEP_MINUTES, sleepMinutes()),
-            R.drawable.ic_image, "Dopo quanto la Stick va in standby se non la usi.",
+        show(getString(R.string.settings_sleep), choices(minuteNames(SLEEP_MINUTES), indexOf(SLEEP_MINUTES, sleepMinutes()),
+            R.drawable.ic_image, getString(R.string.settings_sleep_text),
             index -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SLEEP_TIMEOUT,
                 SLEEP_MINUTES[index] * MINUTE))));
     }
@@ -1084,14 +1127,14 @@ public final class SettingsActivity extends CardActivity {
         Drawable picture = getDrawable(R.drawable.ic_wifi);
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry("Wi-Fi", on ? YES : NO, picture, "Senza Wi-Fi la Stick non ha Internet.", false,
+        entries.add(new Entry("Wi-Fi", on ? YES : NO, picture, getString(R.string.settings_wifi_text), false,
             () -> setWifi(!on)));
         if (on) {
-            entries.add(new Entry("Reti Wi-Fi", null, picture, "Scegli una rete e collegati. Le password restano sulla Stick.",
+            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_networks_text),
                 true, () -> enter(this::showWifi)));
-            entries.addAll(infoRows(DeviceInfo.network(this), picture, "Stato attuale della connessione."));
+            entries.addAll(infoRows(DeviceInfo.network(this), picture, getString(R.string.settings_connection_state)));
         }
-        show("Rete", entries);
+        show(getString(R.string.settings_network), entries);
     }
 
     /**
@@ -1103,15 +1146,15 @@ public final class SettingsActivity extends CardActivity {
         File ask = Updater.shared(this, WIFI_ON);
         if (on) {
             Updater.write(ask, "on");
-            sayLong("Riattivo il Wi-Fi…");
+            sayLong(getString(R.string.settings_wifi_turning_on));
             refreshLater(WIFI_JOIN_MS);
             return;
         }
         String path = ask.getPath();
         String script = "rm -f " + path + "; cmd wifi set-wifi-enabled disabled; sleep 2; settings put global wifi_on 1; "
             + "while [ ! -e " + path + " ]; do sleep 1; done; rm -f " + path + "; cmd wifi set-wifi-enabled enabled";
-        confirm("Disattivare il Wi-Fi?", "La Stick resta senza Internet finché non lo riattivi da qui o non la riavvii.",
-            "Disattiva", () -> {
+        confirm(getString(R.string.settings_wifi_off_question), getString(R.string.settings_wifi_off_warning),
+            getString(R.string.settings_wifi_off), () -> {
                 shell("setsid nohup sh -c " + quoted(script) + " > /dev/null 2>&1 &", output -> { });
                 refreshLater(WIFI_SCAN_MS * 2);
             });
@@ -1119,8 +1162,8 @@ public final class SettingsActivity extends CardActivity {
 
     private void showWifi() {
         Level level = levels.peek();
-        show("Reti Wi-Fi", Arrays.asList(new Entry("Cerco le reti…", null, getDrawable(R.drawable.ic_wifi),
-            "Serve qualche secondo.", false, () -> { })));
+        show(getString(R.string.settings_wifi_networks), Arrays.asList(new Entry(getString(R.string.settings_wifi_scanning), null, getDrawable(R.drawable.ic_wifi),
+            getString(R.string.settings_wifi_scanning_text), false, () -> { })));
         withLocation(() -> {
             getSystemService(WifiManager.class).startScan();
             rows.postDelayed(() -> {
@@ -1131,7 +1174,7 @@ public final class SettingsActivity extends CardActivity {
 
     private String wifiStrength(int rssi) {
         int level = WifiManager.calculateSignalLevel(rssi, WIFI_STRENGTHS.length);
-        return WIFI_STRENGTHS[level];
+        return getString(WIFI_STRENGTHS[level]);
     }
 
     /** Without the location permission the list simply comes back empty. */
@@ -1151,8 +1194,8 @@ public final class SettingsActivity extends CardActivity {
             String name = network.SSID;
             boolean connected = name.equals(current);
             String security = wifiSecurity(network);
-            Entry entry = new Entry(name, connected ? "Collegata" : wifiStrength(network.level), picture,
-                (connected ? "Premi OK per dimenticare questa rete." : "Premi OK per collegarti.")
+            Entry entry = new Entry(name, connected ? getString(R.string.settings_wifi_connected) : wifiStrength(network.level), picture,
+                (connected ? getString(R.string.settings_wifi_press_to_forget) : getString(R.string.settings_wifi_press_to_join))
                     + "\n\n" + wifiDetails(network, connected), false,
                 () -> {
                     if (connected) forgetWifi(name);
@@ -1162,18 +1205,18 @@ public final class SettingsActivity extends CardActivity {
             entries.add(entry);
         }
         if (entries.isEmpty()) {
-            entries.add(new Entry("Nessuna rete trovata", null, picture,
-                "Se l’elenco resta vuoto, Fire OS non ha dato a Salotto il permesso di leggerlo.", false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_wifi_none), null, picture,
+                getString(R.string.settings_wifi_none_text), false, () -> { }));
         }
-        show("Reti Wi-Fi", entries);
+        show(getString(R.string.settings_wifi_networks), entries);
     }
 
     /** Under the icon of the row with the focus. */
     private String wifiDetails(ScanResult network, boolean connected) {
         String security = wifiSecurity(network);
-        String details = "Qualità " + wifiStrength(network.level).toLowerCase(Locale.ITALIAN) + " · "
-            + (network.frequency >= WIFI_5GHZ ? "5 GHz" : "2,4 GHz") + " · "
-            + (security.equals("open") ? "aperta" : security.toUpperCase(Locale.ROOT));
+        String details = getString(R.string.settings_wifi_details, inSentence(wifiStrength(network.level)),
+            getString(network.frequency >= WIFI_5GHZ ? R.string.settings_wifi_5ghz : R.string.settings_wifi_2ghz),
+            security.equals("open") ? getString(R.string.settings_wifi_open) : security.toUpperCase(Locale.ROOT));
         return connected ? details + "\n" + DeviceInfo.wifiLine(this) : details;
     }
 
@@ -1196,9 +1239,9 @@ public final class SettingsActivity extends CardActivity {
         password.setSingleLine(true);
         password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         AlertDialog dialog = dialog()
-            .setTitle("Password di " + name).setView(password)
-            .setNegativeButton("Annulla", null)
-            .setPositiveButton("Collegati", (d, button) -> connectWifi(name, security, password.getText().toString()))
+            .setTitle(getString(R.string.settings_wifi_password, name)).setView(password)
+            .setNegativeButton(getString(R.string.settings_cancel), null)
+            .setPositiveButton(getString(R.string.settings_wifi_join), (d, button) -> connectWifi(name, security, password.getText().toString()))
             .create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         dialog.show();
@@ -1206,7 +1249,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void connectWifi(String name, String security, String password) {
-        sayLong("Mi collego a " + name + "…");
+        sayLong(getString(R.string.settings_wifi_joining, name));
         String secret = password.isEmpty() ? "" : " " + quoted(password);
         Level level = levels.peek();
         shell("cmd wifi connect-network " + quoted(name) + " " + security + secret,
@@ -1215,51 +1258,51 @@ public final class SettingsActivity extends CardActivity {
 
     private void forgetWifi(String name) {
         Level level = levels.peek();
-        confirm("Dimenticare " + name + "?", "La Stick si scollega e per tornare serve di nuovo la password.", "Dimentica",
+        confirm(getString(R.string.settings_forget_question, name), getString(R.string.settings_wifi_forget_warning), getString(R.string.settings_forget),
             () -> shell("cmd wifi list-networks", output -> {
                 Matcher match = Pattern.compile("(?m)^(\\d+)\\s+" + Pattern.quote(name) + "\\s").matcher(output == null ? "" : output);
                 if (match.find()) shell("cmd wifi forget-network " + match.group(1), done -> refreshIf(level));
-                else say("Rete non trovata");
+                else say(getString(R.string.settings_wifi_not_found));
             }));
     }
 
     private void showDevice() {
         Drawable picture = getDrawable(R.drawable.ic_settings);
-        List<Entry> entries = infoRows(DeviceInfo.system(this), picture, "Informazioni su questo dispositivo.");
-        entries.add(new Entry("Archiviazione USB", null, getDrawable(R.drawable.ic_s_usb), "Dischi e chiavette collegati alla Stick.",
+        List<Entry> entries = infoRows(DeviceInfo.system(this), picture, getString(R.string.settings_device_info_text));
+        entries.add(new Entry(getString(R.string.settings_usb), null, getDrawable(R.drawable.ic_s_usb), getString(R.string.settings_usb_text),
             true, () -> enter(this::showUsb)));
-        entries.add(new Entry("Standby", null, getDrawable(R.drawable.ic_power), "Mette subito la Stick in standby.", false,
+        entries.add(new Entry(getString(R.string.settings_standby), null, getDrawable(R.drawable.ic_power), getString(R.string.settings_standby_text), false,
             TaskService::standby));
-        entries.add(new Entry("Riavvia", null, getDrawable(R.drawable.ic_restart), "Riavvia la Stick. Ci vuole circa un minuto.", false,
-            () -> confirm("Riavviare la Stick?", "Le app aperte si chiudono.", "Riavvia",
+        entries.add(new Entry(getString(R.string.settings_restart), null, getDrawable(R.drawable.ic_restart), getString(R.string.settings_restart_text), false,
+            () -> confirm(getString(R.string.settings_restart_question), getString(R.string.settings_restart_warning), getString(R.string.settings_restart),
                 () -> {
                     TaskService.restart();
                 })));
-        show("Dispositivo", entries);
+        show(getString(R.string.settings_device), entries);
     }
 
     private void showBackup() {
         Drawable picture = getDrawable(R.drawable.ic_apps);
-        show("Backup", Arrays.asList(
-            new Entry("Salva le scelte di Salotto", null, getDrawable(R.drawable.ic_s_save),
-                "App della Home, aspetto, orologio e meteo finiscono in un file sulla Stick.", false, () -> {
+        show(getString(R.string.settings_backup), Arrays.asList(
+            new Entry(getString(R.string.settings_save_choices), null, getDrawable(R.drawable.ic_s_save),
+                getString(R.string.settings_save_choices_text), false, () -> {
                     try {
                         Backup.save(this);
-                        say("Scelte salvate");
+                        say(getString(R.string.settings_choices_saved));
                         refresh();
                     } catch (IOException | JSONException e) {
-                        sayLong("Salvataggio non riuscito");
+                        sayLong(getString(R.string.settings_save_failed));
                     }
                 }),
-            new Entry("Ripristina le scelte", Backup.exists(this) ? null : "Nessun backup", getDrawable(R.drawable.ic_s_restore),
-                "Riporta Salotto all’ultimo salvataggio.", false, () -> {
+            new Entry(getString(R.string.settings_restore_choices), Backup.exists(this) ? null : getString(R.string.settings_no_backup), getDrawable(R.drawable.ic_s_restore),
+                getString(R.string.settings_restore_choices_text), false, () -> {
                     try {
                         Backup.restore(this);
-                        say("Scelte ripristinate");
+                        say(getString(R.string.settings_choices_restored));
                         Look.show(this, root::setBackground);
                         refresh();
                     } catch (IOException | JSONException e) {
-                        sayLong("Nessun backup da ripristinare");
+                        sayLong(getString(R.string.settings_nothing_to_restore));
                     }
                 })));
     }
@@ -1275,18 +1318,18 @@ public final class SettingsActivity extends CardActivity {
                 refreshIf(level);
             });
         }
-        show("Strumenti", Arrays.asList(
-            new Entry("Presentazione iniziale", null, getDrawable(R.drawable.ic_salotto),
-                "Rivedi le pagine del primo avvio, con la spiegazione del telecomando.", false,
+        show(getString(R.string.settings_tools), Arrays.asList(
+            new Entry(getString(R.string.settings_tour), null, getDrawable(R.drawable.ic_salotto),
+                getString(R.string.settings_tour_text), false,
                 () -> open(new Intent(this, FirstRunActivity.class))),
             new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
-                "Ricevi video da iPhone, iPad e Mac. Parte da solo all’accensione: si cambia nelle sue impostazioni.",
+                getString(R.string.settings_airplay_text),
                 false, () -> openPackage(Fire.AIRPLAY)),
             new Entry("FireStick Fixer", null, appIcon(Fire.FIXER),
-                "Porta il tasto Home e l’accensione della Stick su Salotto.",
+                getString(R.string.settings_fixer_text),
                 false, () -> openPackage(Fire.FIXER)),
-            new Entry("Home Fire TV con doppio Home", doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
-                "Premendo Home due volte si apre la Home di Fire TV, per esempio per cambiare profilo Amazon.",
+            new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
+                getString(R.string.settings_double_home_text),
                 false, () -> shell(Fire.FIXER_COMMAND + "set doubleTap " + !doubleHome, output -> {
                     doubleHome = !doubleHome;
                     TaskService.rememberDoubleHome(this, doubleHome);
@@ -1298,7 +1341,8 @@ public final class SettingsActivity extends CardActivity {
     private void showUsb() {
         Level level = levels.peek();
         Drawable picture = getDrawable(R.drawable.ic_settings);
-        show("Archiviazione USB", Arrays.asList(new Entry("Controllo…", null, picture, "Cerco dischi e chiavette.", false, () -> { })));
+        show(getString(R.string.settings_usb), Arrays.asList(new Entry(getString(R.string.settings_usb_checking), null, picture,
+            getString(R.string.settings_usb_checking_text), false, () -> { })));
         shell("sm list-volumes public", output -> {
             if (levels.peek() != level) return;
             List<Entry> entries = new ArrayList<>();
@@ -1307,13 +1351,13 @@ public final class SettingsActivity extends CardActivity {
                 if (parts.length < 2 || !parts[0].startsWith("public:")) continue;
                 boolean mounted = parts[1].equals("mounted");
                 String name = parts.length > 2 && !parts[2].equals("null") ? parts[2] : parts[0];
-                entries.add(new Entry(name, mounted ? "Collegato" : "Non collegato", picture,
-                    mounted ? "Premi OK per scollegarlo in sicurezza prima di toglierlo." : "Si può togliere.", false, () -> {
+                entries.add(new Entry(name, mounted ? getString(R.string.settings_connected) : getString(R.string.settings_not_connected), picture,
+                    mounted ? getString(R.string.settings_usb_press_to_unmount) : getString(R.string.settings_usb_can_remove), false, () -> {
                         if (mounted) shell("sm unmount " + parts[0], done -> refreshIf(level));
                     }));
             }
-            if (entries.isEmpty()) entries.add(new Entry("Nessun disco collegato", null, picture, "Collega un disco o una chiavetta.", false, () -> { }));
-            show("Archiviazione USB", entries);
+            if (entries.isEmpty()) entries.add(new Entry(getString(R.string.settings_usb_none), null, picture, getString(R.string.settings_usb_none_text), false, () -> { }));
+            show(getString(R.string.settings_usb), entries);
         });
     }
 
@@ -1324,10 +1368,10 @@ public final class SettingsActivity extends CardActivity {
 
     private Entry weatherBackdrop(String name, int picture, String text) {
         boolean ready = Weather.active(this);
-        return new Entry(name, name.equals(Look.backdrop(this)) ? CHECK : ready ? null : "Scegli il luogo",
-            getDrawable(picture), text + " Si attiva solo con un luogo impostato nel Meteo.", false, () -> {
+        return new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : ready ? null : getString(R.string.first_place_title),
+            getDrawable(picture), getString(R.string.settings_weather_backdrop_text, text), false, () -> {
                 if (!ready) {
-                    sayLong("Scegli prima il luogo nel Meteo");
+                    sayLong(getString(R.string.settings_place_first));
                     return;
                 }
                 Look.setBackdrop(this, name);
@@ -1336,11 +1380,12 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private Entry plainBackdrop(String name, String text, boolean preview) {
-        Entry entry = new Entry(name, name.equals(Look.backdrop(this)) ? CHECK : null, getDrawable(R.drawable.ic_image), text, false, () -> {
-            Look.setBackdrop(this, name);
-            Look.show(this, root::setBackground);
-            refresh();
-        });
+        Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
+            getDrawable(R.drawable.ic_image), text, false, () -> {
+                Look.setBackdrop(this, name);
+                Look.show(this, root::setBackground);
+                refresh();
+            });
         if (preview) entry.preview = Look.preset(name);
         return entry;
     }
@@ -1348,36 +1393,36 @@ public final class SettingsActivity extends CardActivity {
     private void showBackdrops() {
         List<Entry> weather = new ArrayList<>();
         weather.add(weatherBackdrop(Look.WEATHER, R.drawable.ic_cloud,
-            "Cielo, nuvole, pioggia e neve seguono l’ora e il meteo del luogo scelto, con un’animazione leggera."));
+            getString(R.string.settings_backdrop_weather_text)));
         Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
-            "Un’illustrazione diversa per ogni ora del giorno e per ogni meteo del luogo scelto, sempre ferma.");
+            getString(R.string.settings_backdrop_pictures_text));
         pictures.strip = Look.PICTURES_FOLDER;
         weather.add(pictures);
         Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
-            "Una fotografia diversa per ogni momento del giorno e per ogni meteo del luogo scelto, sempre ferma.");
+            getString(R.string.settings_backdrop_photos_text));
         photos.strip = Look.PHOTOS_FOLDER;
         weather.add(photos);
         List<Entry> others = new ArrayList<>();
-        Entry drawn = plainBackdrop(Look.ABSTRACT, "Illustrazioni astratte che cambiano da sole, in ordine casuale.", false);
+        Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text), false);
         drawn.strip = Look.ABSTRACT_FOLDER;
         others.add(drawn);
-        others.add(new Entry("Cambia immagine ogni", minutes(Look.abstractMinutes(this)), getDrawable(R.drawable.ic_timer),
-            "Quanto resta sullo schermo ogni illustrazione astratta.", true, () -> enter(this::showAbstractTimes)));
-        for (String name : Look.PRESET_NAMES) others.add(plainBackdrop(name, "Sfumatura di Salotto.", true));
+        others.add(new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)), getDrawable(R.drawable.ic_timer),
+            getString(R.string.settings_abstract_time_text), true, () -> enter(this::showAbstractTimes)));
+        for (String name : Look.PRESET_NAMES) others.add(plainBackdrop(name, getString(R.string.settings_backdrop_preset_text), true));
         for (File image : Look.images(this)) {
-            others.add(plainBackdrop(image.getName(), "Immagine personale, adattata allo schermo.", false));
+            others.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text), false));
         }
         List<Entry> entries = new ArrayList<>();
         boolean weatherFirst = Weather.active(this);
         entries.addAll(weatherFirst ? weather : others);
         entries.addAll(weatherFirst ? others : weather);
-        show("Sfondo", entries);
+        show(getString(R.string.settings_backdrop), entries);
     }
 
     private void showAbstractTimes() {
-        show("Cambia immagine ogni", choices(minuteNames(Look.ABSTRACT_MINUTES),
+        show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
             indexOf(Look.ABSTRACT_MINUTES, Look.abstractMinutes(this)), R.drawable.ic_timer,
-            "Quanto resta sullo schermo ogni illustrazione astratta.", index -> {
+            getString(R.string.settings_abstract_time_text), index -> {
                 Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
                 refresh();
             }));
@@ -1385,28 +1430,28 @@ public final class SettingsActivity extends CardActivity {
 
     private void showClock() {
         boolean visible = Look.clock(this);
-        show("Orologio", Arrays.asList(
-            new Entry("Mostra sulla Home", visible ? YES : NO, getDrawable(R.drawable.ic_clock),
-                "L’orario resta comunque visibile nella pillola in alto a destra.", false, () -> {
+        show(getString(R.string.settings_clock), Arrays.asList(
+            new Entry(getString(R.string.settings_show_on_home), visible ? YES : NO, getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_clock_show_text), false, () -> {
                     Look.setClock(this, !visible);
                     refresh();
                 }),
-            new Entry("Carattere", Look.FONT_NAMES[Look.font(this)], getDrawable(R.drawable.ic_clock),
-                "Lo stile delle cifre dell’orologio.", true, () -> enter(this::showFonts)),
-            new Entry("Dimensione", Look.SIZE_NAMES[Look.size(this)], getDrawable(R.drawable.ic_clock),
-                "Quanto spazio occupa l’orologio sopra il dock.", true, () -> enter(this::showSizes)),
-            new Entry("Formato", Look.hours24(this) ? "24 ore" : "12 ore", getDrawable(R.drawable.ic_clock),
-                "Vale anche per l’ora nella pillola.", false, () -> {
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_font_text), true, () -> enter(this::showFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_size_text), true, () -> enter(this::showSizes)),
+            new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_hours_text), false, () -> {
                     Look.setHours24(this, !Look.hours24(this));
                     refresh();
                 }),
-            new Entry("Secondi", Look.seconds(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
-                "Mostra anche i secondi.", false, () -> {
+            new Entry(getString(R.string.settings_seconds), Look.seconds(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_seconds_text), false, () -> {
                     Look.setSeconds(this, !Look.seconds(this));
                     refresh();
                 }),
-            new Entry("Data", Look.date(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
-                "Mostra la data sotto l’orologio.", false, () -> {
+            new Entry(getString(R.string.settings_date), Look.date(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_date_text), false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();
                 })));
@@ -1414,23 +1459,23 @@ public final class SettingsActivity extends CardActivity {
 
     private String weatherValue() {
         String place = Weather.place(this);
-        return !Weather.enabled(this) ? "Spento" : place != null ? place : "Scegli il luogo";
+        return !Weather.enabled(this) ? getString(R.string.settings_off) : place != null ? place : getString(R.string.first_place_title);
     }
 
     private void showWeather() {
         boolean enabled = Weather.enabled(this);
         String place = Weather.place(this);
-        show("Meteo", Arrays.asList(
-            new Entry("Mostra sulla Home", enabled ? YES : NO, getDrawable(R.drawable.ic_cloud),
-                "Quando è spento Salotto non chiede il meteo a Internet.", false, () -> {
+        show(getString(R.string.settings_weather), Arrays.asList(
+            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_weather_show_text), false, () -> {
                     Weather.setEnabled(this, !enabled);
                     refresh();
                 }),
-            new Entry("Luogo", place != null ? place : "Da scegliere", getDrawable(R.drawable.ic_cloud),
-                "Scrivi il nome di una città. A Open-Meteo arrivano solo il nome cercato e le sue coordinate.",
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_place_text),
                 true, this::askPlace),
-            new Entry("Unità", Weather.fahrenheit(this) ? "°F" : "°C", getDrawable(R.drawable.ic_cloud),
-                "Gradi Celsius o Fahrenheit.", false, () -> {
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_units_text), false, () -> {
                     Weather.setFahrenheit(this, !Weather.fahrenheit(this));
                     refresh();
                 })));
@@ -1441,8 +1486,8 @@ public final class SettingsActivity extends CardActivity {
         name.setSingleLine(true);
         name.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         AlertDialog dialog = dialog()
-            .setTitle("Nome della città").setView(name)
-            .setPositiveButton("Cerca", (d, button) -> searchPlace(name.getText().toString().trim()))
+            .setTitle(getString(R.string.first_city_hint)).setView(name)
+            .setPositiveButton(getString(R.string.first_search), (d, button) -> searchPlace(name.getText().toString().trim()))
             .create();
         name.setOnEditorActionListener((view, action, event) -> {
             dialog.dismiss();
@@ -1469,13 +1514,13 @@ public final class SettingsActivity extends CardActivity {
         if (name.isEmpty()) return;
         Background.run(() -> {
             try {
-                List<Weather.Place> places = Weather.search(name);
+                List<Weather.Place> places = Weather.search(this, name);
                 runOnUiThread(() -> {
-                    if (places.isEmpty()) say("Nessun luogo trovato");
+                    if (places.isEmpty()) say(getString(R.string.settings_no_place));
                     else enter(() -> showPlaces(places));
                 });
             } catch (IOException | JSONException e) {
-                runOnUiThread(() -> say("Connessione non riuscita"));
+                runOnUiThread(() -> say(getString(R.string.settings_no_connection)));
             }
         });
     }
@@ -1484,12 +1529,12 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         for (Weather.Place place : places) {
             entries.add(new Entry(place.name, place.detail, getDrawable(R.drawable.ic_cloud),
-                "Scegli questo luogo per il meteo sulla Home.", false, () -> {
+                getString(R.string.settings_choose_place_text), false, () -> {
                     Weather.setPlace(this, place);
                     onBackPressed();
                 }));
         }
-        show("Scegli il luogo", entries);
+        show(getString(R.string.first_place_title), entries);
     }
 
     private boolean saverOn() {
@@ -1501,7 +1546,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private String saverValue() {
-        return saverOn() ? minutes(saverMinutes()) : "Spento";
+        return saverOn() ? minutes(saverMinutes()) : getString(R.string.settings_off);
     }
 
     /** Needs WRITE_SECURE_SETTINGS, which only adb can grant: without it the values stay readable. */
@@ -1510,7 +1555,7 @@ public final class SettingsActivity extends CardActivity {
             change.run();
             refresh();
         } catch (SecurityException e) {
-            sayLong("Manca il permesso di sistema per Salotto");
+            sayLong(getString(R.string.settings_no_permission));
         }
     }
 
@@ -1523,14 +1568,14 @@ public final class SettingsActivity extends CardActivity {
         boolean on = saverOn();
         boolean own = ownSaver();
         Drawable picture = getDrawable(R.drawable.ic_image);
-        show("Salvaschermo", Arrays.asList(
-            new Entry("Attivo", on ? YES : NO, picture,
-                "Il salvaschermo parte quando la Stick resta ferma.", false,
+        show(getString(R.string.settings_saver), Arrays.asList(
+            new Entry(getString(R.string.settings_saver_active), on ? YES : NO, picture,
+                getString(R.string.settings_saver_active_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry("Tipo", own ? "Salotto" : "Fire OS", getDrawable(R.drawable.ic_photo),
-                "Quale salvaschermo usare.", true, () -> enter(this::showSaverKinds)),
-            new Entry("Si avvia dopo", minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
-            new Entry("Avvia adesso", null, picture, "Fa partire subito il salvaschermo. Si chiude con Indietro.", false,
+            new Entry(getString(R.string.settings_saver_kind), own ? "Salotto" : "Fire OS", getDrawable(R.drawable.ic_photo),
+                getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
+            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes)),
+            new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
                 () -> open(Fire.screensaver()))));
     }
 
@@ -1538,24 +1583,24 @@ public final class SettingsActivity extends CardActivity {
     private void showSaverKinds() {
         boolean own = ownSaver();
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry("Deciso da Fire OS", own ? null : CHECK, getDrawable(R.drawable.ic_image),
-            "Il salvaschermo di Amazon, con le sue immagini.", false, () -> chooseSaver(Fire.AMAZON_SAVER)));
+        entries.add(new Entry(getString(R.string.settings_saver_fire), own ? null : CHECK, getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_saver_fire_text), false, () -> chooseSaver(Fire.AMAZON_SAVER)));
         if (!own) {
-            entries.add(new Entry("Scegli", null, getDrawable(R.drawable.ic_s_open),
-                "Apre il menu di Fire OS per scegliere tra i suoi salvaschermi: foto, stile, velocità. Il tempo di avvio che conta è quello scelto qui in Salotto.", true, () -> open(Fire.saverMenu())));
+            entries.add(new Entry(getString(R.string.settings_saver_choose), null, getDrawable(R.drawable.ic_s_open),
+                getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
-        show("Tipo", entries);
+        show(getString(R.string.settings_saver_kind), entries);
     }
 
     private Entry saverEntry(Saver saver) {
         if (saver.service == null) {
-            return new Entry(saver.name, "In arrivo", getDrawable(saver.preview), saver.text, false,
-                () -> say("Non è ancora pronto"));
+            return new Entry(getString(saver.name), getString(R.string.settings_saver_coming), getDrawable(saver.preview), getString(saver.text), false,
+                () -> say(getString(R.string.settings_saver_not_ready)));
         }
         String name = new ComponentName(this, saver.service).flattenToShortString();
         String chosen = Settings.Secure.getString(getContentResolver(), SAVER_CHOSEN);
-        return new Entry(saver.name, name.equals(chosen) ? CHECK : null, getDrawable(saver.preview), saver.text, false,
+        return new Entry(getString(saver.name), name.equals(chosen) ? CHECK : null, getDrawable(saver.preview), getString(saver.text), false,
             () -> chooseSaver(name));
     }
 
@@ -1570,8 +1615,9 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private String saverWait() {
-        if (saverInTime(saverMinutes())) return "Quanto aspetta la Stick prima di far partire il salvaschermo.";
-        return "La Stick si spegne dopo " + minutes(sleepMinutes()) + ": il salvaschermo non farà in tempo a partire. Scegli meno, o allunga lo Spegnimento automatico.";
+        if (saverInTime(saverMinutes())) return getString(R.string.settings_saver_wait_text);
+        int sleep = sleepMinutes();
+        return getResources().getQuantityString(R.plurals.settings_saver_too_late, sleep, sleep);
     }
 
     private void showSaverTimes() {
@@ -1585,23 +1631,24 @@ public final class SettingsActivity extends CardActivity {
             entries.get(index).off = true;
             limited = true;
         }
-        show("Si avvia dopo", entries, limited
-            ? "L’attuale Spegnimento automatico, " + minutes(sleepMinutes()) + ", limita le opzioni del salvaschermo." : null);
+        int sleep = sleepMinutes();
+        show(getString(R.string.settings_saver_after), entries, limited
+            ? getResources().getQuantityString(R.plurals.settings_saver_limited, sleep, sleep) : null);
     }
 
     private void showFonts() {
-        List<Entry> entries = choices(Look.FONT_NAMES, Look.font(this), R.drawable.ic_clock,
-            "Lo stile delle cifre dell’orologio.", index -> {
+        List<Entry> entries = choices(Look.fontNames(this), Look.font(this), R.drawable.ic_clock,
+            getString(R.string.settings_font_text), index -> {
                 Look.setFont(this, index);
                 refresh();
             });
         for (int index = 0; index < entries.size(); index++) entries.get(index).family = Look.FONT_FAMILIES[index];
-        show("Carattere", entries);
+        show(getString(R.string.settings_font), entries);
     }
 
     private void showSizes() {
-        show("Dimensione", choices(Look.SIZE_NAMES, Look.size(this), R.drawable.ic_clock,
-            "Quanto spazio occupa l’orologio sopra il dock.", index -> {
+        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.size(this), R.drawable.ic_clock,
+            getString(R.string.settings_size_text), index -> {
                 Look.setSize(this, index);
                 refresh();
             }));
@@ -1610,10 +1657,9 @@ public final class SettingsActivity extends CardActivity {
     private void showColumns() {
         int[] columns = Look.COLUMN_CHOICES;
         String[] names = new String[columns.length];
-        for (int index = 0; index < columns.length; index++) names[index] = columns[index] + " app per fila";
-        show("Griglia", choices(names, indexOf(columns, Look.columns(this)), R.drawable.ic_apps,
-            index -> columns[index] == 6 ? "Come su Apple TV: più app in vista, card un po’ più piccole."
-                : "Card più grandi, meno app in ogni fila.", index -> {
+        for (int index = 0; index < columns.length; index++) names[index] = appsPerRow(columns[index]);
+        show(getString(R.string.settings_grid), choices(names, indexOf(columns, Look.columns(this)), R.drawable.ic_apps,
+            index -> getString(columns[index] == 6 ? R.string.settings_grid_six : R.string.settings_grid_five), index -> {
                 Look.setColumns(this, columns[index]);
                 refresh();
             }));

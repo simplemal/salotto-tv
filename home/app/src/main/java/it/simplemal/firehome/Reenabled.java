@@ -69,7 +69,7 @@ final class Reenabled {
     }
 
     private static String label(Context context, String name) {
-        if (Fire.QUICK_MENU.equals(name)) return "Menu laterale di Fire OS";
+        if (Fire.QUICK_MENU.equals(name)) return context.getString(R.string.reenabled_quick_menu);
         PackageManager manager = context.getPackageManager();
         try {
             String label = manager.getApplicationLabel(manager.getApplicationInfo(name, 0)).toString();

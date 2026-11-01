@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.app.AlertDialog;
 import android.app.Activity;
+import android.content.Context;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -64,8 +65,14 @@ abstract class CardActivity extends Activity {
     private int cardNames;
     private Drawable focusRing;
 
+    @Override protected void attachBaseContext(Context base) {
+        super.attachBaseContext(Language.apply(base));
+    }
+
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        // Pages of words turn round for Arabic by themselves; the Home and the panels are placed by hand.
+        getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
@@ -498,7 +505,7 @@ abstract class CardActivity extends Activity {
 
     protected void confirm(String title, String message, String action, Runnable run) {
         dialog().setTitle(title).setMessage(message)
-            .setNegativeButton("Annulla", null)
+            .setNegativeButton(getString(R.string.card_cancel), null)
             .setPositiveButton(action, (dialog, button) -> run.run())
             .show();
     }
@@ -510,24 +517,24 @@ abstract class CardActivity extends Activity {
     /** False, with a word on screen, while the connection to the shell is not there. */
     /** What a normal app may not do goes through TaskService. Done runs with the output. */
     protected void shell(String command, Consumer<String> done) {
-        if (!TaskService.ready()) sayLong("Se la TV lo chiede, conferma");
+        if (!TaskService.ready()) sayLong(getString(R.string.card_tv_may_ask));
         TaskService.shellAsked(command, done);
     }
 
     /** Through the shell, so that nothing leaves Salotto. Salotto itself stays: it is the Home. */
     protected void uninstall(String pkg) {
         if (pkg.equals(getPackageName())) {
-            sayLong("Salotto è la Home e resta installata");
+            sayLong(getString(R.string.card_home_stays));
             return;
         }
-        confirm("Disinstallare " + HomeApps.label(this, pkg) + "?", "L’app e i suoi dati verranno cancellati.",
-            "Disinstalla", () -> removeApp(pkg));
+        confirm(getString(R.string.card_uninstall_title, HomeApps.label(this, pkg)), getString(R.string.card_uninstall_text),
+            getString(R.string.card_uninstall), () -> removeApp(pkg));
     }
 
     private void removeApp(String pkg) {
         shell("pm uninstall " + pkg, output -> {
             boolean removed = output != null && output.contains("Success");
-            sayLong(removed ? "App disinstallata" : "Fire OS non permette di disinstallarla");
+            sayLong(getString(removed ? R.string.card_app_removed : R.string.card_cannot_remove));
             if (removed) appRemoved();
         });
     }
@@ -543,13 +550,13 @@ abstract class CardActivity extends Activity {
     protected void openPackage(String pkg) {
         Intent intent = launchIntent(pkg);
         if (intent != null) open(intent);
-        else say("App non disponibile");
+        else say(getString(R.string.card_app_unavailable));
     }
 
     protected void open(Intent intent) {
         try { startActivity(intent); }
         catch (ActivityNotFoundException | SecurityException e) {
-            say("Impossibile aprire l’app");
+            say(getString(R.string.card_cannot_open));
         }
     }
 

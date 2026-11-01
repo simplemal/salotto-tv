@@ -65,7 +65,8 @@
         <intent><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent>
         <package android:name="it.simplemal.firehome.cover" />
     </queries>
-    <application android:label="Salotto" android:icon="@drawable/home_icon"
+    <application
+        android:supportsRtl="true" android:label="Salotto" android:icon="@drawable/home_icon"
         android:banner="@drawable/home_banner" android:allowBackup="false"
         android:theme="@android:style/Theme.Material.NoActionBar">
         <activity android:name=".MainActivity" android:exported="true"
