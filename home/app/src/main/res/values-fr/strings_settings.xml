@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Autorisation système manquante pour Salotto</string>
     <string name="settings_saver_active">Activé</string>
     <string name="settings_saver_active_text">L’économiseur d’écran démarre quand le Stick reste inactif.</string>
+    <string name="settings_saver_time">Heure</string>
+    <string name="settings_saver_date">Date</string>
+    <string name="settings_saver_weather">Météo</string>
+    <string name="settings_saver_shows_text">L’afficher ou non sur l’économiseur d’écran.</string>
     <string name="settings_saver_kind">Type</string>
     <string name="settings_saver_kind_text">Quel économiseur d’écran utiliser.</string>
     <string name="settings_saver_after">Démarre après</string>

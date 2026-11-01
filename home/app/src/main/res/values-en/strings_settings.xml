@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Salotto is missing a system permission</string>
     <string name="settings_saver_active">On</string>
     <string name="settings_saver_active_text">The screensaver starts when the Stick sits idle.</string>
+    <string name="settings_saver_time">Time</string>
+    <string name="settings_saver_date">Date</string>
+    <string name="settings_saver_weather">Weather</string>
+    <string name="settings_saver_shows_text">Whether to show it on the screensaver.</string>
     <string name="settings_saver_kind">Type</string>
     <string name="settings_saver_kind_text">Which screensaver to use.</string>
     <string name="settings_saver_after">Starts after</string>

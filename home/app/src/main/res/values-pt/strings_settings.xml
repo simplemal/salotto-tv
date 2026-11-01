@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Falta a permissão de sistema para o Salotto</string>
     <string name="settings_saver_active">Ativo</string>
     <string name="settings_saver_active_text">O protetor de tela entra quando o Stick fica parado.</string>
+    <string name="settings_saver_time">Hora</string>
+    <string name="settings_saver_date">Data</string>
+    <string name="settings_saver_weather">Clima</string>
+    <string name="settings_saver_shows_text">Se aparece no protetor de tela.</string>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Qual protetor de tela usar.</string>
     <string name="settings_saver_after">Inicia depois de</string>

@@ -15,14 +15,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
+import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.Random;
 
 /**
- * Salotto's screensaver: the pictures of one of the timed sets in turn, with only the time and the
- * date. Choosing it is what turns Fire OS's off, since only one runs at a time. The clock moves to
+ * Salotto's screensaver: the pictures of one of the timed sets in turn, with the time, the date and
+ * the weather if chosen. Choosing it is what turns Fire OS's off, since only one runs at a time. The clock moves to
  * another corner with each picture, so that nothing stays in one place on the screen for hours.
  */
 public final class SaverService extends DreamService {
@@ -61,10 +62,21 @@ public final class SaverService extends DreamService {
         root.addView(above, new FrameLayout.LayoutParams(-1, -1));
         clock = new LinearLayout(this);
         clock.setOrientation(LinearLayout.VERTICAL);
-        TextClock time = clock(TIME_SP, Look.timePattern(this));
-        time.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
-        clock.addView(time);
-        clock.addView(clock(DATE_SP, DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")));
+        if (Look.saverTime(this)) {
+            TextClock time = clock(TIME_SP, Look.timePattern(this));
+            time.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
+            clock.addView(time);
+        }
+        if (Look.saverDate(this)) clock.addView(clock(DATE_SP, DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")));
+        String weather = Look.saverWeather(this) ? Weather.line(this) : null;
+        if (weather != null) {
+            TextView line = new TextView(this);
+            line.setText(weather);
+            line.setTextSize(DATE_SP);
+            line.setTextColor(Color.WHITE);
+            line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);
+            clock.addView(line);
+        }
         root.addView(clock, corner(CORNERS[0]));
         setContentView(root);
     }

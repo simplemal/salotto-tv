@@ -244,6 +244,10 @@
     <string name="settings_no_permission">Falta el permiso del sistema para Salotto</string>
     <string name="settings_saver_active">Activo</string>
     <string name="settings_saver_active_text">El salvapantallas se inicia cuando el Stick está sin actividad.</string>
+    <string name="settings_saver_time">Hora</string>
+    <string name="settings_saver_date">Fecha</string>
+    <string name="settings_saver_weather">Tiempo</string>
+    <string name="settings_saver_shows_text">Si se muestra en el salvapantallas.</string>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Qué salvapantallas usar.</string>
     <string name="settings_saver_after">Se inicia tras</string>

@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Нет системного разрешения для Salotto</string>
     <string name="settings_saver_active">Включена</string>
     <string name="settings_saver_active_text">Заставка запускается, когда Stick долго не используют.</string>
+    <string name="settings_saver_time">Время</string>
+    <string name="settings_saver_date">Дата</string>
+    <string name="settings_saver_weather">Погода</string>
+    <string name="settings_saver_shows_text">Показывать ли на заставке.</string>
     <string name="settings_saver_kind">Тип</string>
     <string name="settings_saver_kind_text">Какую заставку использовать.</string>
     <string name="settings_saver_after">Запускается через</string>

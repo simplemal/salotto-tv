@@ -187,6 +187,14 @@ final class Look {
     static String saverFolder(Context context) { return prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER); }
     static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
+    /** What the screensaver shows over its pictures. */
+    static boolean saverTime(Context context) { return prefs(context).getBoolean("saver_time", true); }
+    static void setSaverTime(Context context, boolean on) { prefs(context).edit().putBoolean("saver_time", on).apply(); }
+    static boolean saverDate(Context context) { return prefs(context).getBoolean("saver_date", true); }
+    static void setSaverDate(Context context, boolean on) { prefs(context).edit().putBoolean("saver_date", on).apply(); }
+    static boolean saverWeather(Context context) { return prefs(context).getBoolean("saver_weather", false); }
+    static void setSaverWeather(Context context, boolean on) { prefs(context).edit().putBoolean("saver_weather", on).apply(); }
+
     static boolean weatherPhotos(Context context) { return PHOTOS.equals(backdrop(context)); }
 
     /**

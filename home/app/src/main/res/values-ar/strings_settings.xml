@@ -243,6 +243,10 @@
     <string name="settings_no_permission">ينقص Salotto إذن النظام</string>
     <string name="settings_saver_active">مفعّل</string>
     <string name="settings_saver_active_text">تبدأ شاشة التوقف عندما يبقى جهاز Stick ساكنًا.</string>
+    <string name="settings_saver_time">الوقت</string>
+    <string name="settings_saver_date">التاريخ</string>
+    <string name="settings_saver_weather">الطقس</string>
+    <string name="settings_saver_shows_text">إظهاره على شاشة التوقف أو إخفاؤه.</string>
     <string name="settings_saver_kind">النوع</string>
     <string name="settings_saver_kind_text">أي شاشة توقف تُستخدم.</string>
     <string name="settings_saver_after">تبدأ بعد</string>

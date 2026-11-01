@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Systemberechtigung für Salotto fehlt</string>
     <string name="settings_saver_active">Aktiv</string>
     <string name="settings_saver_active_text">Der Bildschirmschoner startet, wenn der Stick unbenutzt bleibt.</string>
+    <string name="settings_saver_time">Uhrzeit</string>
+    <string name="settings_saver_date">Datum</string>
+    <string name="settings_saver_weather">Wetter</string>
+    <string name="settings_saver_shows_text">Ob es auf dem Bildschirmschoner erscheint.</string>
     <string name="settings_saver_kind">Art</string>
     <string name="settings_saver_kind_text">Welcher Bildschirmschoner genutzt wird.</string>
     <string name="settings_saver_after">Startet nach</string>

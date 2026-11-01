@@ -243,6 +243,10 @@
     <string name="settings_no_permission">Manca il permesso di sistema per Salotto</string>
     <string name="settings_saver_active">Attivo</string>
     <string name="settings_saver_active_text">Il salvaschermo parte quando la Stick resta ferma.</string>
+    <string name="settings_saver_time">Orario</string>
+    <string name="settings_saver_date">Data</string>
+    <string name="settings_saver_weather">Meteo</string>
+    <string name="settings_saver_shows_text">Se mostrarlo sul salvaschermo.</string>
     <string name="settings_saver_kind">Tipo</string>
     <string name="settings_saver_kind_text">Quale salvaschermo usare.</string>
     <string name="settings_saver_after">Si avvia dopo</string>

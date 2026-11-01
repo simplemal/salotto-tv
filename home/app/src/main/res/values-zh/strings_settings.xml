@@ -244,6 +244,10 @@
     <string name="settings_no_permission">Salotto 缺少系统权限</string>
     <string name="settings_saver_active">启用</string>
     <string name="settings_saver_active_text">Stick 闲置不动时，屏保就会启动。</string>
+    <string name="settings_saver_time">时间</string>
+    <string name="settings_saver_date">日期</string>
+    <string name="settings_saver_weather">天气</string>
+    <string name="settings_saver_shows_text">是否在屏保上显示。</string>
     <string name="settings_saver_kind">类型</string>
     <string name="settings_saver_kind_text">使用哪种屏保。</string>
     <string name="settings_saver_after">多久后启动</string>

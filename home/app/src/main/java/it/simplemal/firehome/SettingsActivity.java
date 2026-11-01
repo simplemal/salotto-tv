@@ -54,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
@@ -193,6 +194,8 @@ public final class SettingsActivity extends CardActivity {
         final Runnable show;
         int focus;
         Runnable leave;
+        /** The real page is on screen: reading it again must not replace it with the waiting one. */
+        boolean drawn;
         Level(Runnable show) { this.show = show; }
     }
 
@@ -394,6 +397,7 @@ public final class SettingsActivity extends CardActivity {
             rows.addView(line, new LinearLayout.LayoutParams(-1, -2));
         }
         int focus = levels.peek().focus;
+        levels.peek().drawn = true;
         if (focus == 0) scroll.scrollTo(0, 0);
         selectRow(focus);
     }
@@ -854,10 +858,13 @@ public final class SettingsActivity extends CardActivity {
 
     /** The only row of this page takes the focus: the place in the real page has to survive it. */
     private void showWaiting(String title) {
-        int focus = levels.peek().focus;
+        Level level = levels.peek();
+        if (level.drawn) return;
+        int focus = level.focus;
         show(title, Arrays.asList(new Entry(getString(R.string.settings_reading), null, getDrawable(R.drawable.ic_image),
             getString(R.string.settings_a_moment), false, () -> { })));
-        levels.peek().focus = focus;
+        level.focus = focus;
+        level.drawn = false;
     }
 
     private void showVideo() {
@@ -1669,6 +1676,13 @@ public final class SettingsActivity extends CardActivity {
     }
 
     /** Only one screensaver runs at a time: choosing ours is what turns off Fire OS's. */
+    private Entry saverShows(int name, int icon, boolean on, BiConsumer<Context, Boolean> set) {
+        return new Entry(getString(name), on ? YES : NO, getDrawable(icon), getString(R.string.settings_saver_shows_text), false, () -> {
+            set.accept(this, !on);
+            refresh();
+        });
+    }
+
     private void showSaverKinds() {
         boolean own = ownSaver();
         List<Entry> entries = new ArrayList<>();
@@ -1679,7 +1693,12 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
-        if (own) entries.add(paceEntry());
+        if (own) {
+            entries.add(paceEntry());
+            entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
+            entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
+            entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
+        }
         show(getString(R.string.settings_saver_kind), entries);
     }
 
