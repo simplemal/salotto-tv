@@ -35,6 +35,8 @@ final class FireSteps {
     private int step;
     private long limit;
     private Runnable choose;
+    private boolean wasFocused;
+    private Runnable lost;
     private boolean ended;
 
     FireSteps(AccessibilityService service, Handler main) {
@@ -94,17 +96,36 @@ final class FireSteps {
         main.postDelayed(look, POLL_MS);
     }
 
+    /** Told when the entry has to be found again: until `selected` hears of it, OK does nothing. */
+    void whenLost(Runnable action) { lost = action; }
+
+    /** The entry is selected, so an OK goes to it. */
+    boolean ready() { return entry != null; }
+
     /** TaskService hears OK. */
     void okPressed() {
         okPressed = entry != null;
     }
 
-    /** Pressed, an entry may also turn off or open another window. */
+    /**
+     * Pressed, an entry may also turn off or open another window. An entry gone is not a press: a
+     * page seen for the first time fills in late and builds its rows again. Nor is a selection
+     * that moved away: OK would land on the next row, so until it is back no OK goes through.
+     */
     private void waitForPress() {
         AccessibilityNodeInfo root = service.getRootInActiveWindow();
-        boolean pressed = okPressed || root != null && (root.getWindowId() != windowId || find(steps[step]) == null);
+        boolean there = entry.refresh();
+        boolean focused = there && entry.isFocused();
+        boolean pressed = okPressed || root != null && root.getWindowId() != windowId || there && !entry.isEnabled();
         okPressed = false;
-        if (!pressed && SystemClock.elapsedRealtime() < limit) {
+        wasFocused |= focused;
+        if (!pressed && (!there || wasFocused && !focused)) {
+            entry = null;
+            wasFocused = false;
+            if (lost != null) lost.run();
+            limit = SystemClock.elapsedRealtime() + FIND_LIMIT_MS;
+            main.postDelayed(look, POLL_MS);
+        } else if (!pressed && SystemClock.elapsedRealtime() < limit) {
             main.postDelayed(look, POLL_MS);
         } else if (pressed && step + 1 < steps.length) {
             step++;

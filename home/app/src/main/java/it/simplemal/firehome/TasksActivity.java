@@ -39,6 +39,8 @@ public final class TasksActivity extends CardActivity {
     private static final int BLUR_HEIGHT = 27;
     private static final long SCREEN_WAIT_MS = 500;
     private static final int BUTTON_SIZE = 32;
+    static final String CLOSE = "✕";
+    static final int CLOSE_SP = 13;
     private static final int BUTTON_GAP = 56;
     private static final int BUTTON_RING = 2;
     /** The grey the thin cross looks: over a dark picture the darker fill alone cannot be seen. */
@@ -109,7 +111,7 @@ public final class TasksActivity extends CardActivity {
         title.setGravity(Gravity.CENTER);
         title.setPadding(0, dp(14), 0, dp(12));
         column.addView(title, new LinearLayout.LayoutParams(-1, -2));
-        button = label("✕", 13);
+        button = label(CLOSE, CLOSE_SP);
         button.setGravity(Gravity.CENTER);
         button.setContentDescription(getString(R.string.card_close));
         button.setOnClickListener(view -> stopSelected());
@@ -277,6 +279,8 @@ public final class TasksActivity extends CardActivity {
         buttonFill.setColor(onButton ? Color.WHITE : Color.rgb(84, 88, 96));
         buttonFill.setStroke(dp(BUTTON_RING), onButton ? Color.WHITE : BUTTON_EDGE);
         button.setTextColor(onButton ? Fire.INK : Color.WHITE);
+        // While Fire OS's page gets ready a wheel takes this place: no X to press too soon.
+        button.setText(onButton && !prepareFailed ? "" : CLOSE);
     }
 
     private Drawable edge() {
@@ -302,7 +306,6 @@ public final class TasksActivity extends CardActivity {
     private void stopSelected() {
         if (apps.isEmpty() || stopping || !prepareFailed) return;
         String pkg = apps.get(index).pkg;
-        boolean latest = index == 0;
         stopping = true;
         TaskService.stop(pkg, stopped -> {
             stopping = false;
@@ -310,9 +313,6 @@ public final class TasksActivity extends CardActivity {
             if (!stopped) {
                 sayLong(getString(R.string.tasks_stop_failed));
                 appInfo(pkg);
-            } else if (latest) {
-                open(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                finish();
             } else {
                 load();
             }
@@ -336,6 +336,11 @@ public final class TasksActivity extends CardActivity {
         // Back held opened this page, and the key goes on repeating until it is released.
         boolean repeat = event.getRepeatCount() > 0 && (code == KeyEvent.KEYCODE_BACK || code == KeyEvent.KEYCODE_MENU);
         if (event.getAction() == KeyEvent.ACTION_DOWN && !repeat) press(code);
+        // Only once the key is up: a key still down would end up on Fire OS's page.
+        if (event.getAction() == KeyEvent.ACTION_UP && code == KeyEvent.KEYCODE_DPAD_DOWN && onButton) {
+            main.removeCallbacks(prepareStop);
+            main.postDelayed(prepareStop, PREPARE_MS);
+        }
         return true;
     }
 
@@ -343,19 +348,16 @@ public final class TasksActivity extends CardActivity {
     private void prepareStop() {
         if (!onButton || apps.isEmpty() || stopping) return;
         String pkg = apps.get(index).pkg;
-        boolean latest = index == 0;
         prepareFailed = false;
-        TaskService.prepareStop(this, pkg, result -> {
+        TaskService.prepareStop(this, button, pkg, result -> {
             if (isFinishing()) return;
             if (result == TaskService.STOP_FAILED) {
                 prepareFailed = true;
+                show(false);
             } else if (result == TaskService.STOP_UP) {
                 onButton = false;
                 show(false);
             } else if (result == TaskService.STOP_BACK) {
-                finish();
-            } else if (latest) {
-                open(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 finish();
             } else {
                 onButton = false;
@@ -373,8 +375,8 @@ public final class TasksActivity extends CardActivity {
             select(index + 1);
         } else if (code == KeyEvent.KEYCODE_DPAD_DOWN && !apps.isEmpty()) {
             onButton = true;
+            prepareFailed = false;
             show(false);
-            main.postDelayed(prepareStop, PREPARE_MS);
         } else if (code == KeyEvent.KEYCODE_DPAD_UP) {
             onButton = false;
             main.removeCallbacks(prepareStop);

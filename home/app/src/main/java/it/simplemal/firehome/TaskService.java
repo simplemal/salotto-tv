@@ -15,7 +15,9 @@ import android.graphics.Color;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
@@ -108,6 +110,8 @@ public final class TaskService extends AccessibilityService {
     /** Fire OS closes adb connections made from the TV itself while this is off, and turns it off at every reboot. */
     private static final String WIRELESS_DEBUGGING = "adb_wifi_enabled";
     private static final int WHEEL_DP = 40;
+    /** The wheel in the X's circle: this much of the width on each side, as a fraction. */
+    private static final int STOP_WHEEL_ROOM = 5;
     /**
      * One line for each press, and only once Android has taken Amazon's Home in: a Home started
      * after this comes out on top of it. The system's own log only, or the reading falls behind.
@@ -152,7 +156,6 @@ public final class TaskService extends AccessibilityService {
     private final Runnable uncover = this::uncoverUninstall;
     private FrameLayout installMask;
     private IntConsumer stopAnswer;
-    private volatile boolean stopReady;
     private int stopLeaving;
     private long recentsAt;
     private PanelWindow panelWindow;
@@ -223,7 +226,7 @@ public final class TaskService extends AccessibilityService {
      * the task manager, with Force stop selected, so that the OK on the X is the real press. Those
      * pages take nothing but the real key.
      */
-    static void prepareStop(Activity page, String pkg, IntConsumer answer) {
+    static void prepareStop(Activity page, View button, String pkg, IntConsumer answer) {
         TaskService service = running;
         if (service == null) {
             answer.accept(STOP_FAILED);
@@ -231,22 +234,59 @@ public final class TaskService extends AccessibilityService {
         }
         DisplayMetrics screen = page.getResources().getDisplayMetrics();
         Bitmap picture = Bitmap.createBitmap(screen.widthPixels / 2, screen.heightPixels / 2, Bitmap.Config.ARGB_8888);
-        PixelCopy.request(page.getWindow(), picture, result -> service.coverForStop(picture, pkg, answer), service.main);
+        int[] corner = new int[2];
+        button.getLocationOnScreen(corner);
+        Rect place = new Rect(corner[0], corner[1], corner[0] + button.getWidth(), corner[1] + button.getHeight());
+        PixelCopy.request(page.getWindow(), picture, result -> service.coverForStop(picture, place, pkg, answer), service.main);
     }
 
-    private void coverForStop(Bitmap picture, String pkg, IntConsumer answer) {
+    /** Where the X was: a wheel until an OK there would reach Force stop, the X from then on. */
+    private FrameLayout stopKey(FrameLayout cover, Rect place) {
+        FrameLayout key = new FrameLayout(this);
+        GradientDrawable fill = new GradientDrawable();
+        fill.setShape(GradientDrawable.OVAL);
+        fill.setColor(Color.WHITE);
+        key.setBackground(fill);
+        ProgressBar wheel = new ProgressBar(this);
+        wheel.setIndeterminateTintList(ColorStateList.valueOf(Fire.INK));
+        FrameLayout.LayoutParams inside = new FrameLayout.LayoutParams(-1, -1);
+        int room = place.width() / STOP_WHEEL_ROOM;
+        inside.setMargins(room, room, room, room);
+        key.addView(wheel, inside);
+        TextView mark = new TextView(this);
+        mark.setText(TasksActivity.CLOSE);
+        mark.setTextSize(TasksActivity.CLOSE_SP);
+        mark.setTextColor(Fire.INK);
+        mark.setGravity(Gravity.CENTER);
+        mark.setVisibility(View.GONE);
+        key.addView(mark, new FrameLayout.LayoutParams(-1, -1));
+        FrameLayout.LayoutParams spot = new FrameLayout.LayoutParams(place.width(), place.height(), Gravity.TOP | Gravity.START);
+        spot.leftMargin = place.left;
+        spot.topMargin = place.top;
+        cover.addView(key, spot);
+        return key;
+    }
+
+    private static void showStopKey(FrameLayout key, boolean ready) {
+        key.getChildAt(0).setVisibility(ready ? View.GONE : View.VISIBLE);
+        key.getChildAt(1).setVisibility(ready ? View.VISIBLE : View.GONE);
+    }
+
+    private void coverForStop(Bitmap picture, Rect place, String pkg, IntConsumer answer) {
         FrameLayout cover = mask(getString(R.string.task_closing, HomeApps.label(this, pkg)), picture);
         View working = cover.findViewWithTag(MASK_WORKING);
         working.setVisibility(View.GONE);
         cover.findViewWithTag(MASK_DIM).setVisibility(View.GONE);
+        FrameLayout key = stopKey(cover, place);
         stopAnswer = answer;
-        stopReady = false;
         stopLeaving = STOP_FAILED;
         FireSteps steps = new FireSteps(this, main);
         fireSteps = steps;
+        steps.whenLost(() -> showStopKey(key, false));
         Intent page = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg));
-        steps.run(page, new String[][]{Fire.forceStop(this)}, step -> stopReady = true, pressed -> {
+        steps.run(page, new String[][]{Fire.forceStop(this)}, step -> showStopKey(key, true), pressed -> {
             fireSteps = null;
+            key.setVisibility(View.GONE);
             if (pressed) {
                 cover.findViewWithTag(MASK_DIM).setVisibility(View.VISIBLE);
                 working.setVisibility(View.VISIBLE);
@@ -263,8 +303,9 @@ public final class TaskService extends AccessibilityService {
     /** Only OK reaches the page, and only once Force stop is selected: up and Back leave the X. */
     private boolean keyOnPreparedStop(int key, boolean ok, boolean up) {
         if (ok) {
-            if (stopReady && up && fireSteps != null) fireSteps.okPressed();
-            return !stopReady;
+            boolean ready = fireSteps != null && fireSteps.ready();
+            if (ready && up) fireSteps.okPressed();
+            return !ready;
         }
         boolean leaves = key == KeyEvent.KEYCODE_DPAD_UP || key == KeyEvent.KEYCODE_BACK;
         if (leaves && up && fireSteps != null) {
