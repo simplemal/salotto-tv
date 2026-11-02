@@ -2,7 +2,6 @@ package it.simplemal.firehome;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -22,7 +21,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,7 +52,6 @@ final class PictureMosaic extends FrameLayout {
     private static final float START_Y = -0.6f;
     private static final float COLUMN_STEP_Y = -0.34f;
     /** The files are 1920 wide and a tile a quarter of that. */
-    private static final int SAMPLE = 4;
     private static final long EVERY_MS = 2000;
     private static final long TURN_MS = 800;
     private static final long DISSOLVE_MS = 1000;
@@ -110,12 +107,22 @@ final class PictureMosaic extends FrameLayout {
             return view;
         }
 
+        private Bitmap best;
+
+        /** The better copy, once it is read: the turn or the dissolve may still be going on. */
+        void sharpen(Bitmap picture) {
+            best = picture;
+            if (coming.getVisibility() == VISIBLE) coming.setImageBitmap(picture);
+            else shown.setImageBitmap(picture);
+        }
+
         void dissolve(Bitmap picture) {
+            best = null;
             coming.setImageBitmap(picture);
             coming.setAlpha(0f);
             coming.setVisibility(VISIBLE);
             coming.animate().alpha(1f).setDuration(DISSOLVE_MS).withEndAction(() -> {
-                shown.setImageBitmap(picture);
+                shown.setImageBitmap(best != null ? best : picture);
                 coming.setVisibility(GONE);
                 filled = true;
                 busy = false;
@@ -124,9 +131,10 @@ final class PictureMosaic extends FrameLayout {
 
         /** Edge-on is the moment to change the picture: it never reads mirrored. */
         void turn(Bitmap picture) {
+            best = null;
             AccelerateDecelerateInterpolator ease = new AccelerateDecelerateInterpolator();
             frame.animate().rotationY(QUARTER_TURN).setDuration(TURN_MS / 2).setInterpolator(ease).withEndAction(() -> {
-                shown.setImageBitmap(picture);
+                shown.setImageBitmap(best != null ? best : picture);
                 frame.setRotationY(-QUARTER_TURN);
                 frame.animate().rotationY(0).setDuration(TURN_MS / 2).setInterpolator(ease)
                     .withEndAction(() -> busy = false).start();
@@ -290,7 +298,8 @@ final class PictureMosaic extends FrameLayout {
         String asked = folder;
         Context context = getContext().getApplicationContext();
         Background.draw(() -> {
-            Bitmap picture = decode(context, file);
+            Bitmap quick = Thumbnails.tiny(context, file);
+            Bitmap picture = quick != null ? quick : Thumbnails.read(context, file);
             post(() -> {
                 if (!asked.equals(folder)) return;
                 if (picture == null) {
@@ -301,17 +310,11 @@ final class PictureMosaic extends FrameLayout {
                     tile.dissolve(picture);
                 }
             });
+            if (quick == null) return;
+            Bitmap better = Thumbnails.read(context, file);
+            post(() -> {
+                if (better != null && asked.equals(folder)) tile.sharpen(better);
+            });
         });
-    }
-
-    private static Bitmap decode(Context context, String file) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = SAMPLE;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-        try (InputStream input = context.getAssets().open(file)) {
-            return BitmapFactory.decodeStream(input, null, options);
-        } catch (IOException e) {
-            return null;
-        }
     }
 }

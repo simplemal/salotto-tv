@@ -14,6 +14,8 @@ import java.io.InputStream;
  */
 final class Thumbnails {
     private static final String FOLDER = "miniature/";
+    /** A smaller copy still, for the first moment: it takes a fraction of the time to read. */
+    private static final String TINY_FOLDER = "miniature-piccole/";
     /** Salotto stays in memory under every app: a set and a bit, not all of them. */
     private static final int KEPT_BYTES = 16 * 1024 * 1024;
     /** For a picture with no small copy: a quarter of each side. */
@@ -26,6 +28,9 @@ final class Thumbnails {
 
     /** Already in memory, or null: for the main thread. */
     static Bitmap kept(String asset) { return KEPT.get(asset); }
+
+    /** Away from the main thread. Null if this picture has no such copy. */
+    static Bitmap tiny(Context context, String asset) { return decode(context, TINY_FOLDER + asset, 1); }
 
     /** Takes time: call it away from the main thread. */
     static Bitmap read(Context context, String asset) {

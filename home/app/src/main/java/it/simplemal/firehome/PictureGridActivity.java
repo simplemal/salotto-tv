@@ -281,16 +281,25 @@ public final class PictureGridActivity extends CardActivity {
         String name = pictures.get(index);
         Background.draw(() -> {
             if (isDestroyed()) return;
+            Bitmap quick = Thumbnails.kept(name) == null ? Thumbnails.tiny(this, name) : null;
+            if (quick != null) runOnUiThread(() -> {
+                place.removeView(wheel);
+                appear(cells.get(index), quick);
+            });
             Bitmap thumbnail = Thumbnails.read(this, name);
             runOnUiThread(() -> {
                 place.removeView(wheel);
                 if (thumbnail == null) return;
-                ImageView cell = cells.get(index);
-                cell.setImageAlpha(0);
-                cell.setImageBitmap(thumbnail);
-                ObjectAnimator.ofInt(cell, "imageAlpha", 0, OPAQUE).setDuration(FADE_MS).start();
+                if (quick != null) cells.get(index).setImageBitmap(thumbnail);
+                else appear(cells.get(index), thumbnail);
             });
         });
+    }
+
+    private void appear(ImageView cell, Bitmap picture) {
+        cell.setImageAlpha(0);
+        cell.setImageBitmap(picture);
+        ObjectAnimator.ofInt(cell, "imageAlpha", 0, OPAQUE).setDuration(FADE_MS).start();
     }
 
     private Bitmap decode(String asset) {
