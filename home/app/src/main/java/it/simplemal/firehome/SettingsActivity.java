@@ -1435,7 +1435,7 @@ public final class SettingsActivity extends CardActivity {
 
     /** ACTION_SETTINGS passes through Amazon's home activity, which brings Salotto back here. */
     private Intent fireOsSettings() {
-        return new Intent().setClassName(Fire.AMAZON_HOME, Fire.SETTINGS_PAGE);
+        return Fire.settings();
     }
 
     private Entry weatherBackdrop(String name, int picture, String text) {

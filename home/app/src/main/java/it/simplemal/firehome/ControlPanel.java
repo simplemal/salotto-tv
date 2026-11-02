@@ -275,10 +275,11 @@ final class ControlPanel extends LinearLayout {
         audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(getContext())));
-        Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
-            this::changeWarm);
-        // The matrix takes the shell. The place stays for another tile.
-        if (Fire.ANDROID_9) warm.view.setVisibility(INVISIBLE);
+        // The filter's matrix takes the shell, which Android 9 does not give.
+        Tile warm = Fire.ANDROID_9 ? small(modes, R.drawable.ic_settings, getContext().getString(R.string.settings_fire), GAP, () -> {
+            TaskService.wantFireSettings();
+            host.open(Fire.settings());
+        }) : small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP, this::changeWarm);
 
         LinearLayout tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver(getContext())));
@@ -298,7 +299,7 @@ final class ControlPanel extends LinearLayout {
         timerTile = timer;
         refreshers.add(this::showTimer);
         refreshers.add(() -> showDim(dim));
-        refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
+        if (!Fire.ANDROID_9) refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
 
     private LinearLayout row() {
