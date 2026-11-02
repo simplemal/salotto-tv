@@ -27,7 +27,7 @@ final class BottomBlur {
         int width = picture.getWidth();
         int height = picture.getHeight();
         int top = Math.round(height * START);
-        Bitmap soft = blurred(Bitmap.createBitmap(picture, 0, top, width, height - top));
+        Bitmap soft = blurred(Bitmap.createBitmap(picture, 0, top, width, height - top), HALVINGS);
         Canvas canvas = new Canvas(picture);
         int layer = canvas.saveLayer(0, top, width, height, null);
         canvas.drawBitmap(soft, 0, top, null);
@@ -39,14 +39,15 @@ final class BottomBlur {
         soft.recycle();
     }
 
-    private static Bitmap blurred(Bitmap strip) {
-        int width = strip.getWidth();
-        int height = strip.getHeight();
-        Bitmap soft = strip;
-        for (int step = 1; step <= HALVINGS; step++) {
+    /** The same size as `picture`, which is used up: pass a copy of one still needed. */
+    static Bitmap blurred(Bitmap picture, int halvings) {
+        int width = picture.getWidth();
+        int height = picture.getHeight();
+        Bitmap soft = picture;
+        for (int step = 1; step <= halvings; step++) {
             soft = resized(soft, Math.max(1, width >> step), Math.max(1, height >> step));
         }
-        for (int step = HALVINGS - 1; step >= 0; step--) {
+        for (int step = halvings - 1; step >= 0; step--) {
             soft = resized(soft, Math.max(1, width >> step), Math.max(1, height >> step));
         }
         return soft;

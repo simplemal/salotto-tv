@@ -39,8 +39,8 @@ public final class TasksActivity extends CardActivity {
     private static final int CARD_GAP = 16;
     private static final int RADIUS = 12;
     private static final int ART_INSET = 32;
-    private static final int BLUR_WIDTH = 160;
-    private static final int BLUR_HEIGHT = 90;
+    /** Softer than the Home's: what is behind can still be told apart. */
+    private static final int BLUR_HALVINGS = 3;
     private static final long SCREEN_WAIT_MS = 500;
     private static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
@@ -191,8 +191,7 @@ public final class TasksActivity extends CardActivity {
         if (behind == null) {
             Look.show(this, backdropView::setImageDrawable);
         } else {
-            Bitmap small = Bitmap.createScaledBitmap(behind, BLUR_WIDTH, BLUR_HEIGHT, true);
-            backdropView.setImageBitmap(Bitmap.createScaledBitmap(small, behind.getWidth(), behind.getHeight(), true));
+            backdropView.setImageBitmap(BottomBlur.blurred(behind.copy(Bitmap.Config.ARGB_8888, false), BLUR_HALVINGS));
         }
         root.animate().alpha(1).setDuration(FADE_MS).withEndAction(TaskService::tasksShown).start();
     }
