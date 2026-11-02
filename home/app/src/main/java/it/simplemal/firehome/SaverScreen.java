@@ -30,6 +30,7 @@ final class SaverScreen {
     private static final long MINUTE_MS = 60 * 1000L;
     private static final int TIME_SP = 72;
     private static final int DATE_SP = 22;
+    private static final int WEATHER_SP = 16;
     private static final int MARGIN_DP = 48;
     private static final float SHADOW = 12;
     private static final int SHADOW_COLOR = Color.argb(170, 0, 0, 0);
@@ -70,7 +71,7 @@ final class SaverScreen {
         if (weather != null) {
             TextView line = new TextView(context);
             line.setText(weather);
-            line.setTextSize(DATE_SP);
+            line.setTextSize(WEATHER_SP);
             line.setTextColor(Color.WHITE);
             line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);
             clock.addView(line);
