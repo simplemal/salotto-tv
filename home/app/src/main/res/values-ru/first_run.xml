@@ -34,6 +34,7 @@
     <string name="first_start">Начать</string>
     <string name="first_backdrop_title">Выберите фон</string>
     <string name="first_preview">Предпросмотр</string>
+    <string name="grid_position">%1$d из %2$d</string>
     <string name="first_backdrop_pictures">Иллюстрированная погода</string>
     <string name="first_backdrop_photos">Погода на фото</string>
     <string name="first_backdrop_night">Ночь</string>

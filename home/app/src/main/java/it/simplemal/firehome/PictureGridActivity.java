@@ -1,9 +1,11 @@
 package it.simplemal.firehome;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Outline;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -24,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Every picture of one set, or Salotto's own backdrops with no set named, four across and three down
- * at a time. OK shows one as the whole screen: left and right go through the
+ * Every picture of one set, or Salotto's own backdrops with no set named, four across and down to
+ * the edge of the screen. OK shows one as the whole screen: left and right go through the
  * others there, Confirm keeps the one on show and Back returns to the grid.
  */
 public final class PictureGridActivity extends CardActivity {
@@ -33,7 +35,6 @@ public final class PictureGridActivity extends CardActivity {
     static final String TITLE = "title";
 
     private static final int COLUMNS = 4;
-    private static final int ROWS_SHOWN = 3;
     private static final int CELL_WIDTH = 216;
     private static final int CELL_HEIGHT = 122;
     private static final int GAP = 12;
@@ -44,6 +45,9 @@ public final class PictureGridActivity extends CardActivity {
     private static final int TITLE_BOTTOM = 14;
     /** The edge of a selected cell stays inside the scrolling area. */
     private static final int SIDE_ROOM = 4;
+    private static final int BOTTOM_ROOM = 28;
+    /** What stays in view past the selected row, with the gap: what the screen's edge cuts at the start. */
+    private static final int NEXT_ROW = 72;
     /** A quarter of each side: the grid shows sixty of these at once in very little memory. */
     private static final int THUMB_SAMPLE = 4;
     private static final int NOTE_SP = 14;
@@ -56,6 +60,22 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BUTTON_ROOM = 8;
     private static final int ARROW_SP = 34;
     private static final float ARROW_ALPHA = 0.55f;
+
+    /** A row cut by the edge of the screen is what says there are more, as on the Home. */
+    private static final class GridScroll extends ScrollView {
+        private final Rect wider = new Rect();
+        private final int nextRow;
+
+        GridScroll(Context context, int nextRow) {
+            super(context);
+            this.nextRow = nextRow;
+        }
+
+        @Override protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
+            wider.set(rect.left, rect.top - nextRow, rect.right, rect.bottom + nextRow);
+            return super.computeScrollDeltaToGetChildRectOnScreen(wider);
+        }
+    }
 
     private final List<ImageView> cells = new ArrayList<>();
     private List<String> pictures = new ArrayList<>();
@@ -85,14 +105,14 @@ public final class PictureGridActivity extends CardActivity {
         root.setBackground(Look.plainBackdrop());
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
-        page.setGravity(Gravity.CENTER);
+        page.setGravity(Gravity.CENTER_HORIZONTAL);
         title = label(setName, TITLE_SP);
         title.setPadding(0, dp(TITLE_TOP), 0, dp(TITLE_BOTTOM));
         page.addView(title, new LinearLayout.LayoutParams(-2, -2));
 
         LinearLayout rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
-        rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM));
+        rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(BOTTOM_ROOM));
         LinearLayout row = null;
         for (int index = 0; index < pictures.size(); index++) {
             if (index % COLUMNS == 0) {
@@ -107,13 +127,12 @@ public final class PictureGridActivity extends CardActivity {
             place.setMarginStart(index % COLUMNS == 0 ? 0 : dp(GAP));
             row.addView(cell, place);
         }
-        scroll = new ScrollView(this);
+        scroll = new GridScroll(this, dp(NEXT_ROW));
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
         hideFromFixer(scroll);
         scroll.addView(rows);
-        int shown = ROWS_SHOWN * dp(CELL_HEIGHT) + (ROWS_SHOWN - 1) * dp(GAP) + 2 * dp(SIDE_ROOM);
-        page.addView(scroll, new LinearLayout.LayoutParams(-2, shown));
+        page.addView(scroll, new LinearLayout.LayoutParams(-2, 0, 1));
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));
         preview = previewPage();
         root.addView(preview, new FrameLayout.LayoutParams(-1, -1));
@@ -152,7 +171,8 @@ public final class PictureGridActivity extends CardActivity {
         if (!files) cell.setImageDrawable(Look.preset(pictures.get(index)));
         cell.setOnFocusChangeListener((view, focused) -> {
             view.setForeground(focused ? edge() : null);
-            if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index))));
+            if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
+                getString(R.string.grid_position, index + 1, pictures.size())));
         });
         cell.setOnClickListener(view -> showPreview(index));
         return cell;

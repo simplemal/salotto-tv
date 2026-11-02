@@ -34,6 +34,7 @@
     <string name="first_start">Los geht’s</string>
     <string name="first_backdrop_title">Wähle einen Hintergrund</string>
     <string name="first_preview">Vorschau</string>
+    <string name="grid_position">%1$d von %2$d</string>
     <string name="first_backdrop_pictures">Illustriertes Wetter</string>
     <string name="first_backdrop_photos">Fotografisches Wetter</string>
     <string name="first_backdrop_night">Nacht</string>

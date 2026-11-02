@@ -34,6 +34,7 @@
     <string name="first_start">开始</string>
     <string name="first_backdrop_title">选择背景</string>
     <string name="first_preview">预览</string>
+    <string name="grid_position">%1$d / %2$d</string>
     <string name="first_backdrop_pictures">插画天气</string>
     <string name="first_backdrop_photos">摄影天气</string>
     <string name="first_backdrop_night">夜晚</string>

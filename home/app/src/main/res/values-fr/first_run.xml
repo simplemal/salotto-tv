@@ -34,6 +34,7 @@
     <string name="first_start">Commencer</string>
     <string name="first_backdrop_title">Choisissez un fond d’écran</string>
     <string name="first_preview">Aperçu</string>
+    <string name="grid_position">%1$d sur %2$d</string>
     <string name="first_backdrop_pictures">Météo illustrée</string>
     <string name="first_backdrop_photos">Météo photographique</string>
     <string name="first_backdrop_night">Nuit</string>
