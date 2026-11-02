@@ -34,7 +34,6 @@ final class HomeCover {
     private static final long BRING_BACK_MS = 200;
     /** Fixer can keep its black to the limit after a second press, a second and a half and its tail. */
     private static final long FIXER_BLACK_MS = 2000;
-    private static final long PAIR_MS = 2000;
     /** Without Fixer no black has to end: only the Home coming in over Amazon's is waited for. */
     private static final long OWN_AFTER_HOME_MS = 300;
     /** A late line of the log finds the Home already there, and nothing then says it has come back. */
@@ -63,9 +62,8 @@ final class HomeCover {
     private boolean leftOnAmazon;
     private final Runnable lookForAmazon = this::lookForAmazon;
     private int amazonTries;
-    private long broughtBackAt;
-    private long lastHeard;
-    private int unmatched;
+    private volatile long broughtBackAt;
+    private volatile long lastHeard;
     private boolean holding;
     private Bitmap held;
 
@@ -103,20 +101,22 @@ final class HomeCover {
         }
     }
 
-    /** The log tells of each press twice, once from each side, in either order. */
-    void heard(int side) {
+    /**
+     * From the thread reading the log. The Home starts from here and not from the main thread,
+     * which the Home itself may be keeping busy: every moment lets Amazon's reach the screen.
+     */
+    void heard() {
         long now = SystemClock.elapsedRealtime();
-        if (now - lastHeard > PAIR_MS) unmatched = 0;
+        boolean again = now - lastHeard < DOUBLE_PRESS_MS;
         lastHeard = now;
-        boolean first = unmatched * side >= 0;
-        unmatched += side;
-        if (first) pressed();
+        if (!(again && doubleHome) && !Updater.fixerActive(service)) startHome();
+        main.post(() -> pressed(again));
     }
 
-    void pressed() {
-        long now = SystemClock.elapsedRealtime();
-        boolean again = now - lastPress < DOUBLE_PRESS_MS;
-        lastPress = now;
+    void pressed() { pressed(SystemClock.elapsedRealtime() - lastPress < DOUBLE_PRESS_MS); }
+
+    private void pressed(boolean again) {
+        lastPress = SystemClock.elapsedRealtime();
         main.removeCallbacks(bringBack);
         twice = again;
         boolean ours = !Updater.fixerActive(service);
@@ -127,18 +127,20 @@ final class HomeCover {
         // Taking a picture now is too late: Fixer's black is already up, half a second before it.
         else if (picture == null && MainActivity.showing && home != null) take(home, this::show);
         else show();
-        if (!ours || leftOnAmazon) return;
-        // At once: Amazon's Home plays its sound and shows itself as soon as it gets the screen.
-        bringBack();
-        amazonShown();
+        if (ours && !leftOnAmazon) amazonShown();
     }
 
     /** Fixer ignores a second press: it can take two seconds to notice, or leave Amazon's Home up. */
     private void bringBack() {
         main.removeCallbacks(bringBack);
         returning = false;
+        startHome();
+    }
+
+    private void startHome() {
         broughtBackAt = SystemClock.elapsedRealtime();
-        service.startActivity(new Intent(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        service.startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+            .setClass(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     /** Another app came up, so a double press no longer keeps Amazon's Home. */

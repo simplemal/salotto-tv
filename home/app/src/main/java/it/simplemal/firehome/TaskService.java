@@ -108,12 +108,13 @@ public final class TaskService extends AccessibilityService {
     private static final String WIRELESS_DEBUGGING = "adb_wifi_enabled";
     private static final int WHEEL_DP = 40;
     /**
-     * The key's own line comes first, but can come a second late; Amazon's Home starting never does.
+     * One line for each press, and only once Android has taken Amazon's Home in: a Home started
+     * after this comes out on top of it. The system's own log only, or the reading falls behind.
      */
-    private static final String LOG_FILTER = "HOME_PRESSED|START.u0.*cat=.android.intent.category.HOME.*cmp="
-        + Fire.AMAZON_HOME + "|" + Fire.RECENTS_ACTION;
-    private static final String HOME_LOG = "logcat -v brief -T 1 -e '" + LOG_FILTER + "'";
-    private static final String HOME_PRESSED = "HOME_PRESSED";
+    private static final String[] LOG_OPTIONS = {"-b", "system", "-v", "brief", "-T", "1", "ActivityTaskManager:I"};
+    private static final String HOME_LOG = "logcat " + String.join(" ", LOG_OPTIONS) + " '*:S'";
+    private static final String HOME_INTENT = "cat=[" + Intent.CATEGORY_HOME + "]";
+    private static final String FROM_SYSTEM = "from uid 0";
     private static final long HOME_LOG_START_MS = 1000;
     private static final long HOME_LOG_RETRY_MS = 30000;
     /** From distro/config, the same lists the installer offers. */
@@ -887,7 +888,10 @@ public final class TaskService extends AccessibilityService {
 
     private void watchOwnLog() {
         try {
-            Process log = new ProcessBuilder("logcat", "-v", "brief", "-T", "1", "-e", LOG_FILTER).start();
+            List<String> command = new ArrayList<>(Arrays.asList("logcat"));
+            command.addAll(Arrays.asList(LOG_OPTIONS));
+            command.add("*:S");
+            Process log = new ProcessBuilder(command).start();
             homeLog = log::destroy;
             BufferedReader lines = new BufferedReader(new InputStreamReader(log.getInputStream(), StandardCharsets.UTF_8));
             follow(lines::readLine);
@@ -916,11 +920,8 @@ public final class TaskService extends AccessibilityService {
             if (SystemClock.elapsedRealtime() - started <= HOME_LOG_START_MS) continue;
             if (line.contains(Fire.RECENTS_ACTION)) {
                 main.post(this::holdScreen);
-            } else {
-                int side = line.contains(HOME_PRESSED) ? 1 : -1;
-                main.post(() -> {
-                    if (cover != null) cover.heard(side);
-                });
+            } else if (cover != null && line.contains(HOME_INTENT) && line.contains(Fire.AMAZON_HOME) && line.contains(FROM_SYSTEM)) {
+                cover.heard();
             }
         }
     }
