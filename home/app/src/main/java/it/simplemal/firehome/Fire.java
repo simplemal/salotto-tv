@@ -101,9 +101,9 @@ final class Fire {
     /** Fire OS's own menu of its screensavers. */
     static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }
 
-    /** Not a settings page: Android's own way to start the chosen screensaver. The Max has none, and gets Salotto's. */
+    /** Not a settings page: Android's own way to start the chosen screensaver. Android 9 has none, so Fire OS's can only be chosen there. */
     static Intent screensaver(Context context) {
-        Intent chosen = new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
-        return chosen.resolveActivity(context.getPackageManager()) != null ? chosen : new Intent(context, SaverActivity.class);
+        if (!ANDROID_9) return new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+        return Look.ownSaver(context) ? new Intent(context, SaverActivity.class) : saverMenu();
     }
 }

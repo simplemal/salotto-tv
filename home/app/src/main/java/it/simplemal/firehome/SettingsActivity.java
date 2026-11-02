@@ -1722,7 +1722,7 @@ public final class SettingsActivity extends CardActivity {
             entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], getDrawable(R.drawable.ic_clock),
                 getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
         }
-        entries.add(new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
+        if (own || !Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         show(getString(R.string.settings_saver), entries);
     }
