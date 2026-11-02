@@ -35,10 +35,14 @@ final class HomeCover {
     /** Fixer can keep its black to the limit after a second press, a second and a half and its tail. */
     private static final long FIXER_BLACK_MS = 2000;
     private static final long PAIR_MS = 2000;
-    /** Without Fixer no black has to end: only the Home's first frame is waited for. */
-    private static final long OWN_AFTER_HOME_MS = 150;
-    private static final int AMAZON_TRIES = 10;
-    private static final long AMAZON_TRY_MS = 100;
+    /** Without Fixer no black has to end: only the Home coming in over Amazon's is waited for. */
+    private static final long OWN_AFTER_HOME_MS = 300;
+    /** A late line of the log finds the Home already there, and nothing then says it has come back. */
+    private static final long OWN_LIMIT_MS = 1200;
+    private static final int AMAZON_TRIES = 30;
+    private static final long AMAZON_TRY_MS = 50;
+    /** The Home just brought back needs this long to take over from Amazon's. */
+    private static final long AMAZON_SETTLE_MS = 600;
 
     /** Fixer's double press leaves Amazon's Home on screen, so the cover has to step aside. */
     static volatile boolean doubleHome;
@@ -57,6 +61,9 @@ final class HomeCover {
     private boolean twice;
     /** Asked for with a double press: it stays until a press or another app says otherwise. */
     private boolean leftOnAmazon;
+    private final Runnable lookForAmazon = this::lookForAmazon;
+    private int amazonTries;
+    private long broughtBackAt;
     private long lastHeard;
     private int unmatched;
     private boolean holding;
@@ -112,18 +119,25 @@ final class HomeCover {
         lastPress = now;
         main.removeCallbacks(bringBack);
         twice = again;
+        boolean ours = !Updater.fixerActive(service);
         leftOnAmazon = again && doubleHome;
-        returning = !leftOnAmazon && (again || !Updater.fixerActive(service));
+        returning = !ours && again && !doubleHome;
         if (returning) main.postDelayed(bringBack, BRING_BACK_MS);
         if (leftOnAmazon) hide();
         // Taking a picture now is too late: Fixer's black is already up, half a second before it.
         else if (picture == null && MainActivity.showing && home != null) take(home, this::show);
         else show();
+        if (!ours || leftOnAmazon) return;
+        // At once: Amazon's Home plays its sound and shows itself as soon as it gets the screen.
+        bringBack();
+        amazonShown();
     }
 
     /** Fixer ignores a second press: it can take two seconds to notice, or leave Amazon's Home up. */
     private void bringBack() {
+        main.removeCallbacks(bringBack);
         returning = false;
+        broughtBackAt = SystemClock.elapsedRealtime();
         service.startActivity(new Intent(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
@@ -131,20 +145,26 @@ final class HomeCover {
     void appOpened() { leftOnAmazon = false; }
 
     /**
-     * Without Fixer: Amazon's Home has a page of its own on screen, at power-on, after a press too
-     * quick for the Home brought back, or under an app that ended. It tells of that from behind
-     * other apps as well, and a moment before it is the active window, so that is looked at.
+     * Without Fixer: Amazon's Home got the screen after all, at power-on, under an app that ended or
+     * ahead of a Home started at once. It tells of that from behind other apps as well, so what
+     * counts is whether it is the active window.
      */
-    void amazonShown() { amazonShown(AMAZON_TRIES); }
+    void amazonShown() {
+        amazonTries = AMAZON_TRIES;
+        main.removeCallbacks(lookForAmazon);
+        lookForAmazon();
+    }
 
-    private void amazonShown(int tries) {
-        if (leftOnAmazon || returning || holding) return;
+    private void lookForAmazon() {
+        if (leftOnAmazon || holding) return;
         AccessibilityNodeInfo active = service.getRootInActiveWindow();
-        if (active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName())) {
+        boolean there = active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+        boolean settling = SystemClock.elapsedRealtime() - broughtBackAt < AMAZON_SETTLE_MS;
+        if (there && !settling) {
             show();
             bringBack();
-        } else if (tries > 0) {
-            main.postDelayed(() -> amazonShown(tries - 1), AMAZON_TRY_MS);
+        } else if (amazonTries-- > 0) {
+            main.postDelayed(lookForAmazon, AMAZON_TRY_MS);
         }
     }
 
@@ -174,7 +194,7 @@ final class HomeCover {
         view.invalidate();
         view.setVisibility(View.VISIBLE);
         main.removeCallbacks(hide);
-        main.postDelayed(hide, LIMIT_MS);
+        main.postDelayed(hide, fixer ? LIMIT_MS : OWN_LIMIT_MS);
     }
 
     /** The Home has drawn itself. Before a second press is answered, that is only the first trip ending. */
@@ -195,6 +215,7 @@ final class HomeCover {
     void close() {
         main.removeCallbacks(hide);
         main.removeCallbacks(bringBack);
+        main.removeCallbacks(lookForAmazon);
         windows.removeView(view);
     }
 }
