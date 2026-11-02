@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,8 +49,6 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BOTTOM_ROOM = 28;
     /** What stays in view past the selected row, with the gap: what the screen's edge cuts at the start. */
     private static final int NEXT_ROW = 72;
-    /** A quarter of each side: the grid shows sixty of these at once in very little memory. */
-    private static final int THUMB_SAMPLE = 4;
     private static final int NOTE_SP = 14;
     private static final int NOTE_MARGIN = 24;
     private static final int BUTTON_SP = 16;
@@ -137,9 +136,9 @@ public final class PictureGridActivity extends CardActivity {
         root.addView(preview, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
 
-        int chosen = pictures.indexOf(Look.backdrop(this));
-        if (!cells.isEmpty()) cells.get(Math.max(0, chosen)).requestFocus();
-        if (files) loadThumbnails();
+        int chosen = Math.max(0, pictures.indexOf(Look.backdrop(this)));
+        if (!cells.isEmpty()) cells.get(chosen).requestFocus();
+        if (files) loadThumbnails(chosen);
     }
 
     private List<String> pictures(String folder) {
@@ -167,7 +166,9 @@ public final class PictureGridActivity extends CardActivity {
                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(RADIUS));
             }
         });
-        if (!files) cell.setImageDrawable(Look.preset(pictures.get(index)));
+        Bitmap kept = files ? Thumbnails.kept(pictures.get(index)) : null;
+        if (kept != null) cell.setImageBitmap(kept);
+        else if (!files) cell.setImageDrawable(Look.preset(pictures.get(index)));
         cell.setOnFocusChangeListener((view, focused) -> {
             view.setForeground(focused ? edge() : null);
             if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
@@ -186,23 +187,26 @@ public final class PictureGridActivity extends CardActivity {
         return edge;
     }
 
-    private void loadThumbnails() {
+    /** From the selected cell outwards: what is in view comes first. */
+    private void loadThumbnails(int from) {
+        List<Integer> order = new ArrayList<>();
+        for (int index = 0; index < pictures.size(); index++) {
+            if (cells.get(index).getDrawable() == null) order.add(index);
+        }
+        order.sort(Comparator.comparingInt(index -> Math.abs(index - from)));
         List<String> names = new ArrayList<>(pictures);
         Background.draw(() -> {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = THUMB_SAMPLE;
-            options.inPreferredConfig = Bitmap.Config.RGB_565;
-            for (int index = 0; index < names.size() && !isDestroyed(); index++) {
-                Bitmap thumbnail = decode(names.get(index), options);
-                int cell = index;
-                if (thumbnail != null) runOnUiThread(() -> cells.get(cell).setImageBitmap(thumbnail));
+            for (int index : order) {
+                if (isDestroyed()) return;
+                Bitmap thumbnail = Thumbnails.read(this, names.get(index));
+                if (thumbnail != null) runOnUiThread(() -> cells.get(index).setImageBitmap(thumbnail));
             }
         });
     }
 
-    private Bitmap decode(String asset, BitmapFactory.Options options) {
+    private Bitmap decode(String asset) {
         try (InputStream input = getAssets().open(asset)) {
-            return BitmapFactory.decodeStream(input, null, options);
+            return BitmapFactory.decodeStream(input);
         } catch (IOException e) {
             return null;
         }
@@ -266,7 +270,7 @@ public final class PictureGridActivity extends CardActivity {
         Background.draw(() -> {
             // Going through them quickly leaves the ones already passed behind.
             if (shown != previews) return;
-            Bitmap picture = decode(asset, new BitmapFactory.Options());
+            Bitmap picture = decode(asset);
             if (picture == null) return;
             runOnUiThread(() -> {
                 if (shown == previews && preview.getVisibility() == View.VISIBLE) full.setImageBitmap(picture);

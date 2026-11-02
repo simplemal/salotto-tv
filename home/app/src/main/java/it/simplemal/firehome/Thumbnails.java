@@ -1,0 +1,52 @@
+package it.simplemal.firehome;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.LruCache;
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * The small copies of the backdrop sets. WebP has no smaller view of itself: asking for a quarter
+ * still reads the whole picture, a tenth of a second each, so sixty keep a grid empty for seconds.
+ * These come ready made from distro/tools/prepara-miniature.py, and the last ones read stay here.
+ */
+final class Thumbnails {
+    private static final String FOLDER = "miniature/";
+    /** Salotto stays in memory under every app: a set and a bit, not all of them. */
+    private static final int KEPT_BYTES = 16 * 1024 * 1024;
+    /** For a picture with no small copy: a quarter of each side. */
+    private static final int FULL_SAMPLE = 4;
+    private static final LruCache<String, Bitmap> KEPT = new LruCache<String, Bitmap>(KEPT_BYTES) {
+        @Override protected int sizeOf(String asset, Bitmap thumbnail) { return thumbnail.getByteCount(); }
+    };
+
+    private Thumbnails() {}
+
+    /** Already in memory, or null: for the main thread. */
+    static Bitmap kept(String asset) { return KEPT.get(asset); }
+
+    /** Takes time: call it away from the main thread. */
+    static Bitmap read(Context context, String asset) {
+        Bitmap thumbnail = KEPT.get(asset);
+        if (thumbnail != null) return thumbnail;
+        thumbnail = decode(context, FOLDER + asset, 1);
+        if (thumbnail == null) thumbnail = decode(context, asset, FULL_SAMPLE);
+        if (thumbnail != null) KEPT.put(asset, thumbnail);
+        return thumbnail;
+    }
+
+    private static Bitmap decode(Context context, String asset, int sample) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = sample;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        try (InputStream input = context.getAssets().open(asset)) {
+            return BitmapFactory.decodeStream(input, null, options);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    static void trim() { KEPT.evictAll(); }
+}

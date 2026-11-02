@@ -99,6 +99,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         if (memoryShort(level)) {
             CARD_ART.evictAll();
             Look.trim();
+            Thumbnails.trim();
         }
     }
 

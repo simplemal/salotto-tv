@@ -33,6 +33,10 @@ Il passaggio dalla chiave di sviluppo è stato fatto il 2026-11-01. Android rifi
 
 Tieni una copia della cartella `chiavi-aggiornamento/` fuori da Dropbox, per esempio nel gestore di password: chi perde la chiave deve far reinstallare tutti.
 
+## Immagini degli sfondi
+
+Dopo `distro/tools/prepara-astratti.py` lancia `distro/tools/prepara-miniature.py`: la griglia degli sfondi usa quelle, e senza si riempie in diversi secondi.
+
 ## Aggiornare un programma di terzi
 
 1. Scarica la nuova versione dal progetto originale.
