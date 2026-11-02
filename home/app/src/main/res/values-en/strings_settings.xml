@@ -3,7 +3,7 @@
     <string name="settings_language_text">The language of Salotto. Fire OS stays as it is.</string>
     <string name="settings_title">Settings</string>
     <string name="settings_look">Appearance</string>
-    <string name="settings_look_text">Backdrop, grid and app names on the Home.</string>
+    <string name="settings_look_text">Backdrop, grid, app names on the Home and screensaver.</string>
     <string name="settings_clock_and_date">Clock and date</string>
     <string name="settings_clock_and_date_text">Font, size and format of the time, and the date under the clock.</string>
     <string name="settings_weather">Weather</string>
@@ -11,7 +11,7 @@
     <string name="settings_apps">Apps</string>
     <string name="settings_apps_text">All installed apps, the order of the Home and Fire TV management.</string>
     <string name="settings_screen">Screen and audio</string>
-    <string name="settings_screen_text">Screensaver, auto power-off, TV link, video and audio.</string>
+    <string name="settings_screen_text">Auto power-off, TV link, video and audio.</string>
     <string name="settings_network">Network</string>
     <string name="settings_network_text">Connection status and network settings.</string>
     <string name="settings_remotes">Remotes and Bluetooth</string>

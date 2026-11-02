@@ -3,7 +3,7 @@
     <string name="settings_language_text">لغة Salotto. لغة Fire OS لا تتغير.</string>
     <string name="settings_title">الإعدادات</string>
     <string name="settings_look">المظهر</string>
-    <string name="settings_look_text">الخلفية والتخطيط وأسماء التطبيقات في الرئيسية.</string>
+    <string name="settings_look_text">الخلفية والتخطيط وأسماء التطبيقات في الرئيسية وشاشة التوقف.</string>
     <string name="settings_clock_and_date">الساعة والتاريخ</string>
     <string name="settings_clock_and_date_text">خط الساعة وحجمها وصيغة الوقت، والتاريخ تحت الساعة.</string>
     <string name="settings_weather">الطقس</string>
@@ -11,7 +11,7 @@
     <string name="settings_apps">التطبيقات</string>
     <string name="settings_apps_text">كل التطبيقات المثبّتة، وترتيب الرئيسية، وإدارة Fire TV.</string>
     <string name="settings_screen">الشاشة والصوت</string>
-    <string name="settings_screen_text">شاشة التوقف، والإيقاف التلقائي، والربط بالتلفزيون، والفيديو والصوت.</string>
+    <string name="settings_screen_text">الإيقاف التلقائي، والربط بالتلفزيون، والفيديو والصوت.</string>
     <string name="settings_network">الشبكة</string>
     <string name="settings_network_text">حالة الاتصال وإعدادات الشبكة.</string>
     <string name="settings_remotes">أجهزة التحكم وBluetooth</string>

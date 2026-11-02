@@ -17,6 +17,8 @@ final class Fire {
     static final String FIXER = "io.github.hatim.firestickfixer";
     static final String AIRPLAY = "io.github.jqssun.airplay";
     static final String AMAZON_HOME = "com.amazon.tv.launcher";
+    /** Its package also holds the recent apps page: only this one is the Home itself. */
+    static final String AMAZON_HOME_PAGE = "com.amazon.tv.launcher.ui.HomeActivity_vNext";
     static final String APPSTORE = "com.amazon.venezia";
     /** The store itself. Its launcher entry only asks Amazon's Home for a tab, and Salotto has replaced that Home. */
     static final String APPSTORE_PAGE = "com.amazon.venezia.ade.FEATURED_LAUNCH";
@@ -36,7 +38,8 @@ final class Fire {
     /** What Fire OS opens on the recent apps key. */
     static final String RECENTS_PAGE = "com.amazon.tv.launcher.deeplink.activity.RecentDeepLinkActivityDI";
     /** Fixer's switches answer only to the shell. */
-    static final String FIXER_COMMAND = "dumpsys activity service " + FIXER + "/.HijackService ";
+    static final String FIXER_SERVICE = FIXER + "/.HijackService";
+    static final String FIXER_COMMAND = "dumpsys activity service " + FIXER_SERVICE + " ";
     static final String DOUBLE_HOME_ON = "doubleTap=true";
     static final String CMD_SLEEP = "input keyevent SLEEP";
     static final long MINUTE_MS = 60 * 1000L;

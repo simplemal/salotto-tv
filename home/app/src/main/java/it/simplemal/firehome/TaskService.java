@@ -144,6 +144,7 @@ public final class TaskService extends AccessibilityService {
     private Resources words;
     private boolean waitsAnswer;
     private boolean keyFired;
+    private boolean menuKept;
     private FireSteps fireSteps;
     private FrameLayout uninstallMask;
     private final Runnable uncover = this::uncoverUninstall;
@@ -541,6 +542,8 @@ public final class TaskService extends AccessibilityService {
         if (Veil.warm(this) > 0) adb.post(this::connected);
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
+        // At power-on Amazon's Home comes after this and says so; after a restart it is already up.
+        if (!Updater.fixerActive(this)) cover.amazonShown();
         if (Updater.installed(this)) {
             startActivity(new Intent(this, UpdateActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -578,12 +581,15 @@ public final class TaskService extends AccessibilityService {
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
         // The mask is a window too, and it would take itself for whatever comes next.
         else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
-        if (name.equals(Fire.AMAZON_HOME) && homeLog == null) cover.pressed();
+        boolean fixer = Updater.fixerActive(this);
+        if (name.equals(Fire.AMAZON_HOME) && homeLog == null && fixer) cover.pressed();
+        if (Fire.AMAZON_HOME_PAGE.equals(page) && !fixer) cover.amazonShown();
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
         // The recent apps key of the newer remotes goes straight to Fire OS: no app ever hears it.
         if (Fire.RECENTS_PAGE.contentEquals(String.valueOf(event.getClassName()))) recentsPageShown();
+        if (name.equals(getPackageName()) || HomeApps.isUserApp(this, name)) cover.appOpened();
         if (name.equals(front)) return;
         if (HomeApps.isUserApp(this, name)) front = name;
         else if (HomeApps.isHome(this, name)) front = null;
@@ -603,12 +609,14 @@ public final class TaskService extends AccessibilityService {
         if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;
         if (ok && up && fireSteps != null) fireSteps.okPressed();
         if (key != KeyEvent.KEYCODE_MENU && key != KeyEvent.KEYCODE_BACK) return false;
+        boolean menu = key == KeyEvent.KEYCODE_MENU;
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (event.getRepeatCount() == 0 && menu) menuKept = front != null || appOnScreen() != null;
             if (event.getRepeatCount() == 0 && !TasksActivity.showing && panelWindow == null) {
                 keyFired = false;
-                main.postDelayed(key == KeyEvent.KEYCODE_MENU ? holdMenu : holdBack, HOLD_MS);
+                main.postDelayed(menu ? holdMenu : holdBack, HOLD_MS);
             }
-            return false;
+            return menu && menuKept;
         }
         main.removeCallbacks(holdMenu);
         main.removeCallbacks(holdBack);
@@ -616,9 +624,24 @@ public final class TaskService extends AccessibilityService {
         boolean fired = keyFired;
         keyFired = false;
         if (fired && key == KeyEvent.KEYCODE_BACK && TasksActivity.showing) endBack();
+        if (menu && menuKept) {
+            menuKept = false;
+            if (!fired && panelWindow == null) menuToApp();
+            return true;
+        }
         // Back's release always goes on: Android TV reads Back with OK as a shortcut, and a Back
         // that never ends swallows every OK after it.
-        return fired && key == KeyEvent.KEYCODE_MENU;
+        return fired && menu;
+    }
+
+    /**
+     * An app can answer Menu the moment it goes down, Netflix with its search, before a hold can be
+     * told from a press. So over an app the key stays here, and only the shell can hand a short
+     * press back: without it, on a cable, the app does not get it. What the shell sends never
+     * comes through this filter.
+     */
+    private void menuToApp() {
+        if (client != null) adb.post(() -> run("input keyevent " + KeyEvent.KEYCODE_MENU));
     }
 
     /** Salotto may have restarted under an app, and then nothing has said which one it is. */
@@ -695,15 +718,20 @@ public final class TaskService extends AccessibilityService {
     }
 
     /** Keeps every other service exactly as it is: Fixer's is what sends the Home key to Salotto. */
-    static void setKeys(Context context, boolean on) {
+    static void setKeys(Context context, boolean on) { setService(context, serviceName(context), on); }
+
+    /** With Fixer's service off the Home key is Salotto's, at once: nothing else has to change. */
+    static void setFixer(Context context, boolean on) { setService(context, Fire.FIXER_SERVICE, on); }
+
+    private static void setService(Context context, String name, boolean on) {
         String current = Settings.Secure.getString(context.getContentResolver(), ENABLED_SERVICES);
         List<String> services = new ArrayList<>();
         if (current != null) {
             for (String service : current.split(":")) {
-                if (!service.isEmpty() && !service.equals(serviceName(context))) services.add(service);
+                if (!service.isEmpty() && !service.equals(name)) services.add(service);
             }
         }
-        if (on) services.add(serviceName(context));
+        if (on) services.add(name);
         Settings.Secure.putString(context.getContentResolver(), ENABLED_SERVICES, TextUtils.join(":", services));
         Settings.Secure.putInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
     }
@@ -817,8 +845,10 @@ public final class TaskService extends AccessibilityService {
             opened.openShell("CLASSPATH=" + getPackageCodePath() + " app_process / " + ShellHelper.class.getName());
             if (!"ready".equals(opened.readLine())) throw new IOException("Helper did not start");
             client = opened;
-            String fixer = run(Fire.FIXER_COMMAND + "state");
-            rememberDoubleHome(this, fixer != null && fixer.contains(Fire.DOUBLE_HOME_ON));
+            if (Updater.fixerActive(this)) {
+                String fixer = run(Fire.FIXER_COMMAND + "state");
+                rememberDoubleHome(this, fixer != null && fixer.contains(Fire.DOUBLE_HOME_ON));
+            }
             startHomeLog();
             if (Veil.warm(this) > 0) run(Veil.WARM_ON);
             return true;

@@ -3,7 +3,7 @@
     <string name="settings_language_text">La langue de Salotto. Celle de Fire OS ne change pas.</string>
     <string name="settings_title">Réglages</string>
     <string name="settings_look">Apparence</string>
-    <string name="settings_look_text">Fond d’écran, grille et noms des applis sur l’Accueil.</string>
+    <string name="settings_look_text">Fond d’écran, grille, noms des applis sur l’Accueil et économiseur d’écran.</string>
     <string name="settings_clock_and_date">Horloge et date</string>
     <string name="settings_clock_and_date_text">Police, taille et format de l’heure, et la date sous l’horloge.</string>
     <string name="settings_weather">Météo</string>
@@ -11,7 +11,7 @@
     <string name="settings_apps">Applis</string>
     <string name="settings_apps_text">Toutes les applis installées, l’ordre de l’Accueil et la gestion de Fire TV.</string>
     <string name="settings_screen">Écran et audio</string>
-    <string name="settings_screen_text">Économiseur d’écran, arrêt automatique, liaison avec la TV, vidéo et audio.</string>
+    <string name="settings_screen_text">Arrêt automatique, liaison avec la TV, vidéo et audio.</string>
     <string name="settings_network">Réseau</string>
     <string name="settings_network_text">État de la connexion et réglages du réseau.</string>
     <string name="settings_remotes">Télécommandes et Bluetooth</string>

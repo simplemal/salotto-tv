@@ -3,7 +3,7 @@
     <string name="settings_language_text">Язык Salotto. Язык Fire OS не меняется.</string>
     <string name="settings_title">Настройки</string>
     <string name="settings_look">Внешний вид</string>
-    <string name="settings_look_text">Фон, сетка и названия приложений на главном экране.</string>
+    <string name="settings_look_text">Фон, сетка, названия приложений на главном экране и заставка.</string>
     <string name="settings_clock_and_date">Часы и дата</string>
     <string name="settings_clock_and_date_text">Шрифт, размер и формат времени, а также дата под часами.</string>
     <string name="settings_weather">Погода</string>
@@ -11,7 +11,7 @@
     <string name="settings_apps">Приложения</string>
     <string name="settings_apps_text">Все установленные приложения, порядок на главном экране и управление Fire TV.</string>
     <string name="settings_screen">Экран и звук</string>
-    <string name="settings_screen_text">Заставка, автоотключение, связь с телевизором, видео и звук.</string>
+    <string name="settings_screen_text">Автоотключение, связь с телевизором, видео и звук.</string>
     <string name="settings_network">Сеть</string>
     <string name="settings_network_text">Состояние подключения и настройки сети.</string>
     <string name="settings_remotes">Пульты и Bluetooth</string>

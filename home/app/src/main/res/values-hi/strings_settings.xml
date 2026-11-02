@@ -3,7 +3,7 @@
     <string name="settings_language_text">Salotto की भाषा। Fire OS की भाषा नहीं बदलती।</string>
     <string name="settings_title">सेटिंग</string>
     <string name="settings_look">रूप-रंग</string>
-    <string name="settings_look_text">बैकग्राउंड, ग्रिड और होम पर ऐप के नाम।</string>
+    <string name="settings_look_text">बैकग्राउंड, ग्रिड, होम पर ऐप के नाम और स्क्रीनसेवर।</string>
     <string name="settings_clock_and_date">घड़ी और तारीख</string>
     <string name="settings_clock_and_date_text">फ़ॉन्ट, आकार, समय का फ़ॉर्मैट, और घड़ी के नीचे तारीख।</string>
     <string name="settings_weather">मौसम</string>
@@ -11,7 +11,7 @@
     <string name="settings_apps">ऐप</string>
     <string name="settings_apps_text">सभी इंस्टॉल किए ऐप, होम का क्रम और Fire TV का मैनेजमेंट।</string>
     <string name="settings_screen">स्क्रीन और ऑडियो</string>
-    <string name="settings_screen_text">स्क्रीनसेवर, ऑटो स्लीप, टीवी से कनेक्शन, वीडियो और ऑडियो।</string>
+    <string name="settings_screen_text">ऑटो स्लीप, टीवी से कनेक्शन, वीडियो और ऑडियो।</string>
     <string name="settings_network">नेटवर्क</string>
     <string name="settings_network_text">कनेक्शन की स्थिति और नेटवर्क की सेटिंग।</string>
     <string name="settings_remotes">रिमोट और Bluetooth</string>

@@ -4,7 +4,7 @@
     <string name="settings_language_text">Salotto 使用的语言，Fire OS 的语言不会改变。</string>
     <string name="settings_title">设置</string>
     <string name="settings_look">外观</string>
-    <string name="settings_look_text">背景、网格，以及主页上的应用名称。</string>
+    <string name="settings_look_text">背景、网格、主页上的应用名称和屏保。</string>
     <string name="settings_clock_and_date">时钟和日期</string>
     <string name="settings_clock_and_date_text">时间的字体、大小和格式，以及时钟下方的日期。</string>
     <string name="settings_weather">天气</string>
@@ -12,7 +12,7 @@
     <string name="settings_apps">应用</string>
     <string name="settings_apps_text">所有已安装的应用、主页的顺序，以及 Fire TV 的管理。</string>
     <string name="settings_screen">屏幕和音频</string>
-    <string name="settings_screen_text">屏保、自动待机、与电视联动、视频和音频。</string>
+    <string name="settings_screen_text">自动待机、与电视联动、视频和音频。</string>
     <string name="settings_network">网络</string>
     <string name="settings_network_text">连接状态和网络设置。</string>
     <string name="settings_remotes">遥控器和 Bluetooth</string>

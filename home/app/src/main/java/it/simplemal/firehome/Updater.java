@@ -314,7 +314,7 @@ final class Updater {
         return prefs(context).getBoolean(FIXER_BEFORE, true) && !fixerActive(context);
     }
 
-    private static boolean fixerActive(Context context) {
+    static boolean fixerActive(Context context) {
         String services = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
         return services != null && services.contains(Fire.FIXER);
     }

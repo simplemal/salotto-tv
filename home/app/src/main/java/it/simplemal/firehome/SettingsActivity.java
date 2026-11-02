@@ -606,9 +606,9 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_backup_text), true, () -> enter(this::showBackup)),
             new Entry(getString(R.string.settings_tools), null, getDrawable(R.drawable.ic_s_build),
                 getString(R.string.settings_tools_text), true, () -> enter(this::showTools)),
-            new Entry(getString(R.string.settings_update), BuildVersion.name(this), getDrawable(R.drawable.ic_s_update),
+            new Entry(getString(R.string.settings_update), null, getDrawable(R.drawable.ic_s_update),
                 getString(R.string.settings_update_text),
-                false, () -> open(new Intent(this, UpdateActivity.class))),
+                true, () -> open(new Intent(this, UpdateActivity.class))),
             new Entry(getString(R.string.settings_about), BuildVersion.name(this), getDrawable(R.drawable.ic_s_info),
                 getString(R.string.settings_about_text), true,
                 () -> open(new Intent(this, AboutActivity.class))),
@@ -655,7 +655,9 @@ public final class SettingsActivity extends CardActivity {
                 true, () -> enter(this::showColumns)),
             new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
                 getString(R.string.settings_app_names_text),
-                true, () -> enter(this::showNames))));
+                true, () -> enter(this::showNames)),
+            new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
+                getString(R.string.settings_saver_text), true, () -> enter(this::showSaver))));
     }
 
     /** The rows of a list with one choice marked: each runs `choose` with its own index. */
@@ -805,8 +807,6 @@ public final class SettingsActivity extends CardActivity {
         boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
         Drawable picture = getDrawable(R.drawable.ic_image);
         show(getString(R.string.settings_screen), Arrays.asList(
-            new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
-                getString(R.string.settings_saver_text), true, () -> enter(this::showSaver)),
             new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), getDrawable(R.drawable.ic_timer),
                 getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)),
             new Entry(getString(R.string.settings_cec), cec ? YES : NO, getDrawable(R.drawable.ic_s_hdmi),
@@ -1387,10 +1387,12 @@ public final class SettingsActivity extends CardActivity {
                 })));
     }
 
-    /** The switch is Fixer's: only the shell may read it and turn it. */
+    /** With Fixer the switch is Fixer's, and only the shell may read it and turn it. */
     private void showTools() {
         Level level = levels.peek();
-        if (TaskService.ready()) {
+        doubleHome = HomeCover.doubleHome;
+        boolean fixer = Updater.fixerActive(this);
+        if (fixer && TaskService.ready()) {
             TaskService.shell(Fire.FIXER_COMMAND + "state", output -> {
                 boolean on = output != null && output.contains(Fire.DOUBLE_HOME_ON);
                 if (on == doubleHome) return;
@@ -1405,20 +1407,28 @@ public final class SettingsActivity extends CardActivity {
             new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
                 getString(R.string.settings_airplay_text),
                 false, () -> openPackage(Fire.AIRPLAY)),
-            new Entry("FireStick Fixer", null, appIcon(Fire.FIXER),
+            new Entry("FireStick Fixer", fixer ? YES : NO, appIcon(Fire.FIXER),
                 getString(R.string.settings_fixer_text),
-                false, () -> openPackage(Fire.FIXER)),
+                false, () -> changeSystem(() -> TaskService.setFixer(this, !fixer))),
             new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
                 getString(R.string.settings_double_home_text),
-                false, () -> shell(Fire.FIXER_COMMAND + "set doubleTap " + !doubleHome, output -> {
-                    if (output == null) {
-                        sayLong(getString(R.string.settings_fire_refused));
-                        return;
-                    }
-                    doubleHome = !doubleHome;
-                    TaskService.rememberDoubleHome(this, doubleHome);
-                    refreshIf(level);
-                }))));
+                false, () -> switchDoubleHome(level))));
+    }
+
+    private void switchDoubleHome(Level level) {
+        Runnable switched = () -> {
+            doubleHome = !doubleHome;
+            TaskService.rememberDoubleHome(this, doubleHome);
+            refreshIf(level);
+        };
+        if (!Updater.fixerActive(this)) {
+            switched.run();
+            return;
+        }
+        shell(Fire.FIXER_COMMAND + "set doubleTap " + !doubleHome, output -> {
+            if (output == null) sayLong(getString(R.string.settings_fire_refused));
+            else switched.run();
+        });
     }
 
     /** "public:8,1 mounted 1234-ABCD": one line for each disk. */

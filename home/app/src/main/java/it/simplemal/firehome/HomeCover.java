@@ -13,6 +13,7 @@ import android.view.PixelCopy;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 
 /**
@@ -34,6 +35,10 @@ final class HomeCover {
     /** Fixer can keep its black to the limit after a second press, a second and a half and its tail. */
     private static final long FIXER_BLACK_MS = 2000;
     private static final long PAIR_MS = 2000;
+    /** Without Fixer no black has to end: only the Home's first frame is waited for. */
+    private static final long OWN_AFTER_HOME_MS = 150;
+    private static final int AMAZON_TRIES = 10;
+    private static final long AMAZON_TRY_MS = 100;
 
     /** Fixer's double press leaves Amazon's Home on screen, so the cover has to step aside. */
     static volatile boolean doubleHome;
@@ -50,6 +55,8 @@ final class HomeCover {
     private final Runnable bringBack = this::bringBack;
     private boolean returning;
     private boolean twice;
+    /** Asked for with a double press: it stays until a press or another app says otherwise. */
+    private boolean leftOnAmazon;
     private long lastHeard;
     private int unmatched;
     private boolean holding;
@@ -105,9 +112,10 @@ final class HomeCover {
         lastPress = now;
         main.removeCallbacks(bringBack);
         twice = again;
-        returning = again && !doubleHome;
+        leftOnAmazon = again && doubleHome;
+        returning = !leftOnAmazon && (again || !Updater.fixerActive(service));
         if (returning) main.postDelayed(bringBack, BRING_BACK_MS);
-        if (again && doubleHome) hide();
+        if (leftOnAmazon) hide();
         // Taking a picture now is too late: Fixer's black is already up, half a second before it.
         else if (picture == null && MainActivity.showing && home != null) take(home, this::show);
         else show();
@@ -117,6 +125,27 @@ final class HomeCover {
     private void bringBack() {
         returning = false;
         service.startActivity(new Intent(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    /** Another app came up, so a double press no longer keeps Amazon's Home. */
+    void appOpened() { leftOnAmazon = false; }
+
+    /**
+     * Without Fixer: Amazon's Home has a page of its own on screen, at power-on, after a press too
+     * quick for the Home brought back, or under an app that ended. It tells of that from behind
+     * other apps as well, and a moment before it is the active window, so that is looked at.
+     */
+    void amazonShown() { amazonShown(AMAZON_TRIES); }
+
+    private void amazonShown(int tries) {
+        if (leftOnAmazon || returning || holding) return;
+        AccessibilityNodeInfo active = service.getRootInActiveWindow();
+        if (active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName())) {
+            show();
+            bringBack();
+        } else if (tries > 0) {
+            main.postDelayed(() -> amazonShown(tries - 1), AMAZON_TRY_MS);
+        }
     }
 
     /** Stays until letGo: `still` over a Fire OS page on its way out, black if there is nothing to show. */
@@ -138,8 +167,10 @@ final class HomeCover {
     }
 
     private void show() {
-        if (picture == null) return;
-        view.setImageBitmap(picture);
+        boolean fixer = Updater.fixerActive(service);
+        if (picture == null && fixer) return;
+        if (picture != null) view.setImageBitmap(picture);
+        else view.setImageDrawable(new ColorDrawable(Color.BLACK));
         view.invalidate();
         view.setVisibility(View.VISIBLE);
         main.removeCallbacks(hide);
@@ -151,7 +182,7 @@ final class HomeCover {
         if (view.getVisibility() != View.VISIBLE || returning) return;
         long fixer = twice ? FIXER_BLACK_MS - (SystemClock.elapsedRealtime() - lastPress) : 0;
         main.removeCallbacks(hide);
-        main.postDelayed(hide, Math.max(AFTER_HOME_MS, fixer));
+        main.postDelayed(hide, Updater.fixerActive(service) ? Math.max(AFTER_HOME_MS, fixer) : OWN_AFTER_HOME_MS);
     }
 
     private void hide() {
