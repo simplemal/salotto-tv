@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,7 +29,7 @@ import java.util.List;
  * through focus, so that button stays one press below whichever card is selected.
  */
 public final class TasksActivity extends CardActivity {
-    private static final int SCRIM = Color.argb(170, 8, 10, 14);
+    private static final int SCRIM = Color.argb(200, 8, 10, 14);
     /** Three whole cards and a third of the next on each side show that the row goes on. */
     private static final int CARD_WIDTH = 240;
     private static final int CARD_HEIGHT = 135;
@@ -234,6 +235,9 @@ public final class TasksActivity extends CardActivity {
                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(RADIUS));
             }
         });
+        Drawable glass = cardGlass(dp(RADIUS));
+        image.setTag(glass);
+        image.setForeground(glass);
         image.setOnClickListener(view -> {
             if (position == index) openSelected();
             else select(position);
@@ -272,10 +276,13 @@ public final class TasksActivity extends CardActivity {
             View card = cards.get(position);
             card.animate().scaleX(chosen ? 1 : OTHER_SCALE).scaleY(chosen ? 1 : OTHER_SCALE)
                 .alpha(chosen ? 1 : OTHER_ALPHA).setDuration(time).start();
-            if (!chosen || onButton) card.setForeground(null);
+            if (!chosen || onButton) card.setForeground((Drawable) card.getTag());
         }
         // After the others have let it go: one card at a time wears the same edge.
-        if (!onButton) cards.get(index).setForeground(edge());
+        if (!onButton) {
+            View card = cards.get(index);
+            card.setForeground(new LayerDrawable(new Drawable[]{(Drawable) card.getTag(), edge()}));
+        }
         buttonFill.setColor(onButton ? Color.WHITE : Color.rgb(84, 88, 96));
         buttonFill.setStroke(dp(BUTTON_RING), onButton ? Color.WHITE : BUTTON_EDGE);
         button.setTextColor(onButton ? Fire.INK : Color.WHITE);

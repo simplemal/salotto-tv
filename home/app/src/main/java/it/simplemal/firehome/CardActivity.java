@@ -384,6 +384,9 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     /** The line of light of liquid glass and a soft reflection from above. */
     protected Drawable glassEdge(int radius) { return glassEdge(radius, 54, 235); }
 
+    /** The glass of a card at rest: on artwork it stays a hint. */
+    protected Drawable cardGlass(int radius) { return glassEdge(radius, CARD_REFLECTION, CARD_LIGHT); }
+
     /** The base of the pill and of the control panel. */
     protected GradientDrawable glass(int radius) {
         GradientDrawable glass = new GradientDrawable();
