@@ -32,15 +32,15 @@ import java.util.List;
  * selected.
  */
 public final class TasksActivity extends CardActivity {
-    private static final int SCRIM = Color.argb(200, 8, 10, 14);
+    private static final int SCRIM = Color.argb(225, 8, 10, 14);
     /** Three whole cards and a third of the next on each side show that the row goes on. */
     private static final int CARD_WIDTH = 240;
     private static final int CARD_HEIGHT = 135;
     private static final int CARD_GAP = 16;
     private static final int RADIUS = 12;
     private static final int ART_INSET = 32;
-    private static final int BLUR_WIDTH = 48;
-    private static final int BLUR_HEIGHT = 27;
+    private static final int BLUR_WIDTH = 160;
+    private static final int BLUR_HEIGHT = 90;
     private static final long SCREEN_WAIT_MS = 500;
     private static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
@@ -97,6 +97,7 @@ public final class TasksActivity extends CardActivity {
     private int index;
     private boolean onButton;
     private boolean onPill;
+    private boolean onNetwork;
     private boolean stopping;
     private boolean prepareFailed;
     private final Runnable prepareStop = this::prepareStop;
@@ -155,7 +156,7 @@ public final class TasksActivity extends CardActivity {
         });
     }
 
-    /** The Home's pill, settings in the same place: only the network is beside it, and it does nothing. */
+    /** The Home's pill, settings in the same place: the network beside it leads to its own section. */
     private View pill() {
         LinearLayout line = new LinearLayout(this);
         line.setGravity(Gravity.CENTER_VERTICAL);
@@ -169,7 +170,7 @@ public final class TasksActivity extends CardActivity {
         line.addView(memory);
         network = pillIcon(R.drawable.ic_wifi, "");
         network.setFocusable(false);
-        network.setClickable(false);
+        network.setOnClickListener(view -> openNetwork());
         network.setVisibility(View.GONE);
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
         beside.setMarginEnd(dp(PILL_ICON_GAP));
@@ -245,6 +246,7 @@ public final class TasksActivity extends CardActivity {
     private void showState(State state) {
         memory.setText(state.memory);
         network.setVisibility(state.online ? View.VISIBLE : View.GONE);
+        if (!state.online) onNetwork = false;
         network.setImageResource(state.wired ? R.drawable.ic_ethernet : R.drawable.ic_wifi);
         network.setContentDescription(state.wired ? "Ethernet" : "Wi-Fi");
     }
@@ -317,12 +319,14 @@ public final class TasksActivity extends CardActivity {
         index = position;
         onButton = false;
         onPill = false;
+        onNetwork = false;
         show(true);
     }
 
     /** Keeps the selected card in the middle of the screen. */
     private void show(boolean animate) {
-        lightPillIcon(settings, onPill);
+        lightPillIcon(settings, onPill && !onNetwork);
+        lightPillIcon(network, onPill && onNetwork);
         boolean any = !apps.isEmpty();
         message.setVisibility(any ? View.GONE : View.VISIBLE);
         title.setVisibility(any ? View.VISIBLE : View.INVISIBLE);
@@ -374,6 +378,11 @@ public final class TasksActivity extends CardActivity {
 
     private void openSettings() {
         open(new Intent(this, SettingsActivity.class));
+        finish();
+    }
+
+    private void openNetwork() {
+        open(new Intent(this, SettingsActivity.class).putExtra(SettingsActivity.SECTION, SettingsActivity.NETWORK));
         finish();
     }
 
@@ -449,9 +458,17 @@ public final class TasksActivity extends CardActivity {
             finish();
         } else if (onPill) {
             if (code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER) {
-                openSettings();
+                if (onNetwork) openNetwork();
+                else openSettings();
             } else if (code == KeyEvent.KEYCODE_DPAD_DOWN) {
                 onPill = false;
+                onNetwork = false;
+                show(false);
+            } else if (code == KeyEvent.KEYCODE_DPAD_LEFT && network.getVisibility() == View.VISIBLE) {
+                onNetwork = true;
+                show(false);
+            } else if (code == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                onNetwork = false;
                 show(false);
             }
         } else if (code == KeyEvent.KEYCODE_DPAD_LEFT && !onButton && index > 0) {
