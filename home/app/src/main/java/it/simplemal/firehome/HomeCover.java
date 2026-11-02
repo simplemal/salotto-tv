@@ -156,8 +156,6 @@ final class HomeCover {
         main.postDelayed(hide, HOLD_LIMIT_MS);
     }
 
-    Bitmap held() { return held; }
-
     void letGo() {
         if (holding) hide();
     }

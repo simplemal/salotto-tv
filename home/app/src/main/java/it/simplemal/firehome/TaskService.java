@@ -543,17 +543,6 @@ public final class TaskService extends AccessibilityService {
         });
     }
 
-    /** What is on screen now, or null without a connection. */
-    static void screen(Consumer<Bitmap> done) {
-        onAdb(null, service -> service.client == null ? null : decode(service.ask("shot")), done);
-    }
-
-    private static Bitmap decode(String reply) {
-        if (NOTHING.equals(reply)) return null;
-        byte[] jpeg = Base64.decode(reply, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length);
-    }
-
     /** Lets a connection refused on the TV be tried again, now that someone asked: once a minute, a try is costly. */
     static void retry() {
         TaskService service = running;
@@ -731,12 +720,6 @@ public final class TaskService extends AccessibilityService {
     /** From the system log when it can be: Fire OS's page starts black, well before anyone hears of it. */
     private void holdScreen() {
         cover.hold(front == null ? HomeCover.lastPicture() : BitmapFactory.decodeFile(RunningApps.picture(this, front).getPath()));
-    }
-
-    /** What the task manager opened over, when Fire OS's page was in the way. */
-    static Bitmap heldPicture() {
-        TaskService service = running;
-        return service == null ? null : service.cover.held();
     }
 
     static void tasksShown() {

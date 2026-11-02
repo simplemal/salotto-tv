@@ -11,8 +11,8 @@ android {
         applicationId 'it.simplemal.firehome'
         minSdk 26
         targetSdk 30
-        versionCode 69
-        versionName '1.0.8'
+        versionCode 70
+        versionName '1.0.9'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

@@ -40,7 +40,9 @@ public final class TasksActivity extends CardActivity {
     private static final int RADIUS = 12;
     private static final int ART_INSET = 32;
     private static final int BLUR_RADIUS = 6;
-    private static final long SCREEN_WAIT_MS = 500;
+    /** The backdrop as this page shows it, kept until it changes: working it out takes a moment. */
+    private static String veiledName;
+    private static Bitmap veiled;
     private static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
     static final int CLOSE_SP = 13;
@@ -81,9 +83,7 @@ public final class TasksActivity extends CardActivity {
     private final Handler main = new Handler(Looper.getMainLooper());
     private FrameLayout root;
     private ImageView backdropView;
-    private View scrim;
     private Drawable selection;
-    private boolean revealed;
     private boolean usageAllowed;
     private int loads;
     private List<HomeApps.App> apps = new ArrayList<>();
@@ -109,9 +109,6 @@ public final class TasksActivity extends CardActivity {
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         root.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
-        scrim = new View(this);
-        scrim.setBackgroundColor(SCRIM);
-        root.addView(scrim, new FrameLayout.LayoutParams(-1, -1));
 
         LinearLayout column = new LinearLayout(this);
         column.setOrientation(LinearLayout.VERTICAL);
@@ -146,14 +143,7 @@ public final class TasksActivity extends CardActivity {
         root.addView(pill(), pillPlace());
         setContentView(root);
         root.setAlpha(0);
-        // Android 11 cannot blur what is behind a window, so the page is hidden until the screen
-        // has been captured, then drawn over a blurred copy of it.
-        Runnable wallpaper = () -> reveal(null);
-        main.postDelayed(wallpaper, SCREEN_WAIT_MS);
-        TaskService.screen(frame -> {
-            main.removeCallbacks(wallpaper);
-            reveal(frame);
-        });
+        dressBackdrop();
     }
 
     /** The Home's pill, settings in the same place: the network beside it leads to its own section. */
@@ -182,28 +172,24 @@ public final class TasksActivity extends CardActivity {
         return pillBox(line);
     }
 
-    private void reveal(Bitmap frame) {
-        if (revealed) return;
-        revealed = true;
-        Bitmap behind = frame != null ? frame : TaskService.heldPicture();
-        // On a cable nothing can capture the screen: the Home as last seen is better than a plain page.
-        if (behind == null) behind = HomeCover.lastPicture();
-        if (behind == null) {
-            Look.show(this, backdropView::setImageDrawable);
+    /** The Home's own backdrop, whatever is on screen: the page stays hidden until it is ready. */
+    private void dressBackdrop() {
+        String name = Look.currentName(this);
+        if (name.equals(veiledName)) {
+            backdropView.setImageBitmap(veiled);
             appear();
             return;
         }
-        Bitmap picture = behind;
-        Background.draw(() -> {
+        Look.current(this, picture -> Background.draw(() -> {
             Bitmap shown = Blur.veiled(picture, BLUR_RADIUS, SCRIM);
             runOnUiThread(() -> {
+                veiledName = name;
+                veiled = shown;
                 if (isDestroyed()) return;
-                // The veil is part of the picture now, where it cannot leave bands.
-                scrim.setVisibility(View.GONE);
                 backdropView.setImageBitmap(shown);
                 appear();
             });
-        });
+        }));
     }
 
     private void appear() {

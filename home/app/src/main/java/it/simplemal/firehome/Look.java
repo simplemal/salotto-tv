@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,9 @@ import java.util.function.Consumer;
 
 /** The saved appearance of the Home: grid, clock and backdrop. Only the weather backdrop changes on its own. */
 final class Look {
+    private static final int SMALL_SAMPLE = 4;
+    private static final int SMALL_WIDTH = 480;
+    private static final int SMALL_HEIGHT = 270;
     static final int[] COLUMN_CHOICES = {5, 6};
     private static final int[] FONT_LABELS = {R.string.look_font_thin, R.string.look_font_light, R.string.look_font_normal,
         R.string.look_font_medium, R.string.look_font_serif, R.string.look_font_mono, R.string.look_font_cursive};
@@ -293,6 +298,47 @@ final class Look {
 
     /** The dark shading of the Settings and of every page that does not follow the chosen backdrop. */
     static Drawable plainBackdrop() { return new Shade(PAGE_COLORS); }
+
+    /** What is behind the Home now, by name: it changes only when the picture does. */
+    static String currentName(Context context) {
+        return weatherPictures(context) ? Weather.picture(context) : backdrop(context);
+    }
+
+    /** That same backdrop as a small bitmap, for a page that lays it under itself. On the main thread. */
+    static void current(Context context, Consumer<Bitmap> done) {
+        String name = currentName(context);
+        Runnable plain = () -> show(context, drawable -> done.accept(painted(drawable)));
+        if (!weatherPictures(context) || !name.endsWith(Weather.PICTURE_FILE)) {
+            plain.run();
+            return;
+        }
+        Handler main = new Handler(Looper.getMainLooper());
+        Context app = context.getApplicationContext();
+        Background.draw(() -> {
+            Bitmap picture = small(app, name);
+            main.post(() -> {
+                if (picture == null) plain.run();
+                else done.accept(picture);
+            });
+        });
+    }
+
+    private static Bitmap small(Context context, String asset) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = SMALL_SAMPLE;
+        try (InputStream input = context.getAssets().open(asset)) {
+            return BitmapFactory.decodeStream(input, null, options);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static Bitmap painted(Drawable drawable) {
+        Bitmap picture = Bitmap.createBitmap(SMALL_WIDTH, SMALL_HEIGHT, Bitmap.Config.ARGB_8888);
+        drawable.setBounds(0, 0, SMALL_WIDTH, SMALL_HEIGHT);
+        drawable.draw(new Canvas(picture));
+        return picture;
+    }
 
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
