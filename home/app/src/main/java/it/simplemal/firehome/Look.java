@@ -160,6 +160,9 @@ final class Look {
     /** One picture of a set, chosen and kept: the backdrop is then that file. */
     static boolean fixedPicture(Context context) { return backdrop(context).endsWith(Weather.PICTURE_FILE); }
 
+    /** One of the sets that change on a timer. */
+    static boolean timedBackdrop(Context context) { return timedFolder(context) != null; }
+
     private static String timedFolder(Context context) {
         String chosen = backdrop(context);
         if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;

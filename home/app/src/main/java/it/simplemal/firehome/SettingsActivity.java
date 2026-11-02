@@ -1501,9 +1501,13 @@ public final class SettingsActivity extends CardActivity {
         boolean weatherFirst = Weather.active(this);
         List<Entry> entries = new ArrayList<>();
         entries.add(groupLabel(R.string.first_backdrop_dynamic));
-        entries.add(paceEntry());
-        entries.addAll(weatherFirst ? weather : timed);
-        entries.addAll(weatherFirst ? timed : weather);
+        // It speaks of the sets below it: with any other backdrop there is nothing to change.
+        Entry pace = paceEntry();
+        pace.off = !Look.timedBackdrop(this);
+        if (weatherFirst) entries.addAll(weather);
+        entries.add(pace);
+        entries.addAll(timed);
+        if (!weatherFirst) entries.addAll(weather);
         entries.add(groupLabel(R.string.first_backdrop_static));
         entries.add(standardSet());
         entries.add(pictureSet(Look.ABSTRACT, Look.ABSTRACT_FOLDER));
