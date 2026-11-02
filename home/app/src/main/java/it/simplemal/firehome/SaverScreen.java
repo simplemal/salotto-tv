@@ -31,6 +31,7 @@ final class SaverScreen {
     private static final int TIME_SP = 72;
     private static final int DATE_SP = 22;
     private static final int WEATHER_SP = 16;
+    private static final int WEATHER_GAP_DP = 12;
     private static final int MARGIN_DP = 48;
     private static final float SHADOW = 12;
     private static final int SHADOW_COLOR = Color.argb(170, 0, 0, 0);
@@ -64,9 +65,9 @@ final class SaverScreen {
         if (Look.saverTime(context)) {
             TextClock time = clock(TIME_SP, Look.timePattern(context));
             time.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(context)], Typeface.NORMAL));
-            clock.addView(time);
+            addLine(time, 0);
         }
-        if (Look.saverDate(context)) clock.addView(clock(DATE_SP, DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")));
+        if (Look.saverDate(context)) addLine(clock(DATE_SP, DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")), 0);
         String weather = Look.saverWeather(context) ? Weather.line(context) : null;
         if (weather != null) {
             TextView line = new TextView(context);
@@ -74,12 +75,19 @@ final class SaverScreen {
             line.setTextSize(WEATHER_SP);
             line.setTextColor(Color.WHITE);
             line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);
-            clock.addView(line);
+            addLine(line, WEATHER_GAP_DP);
         }
         int place = Look.saverPlace(context);
         fixed = place > 0 && place < PLACES.length ? PLACES[place] : 0;
         if (fixed == Gravity.CENTER) clock.setGravity(Gravity.CENTER_HORIZONTAL);
         root.addView(clock, corner(fixed != 0 ? fixed : CORNERS[0]));
+    }
+
+    /** Only as wide as its words: a full width line would leave them on the left in the middle of the screen. */
+    private void addLine(View line, int gapDp) {
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(-2, -2);
+        place.topMargin = Math.round(gapDp * context.getResources().getDisplayMetrics().density);
+        clock.addView(line, place);
     }
 
     View view() { return root; }
