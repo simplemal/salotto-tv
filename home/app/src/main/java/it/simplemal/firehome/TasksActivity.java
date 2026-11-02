@@ -138,6 +138,8 @@ public final class TasksActivity extends CardActivity {
         if (revealed) return;
         revealed = true;
         Bitmap behind = frame != null ? frame : TaskService.heldPicture();
+        // On a cable nothing can capture the screen: the Home as last seen is better than a plain page.
+        if (behind == null) behind = HomeCover.lastPicture();
         if (behind == null) {
             Look.show(this, backdropView::setImageDrawable);
         } else {
