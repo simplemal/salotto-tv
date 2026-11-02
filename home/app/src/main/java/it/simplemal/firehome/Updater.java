@@ -59,7 +59,6 @@ final class Updater {
     /** Only updates signed by the private half of this key are ever considered. */
     private static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+Xr4FLe8cXoDAqAen4eIgxam1dviQ81GfwoMv51vrd0sajsazDnwlEzdFR3+VfTHJDTFK7qeOebtfvoWzgePQ==";
     private static final String FILE = "update";
-    private static final String FIXER_BEFORE = "fixer_before";
     private static final String APK = "update.apk";
     private static final String PREVIOUS = "update-previous.apk";
     /** A failed look is usually a network still waking up. */
@@ -114,7 +113,6 @@ final class Updater {
 
     /** Android's installer only goes forward, so the way back has to be set aside first. */
     static void keepCurrent(Context context) throws Failure {
-        prefs(context).edit().putBoolean(FIXER_BEFORE, fixerActive(context)).commit();
         try {
             Files.copy(new File(context.getPackageCodePath()).toPath(), previous(context).toPath(),
                 StandardCopyOption.REPLACE_EXISTING);
@@ -307,16 +305,6 @@ final class Updater {
         } catch (IOException | GeneralSecurityException e) {
             throw new Failure(UpdateError.F108);
         }
-    }
-
-    /** A Stick set up without Fixer has nothing to lose: that says nothing about the update. */
-    static boolean fixerLost(Context context) {
-        return prefs(context).getBoolean(FIXER_BEFORE, true) && !fixerActive(context);
-    }
-
-    static boolean fixerActive(Context context) {
-        String services = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        return services != null && services.contains(Fire.FIXER);
     }
 
     static String read(File file) {

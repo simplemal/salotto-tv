@@ -28,11 +28,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.ViewPropertyAnimator;
-import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Arrays;
@@ -112,17 +110,6 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected int cardWidth(int columns, int edge) {
         return (getResources().getDisplayMetrics().widthPixels
             - 2 * edge - (columns - 1) * dp(GAP)) / columns;
-    }
-
-    /** Fixer swallows Back on any ScrollView it learns as the main screen. Hidden from it, Back arrives. */
-    protected void hideFromFixer(ScrollView scroll) {
-        scroll.setAccessibilityDelegate(new View.AccessibilityDelegate() {
-            @Override public void onInitializeAccessibilityNodeInfo(View host, AccessibilityNodeInfo info) {
-                super.onInitializeAccessibilityNodeInfo(host, info);
-                info.setClassName(FrameLayout.class.getName());
-                info.setScrollable(false);
-            }
-        });
     }
 
     protected LinearLayout row(LinearLayout page) {
@@ -543,10 +530,6 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected void uninstall(String pkg) {
         if (pkg.equals(getPackageName())) {
             sayLong(getString(R.string.card_home_stays));
-            return;
-        }
-        if (pkg.equals(Fire.FIXER)) {
-            sayLong(getString(R.string.card_fixer_stays));
             return;
         }
         removing = pkg;

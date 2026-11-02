@@ -105,7 +105,6 @@ public final class SettingsActivity extends CardActivity {
     private static final String SURROUND_MODE = "encoded_surround_output";
     static final String LEVELER = "aq_volume_leveler";
     static final String DIALOGUE = "aq_dialogue_enhancer";
-    private boolean doubleHome;
     private static final String VIDEO_QUALITY = "com.amazon.tv.settings.VIDEO_QUALITY";
     private static final int[] VIDEO_QUALITY_NAMES = {R.string.settings_quality_good,
         R.string.settings_video_quality_better, R.string.settings_video_quality_best};
@@ -280,7 +279,6 @@ public final class SettingsActivity extends CardActivity {
                 return super.computeScrollDeltaToGetChildRectOnScreen(room);
             }
         };
-        hideFromFixer(scroll);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipChildren(false);
         scroll.setFillViewport(true);
@@ -779,19 +777,16 @@ public final class SettingsActivity extends CardActivity {
         if (launchIntent(pkg) != null) {
             entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
         }
-        // Without it the Home key would land on Amazon's Home.
-        if (!pkg.equals(Fire.FIXER)) {
-            entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
-                () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-            entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
-                false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
-                    getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
-                    () -> shell("pm clear " + pkg, output -> {
-                        sayLong(output != null && output.contains("Success") ? getString(R.string.settings_data_cleared)
-                            : getString(R.string.settings_data_not_cleared));
-                        refreshIf(level);
-                    }))));
-        }
+        entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
+            () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
+        entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+            false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
+                getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
+                () -> shell("pm clear " + pkg, output -> {
+                    sayLong(output != null && output.contains("Success") ? getString(R.string.settings_data_cleared)
+                        : getString(R.string.settings_data_not_cleared));
+                    refreshIf(level);
+                }))));
         entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, getString(R.string.settings_uninstall_text), false, () -> {
             uninstalling = level;
             uninstall(pkg);
@@ -1388,19 +1383,8 @@ public final class SettingsActivity extends CardActivity {
                 })));
     }
 
-    /** With Fixer the switch is Fixer's, and only the shell may read it and turn it. */
     private void showTools() {
-        Level level = levels.peek();
-        doubleHome = HomeCover.doubleHome;
-        boolean fixer = Updater.fixerActive(this);
-        if (fixer && TaskService.ready()) {
-            TaskService.shell(Fire.FIXER_COMMAND + "state", output -> {
-                boolean on = output != null && output.contains(Fire.DOUBLE_HOME_ON);
-                if (on == doubleHome) return;
-                doubleHome = on;
-                refreshIf(level);
-            });
-        }
+        boolean doubleHome = HomeCover.doubleHome;
         show(getString(R.string.settings_tools), Arrays.asList(
             new Entry(getString(R.string.settings_tour), null, getDrawable(R.drawable.ic_salotto),
                 getString(R.string.settings_tour_text), false,
@@ -1408,28 +1392,12 @@ public final class SettingsActivity extends CardActivity {
             new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
                 getString(R.string.settings_airplay_text),
                 false, () -> openPackage(Fire.AIRPLAY)),
-            new Entry("FireStick Fixer", fixer ? YES : NO, appIcon(Fire.FIXER),
-                getString(R.string.settings_fixer_text),
-                false, () -> changeSystem(() -> TaskService.setFixer(this, !fixer))),
             new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
                 getString(R.string.settings_double_home_text),
-                false, () -> switchDoubleHome(level))));
-    }
-
-    private void switchDoubleHome(Level level) {
-        Runnable switched = () -> {
-            doubleHome = !doubleHome;
-            TaskService.rememberDoubleHome(this, doubleHome);
-            refreshIf(level);
-        };
-        if (!Updater.fixerActive(this)) {
-            switched.run();
-            return;
-        }
-        shell(Fire.FIXER_COMMAND + "set doubleTap " + !doubleHome, output -> {
-            if (output == null) sayLong(getString(R.string.settings_fire_refused));
-            else switched.run();
-        });
+                false, () -> {
+                    TaskService.rememberDoubleHome(this, !doubleHome);
+                    refresh();
+                })));
     }
 
     /** "public:8,1 mounted 1234-ABCD": one line for each disk. */
@@ -1456,7 +1424,7 @@ public final class SettingsActivity extends CardActivity {
         });
     }
 
-    /** ACTION_SETTINGS passes through Amazon's home activity, which Fixer redirects back here. */
+    /** ACTION_SETTINGS passes through Amazon's home activity, which brings Salotto back here. */
     private Intent fireOsSettings() {
         return new Intent().setClassName(Fire.AMAZON_HOME, Fire.SETTINGS_PAGE);
     }

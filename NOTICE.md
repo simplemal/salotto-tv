@@ -28,7 +28,6 @@ Non inclusi: l'installazione li scarica dai progetti originali, senza modificarl
 
 | Software | Uso | Licenza |
 |---|---|---|
-| [FireStick Fixer](https://github.com/Hornet34/firestick-fixer) | Porta il tasto Home su Salotto | GPL-3.0 |
 | [AirPlay Server](https://github.com/jqssun/android-airplay-server) | Riceve da iPhone, iPad e Mac | GPL-3.0 |
 | [Aurora Store](https://f-droid.org/packages/com.aurora.store/) | Installa app Android, anche senza account | GPL-3.0 |
 

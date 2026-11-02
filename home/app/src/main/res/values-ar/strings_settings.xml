@@ -23,7 +23,7 @@
     <string name="settings_backup">النسخ الاحتياطي</string>
     <string name="settings_backup_text">حفظ اختيارات Salotto واستعادتها.</string>
     <string name="settings_tools">الأدوات</string>
-    <string name="settings_tools_text">AirPlay وFireStick Fixer.</string>
+    <string name="settings_tools_text">AirPlay والضغط المزدوج على الرئيسية.</string>
     <string name="settings_update">التحديث</string>
     <string name="settings_update_text">يبحث عن إصدار جديد من Salotto. يفحص كل شيء قبل أن يغيّر أي شيء.</string>
     <string name="settings_about">عن Salotto</string>
@@ -201,7 +201,6 @@
     <string name="settings_tour">العرض التمهيدي</string>
     <string name="settings_tour_text">شاهد صفحات التشغيل الأول من جديد، مع شرح جهاز التحكم.</string>
     <string name="settings_airplay_text">استقبل الفيديو من iPhone وiPad وMac. يبدأ تلقائيًا عند التشغيل، ويمكن تغيير ذلك من إعداداته.</string>
-    <string name="settings_fixer_text">ينقل زر الرئيسية وتشغيل جهاز Stick إلى Salotto.</string>
     <string name="settings_double_home">رئيسية Fire TV بضغطتين</string>
     <string name="settings_double_home_text">الضغط على الرئيسية مرتين يفتح رئيسية Fire TV، مثلًا لتغيير ملف Amazon الشخصي.</string>
     <string name="settings_usb_checking">جارٍ الفحص…</string>

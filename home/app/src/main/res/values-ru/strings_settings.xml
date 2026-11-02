@@ -23,7 +23,7 @@
     <string name="settings_backup">Резервная копия</string>
     <string name="settings_backup_text">Сохраняет и восстанавливает параметры Salotto.</string>
     <string name="settings_tools">Инструменты</string>
-    <string name="settings_tools_text">AirPlay и FireStick Fixer.</string>
+    <string name="settings_tools_text">AirPlay и двойное нажатие «Домой».</string>
     <string name="settings_update">Обновление</string>
     <string name="settings_update_text">Ищет новую версию Salotto. Всё проверяется, прежде чем что-то менять.</string>
     <string name="settings_about">О Salotto</string>
@@ -201,7 +201,6 @@
     <string name="settings_tour">Знакомство</string>
     <string name="settings_tour_text">Ещё раз покажет страницы первого запуска с объяснением работы пульта.</string>
     <string name="settings_airplay_text">Принимает видео с iPhone, iPad и Mac. Запускается сам при включении: меняется в его настройках.</string>
-    <string name="settings_fixer_text">Передаёт Salotto кнопку «Домой» и запуск при включении Stick.</string>
     <string name="settings_double_home">Двойное «Домой» для Fire TV</string>
     <string name="settings_double_home_text">При двойном нажатии «Домой» открывается главный экран Fire TV, например чтобы сменить профиль Amazon.</string>
     <string name="settings_usb_checking">Проверяю…</string>

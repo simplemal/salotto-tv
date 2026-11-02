@@ -23,7 +23,7 @@
     <string name="settings_backup">बैकअप</string>
     <string name="settings_backup_text">Salotto की पसंद सहेजें और वापस लाएं।</string>
     <string name="settings_tools">टूल</string>
-    <string name="settings_tools_text">AirPlay और FireStick Fixer।</string>
+    <string name="settings_tools_text">AirPlay और होम बटन को दो बार दबाना।</string>
     <string name="settings_update">अपडेट</string>
     <string name="settings_update_text">Salotto का नया वर्ज़न खोजता है। कुछ भी बदलने से पहले सब जाँच लेता है।</string>
     <string name="settings_about">Salotto के बारे में</string>
@@ -201,7 +201,6 @@
     <string name="settings_tour">शुरुआती परिचय</string>
     <string name="settings_tour_text">पहली बार चालू करने के पेज दोबारा देखें, रिमोट की जानकारी के साथ।</string>
     <string name="settings_airplay_text">iPhone, iPad और Mac से वीडियो पाएं। चालू होते ही अपने आप शुरू होता है: इसकी अपनी सेटिंग में बदला जा सकता है।</string>
-    <string name="settings_fixer_text">होम बटन और Stick का चालू होना Salotto पर लाता है।</string>
     <string name="settings_double_home">डबल होम से Fire TV होम</string>
     <string name="settings_double_home_text">होम दो बार दबाने पर Fire TV का होम खुलता है, जैसे Amazon प्रोफ़ाइल बदलने के लिए।</string>
     <string name="settings_usb_checking">जाँच रहे हैं…</string>

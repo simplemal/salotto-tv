@@ -98,7 +98,7 @@
     <string name="about_private">تتبّع أقل.</string>
     <string name="about_private_text">يوقف التثبيت حزم الإعلانات والقياس عن بُعد وAlexa، ويحدّ من معرّف الإعلانات، ويوقف إرسال بيانات الاستخدام. إذا أعاد تحديث Fire OS تشغيلها، يخبرك Salotto ويمكنك إيقافها من جديد. يتصل Salotto فقط بـ Open-Meteo للطقس وبـ GitHub للتحديثات.</string>
     <string name="about_others">مع برامج من آخرين.</string>
-    <string name="about_others_text">FireStick Fixer ينقل زر الرئيسية إلى Salotto. AirPlay Server يستقبل من iPhone وiPad وMac. Aurora Store يثبّت تطبيقات Android، حتى بلا حساب.</string>
+    <string name="about_others_text">AirPlay Server يستقبل من iPhone وiPad وMac. Aurora Store يثبّت تطبيقات Android، حتى بلا حساب.</string>
     <string name="about_only">في Salotto فقط.</string>
     <string name="about_only_text">خلفيات مرسومة أو فوتوغرافية تتبع طقس مدينتك ووقتها. مركز التحكم فوق أي تطبيق، بالضغط مطولًا على القائمة: Wi-Fi وBluetooth والمؤقت والسطوع وفلتر الضوء الأزرق. مدير المهام بالضغط مطولًا على رجوع. صفحة بمعايير الصوت والفيديو في Stick والتلفزيون. حوارات أوضح ومستوى صوت موحّد في متناول يدك: هي مرشّحات Fire OS مجمّعة في مكان واحد. تحديثات موقّعة ومفحوصة قبل تثبيتها.</string>
     <string name="about_license">الترخيص</string>
@@ -115,7 +115,6 @@
     <string name="about_use_font">خط اسم Salotto</string>
     <string name="about_not_included">برامج غير مضمّنة</string>
     <string name="about_not_included_text">يحمّلها التثبيت من مشاريعها الأصلية، دون تعديل.</string>
-    <string name="about_use_fixer">ينقل زر الرئيسية إلى Salotto</string>
     <string name="about_use_airplay">يستقبل من iPhone وiPad وMac</string>
     <string name="about_use_aurora">يثبّت تطبيقات Android، حتى بلا حساب</string>
 
@@ -289,5 +288,4 @@
     <string name="update_error_r301">النسخة السابقة غير متوفرة</string>
     <string name="update_error_r302">فشلت العودة إلى الإصدار السابق</string>
     <string name="update_error_r303">الحالة النهائية غير معروفة</string>
-    <string name="card_fixer_stays">FireStick Fixer يشغّل زر Home ويبقى مثبتًا</string>
 </resources>

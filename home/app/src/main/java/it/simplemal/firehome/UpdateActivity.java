@@ -163,7 +163,6 @@ public final class UpdateActivity extends CardActivity {
             list.addView(item);
         }
         ScrollView box = new ScrollView(this);
-        hideFromFixer(box);
         box.setDefaultFocusHighlightEnabled(false);
         box.setScrollbarFadingEnabled(false);
         // The padding keeps the scroll bar off the rounded corners; the text still reaches the edge.
@@ -373,7 +372,6 @@ public final class UpdateActivity extends CardActivity {
             long limit = System.currentTimeMillis() + HEALTH_WAIT_MS;
             String verdict = "good";
             if (Updater.installedCode(this) != Updater.target(this)) verdict = UpdateError.C204.name();
-            else if (Updater.fixerLost(this)) verdict = UpdateError.C205.name();
             else {
                 while (!TaskService.running() && System.currentTimeMillis() < limit) pause();
                 if (!TaskService.running()) verdict = UpdateError.C206.name();

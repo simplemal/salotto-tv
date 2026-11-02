@@ -20,7 +20,6 @@ public final class AppsActivity extends CardActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        // Not a full-screen ScrollView: Fixer would take this for the main screen and swallow Back.
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackground(Look.plainBackdrop());

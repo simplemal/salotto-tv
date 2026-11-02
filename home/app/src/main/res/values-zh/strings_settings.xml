@@ -24,7 +24,7 @@
     <string name="settings_backup">备份</string>
     <string name="settings_backup_text">保存和恢复你在 Salotto 中的选择。</string>
     <string name="settings_tools">工具</string>
-    <string name="settings_tools_text">AirPlay 和 FireStick Fixer。</string>
+    <string name="settings_tools_text">AirPlay 和双击主页键。</string>
     <string name="settings_update">更新</string>
     <string name="settings_update_text">检查 Salotto 的新版本。动手之前，会先全部检查一遍。</string>
     <string name="settings_about">关于 Salotto</string>
@@ -202,7 +202,6 @@
     <string name="settings_tour">开机引导</string>
     <string name="settings_tour_text">重看首次启动时的页面，包括遥控器说明。</string>
     <string name="settings_airplay_text">接收来自 iPhone、iPad 和 Mac 的视频。开机时自动启动，可在它自己的设置中更改。</string>
-    <string name="settings_fixer_text">把主页键和 Stick 的开机启动交给 Salotto。</string>
     <string name="settings_double_home">双击主页键进入 Fire TV 主页</string>
     <string name="settings_double_home_text">连按两次主页键，就会打开 Fire TV 主页，例如用来切换 Amazon 个人资料。</string>
     <string name="settings_usb_checking">正在检查…</string>

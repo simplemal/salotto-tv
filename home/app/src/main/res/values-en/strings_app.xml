@@ -86,7 +86,7 @@
     <string name="about_private">Less tracking.</string>
     <string name="about_private_text">Installing turns off the advertising, telemetry and Alexa packages, limits the advertising ID and stops usage data from being sent. If a Fire OS update turns them back on, Salotto tells you and you can turn them off again. Salotto connects only to Open-Meteo for the weather and to GitHub for updates.</string>
     <string name="about_others">With programs from others.</string>
-    <string name="about_others_text">FireStick Fixer brings the Home key to Salotto. AirPlay Server receives from iPhone, iPad and Mac. Aurora Store installs Android apps, even without an account.</string>
+    <string name="about_others_text">AirPlay Server receives from iPhone, iPad and Mac. Aurora Store installs Android apps, even without an account.</string>
     <string name="about_only">Only in Salotto.</string>
     <string name="about_only_text">Illustrated or photographic backdrops that follow your city’s weather and time. A control center over any app, by holding down Menu: Wi-Fi, Bluetooth, timer, brightness and blue light filter. A task manager by holding down Back. A page with the audio and video standards of the Stick and the TV. Clearer dialogue and even volume at your fingertips: they are Fire OS filters, gathered in one place. Signed updates, checked before they are installed.</string>
     <string name="about_license">License</string>
@@ -103,7 +103,6 @@
     <string name="about_use_font">The font of the Salotto name</string>
     <string name="about_not_included">Programs not included</string>
     <string name="about_not_included_text">Installing downloads them from the original projects, without changing them.</string>
-    <string name="about_use_fixer">Brings the Home key to Salotto</string>
     <string name="about_use_airplay">Receives from iPhone, iPad and Mac</string>
     <string name="about_use_aurora">Installs Android apps, even without an account</string>
 
@@ -273,5 +272,4 @@
     <string name="update_error_r301">Previous copy not available</string>
     <string name="update_error_r302">Going back to the previous version failed</string>
     <string name="update_error_r303">Final state unknown</string>
-    <string name="card_fixer_stays">FireStick Fixer runs the Home key, so it stays installed</string>
 </resources>

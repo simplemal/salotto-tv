@@ -92,7 +92,7 @@
     <string name="about_private">Меньше слежки.</string>
     <string name="about_private_text">При установке отключаются пакеты рекламы, телеметрии и Alexa, ограничивается рекламный идентификатор и прекращается отправка данных об использовании. Если обновление Fire OS включит их снова, Salotto сообщит вам, и вы сможете выключить их опять. Salotto подключается только к Open-Meteo за погодой и к GitHub за обновлениями.</string>
     <string name="about_others">С программами других авторов.</string>
-    <string name="about_others_text">FireStick Fixer передаёт Salotto кнопку «Домой». AirPlay Server принимает видео с iPhone, iPad и Mac. Aurora Store устанавливает приложения Android, даже без аккаунта.</string>
+    <string name="about_others_text">AirPlay Server принимает видео с iPhone, iPad и Mac. Aurora Store устанавливает приложения Android, даже без аккаунта.</string>
     <string name="about_only">Только в Salotto.</string>
     <string name="about_only_text">Иллюстрированные или фотографические фоны, которые следуют за погодой и временем вашего города. Центр управления поверх любого приложения при удержании «Меню»: Wi-Fi, Bluetooth, таймер, яркость и фильтр синего света. Диспетчер задач при удержании «Назад». Страница со стандартами звука и видео Stick и телевизора. Чёткая речь и ровная громкость под рукой: это фильтры Fire OS, собранные в одном месте. Подписанные обновления, которые проверяются перед установкой.</string>
     <string name="about_license">Лицензия</string>
@@ -109,7 +109,6 @@
     <string name="about_use_font">Шрифт названия Salotto</string>
     <string name="about_not_included">Программы не входят в комплект</string>
     <string name="about_not_included_text">При установке они загружаются из оригинальных проектов без изменений.</string>
-    <string name="about_use_fixer">Передаёт Salotto кнопку «Домой»</string>
     <string name="about_use_airplay">Принимает видео с iPhone, iPad и Mac</string>
     <string name="about_use_aurora">Устанавливает приложения Android, даже без аккаунта</string>
 
@@ -281,5 +280,4 @@
     <string name="update_error_r301">Предыдущая копия недоступна</string>
     <string name="update_error_r302">Не удалось вернуть прежнюю версию</string>
     <string name="update_error_r303">Итоговое состояние неизвестно</string>
-    <string name="card_fixer_stays">FireStick Fixer управляет кнопкой Home и остаётся установленным</string>
 </resources>

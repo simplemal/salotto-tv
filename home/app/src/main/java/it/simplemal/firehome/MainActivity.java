@@ -25,7 +25,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.accessibility.AccessibilityEvent;
 import android.transition.ChangeBounds;
 import android.transition.Fade;
 import android.transition.TransitionManager;
@@ -241,7 +240,6 @@ public final class MainActivity extends CardActivity {
         weatherRow.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         scroll = new ShelfScroll(this);
-        hideFromFixer(scroll);
         scroll.setFillViewport(true);
         scroll.setClipChildren(false);
         scroll.setVerticalScrollBarEnabled(false);
@@ -511,12 +509,7 @@ public final class MainActivity extends CardActivity {
         showing = true;
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
-        root.postOnAnimation(() -> {
-            // A Home press from the Home opens no new window, and Fixer keeps its black up until
-            // it sees one: its limit is a second and a half.
-            getWindow().getDecorView().sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
-            TaskService.homeBack();
-        });
+        root.postOnAnimation(TaskService::homeBack);
         if (!HomeCover.ready()) root.postDelayed(() -> HomeCover.take(getWindow()), FIRST_PICTURE_MS);
         home = HomeApps.load(this);
         List<String> apps = visible();

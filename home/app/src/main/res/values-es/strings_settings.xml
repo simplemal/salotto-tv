@@ -24,7 +24,7 @@
     <string name="settings_backup">Copia de seguridad</string>
     <string name="settings_backup_text">Guarda y restaura las opciones de Salotto.</string>
     <string name="settings_tools">Herramientas</string>
-    <string name="settings_tools_text">AirPlay y FireStick Fixer.</string>
+    <string name="settings_tools_text">AirPlay y doble pulsación de Inicio.</string>
     <string name="settings_update">Actualización</string>
     <string name="settings_update_text">Busca una versión nueva de Salotto. Lo comprueba todo antes de tocar nada.</string>
     <string name="settings_about">Acerca de Salotto</string>
@@ -202,7 +202,6 @@
     <string name="settings_tour">Presentación inicial</string>
     <string name="settings_tour_text">Vuelve a ver las páginas del primer inicio, con la explicación del mando.</string>
     <string name="settings_airplay_text">Recibe vídeo de iPhone, iPad y Mac. Se inicia solo al encender: se cambia en sus propios ajustes.</string>
-    <string name="settings_fixer_text">Lleva el botón Inicio y el encendido del Stick a Salotto.</string>
     <string name="settings_double_home">Inicio de Fire TV con doble Inicio</string>
     <string name="settings_double_home_text">Al pulsar Inicio dos veces se abre el Inicio de Fire TV, por ejemplo para cambiar de perfil de Amazon.</string>
     <string name="settings_usb_checking">Comprobando…</string>

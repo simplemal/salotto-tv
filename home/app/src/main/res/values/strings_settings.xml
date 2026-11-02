@@ -23,7 +23,7 @@
     <string name="settings_backup">Backup</string>
     <string name="settings_backup_text">Salva e ripristina le scelte di Salotto.</string>
     <string name="settings_tools">Strumenti</string>
-    <string name="settings_tools_text">AirPlay e FireStick Fixer.</string>
+    <string name="settings_tools_text">AirPlay e doppia pressione di Home.</string>
     <string name="settings_update">Aggiornamento</string>
     <string name="settings_update_text">Cerca una nuova versione di Salotto. Controlla tutto prima di toccare qualcosa.</string>
     <string name="settings_about">Informazioni su Salotto</string>
@@ -201,7 +201,6 @@
     <string name="settings_tour">Presentazione iniziale</string>
     <string name="settings_tour_text">Rivedi le pagine del primo avvio, con la spiegazione del telecomando.</string>
     <string name="settings_airplay_text">Ricevi video da iPhone, iPad e Mac. Parte da solo all’accensione: si cambia nelle sue impostazioni.</string>
-    <string name="settings_fixer_text">Porta il tasto Home e l’accensione della Stick su Salotto.</string>
     <string name="settings_double_home">Home Fire TV con doppio Home</string>
     <string name="settings_double_home_text">Premendo Home due volte si apre la Home di Fire TV, per esempio per cambiare profilo Amazon.</string>
     <string name="settings_usb_checking">Controllo…</string>

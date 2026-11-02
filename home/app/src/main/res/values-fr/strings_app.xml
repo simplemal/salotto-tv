@@ -86,7 +86,7 @@
     <string name="about_private">Moins de suivi.</string>
     <string name="about_private_text">L’installation désactive les paquets de publicité, de télémétrie et d’Alexa, limite l’identifiant publicitaire et arrête l’envoi des données d’utilisation. Si une mise à jour de Fire OS les réactive, Salotto vous le dit et vous pouvez les désactiver de nouveau. Salotto se connecte seulement à Open-Meteo pour la météo et à GitHub pour les mises à jour.</string>
     <string name="about_others">Avec des programmes d’autres auteurs.</string>
-    <string name="about_others_text">FireStick Fixer redirige la touche Accueil vers Salotto. AirPlay Server reçoit depuis iPhone, iPad et Mac. Aurora Store installe des applis Android, même sans compte.</string>
+    <string name="about_others_text">AirPlay Server reçoit depuis iPhone, iPad et Mac. Aurora Store installe des applis Android, même sans compte.</string>
     <string name="about_only">Uniquement dans Salotto.</string>
     <string name="about_only_text">Fonds d’écran illustrés ou photographiques qui suivent la météo et l’heure de votre ville. Centre de contrôle sur n’importe quelle appli, en maintenant Menu : Wi-Fi, Bluetooth, minuteur, luminosité et filtre lumière bleue. Gestionnaire de tâches en maintenant Retour. Une page avec les normes audio et vidéo du Stick et de la TV. Dialogues plus clairs et volume uniforme à portée de main : ce sont des filtres de Fire OS, réunis en un seul endroit. Mises à jour signées et vérifiées avant l’installation.</string>
     <string name="about_license">Licence</string>
@@ -103,7 +103,6 @@
     <string name="about_use_font">La police du nom Salotto</string>
     <string name="about_not_included">Programmes non inclus</string>
     <string name="about_not_included_text">L’installation les télécharge depuis les projets d’origine, sans les modifier.</string>
-    <string name="about_use_fixer">Redirige la touche Accueil vers Salotto</string>
     <string name="about_use_airplay">Reçoit depuis iPhone, iPad et Mac</string>
     <string name="about_use_aurora">Installe des applis Android, même sans compte</string>
 
@@ -273,5 +272,4 @@
     <string name="update_error_r301">Copie précédente indisponible</string>
     <string name="update_error_r302">Échec du retour à la version précédente</string>
     <string name="update_error_r303">État final inconnu</string>
-    <string name="card_fixer_stays">FireStick Fixer fait fonctionner la touche Home et reste installé</string>
 </resources>

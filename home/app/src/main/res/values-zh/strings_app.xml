@@ -83,7 +83,7 @@
     <string name="about_private">更少跟踪。</string>
     <string name="about_private_text">安装时会关闭广告、遥测和 Alexa 相关组件，限制广告标识符，并停止发送使用数据。如果 Fire OS 更新后又把它们打开，Salotto 会告诉你，你可以再次关闭。Salotto 只连接 Open-Meteo 获取天气，连接 GitHub 获取更新。</string>
     <string name="about_others">借助他人的程序。</string>
-    <string name="about_others_text">FireStick Fixer 把主页键交给 Salotto。AirPlay Server 接收来自 iPhone、iPad 和 Mac 的内容。Aurora Store 可以安装 Android 应用，无需账户。</string>
+    <string name="about_others_text">AirPlay Server 接收来自 iPhone、iPad 和 Mac 的内容。Aurora Store 可以安装 Android 应用，无需账户。</string>
     <string name="about_only">Salotto 独有。</string>
     <string name="about_only_text">插画或照片背景，跟随你所在城市的天气和时间。在任何应用中长按菜单键，都能打开控制中心：Wi-Fi、Bluetooth、定时、亮度和蓝光过滤。长按返回键打开任务管理器。一个展示 Stick 和电视音频、视频规格的页面。更清晰的对白和统一音量触手可及：它们是 Fire OS 的滤镜，这里集中在一处。更新经过签名，安装前会先检查。</string>
     <string name="about_license">许可</string>
@@ -100,7 +100,6 @@
     <string name="about_use_font">Salotto 名称使用的字体</string>
     <string name="about_not_included">未包含的程序</string>
     <string name="about_not_included_text">安装时会从原项目下载，不做任何修改。</string>
-    <string name="about_use_fixer">把主页键交给 Salotto</string>
     <string name="about_use_airplay">接收来自 iPhone、iPad 和 Mac 的内容</string>
     <string name="about_use_aurora">安装 Android 应用，无需账户</string>
 
@@ -269,5 +268,4 @@
     <string name="update_error_r301">之前的备份不可用</string>
     <string name="update_error_r302">退回之前的版本失败</string>
     <string name="update_error_r303">最终状态未知</string>
-    <string name="card_fixer_stays">FireStick Fixer 负责 Home 键，因此不能卸载</string>
 </resources>

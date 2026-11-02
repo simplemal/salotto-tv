@@ -120,7 +120,7 @@
     <string name="about_private_text">L’installazione spegne i pacchetti di pubblicità, telemetria e Alexa, limita l’identificativo pubblicitario e ferma l’invio dei dati d’uso. Se un aggiornamento di Fire OS li riaccende, Salotto te lo dice e puoi rispegnerli. Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamenti.</string>
     <!-- With programs made by other people -->
     <string name="about_others">Con programmi di altri.</string>
-    <string name="about_others_text">FireStick Fixer porta il tasto Home su Salotto. AirPlay Server riceve da iPhone, iPad e Mac. Aurora Store installa app Android, anche senza account.</string>
+    <string name="about_others_text">AirPlay Server riceve da iPhone, iPad e Mac. Aurora Store installa app Android, anche senza account.</string>
     <!-- Salotto is the app here, not a room -->
     <string name="about_only">Solo in Salotto.</string>
     <string name="about_only_text">Sfondi illustrati o fotografici che seguono il meteo e l’ora della tua città. Centro di controllo su qualsiasi app, tenendo premuto Menu: Wi-Fi, Bluetooth, timer, luminosità e filtro luce blu. Task manager tenendo premuto Indietro. Una pagina con gli standard audio e video di Stick e TV. Dialoghi più chiari e volume uniforme a portata di mano: sono filtri di Fire OS, raccolti in un posto solo. Aggiornamenti firmati e controllati prima di installarli.</string>
@@ -139,7 +139,6 @@
     <string name="about_use_font">Il carattere del nome Salotto</string>
     <string name="about_not_included">Programmi non inclusi</string>
     <string name="about_not_included_text">L’installazione li scarica dai progetti originali, senza modificarli.</string>
-    <string name="about_use_fixer">Porta il tasto Home su Salotto</string>
     <string name="about_use_airplay">Riceve da iPhone, iPad e Mac</string>
     <string name="about_use_aurora">Installa app Android, anche senza account</string>
 
@@ -347,5 +346,4 @@
     <string name="update_error_r301">Copia precedente non disponibile</string>
     <string name="update_error_r302">Ritorno alla versione precedente non riuscito</string>
     <string name="update_error_r303">Stato finale sconosciuto</string>
-    <string name="card_fixer_stays">FireStick Fixer serve al tasto Home e resta installato</string>
 </resources>

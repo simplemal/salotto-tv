@@ -464,7 +464,6 @@ public final class FirstRunActivity extends CardActivity {
             if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
         }
         ScrollView list = new ScrollView(this);
-        hideFromFixer(list);
         list.setVerticalScrollBarEnabled(false);
         list.setClipChildren(false);
         list.addView(rows);

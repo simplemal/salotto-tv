@@ -543,8 +543,9 @@ public final class TaskService extends AccessibilityService {
         if (Veil.warm(this) > 0) adb.post(this::connected);
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
+        endFixer();
         // At power-on Amazon's Home comes after this and says so; after a restart it is already up.
-        if (!Updater.fixerActive(this)) cover.amazonShown();
+        cover.amazonShown();
         if (Updater.installed(this)) {
             startActivity(new Intent(this, UpdateActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -582,9 +583,7 @@ public final class TaskService extends AccessibilityService {
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
         // The mask is a window too, and it would take itself for whatever comes next.
         else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
-        boolean fixer = Updater.fixerActive(this);
-        if (name.equals(Fire.AMAZON_HOME) && homeLog == null && fixer) cover.pressed();
-        if (Fire.AMAZON_HOME_PAGE.equals(page) && !fixer) cover.amazonShown();
+        if (Fire.AMAZON_HOME_PAGE.equals(page)) cover.amazonShown();
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
@@ -643,6 +642,21 @@ public final class TaskService extends AccessibilityService {
      */
     private void menuToApp() {
         if (client != null) adb.post(() -> run("input keyevent " + KeyEvent.KEYCODE_MENU));
+    }
+
+    /** A Stick updated from when Fixer had the Home key: the two would answer every press. */
+    private void endFixer() {
+        String current = Settings.Secure.getString(getContentResolver(), ENABLED_SERVICES);
+        if (current == null || !current.contains(Fire.OLD_FIXER)) return;
+        List<String> services = new ArrayList<>();
+        for (String service : current.split(":")) {
+            if (!service.startsWith(Fire.OLD_FIXER)) services.add(service);
+        }
+        try {
+            Settings.Secure.putString(getContentResolver(), ENABLED_SERVICES, TextUtils.join(":", services));
+        } catch (SecurityException e) {
+            Log.w(TAG, "No permission yet to end Fixer", e);
+        }
     }
 
     /** Salotto may have restarted under an app, and then nothing has said which one it is. */
@@ -718,13 +732,9 @@ public final class TaskService extends AccessibilityService {
         return services != null && Arrays.asList(services.split(":")).contains(serviceName(context));
     }
 
-    /** Keeps every other service exactly as it is: Fixer's is what sends the Home key to Salotto. */
-    static void setKeys(Context context, boolean on) { setService(context, serviceName(context), on); }
-
-    /** With Fixer's service off the Home key is Salotto's, at once: nothing else has to change. */
-    static void setFixer(Context context, boolean on) { setService(context, Fire.FIXER_SERVICE, on); }
-
-    private static void setService(Context context, String name, boolean on) {
+    /** Keeps every other service exactly as it is. */
+    static void setKeys(Context context, boolean on) {
+        String name = serviceName(context);
         String current = Settings.Secure.getString(context.getContentResolver(), ENABLED_SERVICES);
         List<String> services = new ArrayList<>();
         if (current != null) {
@@ -846,10 +856,6 @@ public final class TaskService extends AccessibilityService {
             opened.openShell("CLASSPATH=" + getPackageCodePath() + " app_process / " + ShellHelper.class.getName());
             if (!"ready".equals(opened.readLine())) throw new IOException("Helper did not start");
             client = opened;
-            if (Updater.fixerActive(this)) {
-                String fixer = run(Fire.FIXER_COMMAND + "state");
-                rememberDoubleHome(this, fixer != null && fixer.contains(Fire.DOUBLE_HOME_ON));
-            }
             startHomeLog();
             if (Veil.warm(this) > 0) run(Veil.WARM_ON);
             return true;

@@ -86,7 +86,7 @@
     <string name="about_private">कम ट्रैकिंग।</string>
     <string name="about_private_text">इंस्टॉल करते समय विज्ञापन, टेलीमेट्री और Alexa के पैकेज बंद हो जाते हैं, विज्ञापन आईडी सीमित हो जाती है और उपयोग के डेटा का भेजना रुक जाता है। अगर Fire OS का कोई अपडेट इन्हें फिर चालू कर दे, तो Salotto आपको बताता है और आप इन्हें दोबारा बंद कर सकते हैं। Salotto सिर्फ़ मौसम के लिए Open-Meteo से और अपडेट के लिए GitHub से जुड़ता है।</string>
     <string name="about_others">दूसरों के प्रोग्राम के साथ।</string>
-    <string name="about_others_text">FireStick Fixer होम बटन को Salotto पर लाता है। AirPlay Server iPhone, iPad और Mac से वीडियो पाता है। Aurora Store बिना खाते के भी Android ऐप इंस्टॉल करता है।</string>
+    <string name="about_others_text">AirPlay Server iPhone, iPad और Mac से वीडियो पाता है। Aurora Store बिना खाते के भी Android ऐप इंस्टॉल करता है।</string>
     <string name="about_only">सिर्फ़ Salotto में।</string>
     <string name="about_only_text">चित्रित या फ़ोटो वाले बैकग्राउंड, जो आपके शहर के मौसम और समय के साथ बदलते हैं। किसी भी ऐप पर मेनू दबाए रखने से कंट्रोल सेंटर: Wi-Fi, Bluetooth, टाइमर, ब्राइटनेस और ब्लू लाइट फ़िल्टर। वापस दबाए रखने से टास्क मैनेजर। Stick और टीवी के ऑडियो और वीडियो स्टैंडर्ड का एक पेज। साफ़ डायलॉग और एक जैसा वॉल्यूम बस एक क्लिक पर: ये Fire OS के फ़िल्टर हैं, जो एक ही जगह इकट्ठा किए गए हैं। साइन किए हुए अपडेट, जो इंस्टॉल से पहले जाँचे जाते हैं।</string>
     <string name="about_license">लाइसेंस</string>
@@ -103,7 +103,6 @@
     <string name="about_use_font">Salotto नाम का फ़ॉन्ट</string>
     <string name="about_not_included">शामिल नहीं किए गए प्रोग्राम</string>
     <string name="about_not_included_text">इंस्टॉल के समय इन्हें मूल प्रोजेक्ट से डाउनलोड किया जाता है, बिना बदले।</string>
-    <string name="about_use_fixer">होम बटन को Salotto पर लाता है</string>
     <string name="about_use_airplay">iPhone, iPad और Mac से वीडियो पाता है</string>
     <string name="about_use_aurora">बिना खाते के भी Android ऐप इंस्टॉल करता है</string>
 
@@ -273,5 +272,4 @@
     <string name="update_error_r301">पिछली कॉपी उपलब्ध नहीं</string>
     <string name="update_error_r302">पिछले वर्ज़न पर लौटना नहीं हो सका</string>
     <string name="update_error_r303">अंतिम स्थिति पता नहीं</string>
-    <string name="card_fixer_stays">FireStick Fixer से Home बटन चलता है, इसलिए यह इंस्टॉल रहता है</string>
 </resources>

@@ -52,8 +52,6 @@ enum UpdateError {
         "Salotto è tornata alla versione precedente. Segnala il problema."),
     C204("Versione sbagliata dopo l'installazione", "La versione installata non è quella attesa.",
         "Salotto è tornata alla versione precedente. Segnala il problema."),
-    C205("Tasto Home non collegato", "Dopo l'installazione FireStick Fixer non risulta attivo.",
-        "Salotto è tornata alla versione precedente. Riavvia la Stick e controlla il tasto Home."),
     C206("Tempo scaduto", "La nuova versione non ha confermato di funzionare in tempo.",
         "Salotto è tornata alla versione precedente. Riavvia la Stick e riprova."),
     R301("Copia precedente non disponibile", "Non è stato possibile salvare la versione installata prima di procedere.",
@@ -85,7 +83,7 @@ enum UpdateError {
     String outcome(Context context) {
         switch (this) {
             case C202: return context.getString(R.string.update_outcome_stayed);
-            case C203: case C204: case C205: case C206: return context.getString(R.string.update_outcome_back);
+            case C203: case C204: case C206: return context.getString(R.string.update_outcome_back);
             case R302: return context.getString(R.string.update_outcome_not_back);
             case R303: return context.getString(R.string.update_outcome_unknown);
             default: return context.getString(R.string.update_outcome_untouched);

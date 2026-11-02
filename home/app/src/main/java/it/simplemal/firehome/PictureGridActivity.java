@@ -130,7 +130,6 @@ public final class PictureGridActivity extends CardActivity {
         scroll = new GridScroll(this, dp(NEXT_ROW));
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
-        hideFromFixer(scroll);
         scroll.addView(rows);
         page.addView(scroll, new LinearLayout.LayoutParams(-2, 0, 1));
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));

@@ -86,7 +86,7 @@
     <string name="about_private">Weniger Tracking.</string>
     <string name="about_private_text">Die Installation schaltet Pakete für Werbung, Telemetrie und Alexa aus, begrenzt die Werbe-ID und stoppt das Senden von Nutzungsdaten. Schaltet ein Update von Fire OS sie wieder ein, sagt Salotto es dir und du kannst sie erneut ausschalten. Salotto verbindet sich nur mit Open-Meteo für das Wetter und mit GitHub für Updates.</string>
     <string name="about_others">Mit Programmen anderer.</string>
-    <string name="about_others_text">FireStick Fixer bringt die Home-Taste zu Salotto. AirPlay Server empfängt von iPhone, iPad und Mac. Aurora Store installiert Android-Apps, auch ohne Konto.</string>
+    <string name="about_others_text">AirPlay Server empfängt von iPhone, iPad und Mac. Aurora Store installiert Android-Apps, auch ohne Konto.</string>
     <string name="about_only">Nur in Salotto.</string>
     <string name="about_only_text">Illustrierte oder fotografische Hintergründe, die Wetter und Uhrzeit deiner Stadt folgen. Kontrollzentrum in jeder App durch langes Drücken von Menü: Wi-Fi, Bluetooth, Timer, Helligkeit und Blaulichtfilter. Task-Manager durch langes Drücken von Zurück. Eine Seite mit den Audio- und Videostandards von Stick und Fernseher. Klarere Dialoge und Einheitliche Lautstärke griffbereit: Das sind Filter von Fire OS, an einem Ort gesammelt. Signierte Updates, die vor der Installation geprüft werden.</string>
     <string name="about_license">Lizenz</string>
@@ -103,7 +103,6 @@
     <string name="about_use_font">Die Schriftart des Namens Salotto</string>
     <string name="about_not_included">Nicht enthaltene Programme</string>
     <string name="about_not_included_text">Die Installation lädt sie von den Originalprojekten herunter, ohne sie zu verändern.</string>
-    <string name="about_use_fixer">Bringt die Home-Taste zu Salotto</string>
     <string name="about_use_airplay">Empfängt von iPhone, iPad und Mac</string>
     <string name="about_use_aurora">Installiert Android-Apps, auch ohne Konto</string>
 
@@ -273,5 +272,4 @@
     <string name="update_error_r301">Vorherige Kopie nicht verfügbar</string>
     <string name="update_error_r302">Rückkehr zur vorherigen Version fehlgeschlagen</string>
     <string name="update_error_r303">Endstatus unbekannt</string>
-    <string name="card_fixer_stays">FireStick Fixer steuert die Home-Taste und bleibt installiert</string>
 </resources>

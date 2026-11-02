@@ -23,7 +23,7 @@
     <string name="settings_backup">Backup</string>
     <string name="settings_backup_text">Die Auswahl von Salotto sichern und wiederherstellen.</string>
     <string name="settings_tools">Werkzeuge</string>
-    <string name="settings_tools_text">AirPlay und FireStick Fixer.</string>
+    <string name="settings_tools_text">AirPlay und doppeltes Drücken von Home.</string>
     <string name="settings_update">Update</string>
     <string name="settings_update_text">Sucht nach einer neuen Version von Salotto. Prüft alles, bevor etwas geändert wird.</string>
     <string name="settings_about">Über Salotto</string>
@@ -201,7 +201,6 @@
     <string name="settings_tour">Einführung</string>
     <string name="settings_tour_text">Sieh dir die Seiten vom ersten Start noch einmal an, mit der Erklärung zur Fernbedienung.</string>
     <string name="settings_airplay_text">Empfange Videos von iPhone, iPad und Mac. Startet beim Einschalten von selbst: Das lässt sich in den eigenen Einstellungen ändern.</string>
-    <string name="settings_fixer_text">Bringt die Home-Taste und das Einschalten des Sticks zu Salotto.</string>
     <string name="settings_double_home">Fire TV Home mit Doppel-Home</string>
     <string name="settings_double_home_text">Zweimal Home drücken öffnet die Home von Fire TV, zum Beispiel um das Amazon-Profil zu wechseln.</string>
     <string name="settings_usb_checking">Prüfe…</string>

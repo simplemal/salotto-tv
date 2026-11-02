@@ -86,7 +86,7 @@
     <string name="about_private">Menos seguimiento.</string>
     <string name="about_private_text">La instalación apaga los paquetes de publicidad, telemetría y Alexa, limita el identificador publicitario y detiene el envío de datos de uso. Si una actualización de Fire OS los vuelve a encender, Salotto te avisa y puedes apagarlos otra vez. Salotto se conecta solo a Open-Meteo para el tiempo y a GitHub para las actualizaciones.</string>
     <string name="about_others">Con programas de otros.</string>
-    <string name="about_others_text">FireStick Fixer lleva el botón Inicio a Salotto. AirPlay Server recibe de iPhone, iPad y Mac. Aurora Store instala apps de Android, incluso sin cuenta.</string>
+    <string name="about_others_text">AirPlay Server recibe de iPhone, iPad y Mac. Aurora Store instala apps de Android, incluso sin cuenta.</string>
     <string name="about_only">Solo en Salotto.</string>
     <string name="about_only_text">Fondos ilustrados o fotográficos que siguen el tiempo y la hora de tu ciudad. Centro de control en cualquier app, manteniendo pulsado Menú: Wi-Fi, Bluetooth, temporizador, brillo y filtro de luz azul. Administrador de tareas manteniendo pulsado Atrás. Una página con los estándares de audio y vídeo del Stick y de la TV. Diálogos más claros y volumen uniforme a mano: son filtros de Fire OS, reunidos en un solo sitio. Actualizaciones firmadas y comprobadas antes de instalarlas.</string>
     <string name="about_license">Licencia</string>
@@ -103,7 +103,6 @@
     <string name="about_use_font">El tipo de letra del nombre Salotto</string>
     <string name="about_not_included">Programas no incluidos</string>
     <string name="about_not_included_text">La instalación los descarga de los proyectos originales, sin modificarlos.</string>
-    <string name="about_use_fixer">Lleva el botón Inicio a Salotto</string>
     <string name="about_use_airplay">Recibe de iPhone, iPad y Mac</string>
     <string name="about_use_aurora">Instala apps de Android, incluso sin cuenta</string>
 
@@ -273,5 +272,4 @@
     <string name="update_error_r301">Copia anterior no disponible</string>
     <string name="update_error_r302">No se pudo volver a la versión anterior</string>
     <string name="update_error_r303">Estado final desconocido</string>
-    <string name="card_fixer_stays">FireStick Fixer hace funcionar el botón Home y sigue instalado</string>
 </resources>

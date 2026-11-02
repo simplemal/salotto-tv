@@ -23,8 +23,8 @@ import java.util.Map;
  * Fire OS silently ignores killBackgroundProcesses from a normal app, even on cached processes.
  */
 final class RunningApps {
-    /** Stopping these would stop the Home key or the AirPlay receiver. */
-    private static final List<String> KEPT = Arrays.asList(Fire.FIXER, Fire.AIRPLAY);
+    /** Stopping this would stop the AirPlay receiver. */
+    private static final List<String> KEPT = Arrays.asList(Fire.AIRPLAY);
     private static final String PICTURES = "anteprime";
 
     private RunningApps() {}

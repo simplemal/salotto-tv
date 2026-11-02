@@ -14,7 +14,8 @@ import java.util.Arrays;
 final class Fire {
     /** The tools read this line too: pubblica-aggiornamento.sh and genera-errori.py. */
     static final String UPDATES_REPO = "simplemal/salotto-tv";
-    static final String FIXER = "io.github.hatim.firestickfixer";
+    /** Took the Home key to Salotto on Sticks set up before Salotto did that itself. */
+    static final String OLD_FIXER = "io.github.hatim.firestickfixer";
     static final String AIRPLAY = "io.github.jqssun.airplay";
     static final String AMAZON_HOME = "com.amazon.tv.launcher";
     /** Its package also holds the recent apps page: only this one is the Home itself. */
@@ -37,10 +38,6 @@ final class Fire {
     static final String RECENTS_ACTION = "com.amazon.tv.action.NAVIGATE_TO_RECENTS";
     /** What Fire OS opens on the recent apps key. */
     static final String RECENTS_PAGE = "com.amazon.tv.launcher.deeplink.activity.RecentDeepLinkActivityDI";
-    /** Fixer's switches answer only to the shell. */
-    static final String FIXER_SERVICE = FIXER + "/.HijackService";
-    static final String FIXER_COMMAND = "dumpsys activity service " + FIXER_SERVICE + " ";
-    static final String DOUBLE_HOME_ON = "doubleTap=true";
     static final String CMD_SLEEP = "input keyevent SLEEP";
     static final long MINUTE_MS = 60 * 1000L;
     static final long DAY_MS = 24 * 60 * MINUTE_MS;
