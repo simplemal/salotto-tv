@@ -180,6 +180,7 @@ public final class MainActivity extends CardActivity {
         super.onCreate(state);
         TaskService.keysByDefault(this);
         TaskService.quickAnimationsByDefault(this);
+        TaskService.alarmsAtOnce(this);
         TaskService.keepAdbKey(this);
         if (FirstRunActivity.due(this)) {
             startActivity(new Intent(this, FirstRunActivity.class));

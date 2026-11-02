@@ -88,6 +88,8 @@ public final class TaskService extends AccessibilityService {
     private static final int PAGE_NO_BACK = -1;
     private static final String ENABLED_SERVICES = Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES;
     private static final String KEY_LIFETIME = "adb_allowed_connection_time";
+    private static final String ALARM_SETTINGS = "alarm_manager_constants";
+    private static final String ALARM_AT_ONCE = "min_futurity=0";
     private static final String KEYS_FILE = "keys";
     private static final String KEYS_CHOSEN = "chosen";
     private static final String QUICK_CHOSEN = "quick_animations";
@@ -812,6 +814,18 @@ public final class TaskService extends AccessibilityService {
             first.edit().putBoolean(KEYS_CHOSEN, true).apply();
         } catch (SecurityException e) {
             Log.w(TAG, "No permission yet for the keys", e);
+        }
+    }
+
+    /** Android 9 keeps every alarm 5 s away, and the Home key needs one at once. Fire OS may reset this with an update. */
+    static void alarmsAtOnce(Context context) {
+        if (!Fire.ANDROID_9) return;
+        try {
+            String now = Settings.Global.getString(context.getContentResolver(), ALARM_SETTINGS);
+            if (now != null && now.contains(ALARM_AT_ONCE)) return;
+            Settings.Global.putString(context.getContentResolver(), ALARM_SETTINGS, now == null ? ALARM_AT_ONCE : now + "," + ALARM_AT_ONCE);
+        } catch (SecurityException e) {
+            Log.w(TAG, "No permission yet for the alarms", e);
         }
     }
 
