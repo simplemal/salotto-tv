@@ -16,7 +16,11 @@ one() {
   [ ${#found[@]} -gt 0 ] && cp "${found[0]}" "$TARGET/$2"
 }
 
-one 'Installa Salotto-*-arm64.dmg' Installa-Salotto-Mac.dmg || { echo "Fermo: manca il pacchetto Mac in installatore/dist, va compilato."; exit 1; }
+one 'Installa-Salotto-*-arm64.dmg' Installa-Salotto-Mac.dmg || { echo "Fermo: manca il pacchetto Mac in installatore/dist, va compilato."; exit 1; }
+# What the installer updates itself from: latest-mac.yml names the zip, so that name stays.
+for part in "$DIST"/Installa-Salotto-*-arm64.zip "$DIST"/latest-mac.yml; do
+  cp "$part" "$TARGET/"
+done
 # Built only on a computer that can run their tools: when they are there, they go too.
 one 'Installa Salotto Setup *.exe' Installa-Salotto-Windows.exe || true
 one 'Installa Salotto-*.AppImage' Installa-Salotto-Linux.AppImage || true
