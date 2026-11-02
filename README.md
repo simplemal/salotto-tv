@@ -2,7 +2,7 @@
 
 Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
 
-Provata finora su una sola Stick: Fire TV Stick 4K 2ª generazione, con Fire OS 8. È in sviluppo, e la firma delle build non è ancora quella definitiva.
+Supporta tre modelli: Fire TV Stick 4K 2ª generazione, 4K Max 2ª generazione e 4K Max 1ª generazione. Sulla 4K Max 1ª generazione, con Fire OS 7, alcune funzioni sono limitate. È in sviluppo, e la firma delle build non è ancora quella definitiva.
 
 ## Cosa fa
 
@@ -26,6 +26,8 @@ Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamen
 Per compilare servono JDK 17, Android SDK e Gradle 8.9: `gradle :app:assembleDebug` dalla cartella `home`.
 
 ## Aggiornamenti ed errori
+
+Per installarla scarica [Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg).
 
 Ogni versione è una [release](https://github.com/simplemal/salotto-tv/releases) con l'APK, `update.json` e la sua firma. Salotto installa solo ciò che è firmato con la chiave giusta.
 
