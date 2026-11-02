@@ -136,12 +136,6 @@ Cosa fare: Salotto è tornata alla versione precedente. Segnala il problema.
 
 Cosa fare: Salotto è tornata alla versione precedente. Segnala il problema.
 
-### SAL-C205
-
-**Tasto Home non collegato.** Dopo l'installazione FireStick Fixer non risulta attivo.
-
-Cosa fare: Salotto è tornata alla versione precedente. Riavvia la Stick e controlla il tasto Home.
-
 ### SAL-C206
 
 **Tempo scaduto.** La nuova versione non ha confermato di funzionare in tempo.
