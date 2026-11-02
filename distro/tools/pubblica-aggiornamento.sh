@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Publishes the built Salotto as a release of this repository: APK, signed update.json, error page.
+# Publishes the built Salotto as a release of this repository: APK, signed update.json, error page,
+# and next to them the latest installer, which is what people download.
 # Usage: distro/tools/pubblica-aggiornamento.sh "first change" "second change" ...
 set -euo pipefail
 
@@ -31,6 +32,7 @@ SIGNER="$(JAVA_HOME="$(echo "$TOOLS"/jdk-*/Contents/Home)" "$TOOLS/android-sdk/b
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
 cp "$APK" "$WORK/salotto.apk"
+"$ROOT/distro/tools/prepara-installatore.sh" "$WORK/installatore"
 python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$@" <<'PY'
 import hashlib, json, os, sys
 work, code, name, repo, *changes = sys.argv[1:]
@@ -49,6 +51,6 @@ python3 "$ROOT/distro/tools/genera-errori.py" "$ROOT/ERRORI.md"
 git -C "$ROOT" add ERRORI.md
 git -C "$ROOT" diff --cached --quiet || git -C "$ROOT" commit -q -m "Errori per la versione $NAME"
 git -C "$ROOT" push -q origin HEAD
-gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" \
+gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" "$WORK"/installatore/* \
   --repo "$REPO" --title "Salotto $NAME" --notes "$(printf -- '- %s\n' "$@")" --latest
 echo "Pubblicata la versione $NAME ($CODE)"
