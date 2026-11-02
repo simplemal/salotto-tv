@@ -529,8 +529,11 @@ public final class TaskService extends AccessibilityService {
         if (installMask == null) return;
         AccessibilityNodeInfo root = getRootInActiveWindow();
         if (root != null && Fire.INSTALLER.contentEquals(String.valueOf(root.getPackageName()))) {
-            for (AccessibilityNodeInfo button : root.findAccessibilityNodeInfosByViewId(Fire.INSTALL_BUTTON)) {
-                if (button.isEnabled() && button.performAction(AccessibilityNodeInfo.ACTION_CLICK)) return;
+            List<AccessibilityNodeInfo> buttons = new ArrayList<>(root.findAccessibilityNodeInfosByViewId(Fire.INSTALL_BUTTON));
+            buttons.addAll(root.findAccessibilityNodeInfosByViewId(Fire.INSTALL_BUTTON_9));
+            for (String word : Fire.install(this)) buttons.addAll(root.findAccessibilityNodeInfosByText(word));
+            for (AccessibilityNodeInfo button : buttons) {
+                if (button.isClickable() && button.isEnabled() && button.performAction(AccessibilityNodeInfo.ACTION_CLICK)) return;
             }
         }
         if (tries > 0) main.postDelayed(() -> pressInstall(tries - 1), INSTALL_POLL_MS);

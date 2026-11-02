@@ -35,6 +35,10 @@ final class Fire {
     static final String UNINSTALL_PROGRESS = ".television.UninstallAppProgress";
     static final String INSTALLER = "com.android.packageinstaller";
     static final String INSTALL_BUTTON = "android:id/button1";
+    /** Android 9 gives its button another name. */
+    static final String INSTALL_BUTTON_9 = INSTALLER + ":id/ok_button";
+    private static final String[] INSTALL = {"Installa", "Install"};
+    private static final String INSTALL_WORDS = "install";
     static final String DEVICE_PAGE = "com.amazon.device.settings.action.DEVICE";
     static final String[] FORCE_STOP = {"Forza arresto", "Force stop"};
     static final String[] RESTART = {"Riavvia", "Restart"};
@@ -77,15 +81,17 @@ final class Fire {
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
 
-    static String[] forceStop(Context context) { return labels(context, FORCE_STOP_WORDS, FORCE_STOP); }
+    static String[] forceStop(Context context) { return labels(context, SETTINGS, FORCE_STOP_WORDS, FORCE_STOP); }
 
-    static String[] restart(Context context) { return labels(context, RESTART_WORDS, RESTART); }
+    static String[] restart(Context context) { return labels(context, SETTINGS, RESTART_WORDS, RESTART); }
+
+    static String[] install(Context context) { return labels(context, INSTALLER, INSTALL_WORDS, INSTALL); }
 
     /** Fire OS's pages speak its own language, not Salotto's: the words come from its app, these only if that fails. */
-    private static String[] labels(Context context, String words, String[] known) {
+    private static String[] labels(Context context, String app, String words, String[] known) {
         try {
-            Resources fire = context.getPackageManager().getResourcesForApplication(SETTINGS);
-            int id = fire.getIdentifier(words, "string", SETTINGS);
+            Resources fire = context.getPackageManager().getResourcesForApplication(app);
+            int id = fire.getIdentifier(words, "string", app);
             if (id == 0) return known;
             String[] all = Arrays.copyOf(known, known.length + 1);
             all[known.length] = fire.getString(id);
