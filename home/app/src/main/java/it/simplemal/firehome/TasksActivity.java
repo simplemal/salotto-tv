@@ -39,8 +39,7 @@ public final class TasksActivity extends CardActivity {
     private static final int CARD_GAP = 16;
     private static final int RADIUS = 12;
     private static final int ART_INSET = 32;
-    /** Softer than the Home's: what is behind can still be told apart. */
-    private static final int BLUR_HALVINGS = 3;
+    private static final int BLUR_RADIUS = 6;
     private static final long SCREEN_WAIT_MS = 500;
     private static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
@@ -82,6 +81,7 @@ public final class TasksActivity extends CardActivity {
     private final Handler main = new Handler(Looper.getMainLooper());
     private FrameLayout root;
     private ImageView backdropView;
+    private View scrim;
     private Drawable selection;
     private boolean revealed;
     private boolean usageAllowed;
@@ -109,7 +109,7 @@ public final class TasksActivity extends CardActivity {
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         root.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
-        View scrim = new View(this);
+        scrim = new View(this);
         scrim.setBackgroundColor(SCRIM);
         root.addView(scrim, new FrameLayout.LayoutParams(-1, -1));
 
@@ -190,9 +190,23 @@ public final class TasksActivity extends CardActivity {
         if (behind == null) behind = HomeCover.lastPicture();
         if (behind == null) {
             Look.show(this, backdropView::setImageDrawable);
-        } else {
-            backdropView.setImageBitmap(BottomBlur.blurred(behind.copy(Bitmap.Config.ARGB_8888, false), BLUR_HALVINGS));
+            appear();
+            return;
         }
+        Bitmap picture = behind;
+        Background.draw(() -> {
+            Bitmap shown = Blur.veiled(picture, BLUR_RADIUS, SCRIM);
+            runOnUiThread(() -> {
+                if (isDestroyed()) return;
+                // The veil is part of the picture now, where it cannot leave bands.
+                scrim.setVisibility(View.GONE);
+                backdropView.setImageBitmap(shown);
+                appear();
+            });
+        });
+    }
+
+    private void appear() {
         root.animate().alpha(1).setDuration(FADE_MS).withEndAction(TaskService::tasksShown).start();
     }
 
