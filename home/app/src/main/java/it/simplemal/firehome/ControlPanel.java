@@ -275,8 +275,9 @@ final class ControlPanel extends LinearLayout {
         audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(getContext())));
-        // The filter's matrix takes the shell, which Android 9 does not give.
-        Tile warm = Fire.ANDROID_9 ? small(modes, R.drawable.ic_settings, getContext().getString(R.string.settings_fire), GAP, () -> {
+        // The filter's matrix takes the shell, which Android 9 does not give, nor Android with a cable.
+        boolean noFilter = Fire.ANDROID_9 || wired() && !TaskService.ready();
+        Tile warm = noFilter ? small(modes, R.drawable.ic_settings, getContext().getString(R.string.settings_fire), GAP, () -> {
             TaskService.wantFireSettings();
             host.open(Fire.settings());
         }) : small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP, this::changeWarm);
@@ -299,7 +300,7 @@ final class ControlPanel extends LinearLayout {
         timerTile = timer;
         refreshers.add(this::showTimer);
         refreshers.add(() -> showDim(dim));
-        if (!Fire.ANDROID_9) refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
+        if (!noFilter) refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
 
     private LinearLayout row() {
@@ -418,12 +419,7 @@ final class ControlPanel extends LinearLayout {
         refresh();
     }
 
-    /** The matrix takes the shell: with a cable there is none, and a tint is not what this tile promises. */
     private void changeWarm() {
-        if (wired() && !TaskService.ready()) {
-            host.sayLong(getContext().getString(R.string.card_needs_wifi));
-            return;
-        }
         host.shell(Veil.warm(getContext()) == 0 ? Veil.WARM_ON : Veil.WARM_OFF, output -> {
             if (Veil.accepted(output)) Veil.nextWarm(getContext());
             else host.say(getContext().getString(R.string.panel_command_failed));
