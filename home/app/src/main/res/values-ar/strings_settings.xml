@@ -328,6 +328,7 @@
         <item quantity="other">«الإيقاف التلقائي» الحالي، %1$d دقيقة، يحدّ من خيارات شاشة التوقف.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">مشاهد لمدينة مستقبلية في الليل بين النيون والمطر، تتغير تلقائيًا بترتيب عشوائي.</string>
+    <string name="settings_backdrop_nature_text">مناظر طبيعية من الأعلى بين الصخور والماء والنباتات، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_backdrop_abstract3d_text">منحوتات تجريدية ثلاثية الأبعاد على خلفية داكنة، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_saver_set_text">تتناوب صوره مع عرض الوقت والتاريخ فقط.</string>
 </resources>

@@ -305,6 +305,7 @@
         <item quantity="other">El Apagado automático actual, %1$d minutos, limita las opciones del salvapantallas.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Vistas de una ciudad futura de noche, entre neones y lluvia, que cambian solas, en orden aleatorio.</string>
+    <string name="settings_backdrop_nature_text">Paisajes naturales vistos desde arriba, entre rocas, agua y plantas, que cambian solos, en orden aleatorio.</string>
     <string name="settings_backdrop_abstract3d_text">Esculturas abstractas en 3D sobre fondo oscuro, que cambian solas, en orden aleatorio.</string>
     <string name="settings_saver_set_text">Sus imágenes se van alternando, solo con la hora y la fecha.</string>
 </resources>

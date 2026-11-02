@@ -304,6 +304,7 @@
         <item quantity="other">The current Auto power-off, %1$d minutes, limits the screensaver options.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Views of a future city at night, all neon and rain, that change on their own, in random order.</string>
+    <string name="settings_backdrop_nature_text">Natural landscapes seen from above, among rocks, water and plants, that change on their own, in random order.</string>
     <string name="settings_backdrop_abstract3d_text">Abstract 3D sculptures on a dark background, changing on their own, in random order.</string>
     <string name="settings_saver_set_text">Its pictures take turns, with only the time and date.</string>
 </resources>

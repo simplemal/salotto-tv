@@ -304,6 +304,7 @@
         <item quantity="other">Das aktuelle Automatische Ausschalten, %1$d Minuten, begrenzt die Optionen des Bildschirmschoners.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Ansichten einer Zukunftsstadt bei Nacht, mit Neon und Regen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
+    <string name="settings_backdrop_nature_text">Naturlandschaften von oben, mit Felsen, Wasser und Pflanzen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_backdrop_abstract3d_text">Abstrakte 3D-Skulpturen auf dunklem Grund, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_saver_set_text">Die Bilder wechseln sich ab, nur mit Uhrzeit und Datum.</string>
 </resources>

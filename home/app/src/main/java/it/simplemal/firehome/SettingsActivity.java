@@ -151,7 +151,8 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private static final Saver[] SAVERS = {new Saver(Look.ABSTRACT, Look.ABSTRACT_FOLDER),
-        new Saver(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER), new Saver(Look.NOX, Look.NOX_FOLDER)};
+        new Saver(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER), new Saver(Look.NOX, Look.NOX_FOLDER),
+        new Saver(Look.NATURE, Look.NATURE_FOLDER)};
 
     private static final class Entry {
         final String title;
@@ -1514,6 +1515,10 @@ public final class SettingsActivity extends CardActivity {
         city.mosaic = Look.NOX_FOLDER;
         city.mark = R.drawable.ic_restart;
         timed.add(city);
+        Entry nature = plainBackdrop(Look.NATURE, getString(R.string.settings_backdrop_nature_text));
+        nature.mosaic = Look.NATURE_FOLDER;
+        nature.mark = R.drawable.ic_restart;
+        timed.add(nature);
         boolean weatherFirst = Weather.active(this);
         List<Entry> entries = new ArrayList<>();
         entries.add(groupLabel(R.string.first_backdrop_dynamic));
@@ -1525,6 +1530,7 @@ public final class SettingsActivity extends CardActivity {
         entries.add(pictureSet(Look.ABSTRACT, Look.ABSTRACT_FOLDER));
         entries.add(pictureSet(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER));
         entries.add(pictureSet(Look.NOX, Look.NOX_FOLDER));
+        entries.add(pictureSet(Look.NATURE, Look.NATURE_FOLDER));
         for (File image : Look.images(this)) {
             entries.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text)));
         }

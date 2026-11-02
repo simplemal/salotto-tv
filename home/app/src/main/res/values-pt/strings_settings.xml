@@ -304,6 +304,7 @@
         <item quantity="other">O Desligamento automático atual, %1$d minutos, limita as opções do protetor de tela.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Vistas de uma cidade futura à noite, entre neon e chuva, que mudam sozinhas, em ordem aleatória.</string>
+    <string name="settings_backdrop_nature_text">Paisagens naturais vistas de cima, entre rochas, água e plantas, que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_backdrop_abstract3d_text">Esculturas abstratas em 3D sobre fundo escuro, que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_saver_set_text">As imagens se alternam, só com a hora e a data.</string>
 </resources>

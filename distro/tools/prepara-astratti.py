@@ -12,7 +12,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "home/app/src/main/assets"
 SETS = {ROOT / "assets/background-abstract-illustrated": ASSETS / "astratti",
         ROOT / "assets/background-abstract-3d": ASSETS / "astratti-3d",
-        ROOT / "assets/background-nox-city": ASSETS / "nox-city"}
+        ROOT / "assets/background-nox-city": ASSETS / "nox-city",
+        ROOT / "assets/background-aereal": ASSETS / "natura-aerea"}
 SIZE = (1920, 1080)
 QUALITY = 78
 EXPECTED = 60

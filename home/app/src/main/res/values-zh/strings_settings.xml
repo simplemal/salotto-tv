@@ -299,6 +299,7 @@
         <item quantity="other">当前的“自动待机”为 %1$d 分钟，限制了屏保的选项。</item>
     </plurals>
     <string name="settings_backdrop_nox_text">夜色中的未来城市，霓虹与雨水交织，自动更换，顺序随机。</string>
+    <string name="settings_backdrop_nature_text">从空中俯瞰的自然风光，岩石、流水与植物交织，自动更换，顺序随机。</string>
     <string name="settings_backdrop_abstract3d_text">深色背景上的抽象 3D 雕塑，自动更换，顺序随机。</string>
     <string name="settings_saver_set_text">图片轮流显示，只显示时间和日期。</string>
 </resources>

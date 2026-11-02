@@ -61,6 +61,7 @@
     <string name="first_plain_text">A simple gradient, always the same.</string>
     <string name="first_remote_note">The first time, the TV may ask to allow wireless debugging: choose Allow.</string>
     <string name="first_nox_text">Views of a future city at night, all neon and rain, that change on their own every 5 minutes, in random order.</string>
+    <string name="first_nature_text">Natural landscapes seen from above, among rocks, water and plants, that change on their own every 5 minutes, in random order.</string>
     <string name="first_abstract3d_text">Abstract 3D sculptures on a dark background, changing on their own every 5 minutes, in random order.</string>
     <string name="first_backdrop_dynamic">Dynamic backdrop</string>
     <string name="first_backdrop_static">Static backdrop</string>

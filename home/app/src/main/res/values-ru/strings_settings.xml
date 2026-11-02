@@ -316,6 +316,7 @@
         <item quantity="other">«Автоотключение» через %1$d минуты ограничивает параметры заставки.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Виды города будущего ночью, в неоне и под дождём, которые сами меняются в случайном порядке.</string>
+    <string name="settings_backdrop_nature_text">Природные пейзажи с высоты, среди скал, воды и растений, которые сами меняются в случайном порядке.</string>
     <string name="settings_backdrop_abstract3d_text">Абстрактные 3D-скульптуры на тёмном фоне, которые сами меняются в случайном порядке.</string>
     <string name="settings_saver_set_text">Изображения сменяют друг друга, на экране только время и дата.</string>
 </resources>

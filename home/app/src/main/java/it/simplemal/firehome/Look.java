@@ -67,12 +67,14 @@ final class Look {
     static final String ABSTRACT = "Abstract Illustrated";
     static final String ABSTRACT_3D = "Abstract 3D";
     static final String NOX = "Nox City";
+    static final String NATURE = "Aerial Nature";
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
     static final String AERIAL_FOLDER = "meteo-aereo";
     static final String ABSTRACT_FOLDER = "astratti";
     static final String ABSTRACT_3D_FOLDER = "astratti-3d";
     static final String NOX_FOLDER = "nox-city";
+    static final String NATURE_FOLDER = "natura-aerea";
     static final int[] ABSTRACT_MINUTES = {1, 5, 15, 30, 60};
     private static final int ABSTRACT_DEFAULT = 5;
     private static final long MINUTE_MS = 60 * 1000L;
@@ -157,7 +159,8 @@ final class Look {
         String chosen = backdrop(context);
         if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;
         if (ABSTRACT_3D.equals(chosen)) return ABSTRACT_3D_FOLDER;
-        return NOX.equals(chosen) ? NOX_FOLDER : null;
+        if (NOX.equals(chosen)) return NOX_FOLDER;
+        return NATURE.equals(chosen) ? NATURE_FOLDER : null;
     }
 
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }

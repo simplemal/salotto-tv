@@ -61,6 +61,7 @@
     <string name="first_plain_text">简单的渐变色，始终不变。</string>
     <string name="first_remote_note">首次使用时，电视可能会询问是否允许无线调试：请选择“允许”。</string>
     <string name="first_nox_text">夜色中的未来城市，霓虹与雨水交织，每 5 分钟自动更换一次，顺序随机。</string>
+    <string name="first_nature_text">从空中俯瞰的自然风光，岩石、流水与植物交织，每 5 分钟自动更换一次，顺序随机。</string>
     <string name="first_abstract3d_text">深色背景上的抽象 3D 雕塑，每 5 分钟自动更换一次，顺序随机。</string>
     <string name="first_backdrop_dynamic">动态背景</string>
     <string name="first_backdrop_static">静态背景</string>

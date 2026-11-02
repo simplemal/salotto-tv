@@ -304,6 +304,7 @@
         <item quantity="other">अभी का «ऑटो स्लीप», %1$d मिनट, स्क्रीनसेवर के विकल्पों को सीमित करता है।</item>
     </plurals>
     <string name="settings_backdrop_nox_text">रात में भविष्य के शहर के दृश्य, नियॉन और बारिश के बीच, जो अपने आप बदलते हैं, किसी भी क्रम में।</string>
+    <string name="settings_backdrop_nature_text">ऊपर से दिखते प्राकृतिक दृश्य, चट्टानों, पानी और पौधों के बीच, जो अपने आप बदलते हैं, बिना किसी क्रम के।</string>
     <string name="settings_backdrop_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो अपने आप बदलती हैं, किसी भी क्रम में।</string>
     <string name="settings_saver_set_text">इसकी तस्वीरें बारी-बारी से बदलती हैं, साथ में सिर्फ़ समय और तारीख़।</string>
 </resources>

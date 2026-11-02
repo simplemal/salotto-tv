@@ -111,6 +111,7 @@ public final class FirstRunActivity extends CardActivity {
         new Choice(Look.ABSTRACT, 0, R.string.first_abstract_text, Look.ABSTRACT_FOLDER, R.drawable.ic_restart),
         new Choice(Look.ABSTRACT_3D, 0, R.string.first_abstract3d_text, Look.ABSTRACT_3D_FOLDER, R.drawable.ic_restart),
         new Choice(Look.NOX, 0, R.string.first_nox_text, Look.NOX_FOLDER, R.drawable.ic_restart),
+        new Choice(Look.NATURE, 0, R.string.first_nature_text, Look.NATURE_FOLDER, R.drawable.ic_restart),
         new Choice(Look.PRESET_NAMES[0], R.string.first_backdrop_night, R.string.first_plain_text, null, 0),
         new Choice(Look.PRESET_NAMES[1], R.string.first_backdrop_ocean, R.string.first_plain_text, null, 0),
         new Choice(Look.PRESET_NAMES[2], R.string.first_backdrop_forest, R.string.first_plain_text, null, 0),

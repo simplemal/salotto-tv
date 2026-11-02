@@ -304,6 +304,7 @@
         <item quantity="other">L’Arrêt automatique actuel, %1$d minutes, limite les options de l’économiseur d’écran.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Des vues d’une ville future la nuit, entre néons et pluie, qui changent toutes seules, dans un ordre aléatoire.</string>
+    <string name="settings_backdrop_nature_text">Des paysages naturels vus du ciel, entre roches, eau et plantes, qui changent tout seuls, dans un ordre aléatoire.</string>
     <string name="settings_backdrop_abstract3d_text">Des sculptures abstraites en 3D sur fond sombre, qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_saver_set_text">Ses images se succèdent, avec seulement l’heure et la date.</string>
 </resources>

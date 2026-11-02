@@ -304,6 +304,7 @@
         <item quantity="other">L’attuale Spegnimento automatico, %1$d minuti, limita le opzioni del salvaschermo.</item>
     </plurals>
     <string name="settings_backdrop_nox_text">Scorci di una città futura di notte, tra neon e pioggia, che cambiano da soli, in ordine casuale.</string>
+    <string name="settings_backdrop_nature_text">Paesaggi naturali visti dall’alto, tra rocce, acqua e piante, che cambiano da soli, in ordine casuale.</string>
     <string name="settings_backdrop_abstract3d_text">Sculture astratte in 3D su fondo scuro, che cambiano da sole, in ordine casuale.</string>
     <string name="settings_saver_set_text">Le sue immagini si alternano a tempo, con solo orario e data.</string>
 </resources>

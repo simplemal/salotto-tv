@@ -61,6 +61,7 @@
     <string name="first_plain_text">Un degradado sencillo, siempre igual.</string>
     <string name="first_remote_note">La primera vez, la TV puede pedir permiso para la depuración inalámbrica: elige Permitir.</string>
     <string name="first_nox_text">Vistas de una ciudad futura de noche, entre neones y lluvia, que cambian solas cada 5 minutos, en orden aleatorio.</string>
+    <string name="first_nature_text">Paisajes naturales vistos desde arriba, entre rocas, agua y plantas, que cambian solos cada 5 minutos, en orden aleatorio.</string>
     <string name="first_abstract3d_text">Esculturas abstractas en 3D sobre fondo oscuro, que cambian solas cada 5 minutos, en orden aleatorio.</string>
     <string name="first_backdrop_dynamic">Fondo dinámico</string>
     <string name="first_backdrop_static">Fondo estático</string>
