@@ -59,7 +59,9 @@ enum UpdateError {
     R302("Ritorno alla versione precedente non riuscito", "Fire OS non ha accettato la versione precedente.",
         "Dal Mac lancia install.sh della distro: reinstalla Salotto senza perdere le scelte. Poi segnala il problema."),
     R303("Stato finale sconosciuto", "L'aggiornamento non ha lasciato un esito leggibile.",
-        "Controlla che Salotto funzioni, poi segnala il problema.");
+        "Controlla che Salotto funzioni, poi segnala il problema."),
+    R304("Serve Installa Salotto sul computer", "Su questa TV Salotto non può tornare da sola alla versione precedente.",
+        "Apri Installa Salotto sul computer e scegli «Torna alla versione precedente».");
 
     final String title;
     final String cause;
@@ -84,7 +86,7 @@ enum UpdateError {
         switch (this) {
             case C202: return context.getString(R.string.update_outcome_stayed);
             case C203: case C204: case C206: return context.getString(R.string.update_outcome_back);
-            case R302: return context.getString(R.string.update_outcome_not_back);
+            case R302: case R304: return context.getString(R.string.update_outcome_not_back);
             case R303: return context.getString(R.string.update_outcome_unknown);
             default: return context.getString(R.string.update_outcome_untouched);
         }

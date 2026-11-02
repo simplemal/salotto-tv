@@ -27,7 +27,8 @@ public final class ReenabledActivity extends CardActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(DIM);
+        if (Fire.ANDROID_9) root.setBackground(Look.plainBackdrop());
+        else root.setBackgroundColor(DIM);
         page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -35,6 +36,7 @@ public final class ReenabledActivity extends CardActivity {
         setContentView(root);
         ArrayList<String> names = getIntent().getStringArrayListExtra(REENABLED);
         if (names == null) finish();
+        else if (Fire.ANDROID_9) showWhatToDo(names);
         else showReenabled(names);
     }
 
@@ -67,6 +69,27 @@ public final class ReenabledActivity extends CardActivity {
         page.addView(off, wide(26));
         page.addView(button(getString(R.string.reenabled_leave_on), BUTTON_SP, () -> leaveOn(names)), wide(10));
         off.requestFocus();
+    }
+
+    /** Turning them off takes the shell, which here only a computer has. */
+    private void showWhatToDo(ArrayList<String> names) {
+        heading(getString(R.string.reenabled_title), getString(R.string.reenabled_text));
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(0, dp(18), 0, 0);
+        for (String group : Reenabled.groups(this, names)) {
+            TextView line = label(group, 18);
+            line.setGravity(Gravity.CENTER);
+            list.addView(line);
+        }
+        page.addView(list);
+        TextView steps = label(getString(R.string.reenabled_steps), 15);
+        steps.setGravity(Gravity.CENTER);
+        steps.setPadding(0, dp(22), 0, 0);
+        page.addView(steps);
+        TextView close = button(getString(R.string.card_close), BUTTON_SP, () -> leaveOn(names));
+        page.addView(close, wide(26));
+        close.requestFocus();
     }
 
     private void leaveOn(ArrayList<String> names) {

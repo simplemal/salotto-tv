@@ -115,10 +115,10 @@ public final class TaskService extends AccessibilityService {
      * One line for each press, and only once Android has taken Amazon's Home in: a Home started
      * after this comes out on top of it. The system's own log only, or the reading falls behind.
      */
-    private static final String[] LOG_OPTIONS = {"-b", "system", "-v", "brief", "-T", "1", "ActivityTaskManager:I"};
+    private static final String[] LOG_OPTIONS = {"-b", "system", "-v", "brief", "-T", "1", (Fire.ANDROID_9 ? "ActivityManager" : "ActivityTaskManager") + ":I"};
     private static final String HOME_LOG = "logcat " + String.join(" ", LOG_OPTIONS) + " '*:S'";
     private static final String HOME_INTENT = "cat=[" + Intent.CATEGORY_HOME + "]";
-    private static final String FROM_SYSTEM = "from uid 0";
+    private static final String FROM_SYSTEM = Fire.ANDROID_9 ? "from uid 1000" : "from uid 0";
     private static final long HOME_LOG_START_MS = 1000;
     private static final long HOME_LOG_RETRY_MS = 30000;
     /** From distro/config, the same lists the installer offers. */
@@ -150,6 +150,8 @@ public final class TaskService extends AccessibilityService {
     private boolean waitsAnswer;
     private boolean keyFired;
     private boolean menuKept;
+    private boolean menuForApp;
+    private long homeHeldAt;
     private FireSteps fireSteps;
     private boolean okGoesThrough;
     private FrameLayout uninstallMask;
@@ -631,6 +633,7 @@ public final class TaskService extends AccessibilityService {
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
         // The recent apps key of the newer remotes goes straight to Fire OS: no app ever hears it.
         if (Fire.RECENTS_PAGE.contentEquals(String.valueOf(event.getClassName()))) recentsPageShown();
+        if (Fire.ANDROID_9 && Fire.HOME_HELD_PAGE.contentEquals(String.valueOf(event.getClassName()))) homeHeldPageShown();
         if (name.equals(getPackageName()) || HomeApps.isUserApp(this, name)) cover.appOpened();
         if (name.equals(front)) return;
         if (HomeApps.isUserApp(this, name)) front = name;
@@ -653,8 +656,12 @@ public final class TaskService extends AccessibilityService {
         if (key != KeyEvent.KEYCODE_MENU && key != KeyEvent.KEYCODE_BACK) return false;
         boolean menu = key == KeyEvent.KEYCODE_MENU;
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (event.getRepeatCount() == 0 && menu) menuKept = front != null || appOnScreen() != null;
-            if (event.getRepeatCount() == 0 && !TasksActivity.showing && panelWindow == null) {
+            if (event.getRepeatCount() == 0 && menu) {
+                boolean overApp = front != null || appOnScreen() != null;
+                menuKept = overApp && !Fire.ANDROID_9;
+                menuForApp = overApp && Fire.ANDROID_9;
+            }
+            if (event.getRepeatCount() == 0 && !TasksActivity.showing && panelWindow == null && !(menu && menuForApp)) {
                 keyFired = false;
                 main.postDelayed(menu ? holdMenu : holdBack, HOLD_MS);
             }
@@ -828,9 +835,21 @@ public final class TaskService extends AccessibilityService {
     /** Home held would be the natural key, but Fire OS answers that with a page of its own, which stops the video. */
     private void menuHeld() {
         keyFired = true;
+        openPanelHere();
+    }
+
+    private void openPanelHere() {
         if (front == null) front = appOnScreen();
         panelApp = front;
         openPanel();
+    }
+
+    /** With no shell to hand Menu back, over an app it stays with the app, and Home held opens the panel. */
+    private void homeHeldPageShown() {
+        long now = SystemClock.elapsedRealtime();
+        if (now - homeHeldAt < RECENTS_ONCE_MS) return;
+        homeHeldAt = now;
+        closePage(Fire.SETTINGS, this::openPanelHere, PAGE_TRIES, PAGE_NO_BACK);
     }
 
     private void openSettings() {
@@ -883,7 +902,7 @@ public final class TaskService extends AccessibilityService {
 
     private boolean connected() {
         if (client != null) return true;
-        if (refused) return false;
+        if (refused || Fire.ANDROID_9) return false;
         AdbClient opened = null;
         try {
             boolean asks = waitsAnswer || Settings.Global.getInt(getContentResolver(), WIRELESS_DEBUGGING, 0) == 0;

@@ -273,4 +273,10 @@
     <string name="update_error_r301">Vorherige Kopie nicht verfügbar</string>
     <string name="update_error_r302">Rückkehr zur vorherigen Version fehlgeschlagen</string>
     <string name="update_error_r303">Endstatus unbekannt</string>
+    <string name="settings_wifi_on_fire">WLAN-Netze werden in den Fire-OS-Einstellungen verwaltet.</string>
+    <string name="reenabled_group_ads">Werbung auf der Amazon-Startseite</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">Zum erneuten Ausschalten wird ein Computer gebraucht:\n1. Install Salotto öffnen.\n2. Diesen Fernseher wählen.\n3. Den angezeigten Schritten folgen.</string>
+    <string name="update_error_r304">Install Salotto wird auf einem Computer gebraucht</string>
+    <string name="update_back_computer">Um zur vorherigen Version zurückzukehren, Install Salotto auf einem Computer öffnen und „Zur vorherigen Version zurückkehren“ wählen.</string>
 </resources>

@@ -395,6 +395,10 @@ public final class UpdateActivity extends CardActivity {
     }
 
     private void goBack(String verdict) {
+        if (Fire.ANDROID_9) {
+            showError(UpdateError.R304);
+            return;
+        }
         step(HEALTH, getString(R.string.update_detail_back_ask));
         background(() -> {
             try {
@@ -479,6 +483,11 @@ public final class UpdateActivity extends CardActivity {
         ImageView code = new ImageView(this);
         code.setImageResource(R.drawable.qr_errori);
         body.addView(code, new LinearLayout.LayoutParams(-2, -2));
+        if (error == UpdateError.R304) {
+            TextView steps = text(getString(R.string.update_back_computer), CHANGE_SP, false);
+            steps.setPadding(0, 0, 0, dp(16));
+            body.addView(steps, 1);
+        }
         TextView help = text(getString(R.string.update_scan_help), CHANGE_SP, false);
         help.setPadding(0, dp(12), 0, 0);
         body.addView(help);

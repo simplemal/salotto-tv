@@ -273,4 +273,10 @@
     <string name="update_error_r301">पिछली कॉपी उपलब्ध नहीं</string>
     <string name="update_error_r302">पिछले वर्ज़न पर लौटना नहीं हो सका</string>
     <string name="update_error_r303">अंतिम स्थिति पता नहीं</string>
+    <string name="settings_wifi_on_fire">Wi-Fi नेटवर्क Fire OS की सेटिंग में प्रबंधित होते हैं।</string>
+    <string name="reenabled_group_ads">Amazon होम पर विज्ञापन</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">इन्हें फिर से बंद करने के लिए कंप्यूटर चाहिए:\n1. Install Salotto खोलें।\n2. यह टीवी चुनें।\n3. बताए गए चरणों का पालन करें।</string>
+    <string name="update_error_r304">कंप्यूटर पर Install Salotto चाहिए</string>
+    <string name="update_back_computer">पिछले संस्करण पर लौटने के लिए कंप्यूटर पर Install Salotto खोलें और «पिछले संस्करण पर लौटें» चुनें।</string>
 </resources>

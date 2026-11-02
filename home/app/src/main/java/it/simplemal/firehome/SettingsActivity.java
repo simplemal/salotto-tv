@@ -28,6 +28,7 @@ import android.os.Looper;
 import android.os.Bundle;
 import android.os.Process;
 import android.os.storage.StorageManager;
+import android.net.Uri;
 import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -779,7 +780,9 @@ public final class SettingsActivity extends CardActivity {
         }
         entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
             () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-        entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+        if (Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+            false, () -> open(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)))));
+        else entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
             false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
                 getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
                 () -> shell("pm clear " + pkg, output -> {
@@ -1155,16 +1158,17 @@ public final class SettingsActivity extends CardActivity {
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
         boolean counted = NotificationCounter.allowed(this);
         Drawable picture = getDrawable(R.drawable.ic_settings);
-        show(getString(R.string.settings_privacy), Arrays.asList(
-            new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
-                getString(R.string.settings_notification_count_text), false,
-                () -> changeCounter(counted)),
+        List<Entry> entries = new ArrayList<>(Arrays.asList(
             new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, getDrawable(R.drawable.ic_s_ads),
                 getString(R.string.settings_limit_ads_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
             new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, getDrawable(R.drawable.ic_s_chart),
                 getString(R.string.settings_usage_data_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), USAGE_METRICS, metrics ? 0 : 1)))));
+        if (!Fire.ANDROID_9) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
+            getString(R.string.settings_notification_count_text), false,
+            () -> changeCounter(counted)));
+        show(getString(R.string.settings_privacy), entries);
     }
 
     private int sleepMinutes() {
@@ -1200,10 +1204,15 @@ public final class SettingsActivity extends CardActivity {
         Drawable picture = getDrawable(R.drawable.ic_wifi);
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry("Wi-Fi", on ? YES : NO, picture, getString(R.string.settings_wifi_text), false,
-            () -> setWifi(!on)));
+        if (Fire.ANDROID_9) {
+            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_on_fire),
+                false, () -> open(new Intent(Settings.ACTION_WIFI_SETTINGS))));
+        } else {
+            entries.add(new Entry("Wi-Fi", on ? YES : NO, picture, getString(R.string.settings_wifi_text), false,
+                () -> setWifi(!on)));
+        }
         if (on) {
-            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_networks_text),
+            if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_networks_text),
                 true, () -> enter(this::showWifi)));
             entries.addAll(infoRows(DeviceInfo.network(this), picture, getString(R.string.settings_connection_state)));
         }
@@ -1345,7 +1354,7 @@ public final class SettingsActivity extends CardActivity {
     private void showDevice() {
         Drawable picture = getDrawable(R.drawable.ic_settings);
         List<Entry> entries = infoRows(DeviceInfo.system(this), picture, getString(R.string.settings_device_info_text));
-        entries.add(new Entry(getString(R.string.settings_usb), null, getDrawable(R.drawable.ic_s_usb), getString(R.string.settings_usb_text),
+        if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_usb), null, getDrawable(R.drawable.ic_s_usb), getString(R.string.settings_usb_text),
             true, () -> enter(this::showUsb)));
         entries.add(new Entry(getString(R.string.settings_standby), null, getDrawable(R.drawable.ic_power), getString(R.string.settings_standby_text), false,
             TaskService::standby));
@@ -1714,7 +1723,7 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
         }
         entries.add(new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
-            () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver())));
+            () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         show(getString(R.string.settings_saver), entries);
     }
 

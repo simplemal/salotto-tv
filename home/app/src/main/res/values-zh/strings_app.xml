@@ -269,4 +269,10 @@
     <string name="update_error_r301">之前的备份不可用</string>
     <string name="update_error_r302">退回之前的版本失败</string>
     <string name="update_error_r303">最终状态未知</string>
+    <string name="settings_wifi_on_fire">Wi-Fi 网络在 Fire OS 设置中管理。</string>
+    <string name="reenabled_group_ads">Amazon 主屏幕上的广告</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">要再次关闭，需要一台电脑：\n1. 打开 Install Salotto。\n2. 选择这台电视。\n3. 按提示的步骤操作。</string>
+    <string name="update_error_r304">需要在电脑上使用 Install Salotto</string>
+    <string name="update_back_computer">要回到上一版本，请在电脑上打开 Install Salotto，然后选择“回到上一版本”。</string>
 </resources>

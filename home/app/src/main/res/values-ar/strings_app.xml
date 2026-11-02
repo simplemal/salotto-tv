@@ -289,4 +289,10 @@
     <string name="update_error_r301">النسخة السابقة غير متوفرة</string>
     <string name="update_error_r302">فشلت العودة إلى الإصدار السابق</string>
     <string name="update_error_r303">الحالة النهائية غير معروفة</string>
+    <string name="settings_wifi_on_fire">تتم إدارة شبكات Wi-Fi من إعدادات Fire OS.</string>
+    <string name="reenabled_group_ads">الإعلانات في شاشة Amazon الرئيسية</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">لإيقافها مجددًا يلزم حاسوب:\n1. افتح Install Salotto.\n2. اختر هذا التلفاز.\n3. اتبع الخطوات المعروضة.</string>
+    <string name="update_error_r304">يلزم Install Salotto على حاسوب</string>
+    <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
 </resources>

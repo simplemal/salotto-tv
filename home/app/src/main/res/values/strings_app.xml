@@ -347,4 +347,10 @@
     <string name="update_error_r301">Copia precedente non disponibile</string>
     <string name="update_error_r302">Ritorno alla versione precedente non riuscito</string>
     <string name="update_error_r303">Stato finale sconosciuto</string>
+    <string name="settings_wifi_on_fire">Le reti Wi-Fi si gestiscono nelle impostazioni di Fire OS.</string>
+    <string name="reenabled_group_ads">Pubblicità sulla Home Amazon</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">Per rispegnerle serve un computer:\n1. Apri Installa Salotto.\n2. Scegli questa TV.\n3. Segui i passi che propone.</string>
+    <string name="update_error_r304">Serve Installa Salotto sul computer</string>
+    <string name="update_back_computer">Per tornare alla versione precedente apri Installa Salotto sul computer e scegli «Torna alla versione precedente».</string>
 </resources>

@@ -1,6 +1,8 @@
 package it.simplemal.firehome;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -28,13 +30,13 @@ final class HomeCover {
     /** The Home comes in over Amazon's with an animation: this stays on top until that has ended. */
     private static final long AFTER_HOME_MS = 300;
     /** A line of the log can find the Home already there, and nothing then says it has come back. */
-    private static final long SHOW_LIMIT_MS = 1200;
+    private static final long SHOW_LIMIT_MS = Fire.ANDROID_9 ? 2000 : 1200;
     private static final long HOLD_LIMIT_MS = 3000;
     private static final long DOUBLE_PRESS_MS = 900;
     private static final int AMAZON_TRIES = 30;
     private static final long AMAZON_TRY_MS = 50;
     /** The Home just started needs this long to take over from Amazon's. */
-    private static final long AMAZON_SETTLE_MS = 600;
+    private static final long AMAZON_SETTLE_MS = Fire.ANDROID_9 ? 1500 : 600;
 
     /** The setting: a double press leaves Amazon's Home on screen. */
     static volatile boolean doubleHome;
@@ -113,8 +115,14 @@ final class HomeCover {
 
     private void startHome() {
         startedAt = SystemClock.elapsedRealtime();
-        service.startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
-            .setClass(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        Intent salotto = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+            .setClass(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (Fire.ANDROID_9) {
+            service.getSystemService(AlarmManager.class).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, startedAt,
+                PendingIntent.getActivity(service, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT));
+        } else {
+            service.startActivity(salotto);
+        }
     }
 
     /** Another app came up, so a double press no longer keeps Amazon's Home. */

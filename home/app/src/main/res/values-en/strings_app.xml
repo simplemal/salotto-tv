@@ -273,4 +273,10 @@
     <string name="update_error_r301">Previous copy not available</string>
     <string name="update_error_r302">Going back to the previous version failed</string>
     <string name="update_error_r303">Final state unknown</string>
+    <string name="settings_wifi_on_fire">Wi-Fi networks are managed in the Fire OS settings.</string>
+    <string name="reenabled_group_ads">Ads on the Amazon Home</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">To turn them off again you need a computer:\n1. Open Install Salotto.\n2. Choose this TV.\n3. Follow the steps it offers.</string>
+    <string name="update_error_r304">Install Salotto is needed on a computer</string>
+    <string name="update_back_computer">To go back to the previous version, open Install Salotto on a computer and choose “Go back to the previous version”.</string>
 </resources>

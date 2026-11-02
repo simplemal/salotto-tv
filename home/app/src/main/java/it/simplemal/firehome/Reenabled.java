@@ -18,6 +18,7 @@ import java.util.TreeSet;
  */
 final class Reenabled {
     private static final String[] LISTS = {"disattiva-pubblicita.txt", "disattiva-alexa.txt"};
+    private static final int[] GROUPS = {R.string.reenabled_group_ads, R.string.reenabled_group_alexa};
     private static final String FILE = "reenabled";
     private static final String LEFT_ON = "left_on";
 
@@ -66,6 +67,21 @@ final class Reenabled {
             if (label != null) labels.add(label);
         }
         return labels;
+    }
+
+    /** For the page that can only tell: what each list is about, in words anyone knows. */
+    static TreeSet<String> groups(Context context, List<String> names) {
+        TreeSet<String> groups = new TreeSet<>();
+        for (int index = 0; index < LISTS.length; index++) {
+            try (BufferedReader lines = new BufferedReader(new InputStreamReader(context.getAssets().open(LISTS[index])))) {
+                for (String line; (line = lines.readLine()) != null; ) {
+                    if (names.contains(line.trim())) groups.add(context.getString(GROUPS[index]));
+                }
+            } catch (IOException e) {
+                continue;
+            }
+        }
+        return groups;
     }
 
     private static String label(Context context, String name) {

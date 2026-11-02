@@ -273,4 +273,10 @@
     <string name="update_error_r301">Cópia anterior indisponível</string>
     <string name="update_error_r302">Falha ao voltar à versão anterior</string>
     <string name="update_error_r303">Estado final desconhecido</string>
+    <string name="settings_wifi_on_fire">As redes Wi-Fi são geridas nas definições do Fire OS.</string>
+    <string name="reenabled_group_ads">Publicidade no ecrã inicial da Amazon</string>
+    <string name="reenabled_group_alexa">Alexa</string>
+    <string name="reenabled_steps">Para as desligar de novo é preciso um computador:\n1. Abra o Install Salotto.\n2. Escolha esta TV.\n3. Siga os passos propostos.</string>
+    <string name="update_error_r304">É preciso o Install Salotto num computador</string>
+    <string name="update_back_computer">Para voltar à versão anterior, abra o Install Salotto num computador e escolha «Voltar à versão anterior».</string>
 </resources>

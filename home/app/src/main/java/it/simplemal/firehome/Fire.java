@@ -8,10 +8,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Build;
 import java.util.Arrays;
 
 /** What several screens share about the Stick and the apps around Salotto. */
 final class Fire {
+    /**
+     * The 4K Max of 2021. Its adbd answers only other machines, so Salotto has no shell there, and
+     * after Home it holds every start for 5 s, except one made by an alarm.
+     */
+    static final boolean ANDROID_9 = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
     /** The tools read this line too: pubblica-aggiornamento.sh and genera-errori.py. */
     static final String UPDATES_REPO = "simplemal/salotto-tv";
     /** Took the Home key to Salotto on Sticks set up before Salotto did that itself. */
@@ -36,6 +42,8 @@ final class Fire {
     private static final String RESTART_WORDS = "restart_settings_title";
     /** What Fire OS opens on a remote's Settings key. */
     static final String SETTINGS_PAGE = "com.amazon.tv.launcher.ui.MainSettingsActivity";
+    /** What Fire OS opens when Home is held. */
+    static final String HOME_HELD_PAGE = "com.amazon.tv.settings.v2.hud.HudActivity";
     static final String RECENTS_ACTION = "com.amazon.tv.action.NAVIGATE_TO_RECENTS";
     /** What Fire OS opens on the recent apps key. */
     static final String RECENTS_PAGE = "com.amazon.tv.launcher.deeplink.activity.RecentDeepLinkActivityDI";
@@ -93,8 +101,9 @@ final class Fire {
     /** Fire OS's own menu of its screensavers. */
     static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }
 
-    /** Not a settings page: Android's own way to start the chosen screensaver. */
-    static Intent screensaver() {
-        return new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+    /** Not a settings page: Android's own way to start the chosen screensaver. The Max has none, and gets Salotto's. */
+    static Intent screensaver(Context context) {
+        Intent chosen = new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
+        return chosen.resolveActivity(context.getPackageManager()) != null ? chosen : new Intent(context, SaverActivity.class);
     }
 }

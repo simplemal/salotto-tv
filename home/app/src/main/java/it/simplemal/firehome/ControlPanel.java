@@ -277,9 +277,11 @@ final class ControlPanel extends LinearLayout {
             () -> change(() -> Veil.nextDim(getContext())));
         Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
             this::changeWarm);
+        // The matrix takes the shell. The place stays for another tile.
+        if (Fire.ANDROID_9) warm.view.setVisibility(INVISIBLE);
 
         LinearLayout tools = row();
-        small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver()));
+        small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver(getContext())));
         Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), GAP, () -> {
             nextTimer();
             refresh();

@@ -558,6 +558,10 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     /** False, with a word on screen, while the connection to the shell is not there. */
     /** What a normal app may not do goes through TaskService. Done runs with the output. */
     @Override public void shell(String command, Consumer<String> done) {
+        if (Fire.ANDROID_9) {
+            done.accept(null);
+            return;
+        }
         if (!TaskService.ready() && onCable()) {
             sayLong(getString(R.string.card_needs_wifi));
             done.accept(null);
