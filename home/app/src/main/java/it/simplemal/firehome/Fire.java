@@ -18,6 +18,7 @@ final class Fire {
     static final String OLD_FIXER = "io.github.hatim.firestickfixer";
     static final String AIRPLAY = "io.github.jqssun.airplay";
     static final String AMAZON_HOME = "com.amazon.tv.launcher";
+    static final String AMBIENT = "com.amazon.tv.ftvambient";
     /** Its package also holds the recent apps page: only this one is the Home itself. */
     static final String AMAZON_HOME_PAGE = "com.amazon.tv.launcher.ui.HomeActivity_vNext";
     static final String APPSTORE = "com.amazon.venezia";
