@@ -1,0 +1,564 @@
+{
+  "status": "complete",
+  "target_count": 60,
+  "completed_count": 60,
+  "assets": [
+    {
+      "n": 1,
+      "file": "001-jade-pools.webp",
+      "scene": "An intimate chain of four deep jade rock pools linked by tiny white cascades, smooth dark gray granite, copper fallen leaves caught in eddies, fern banks. Individual wet boulders and separate fern crowns are easily identifiable.",
+      "conditions": "Bright overcast after gentle rain, fresh woodland, damp surfaces without airborne rain.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.95
+    },
+    {
+      "n": 2,
+      "file": "002-red-sandstone-fern.webp",
+      "scene": "A sculptural red sandstone overhang and curving dry streambed with a few flourishing green ferns rooted in narrow sheltered cracks, individual stones, warm rust sand and dark maroon rock.",
+      "conditions": "Clear late afternoon, crisp broad sun shadows, arid warm climate.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.91
+    },
+    {
+      "n": 3,
+      "file": "003-kelp-garden.webp",
+      "scene": "A transparent cold-water cove with a dense underwater kelp garden, recognizable long golden kelp fronds, patches of dark eelgrass, large submerged boulders and a narrow black rock shelf.",
+      "conditions": "Soft cloud-filtered coastal daylight, quiet water and restrained glints, no foam blanketing the picture.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.53
+    },
+    {
+      "n": 4,
+      "file": "004-misty-redwoods.webp",
+      "scene": "A small group of immense redwood tree crowns among lower sword ferns and several visible reddish fallen trunks, distinct trees rather than endless forest texture.",
+      "conditions": "Thin morning mist threading between canopies, muted humid daylight, soft depth separation.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.99
+    },
+    {
+      "n": 5,
+      "file": "005-copper-dune.webp",
+      "scene": "A single gracefully curved burnt orange dune crest beside black desert pavement and scattered distinctly shaped drought-resistant shrubs, visible small wind ripples at realistic scale.",
+      "conditions": "Low winter sunlight and a broad deep shadow cast by the dune; clear warm dry air.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.76
+    },
+    {
+      "n": 6,
+      "file": "006-rainy-lily-channel.webp",
+      "scene": "A winding narrow dark stream through a wild wetland with recognizable water lily leaves, long reed clumps, a half-submerged old tree limb, several connected muddy side pools.",
+      "conditions": "Steady moderate rain; visible atmospheric rain near edges aimed toward center, darkened saturated reeds, overlapping tiny surface agitation, connected runoff. Mild daytime, subdued blue-green light.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.03
+    },
+    {
+      "n": 7,
+      "file": "007-frosted-basalt.webp",
+      "scene": "Several upright-looking basalt columns seen directly at their polygonal top faces, a little residual hoarfrost at shaded joints, blue-black meltwater in cracks, wind-scoured dark stone.",
+      "conditions": "Cold dawn after a clear freezing night, low warm light catches only selected stone edges. Pale frost occupies minority of image.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.43
+    },
+    {
+      "n": 8,
+      "file": "008-emerald-crevasse.webp",
+      "scene": "An exposed intensely blue glacial meltwater slot between translucent turquoise ice walls, visible rounded ice lumps, dark sediment stripes and smooth deep water.",
+      "conditions": "Very cold bright overcast; physically real blue ice, no fantasy illumination, dark sediment-covered rock across upper left.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.28
+    },
+    {
+      "n": 9,
+      "file": "009-magnolia-canopy.webp",
+      "scene": "Three very large old magnolia tree crowns with recognizable glossy leaves and sparse ivory blossoms, a shadowed earthy forest floor visible in gaps and a decaying log with moss.",
+      "conditions": "Warm spring cloudy afternoon, gentle film softness; no garden, no arranged planting.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 6.28
+    },
+    {
+      "n": 10,
+      "file": "010-moonlit-tidepools.webp",
+      "scene": "A few large sea-carved tide pools on folded dark coastal rock, clear still water showing individual rounded stones, a cluster of pink coralline algae, ribbons of seaweed.",
+      "conditions": "Blue-hour NIGHT with moonlight softened by thin cloud, readable cool blue gray midtones, no black crush.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 10.75
+    },
+    {
+      "n": 11,
+      "file": "011-golden-aspen-island.webp",
+      "scene": "A tiny stony river island occupied by four autumn aspens with luminous golden crowns, a single white fallen trunk extending across a shallow river arm and dark brown underwater pebbles.",
+      "conditions": "Clear autumn morning with long legible tree shadows across water.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.27
+    },
+    {
+      "n": 12,
+      "file": "012-foggy-limestone-arch.webp",
+      "scene": "A natural limestone bridge spanning a narrow deep gorge, unmistakably seen from directly overhead, sparse dark juniper trees, broad stone terrace with fissures.",
+      "conditions": "Low drifting fog rests inside the gorge without hiding the bridge. Cool diffuse light, subdued stone colors.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.52
+    },
+    {
+      "n": 13,
+      "file": "013-coral-sand-inlet.webp",
+      "scene": "A small sinuous tropical tidal inlet between dark volcanic ledges and warm pinkish coral sand, recognizably separate palms leaning over shore, submerged coral heads in shallow green water.",
+      "conditions": "Passing broken cloud, late daytime, natural tropical color without postcard oversaturation.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.58
+    },
+    {
+      "n": 14,
+      "file": "014-storm-fallen-pine.webp",
+      "scene": "One massive fallen pine trunk crossing a flooded rocky woodland hollow, broken branches, individual fern fans, dark standing water and rounded mossy boulders.",
+      "conditions": "Heavy rain in daylight; broad sheets of runoff over rock, rising water linking puddles, sediment washing off bank. Soft radial rain optics with subtle center and blurred outer drops; natural atmospheric veiling.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.01
+    },
+    {
+      "n": 15,
+      "file": "015-purple-heather.webp",
+      "scene": "An irregular natural purple heather heath punctuated by broad bare slate slabs, individual heather bushes and tawny grass tufts around a shallow dark pool.",
+      "conditions": "Cool overcast autumn day, diffused light, understated purple, no oversharpened vegetation.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.23
+    },
+    {
+      "n": 16,
+      "file": "016-tropical-roots.webp",
+      "scene": "Massive interlaced buttress roots of an old tropical tree, its leafy crown partly at edge, wet brown soil, separate fallen leathery leaves and vivid soft moss on roots.",
+      "conditions": "Humid cloudy daylight after rain, tiny low wisps of mist, rich earthy green tones.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.69
+    },
+    {
+      "n": 17,
+      "file": "017-snowy-boulder-cleft.webp",
+      "scene": "A narrow clear brook running between two enormous dark boulders with thin powder snow on their outer surfaces; evergreen shrubs and pale bare willow branches remain distinguishable.",
+      "conditions": "Light snowfall during cold blue-gray daytime, soft near-lens flakes out of focus, small crisp distant flakes, upper-left exposed rock stays naturally dark.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.16
+    },
+    {
+      "n": 18,
+      "file": "018-ochre-salt-rim.webp",
+      "scene": "An ochre mineral spring with one irregular dark amber pool, scalloped mineral rim, black wet stones and pale cream mineral fan limited to one side.",
+      "conditions": "Dry cool overcast light with thin real steam drifting across lower right; not glowing or alien.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.69
+    },
+    {
+      "n": 19,
+      "file": "019-charcoal-lava-fern.webp",
+      "scene": "A cracked ancient charcoal lava flow penetrated by several full green fern rosettes, black shallow rainwater troughs, smooth rope-like volcanic folds and one isolated red-brown stone.",
+      "conditions": "Moist tropical dawn, restrained warm rim illumination, individual features readable.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.6
+    },
+    {
+      "n": 20,
+      "file": "020-stormy-beech-gully.webp",
+      "scene": "A narrow winding ravine through a beech woodland, copper leaf carpet, a broken forked branch and large exposed tree roots lining dark water.",
+      "conditions": "Rainy NIGHT, soft cloud-reflected cool-blue light with retained midtones, moderate rain causes rippled pools and muddy trickles, faint radial precipitation, no artificial light.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 14.44
+    },
+    {
+      "n": 21,
+      "file": "021-seagrass-sand-ribbons.webp",
+      "scene": "Clear very shallow sea water with an intricate natural edge of dark seagrass meadow alternating with pale sand ribbons, a few large clam shells discernible near a dark rock shelf.",
+      "conditions": "Quiet high overcast morning, muted mint water, no bright blank upper-left area.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.85
+    },
+    {
+      "n": 22,
+      "file": "022-alpine-rhododendron.webp",
+      "scene": "Large pink wild alpine rhododendron bushes in cracks between dark slate outcrops, a winding fine meltwater rill and separate low shrubs.",
+      "conditions": "Mountain summer after a shower, diffuse sunshine appears through passing cloud, distant haze absent at this close scale.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 12.7
+    },
+    {
+      "n": 23,
+      "file": "023-birch-reflection.webp",
+      "scene": "A still dark woodland pond with a few silver birch trunks fallen over its margin, distinct yellow leaves floating on water, mossy bank, partial reflections subdued enough to reveal pond bottom at edge.",
+      "conditions": "Still cool autumn early morning, thin fog low over lower pond, moody natural brown and muted gold.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.74
+    },
+    {
+      "n": 24,
+      "file": "024-black-beach-foam.webp",
+      "scene": "One advancing thin curling wave onto a black volcanic pebble beach, recognizable individually sized smooth cobbles, long driftwood log, irregular rock tongue.",
+      "conditions": "Storm clearing daylight, wet surfaces, foam delicate and localized, dark exposed wet rock in upper left.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 10.46
+    },
+    {
+      "n": 25,
+      "file": "025-desert-aloes.webp",
+      "scene": "Several large wild aloe rosettes beside fractured terracotta rock, gritty desert ground and a small natural drainage crease, individual succulent leaves clearly legible.",
+      "conditions": "Warm late afternoon with strong broad shadows and amber rim light, restrained cinematic color.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.37
+    },
+    {
+      "n": 26,
+      "file": "026-rainforest-waterfall-lip.webp",
+      "scene": "The lip of a small secluded rainforest waterfall pouring over a dark broad rock ledge, swirling green plunge water below, broad-leaf plants and distinct tree roots at bank.",
+      "conditions": "Heavy warm rainfall; fast runoff joins the waterfall, water turbulence and muddy tributary plumes visible at ground scale, photographic rain depth, less visible rain at center.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 6
+    },
+    {
+      "n": 27,
+      "file": "027-frozen-willow-pool.webp",
+      "scene": "A small partially frozen woodland pool framed by bare willow limbs and dark reed tufts, thin dark transparent ice with fine natural fractures, a few rust leaves trapped within.",
+      "conditions": "Cold overcast day, tiny trace of snow along bank, no sun glow, no bright white expanse.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 13.13
+    },
+    {
+      "n": 28,
+      "file": "028-rose-granite-slabs.webp",
+      "scene": "Broad naturally fractured rose granite slabs with smooth rounded edges, a dark narrow wet fissure, black lichen patches and one bent low pine rooted in a crack.",
+      "conditions": "Clear morning, long pine shadow, realistic pink-gray granite and subdued green.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.14
+    },
+    {
+      "n": 29,
+      "file": "029-mangrove-fingers.webp",
+      "scene": "A few unmistakable mangrove trees with interlocking exposed roots reaching into shallow brown-green tidal water, narrow sand finger, scattered fallen leaves, identifiable roots rather than abstract canopy.",
+      "conditions": "Warm hazy daylight under broken cloud, natural soft reflections.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.76
+    },
+    {
+      "n": 30,
+      "file": "030-night-copper-canyon.webp",
+      "scene": "A close section of narrow sculpted copper sandstone slot canyon, alternating convex curves, a dark pool and several trapped smooth boulders, clear stone-layer structure.",
+      "conditions": "Moonlit NIGHT, readable slate-blue and subdued copper midtones, gentle volumetric haze in the slot, no glowing light sources.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 12.35
+    },
+    {
+      "n": 31,
+      "file": "031-meadow-blackwater.webp",
+      "scene": "A tiny natural blackwater creek through lush wet meadow, separate marsh irises, tussocks, a few dark flat stepping-like natural stones and a small fallen branch.",
+      "conditions": "Light drizzle in cool daylight, water beads and damp grasses, faint fine precipitation only, no synthetic streak curtain.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.32
+    },
+    {
+      "n": 32,
+      "file": "032-cypress-knees.webp",
+      "scene": "A shallow flooded bald-cypress hollow with distinct wide tree bases, recognizable cypress knees, rusty orange fallen needles floating on dark water and small bright duckweed patches.",
+      "conditions": "Cool autumn morning after rain, subtle ground mist at lower edge, moody olive and umber.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.9
+    },
+    {
+      "n": 33,
+      "file": "033-snow-and-juniper.webp",
+      "scene": "A wind-shaped dark juniper shrub spreading over coarse red-brown bedrock, scattered thin snow patches, frost along branch tips and a small clear frozen puddle.",
+      "conditions": "Sunny winter morning, dark exposed rock covers substantial area, natural long shadows and cold dry air.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.53
+    },
+    {
+      "n": 34,
+      "file": "034-sea-cave-roof.webp",
+      "scene": "A striking natural opening in a coastal rock roof revealing dark emerald sea below, jagged folded gray rock, sparse tough coastal plants and pools around the rim.",
+      "conditions": "Overcast coastal afternoon, sea movement visible through opening, genuine stone texture with soft film rendering.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.08
+    },
+    {
+      "n": 35,
+      "file": "035-lotus-leaf-rafts.webp",
+      "scene": "A few large recognizable lotus leaves on dark marsh water, mixed emerald and aging copper leaves, single curved seed pods, reed clusters along an irregular muddy margin.",
+      "conditions": "Warm morning after a shower with soft oblique sun through thin cloud, restrained reflections.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.85
+    },
+    {
+      "n": 36,
+      "file": "036-hail-on-slate.webp",
+      "scene": "An angular dark slate outcrop surrounding three small rock pools with individual low green shrubs growing in joints.",
+      "conditions": "Short daytime hail shower, localized small white hail accumulations in crevices, tiny blurred hail in air, runoff and rippled water, main upper-left slab dark and exposed.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.16
+    },
+    {
+      "n": 37,
+      "file": "037-ancient-olive-roots.webp",
+      "scene": "A single ancient wild olive tree rooted into layered dark limestone, twisted trunk glimpsed through sparse gray-green leaves, visible radial roots over dry earth, thyme bushes.",
+      "conditions": "Hot dry hazy afternoon, distinct soft-edged trunk shadows, Mediterranean natural setting without cultivation or terracing.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 10.99
+    },
+    {
+      "n": 38,
+      "file": "038-moonlit-kelp-rocks.webp",
+      "scene": "A seaweed-covered granite intertidal shelf with several dark pools, clearly distinct brown bladderwrack fronds, small rounded wet boulders and one thin incoming wave.",
+      "conditions": "Cloudy coastal NIGHT with readable soft blue-green midtones and natural silver highlights, no artificial glow.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 12.92
+    },
+    {
+      "n": 39,
+      "file": "039-autumn-maple-stream.webp",
+      "scene": "A shallow brook splitting around a large mossy boulder with a small red maple canopy over one arm, separate maple leaves floating among stones, exposed roots and a graceful curved branch.",
+      "conditions": "Clear late autumn afternoon, broad amber light and deep soft natural shadow, no HDR.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.64
+    },
+    {
+      "n": 40,
+      "file": "040-volcanic-sulfur-runnel.webp",
+      "scene": "A tiny sulfur-yellow mineral runnel cutting through black volcanic soil, dark stone islands, subdued rust deposits, one shallow greenish pool and visible fine water channels.",
+      "conditions": "Cool cloudy daylight, real thin steam locally softens edges, no neon saturation or eruption.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 6.72
+    },
+    {
+      "n": 41,
+      "file": "041-rainy-palmetto.webp",
+      "scene": "Distinct wild fan palmetto crowns in a dense low subtropical hammock, a visible sandy hollow with dark wet leaf litter, recognizable long leaves and one fallen palm trunk.",
+      "conditions": "Intense afternoon rain, visibly flattened wet fronds, linked muddy puddles, runoff tracing low hollow; soft atmosphere and radial depth rain, subdued teal greens.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.89
+    },
+    {
+      "n": 42,
+      "file": "042-granite-trough.webp",
+      "scene": "A long natural water-worn trough in smooth charcoal granite, a series of oval deep-blue pools, sparse amber grass at cracks and one large rounded glacial erratic.",
+      "conditions": "Cool clear early morning with gentle broad light and defined deep trough shadows.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.64
+    },
+    {
+      "n": 43,
+      "file": "043-misty-moss-log.webp",
+      "scene": "An enormous moss-covered fallen oak trunk in a fern-rich woodland clearing, exposed root plate, individual green fern fans and deep brown leaf litter.",
+      "conditions": "Dense cool low morning fog, recognizable foreground trunk remains detailed but soft, background fern bed veiled; reduced contrast.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.71
+    },
+    {
+      "n": 44,
+      "file": "044-snowy-coastal-pines.webp",
+      "scene": "A pair of dark wind-bent coastal pines rooted on black rock beside unfrozen dark teal water, sparse snow around roots and rock cracks, individual branches clear.",
+      "conditions": "Light snow showers in winter daylight, flakes smaller near center and softly blurred near lens, no uniform white ground.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.45
+    },
+    {
+      "n": 45,
+      "file": "045-tropical-coral-ledges.webp",
+      "scene": "Shallow clear tropical water over large recognizable living coral heads separated by dark blue channels and a natural rough volcanic ledge, branching coral shapes evident at this close altitude.",
+      "conditions": "Clear morning with soft water caustics, controlled highlights, genuine natural underwater optical softness.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.19
+    },
+    {
+      "n": 46,
+      "file": "046-night-basalt-cascade.webp",
+      "scene": "A compact black basalt streambed directly beneath the camera, three round rain-filled pothole pools linked by NARROW SHALLOW WATER RUNNELS cut in the HORIZONTAL TOP surface of broad rock slabs, small green moss cushions and a few angular wet stones. Entire streambed lies on a nearly flat horizontal plane, see only top faces of rocks and tops of moss. No vertical cliffs, no tall waterfall, no front-facing cascade.",
+      "conditions": "Rainy NIGHT under overcast cool moon sky, soft midnight-blue readable tones, thin atmospheric rain and obvious shallow water runoff moving between pools, no artificial light.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.78
+    },
+    {
+      "n": 47,
+      "file": "047-amber-peat-pools.webp",
+      "scene": "Several naturally irregular amber peat pools within a wild bog, individual reddish sphagnum cushions, low cotton grass tufts and a dark weathered branch across a narrow channel.",
+      "conditions": "Cool bright overcast afternoon, some wet sheen, quiet muted rust-green palette.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 10.38
+    },
+    {
+      "n": 48,
+      "file": "048-red-rock-cactus.webp",
+      "scene": "Three large wild barrel cacti with distinct ribbed round bodies near a dark red rock ledge, coarse sandy soil, scattered agave shoots and recognizable dry branches.",
+      "conditions": "Dry clear sunset-adjacent late afternoon, warm natural broad light, long dark plant shadows, no horizon.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 6.94
+    },
+    {
+      "n": 49,
+      "file": "049-rainy-bamboo-ravine.webp",
+      "scene": "A small patch of wild bamboo overhanging a rocky stream, individual jointed fallen bamboo stems on bank, dark rounded boulders and fine leaves in separated fans.",
+      "conditions": "Moderate daytime rain, soft humid veil, visible surface agitation, linked runnels on stone, sparse gently radial drops with center least visible.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.71
+    },
+    {
+      "n": 50,
+      "file": "050-beech-leaf-whirlpool.webp",
+      "scene": "A tight slow natural stream whirlpool around a single dark polished boulder, copper beech leaves gathering into one imperfect spiral, moss-covered bank and a few exposed tree roots.",
+      "conditions": "Still autumn cloudy daylight, subtle water movement, real scale, no geometric artificial spiral.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.97
+    },
+    {
+      "n": 51,
+      "file": "051-frosted-heath-night.webp",
+      "scene": "A dark rocky heath with clearly separated low heather shrubs, subtle hoarfrost on outer tips, tiny frozen pool and natural pale grass tufts.",
+      "conditions": "Clear winter NIGHT, natural blue-gray moon exposure with visible midtones, small frost highlights only, no blanket snow.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 14.92
+    },
+    {
+      "n": 52,
+      "file": "052-canyon-cottonwood.webp",
+      "scene": "One immense golden cottonwood rooted beside a narrow green stream at the foot of dark plum sandstone, fallen limbs and rounded pebbles visible around canopy edge.",
+      "conditions": "Bright autumn sunlight filtered by thin high cloud, vivid yet realistic gold, naturally shadowed rock upper left.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 8.37
+    },
+    {
+      "n": 53,
+      "file": "053-rippled-sand-moss.webp",
+      "scene": "A shallow clear stream over rippled warm brown sand with a dark island of mossy stones, individual green ferns leaning above the margin and one diagonal fallen twig.",
+      "conditions": "Drizzly temperate morning, small concentric rain impacts at physically tiny scale, faint atmosphere; water remains transparent at shallows.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.01
+    },
+    {
+      "n": 54,
+      "file": "054-alpine-pine-roots.webp",
+      "scene": "The spreading roots of a weather-beaten alpine pine gripping dark striated gneiss, small blue alpine flowers and a tiny rain-fed pool in a smooth stone hollow.",
+      "conditions": "Broken clouds after summer mountain thunderstorm, wet rock, one gentle shaft of sun across lower right.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 5.3
+    },
+    {
+      "n": 55,
+      "file": "055-saltmarsh-tidal-scroll.webp",
+      "scene": "One tight curling natural saltmarsh creek with very dark reflective water, distinct bright green glasswort clumps and reddish mud islands, small exposed roots along steep bank.",
+      "conditions": "Low warm morning sun, mild coastal haze, natural legible creek-bank shadows.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 10.58
+    },
+    {
+      "n": 56,
+      "file": "056-storm-worn-gneiss.webp",
+      "scene": "A storm-exposed broad gneiss slab with thick dark veins, a sheltered tuft of grass, several linked rock hollows and narrow waterfall-like runoff at the slab edge.",
+      "conditions": "Violent afternoon downpour, clearly streaming sheet water across rock, fuller linked hollows and airborne rain depth. Gently inward oriented soft rain, almost invisible center, no starburst.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 7.59
+    },
+    {
+      "n": 57,
+      "file": "057-moonlit-palm-oasis.webp",
+      "scene": "A tiny completely wild desert spring with three identifiable fan palms, fallen fronds, dark spring water, coarse reddish gravel and broad exposed black rock.",
+      "conditions": "Clear warm NIGHT, natural soft blue and muted warm brown midtones, no lanterns, settlement or exotic luminescence.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.41
+    },
+    {
+      "n": 58,
+      "file": "058-lichen-boulder-seam.webp",
+      "scene": "Two huge split dark boulders with a winding seam full of vivid green moss and low fern crowns, intricate natural pale lichen mainly on lower-right rock, damp soil in crevice.",
+      "conditions": "Cool overcast noon, real photographic softness, varied rock surfaces without crunchy clarity.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 9.04
+    },
+    {
+      "n": 59,
+      "file": "059-sleet-tarn-edge.webp",
+      "scene": "A small dark upland tarn margin with recognizable gray slate stones under shallow water, amber grass tussocks, a twisted bare shrub and scattered frost in shadow.",
+      "conditions": "Cold mixed sleet shower, a few small soft pellets in air, wet rocks and thin irregular slush accumulating at sheltered shore. Blue-gray daytime.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 11.26
+    },
+    {
+      "n": 60,
+      "file": "060-spring-forest-islet.webp",
+      "scene": "A mossy irregular island in a shallow woodland creek, three fresh green deciduous trees with separate leafy crowns, white wildflowers on the bank and an old fallen log crossing water.",
+      "conditions": "Gentle clear spring morning after fog has lifted, soft warm sunshine with broad readable tree shadows.",
+      "width": 3840,
+      "height": 2160,
+      "clock_contrast": 6.89
+    }
+  ],
+  "resolution_note": "Images generated with the built-in image tool and resized to3840x2160 for delivery.",
+  "visual_rules": {
+    "camera": "Close overhead aerial views of natural environments, with identifiable individual rocks, plants, roots, logs and pools; no sky or horizon.",
+    "photography": "Very subtle fine organic photographic grain, softened fine edge acutance, restrained local microcontrast and smooth cinematic35mm tonal transitions; natural forms remain recognizable.",
+    "rain": "Falls along world altitude Z; subtle center, gently inward radial traces around it; intensity visible on terrain.",
+    "clock": "Naturally quiet dark upper left for white clock."
+  },
+  "validation": {
+    "image_count": 60,
+    "unique_image_files": 60,
+    "continuous_numbering": "001-060",
+    "dimensions": [
+      3840,
+      2160
+    ],
+    "work_pngs_removed": true
+  }
+}
