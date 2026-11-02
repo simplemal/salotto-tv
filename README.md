@@ -1,6 +1,14 @@
 # Salotto
 
+<p align="center"><img src="assets/Logo/SalottoTV.svg" alt="Salotto" width="160"></p>
+
 Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
+
+<p align="center"><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="800"></p>
+
+| Centro di controllo | Scelta dello sfondo | Task manager |
+|---|---|---|
+| ![Centro di controllo](distro/docs/immagini/centro-di-controllo.webp) | ![Scelta dello sfondo](distro/docs/immagini/sfondo.webp) | ![Task manager](distro/docs/immagini/task-manager.webp) |
 
 Supporta tre modelli: Fire TV Stick 4K 2ª generazione, 4K Max 2ª generazione e 4K Max 1ª generazione. Sulla 4K Max 1ª generazione, con Fire OS 7, alcune funzioni sono limitate. È in sviluppo, e la firma delle build non è ancora quella definitiva.
 
