@@ -84,7 +84,7 @@ public final class SettingsActivity extends CardActivity {
     private static final int PICTURE_TOP = 170;
     private static final int EXPLANATION_TOP = PICTURE_TOP + PICTURE_SIZE + 22;
     private static final int EXPLANATION_SP = 16;
-    private static final String RESOLUTION = "pq_video_resolution";
+    static final String RESOLUTION = "pq_video_resolution";
     private static final String[] RESOLUTIONS = {"-1", "97", "96", "16", "31", "4", "19"};
     private static final int[] RESOLUTION_NAMES = {R.string.settings_resolution_auto, R.string.settings_resolution_4k_60,
         R.string.settings_resolution_4k_50, R.string.settings_resolution_1080_60, R.string.settings_resolution_1080_50,
@@ -204,6 +204,7 @@ public final class SettingsActivity extends CardActivity {
     static final String SECTION = "section";
     static final String NETWORK = "network";
     static final String REMOTES = "remotes";
+    static final String SCREEN = "screen";
     static final String APP = "app";
     static final String PACKAGE = "package";
 
@@ -314,6 +315,7 @@ public final class SettingsActivity extends CardActivity {
         String section = getIntent().getStringExtra(SECTION);
         if (NETWORK.equals(section)) enter(this::showNetwork);
         else if (REMOTES.equals(section)) enter(this::showRemotes);
+        else if (SCREEN.equals(section)) enter(this::showScreen);
         else if (APP.equals(section)) enter(() -> showApp(getIntent().getStringExtra(PACKAGE)));
         else enter(this::showRoot);
     }

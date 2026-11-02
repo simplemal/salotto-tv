@@ -277,10 +277,7 @@ final class ControlPanel extends LinearLayout {
             () -> change(() -> Veil.nextDim(getContext())));
         // The filter's matrix takes the shell, which Android 9 does not give, nor Android with a cable.
         boolean noFilter = Fire.ANDROID_9 || wired() && !TaskService.ready();
-        Tile warm = noFilter ? small(modes, R.drawable.ic_settings, getContext().getString(R.string.settings_fire), GAP, () -> {
-            TaskService.wantFireSettings();
-            host.open(Fire.settings());
-        }) : small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP, this::changeWarm);
+        Tile warm = noFilter ? small(modes, R.drawable.ic_s_tv, getContext().getString(R.string.settings_screen), GAP, this::openScreen) : small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP, this::changeWarm);
 
         LinearLayout tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver(getContext())));
@@ -360,6 +357,22 @@ final class ControlPanel extends LinearLayout {
             Background.run(() -> {
                 boolean on = "true".equals(settings.read(FireSettings.AUDIO, id));
                 host.runOnUiThread(() -> showSwitch(tile[0], on));
+            });
+        });
+    }
+
+    /** Salotto's own page where Fire OS answers it, or else Fire OS's settings. */
+    private void openScreen() {
+        FireSettings settings = fire();
+        Background.run(() -> {
+            boolean ours = settings.read(FireSettings.PICTURE, SettingsActivity.RESOLUTION) != null;
+            host.runOnUiThread(() -> {
+                if (ours) {
+                    settings(SettingsActivity.SCREEN);
+                } else {
+                    TaskService.wantFireSettings();
+                    host.open(Fire.settings());
+                }
             });
         });
     }
