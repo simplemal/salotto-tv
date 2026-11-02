@@ -7,20 +7,22 @@ Needs Pillow. Usage: distro/tools/prepara-miniature.py
 import multiprocessing
 import pathlib
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "home/app/src/main/assets"
 SETS = ("astratti", "astratti-3d", "nox-city", "natura-aerea")
 TARGET = ASSETS / "miniature"
-# The cell of PictureGridActivity on the screen, so that nothing is enlarged or shrunk again.
-SIZE = (432, 243)
+# The cell of PictureGridActivity on the screen, pixel for pixel. It is not quite 16:9, so a line of
+# the picture goes at the edges: enlarged instead, on the Stick, the whole picture would go soft.
+SIZE = (432, 244)
 QUALITY = 70
 
 
 def shrink(job):
     source, target = job
-    Image.open(source).convert("RGB").resize(SIZE, Image.LANCZOS).save(target, "WEBP", quality=QUALITY, method=6)
+    picture = ImageOps.fit(Image.open(source).convert("RGB"), SIZE, Image.LANCZOS)
+    picture.save(target, "WEBP", quality=QUALITY, method=6)
     return target.stat().st_size
 
 
