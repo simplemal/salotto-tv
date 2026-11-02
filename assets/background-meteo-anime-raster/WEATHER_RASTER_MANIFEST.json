@@ -1,0 +1,1717 @@
+{
+  "schemaVersion": 1,
+  "imageCount": 120,
+  "format": "webp",
+  "width": 3840,
+  "height": 2160,
+  "aspectRatio": "16:9",
+  "basePath": "assets/background-meteo-raster/",
+  "resolutionNote": "3840x2160 exports enlarged from generated originals; not native4K generation.",
+  "phases": [
+    {
+      "id": "dawn",
+      "label": "Alba",
+      "imageCount": 20
+    },
+    {
+      "id": "day",
+      "label": "Giorno",
+      "imageCount": 20
+    },
+    {
+      "id": "afternoon",
+      "label": "Pomeriggio",
+      "imageCount": 20
+    },
+    {
+      "id": "sunset",
+      "label": "Tramonto",
+      "imageCount": 20
+    },
+    {
+      "id": "evening",
+      "label": "Sera",
+      "imageCount": 20
+    },
+    {
+      "id": "night",
+      "label": "Notte",
+      "imageCount": 20
+    }
+  ],
+  "profiles": [
+    {
+      "id": "clear_sky",
+      "label": "Sereno",
+      "wmoCodes": [
+        0
+      ]
+    },
+    {
+      "id": "mostly_clear",
+      "label": "Quasi sereno",
+      "wmoCodes": [
+        1
+      ]
+    },
+    {
+      "id": "partly_cloudy",
+      "label": "Parzialmente nuvoloso",
+      "wmoCodes": [
+        2
+      ]
+    },
+    {
+      "id": "overcast",
+      "label": "Coperto",
+      "wmoCodes": [
+        3
+      ]
+    },
+    {
+      "id": "fog",
+      "label": "Nebbia",
+      "wmoCodes": [
+        45
+      ]
+    },
+    {
+      "id": "freezing_fog",
+      "label": "Nebbia gelata",
+      "wmoCodes": [
+        48
+      ]
+    },
+    {
+      "id": "light_drizzle",
+      "label": "Pioviggine debole",
+      "wmoCodes": [
+        51,
+        56
+      ]
+    },
+    {
+      "id": "moderate_drizzle",
+      "label": "Pioviggine moderata",
+      "wmoCodes": [
+        53,
+        57
+      ]
+    },
+    {
+      "id": "heavy_drizzle",
+      "label": "Pioviggine intensa",
+      "wmoCodes": [
+        55
+      ]
+    },
+    {
+      "id": "light_rain",
+      "label": "Pioggia debole",
+      "wmoCodes": [
+        61,
+        66
+      ]
+    },
+    {
+      "id": "moderate_rain",
+      "label": "Pioggia moderata",
+      "wmoCodes": [
+        63
+      ]
+    },
+    {
+      "id": "heavy_rain",
+      "label": "Pioggia forte",
+      "wmoCodes": [
+        65,
+        67
+      ]
+    },
+    {
+      "id": "light_snow",
+      "label": "Neve debole",
+      "wmoCodes": [
+        71,
+        77
+      ]
+    },
+    {
+      "id": "moderate_snow",
+      "label": "Neve moderata",
+      "wmoCodes": [
+        73
+      ]
+    },
+    {
+      "id": "heavy_snow",
+      "label": "Neve intensa",
+      "wmoCodes": [
+        75
+      ]
+    },
+    {
+      "id": "light_rain_showers",
+      "label": "Rovesci deboli",
+      "wmoCodes": [
+        80
+      ]
+    },
+    {
+      "id": "heavy_rain_showers",
+      "label": "Rovesci forti",
+      "wmoCodes": [
+        81,
+        82
+      ]
+    },
+    {
+      "id": "light_snow_showers",
+      "label": "Rovesci deboli di neve",
+      "wmoCodes": [
+        85
+      ]
+    },
+    {
+      "id": "heavy_snow_showers",
+      "label": "Rovesci forti di neve",
+      "wmoCodes": [
+        86
+      ]
+    },
+    {
+      "id": "thunderstorm",
+      "label": "Temporale",
+      "wmoCodes": [
+        95,
+        96,
+        97,
+        99
+      ]
+    }
+  ],
+  "lookupByPhaseAndWeather": {
+    "dawn": {
+      "clear_sky": "dawn/101-weather_dawn_clear_sky_reed_creek_bend_4k.webp",
+      "mostly_clear": "dawn/102-weather_dawn_mostly_clear_palm_dune_meadow_4k.webp",
+      "partly_cloudy": "dawn/103-weather_dawn_partly_cloudy_walnut_cottage_hill_4k.webp",
+      "overcast": "dawn/104-weather_dawn_overcast_limestone_alder_hollow_4k.webp",
+      "fog": "dawn/105-weather_dawn_fog_rowan_fog_embankment_4k.webp",
+      "freezing_fog": "dawn/106-weather_dawn_freezing_fog_frosted_heath_field_store_4k.webp",
+      "light_drizzle": "dawn/107-weather_dawn_light_drizzle_apricot_earthen_terrace_4k.webp",
+      "moderate_drizzle": "dawn/108-weather_dawn_moderate_drizzle_sandy_river_ford_4k.webp",
+      "heavy_drizzle": "dawn/109-weather_dawn_heavy_drizzle_bamboo_ravine_footpath_4k.webp",
+      "light_rain": "dawn/110-weather_dawn_light_rain_mossy_birch_track_4k.webp",
+      "moderate_rain": "dawn/111-weather_dawn_moderate_rain_stone_barn_grass_shelf_4k.webp",
+      "heavy_rain": "dawn/112-weather_dawn_heavy_rain_spring_marsh_shallows_4k.webp",
+      "light_snow": "dawn/113-weather_dawn_light_snow_hazel_snow_copse_4k.webp",
+      "moderate_snow": "dawn/114-weather_dawn_moderate_snow_frozen_willow_fen_4k.webp",
+      "heavy_snow": "dawn/115-weather_dawn_heavy_snow_snowy_thatch_roof_corner_4k.webp",
+      "light_rain_showers": "dawn/116-weather_dawn_light_rain_showers_warm_grove_shower_4k.webp",
+      "heavy_rain_showers": "dawn/117-weather_dawn_heavy_rain_showers_clay_riverbank_shower_4k.webp",
+      "light_snow_showers": "dawn/118-weather_dawn_light_snow_showers_partly_frozen_tarn_4k.webp",
+      "heavy_snow_showers": "dawn/119-weather_dawn_heavy_snow_showers_snowy_stone_wall_fragment_4k.webp",
+      "thunderstorm": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp"
+    },
+    "day": {
+      "clear_sky": "day/001-weather_day_clear_sky_aerial_lake_basin_4k.webp",
+      "mostly_clear": "day/002-weather_day_mostly_clear_aerial_sky_third_4k.webp",
+      "partly_cloudy": "day/003-weather_day_partly_cloudy_dry_uplands_4k.webp",
+      "overcast": "day/004-weather_day_overcast_close_mountain_terrace_4k.webp",
+      "fog": "day/005-weather_day_fog_rural_track_4k.webp",
+      "freezing_fog": "day/006-weather_day_freezing_fog_frosted_pasture_4k.webp",
+      "light_drizzle": "day/007-weather_day_light_drizzle_bamboo_hamlet_lens_drops_4k.webp",
+      "moderate_drizzle": "day/008-weather_day_moderate_drizzle_coastal_fields_single_rock_group_4k.webp",
+      "heavy_drizzle": "day/009-weather_day_heavy_drizzle_volcanic_foothill_4k.webp",
+      "light_rain": "day/010-weather_day_light_rain_stone_footbridge_4k.webp",
+      "moderate_rain": "day/011-weather_day_moderate_rain_rural_garden_4k.webp",
+      "heavy_rain": "day/012-weather_day_heavy_rain_cedar_gorge_4k.webp",
+      "light_snow": "day/013-weather_day_light_snow_highland_meadow_4k.webp",
+      "moderate_snow": "day/014-weather_day_moderate_snow_rural_crossroads_4k.webp",
+      "heavy_snow": "day/015-weather_day_heavy_snow_sheltered_pass_4k.webp",
+      "light_rain_showers": "day/016-weather_day_light_rain_showers_palm_cove_4k.webp",
+      "heavy_rain_showers": "day/017-weather_day_heavy_rain_showers_autumn_hollow_4k.webp",
+      "light_snow_showers": "day/018-weather_day_light_snow_showers_birch_clearing_4k.webp",
+      "heavy_snow_showers": "day/019-weather_day_heavy_snow_showers_winter_headland_4k.webp",
+      "thunderstorm": "day/020-weather_day_thunderstorm_open_moor_4k.webp"
+    },
+    "afternoon": {
+      "clear_sky": "afternoon/021-weather_afternoon_clear_sky_sandstone_grassland_scarp_4k.webp",
+      "mostly_clear": "afternoon/022-weather_afternoon_mostly_clear_hillside_cottage_plum_trees_4k.webp",
+      "partly_cloudy": "afternoon/023-weather_afternoon_partly_cloudy_windy_coastal_grass_shelf_4k.webp",
+      "overcast": "afternoon/024-weather_afternoon_overcast_fern_hollow_fallen_trunk_4k.webp",
+      "fog": "afternoon/025-weather_afternoon_fog_reed_marsh_causeway_4k.webp",
+      "freezing_fog": "afternoon/026-weather_afternoon_freezing_fog_frosted_larch_ledge_4k.webp",
+      "light_drizzle": "afternoon/027-weather_afternoon_light_drizzle_chestnut_pasture_4k.webp",
+      "moderate_drizzle": "afternoon/028-weather_afternoon_moderate_drizzle_reed_estuary_bank_4k.webp",
+      "heavy_drizzle": "afternoon/029-weather_afternoon_heavy_drizzle_beech_saddle_trail_4k.webp",
+      "light_rain": "afternoon/030-weather_afternoon_light_rain_willow_meadow_pond_4k.webp",
+      "moderate_rain": "afternoon/031-weather_afternoon_moderate_rain_rural_slope_thatched_huts_4k.webp",
+      "heavy_rain": "afternoon/032-weather_afternoon_heavy_rain_rocky_alpine_tarn_4k.webp",
+      "light_snow": "afternoon/033-weather_afternoon_light_snow_persimmon_foothill_4k.webp",
+      "moderate_snow": "afternoon/034-weather_afternoon_moderate_snow_larch_frozen_stream_bend_4k.webp",
+      "heavy_snow": "afternoon/035-weather_afternoon_heavy_snow_snowbound_mountain_hamlet_4k.webp",
+      "light_rain_showers": "afternoon/036-weather_afternoon_light_rain_showers_olive_terrace_shower_4k.webp",
+      "heavy_rain_showers": "afternoon/037-weather_afternoon_heavy_rain_showers_red_soil_fern_hollow_4k.webp",
+      "light_snow_showers": "afternoon/038-weather_afternoon_light_snow_showers_alpine_lake_shore_4k.webp",
+      "heavy_snow_showers": "afternoon/039-weather_afternoon_heavy_snow_showers_wind_sculpted_rock_saddle_4k.webp",
+      "thunderstorm": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp"
+    },
+    "sunset": {
+      "clear_sky": "sunset/041-weather_sunset_clear_sky_terracotta_dune_ridge_4k.webp",
+      "mostly_clear": "sunset/042-weather_sunset_mostly_clear_meadow_river_ford_4k.webp",
+      "partly_cloudy": "sunset/043-weather_sunset_partly_cloudy_pine_ridge_clearing_4k.webp",
+      "overcast": "sunset/044-weather_sunset_overcast_rural_field_shed_4k.webp",
+      "fog": "sunset/045-weather_sunset_fog_alder_backwater_4k.webp",
+      "freezing_fog": "sunset/046-weather_sunset_freezing_fog_rime_heather_hollow_4k.webp",
+      "light_drizzle": "sunset/047-weather_sunset_light_drizzle_cypress_red_earth_trail_4k.webp",
+      "moderate_drizzle": "sunset/048-weather_sunset_moderate_drizzle_stone_spring_hollow_4k.webp",
+      "heavy_drizzle": "sunset/049-weather_sunset_heavy_drizzle_mossy_hillside_steps_4k.webp",
+      "light_rain": "sunset/050-weather_sunset_light_rain_rush_lake_inlet_4k.webp",
+      "moderate_rain": "sunset/051-weather_sunset_moderate_rain_shingled_grain_store_4k.webp",
+      "heavy_rain": "sunset/052-weather_sunset_heavy_rain_ochre_cliff_pool_4k.webp",
+      "light_snow": "sunset/053-weather_sunset_light_snow_copper_beech_meadow_4k.webp",
+      "moderate_snow": "sunset/054-weather_sunset_moderate_snow_timber_bridge_hollow_4k.webp",
+      "heavy_snow": "sunset/055-weather_sunset_heavy_snow_frozen_lake_stone_shore_4k.webp",
+      "light_rain_showers": "sunset/056-weather_sunset_light_rain_showers_coastal_palm_track_4k.webp",
+      "heavy_rain_showers": "sunset/057-weather_sunset_heavy_rain_showers_ginkgo_shower_hollow_4k.webp",
+      "light_snow_showers": "sunset/058-weather_sunset_light_snow_showers_juniper_snow_shelf_4k.webp",
+      "heavy_snow_showers": "sunset/059-weather_sunset_heavy_snow_showers_snowy_upper_basin_4k.webp",
+      "thunderstorm": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp"
+    },
+    "evening": {
+      "clear_sky": "evening/061-weather_evening_clear_sky_juniper_coastal_knoll_4k.webp",
+      "mostly_clear": "evening/062-weather_evening_mostly_clear_orchard_roof_edge_4k.webp",
+      "partly_cloudy": "evening/063-weather_evening_partly_cloudy_pine_plateau_puddle_4k.webp",
+      "overcast": "evening/064-weather_evening_overcast_quiet_fen_causeway_4k.webp",
+      "fog": "evening/065-weather_evening_fog_alder_lane_fog_4k.webp",
+      "freezing_fog": "evening/066-weather_evening_freezing_fog_rime_stone_gate_4k.webp",
+      "light_drizzle": "evening/067-weather_evening_light_drizzle_oak_stump_track_4k.webp",
+      "moderate_drizzle": "evening/068-weather_evening_moderate_drizzle_basalt_brook_ledge_4k.webp",
+      "heavy_drizzle": "evening/069-weather_evening_heavy_drizzle_cedar_edge_hollow_4k.webp",
+      "light_rain": "evening/070-weather_evening_light_rain_timber_barn_meadow_4k.webp",
+      "moderate_rain": "evening/071-weather_evening_moderate_rain_mulberry_hillside_4k.webp",
+      "heavy_rain": "evening/072-weather_evening_heavy_rain_granite_marsh_islet_4k.webp",
+      "light_snow": "evening/073-weather_evening_light_snow_rosehip_snow_path_4k.webp",
+      "moderate_snow": "evening/074-weather_evening_moderate_snow_spruce_log_clearing_4k.webp",
+      "heavy_snow": "evening/075-weather_evening_heavy_snow_snowbound_well_cottage_4k.webp",
+      "light_rain_showers": "evening/076-weather_evening_light_rain_showers_paddy_edge_shower_4k.webp",
+      "heavy_rain_showers": "evening/077-weather_evening_heavy_rain_showers_willow_raincut_bank_4k.webp",
+      "light_snow_showers": "evening/078-weather_evening_light_snow_showers_snowy_alpine_creek_bank_4k.webp",
+      "heavy_snow_showers": "evening/079-weather_evening_heavy_snow_showers_snowy_ridge_footway_4k.webp",
+      "thunderstorm": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp"
+    },
+    "night": {
+      "clear_sky": "night/081-weather_night_clear_sky_moonlit_birch_lake_4k.webp",
+      "mostly_clear": "night/082-weather_night_mostly_clear_silvergrass_hut_knoll_4k.webp",
+      "partly_cloudy": "night/083-weather_night_partly_cloudy_palm_plain_clouds_4k.webp",
+      "overcast": "night/084-weather_night_overcast_cypress_farm_lane_4k.webp",
+      "fog": "night/085-weather_night_fog_stone_footbridge_mist_4k.webp",
+      "freezing_fog": "night/086-weather_night_freezing_fog_larch_rime_bank_4k.webp",
+      "light_drizzle": "night/087-weather_night_light_drizzle_chestnut_drizzle_slope_4k.webp",
+      "moderate_drizzle": "night/088-weather_night_moderate_drizzle_fern_pond_bank_4k.webp",
+      "heavy_drizzle": "night/089-weather_night_heavy_drizzle_rainy_slate_shelter_edge_4k.webp",
+      "light_rain": "night/090-weather_night_light_rain_maple_meadow_knoll_4k.webp",
+      "moderate_rain": "night/091-weather_night_moderate_rain_meadow_stone_sluice_4k.webp",
+      "heavy_rain": "night/092-weather_night_heavy_rain_alpine_gully_pool_4k.webp",
+      "light_snow": "night/093-weather_night_light_snow_birch_first_snow_pasture_4k.webp",
+      "moderate_snow": "night/094-weather_night_moderate_snow_snowy_single_gatehouse_4k.webp",
+      "heavy_snow": "night/095-weather_night_heavy_snow_spruce_snow_hollow_4k.webp",
+      "light_rain_showers": "night/096-weather_night_light_rain_showers_coastal_palm_shower_bank_4k.webp",
+      "heavy_rain_showers": "night/097-weather_night_heavy_rain_showers_orchard_granary_shower_4k.webp",
+      "light_snow_showers": "night/098-weather_night_light_snow_showers_larch_ridge_snow_flurry_4k.webp",
+      "heavy_snow_showers": "night/099-weather_night_heavy_snow_showers_snowy_lake_peninsula_4k.webp",
+      "thunderstorm": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp"
+    }
+  },
+  "lookupByPhaseAndWmo": {
+    "dawn": {
+      "0": "dawn/101-weather_dawn_clear_sky_reed_creek_bend_4k.webp",
+      "1": "dawn/102-weather_dawn_mostly_clear_palm_dune_meadow_4k.webp",
+      "2": "dawn/103-weather_dawn_partly_cloudy_walnut_cottage_hill_4k.webp",
+      "3": "dawn/104-weather_dawn_overcast_limestone_alder_hollow_4k.webp",
+      "45": "dawn/105-weather_dawn_fog_rowan_fog_embankment_4k.webp",
+      "48": "dawn/106-weather_dawn_freezing_fog_frosted_heath_field_store_4k.webp",
+      "51": "dawn/107-weather_dawn_light_drizzle_apricot_earthen_terrace_4k.webp",
+      "53": "dawn/108-weather_dawn_moderate_drizzle_sandy_river_ford_4k.webp",
+      "55": "dawn/109-weather_dawn_heavy_drizzle_bamboo_ravine_footpath_4k.webp",
+      "56": "dawn/107-weather_dawn_light_drizzle_apricot_earthen_terrace_4k.webp",
+      "57": "dawn/108-weather_dawn_moderate_drizzle_sandy_river_ford_4k.webp",
+      "61": "dawn/110-weather_dawn_light_rain_mossy_birch_track_4k.webp",
+      "63": "dawn/111-weather_dawn_moderate_rain_stone_barn_grass_shelf_4k.webp",
+      "65": "dawn/112-weather_dawn_heavy_rain_spring_marsh_shallows_4k.webp",
+      "66": "dawn/110-weather_dawn_light_rain_mossy_birch_track_4k.webp",
+      "67": "dawn/112-weather_dawn_heavy_rain_spring_marsh_shallows_4k.webp",
+      "71": "dawn/113-weather_dawn_light_snow_hazel_snow_copse_4k.webp",
+      "73": "dawn/114-weather_dawn_moderate_snow_frozen_willow_fen_4k.webp",
+      "75": "dawn/115-weather_dawn_heavy_snow_snowy_thatch_roof_corner_4k.webp",
+      "77": "dawn/113-weather_dawn_light_snow_hazel_snow_copse_4k.webp",
+      "80": "dawn/116-weather_dawn_light_rain_showers_warm_grove_shower_4k.webp",
+      "81": "dawn/117-weather_dawn_heavy_rain_showers_clay_riverbank_shower_4k.webp",
+      "82": "dawn/117-weather_dawn_heavy_rain_showers_clay_riverbank_shower_4k.webp",
+      "85": "dawn/118-weather_dawn_light_snow_showers_partly_frozen_tarn_4k.webp",
+      "86": "dawn/119-weather_dawn_heavy_snow_showers_snowy_stone_wall_fragment_4k.webp",
+      "95": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp",
+      "96": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp",
+      "97": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp",
+      "99": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp"
+    },
+    "day": {
+      "0": "day/001-weather_day_clear_sky_aerial_lake_basin_4k.webp",
+      "1": "day/002-weather_day_mostly_clear_aerial_sky_third_4k.webp",
+      "2": "day/003-weather_day_partly_cloudy_dry_uplands_4k.webp",
+      "3": "day/004-weather_day_overcast_close_mountain_terrace_4k.webp",
+      "45": "day/005-weather_day_fog_rural_track_4k.webp",
+      "48": "day/006-weather_day_freezing_fog_frosted_pasture_4k.webp",
+      "51": "day/007-weather_day_light_drizzle_bamboo_hamlet_lens_drops_4k.webp",
+      "53": "day/008-weather_day_moderate_drizzle_coastal_fields_single_rock_group_4k.webp",
+      "55": "day/009-weather_day_heavy_drizzle_volcanic_foothill_4k.webp",
+      "56": "day/007-weather_day_light_drizzle_bamboo_hamlet_lens_drops_4k.webp",
+      "57": "day/008-weather_day_moderate_drizzle_coastal_fields_single_rock_group_4k.webp",
+      "61": "day/010-weather_day_light_rain_stone_footbridge_4k.webp",
+      "63": "day/011-weather_day_moderate_rain_rural_garden_4k.webp",
+      "65": "day/012-weather_day_heavy_rain_cedar_gorge_4k.webp",
+      "66": "day/010-weather_day_light_rain_stone_footbridge_4k.webp",
+      "67": "day/012-weather_day_heavy_rain_cedar_gorge_4k.webp",
+      "71": "day/013-weather_day_light_snow_highland_meadow_4k.webp",
+      "73": "day/014-weather_day_moderate_snow_rural_crossroads_4k.webp",
+      "75": "day/015-weather_day_heavy_snow_sheltered_pass_4k.webp",
+      "77": "day/013-weather_day_light_snow_highland_meadow_4k.webp",
+      "80": "day/016-weather_day_light_rain_showers_palm_cove_4k.webp",
+      "81": "day/017-weather_day_heavy_rain_showers_autumn_hollow_4k.webp",
+      "82": "day/017-weather_day_heavy_rain_showers_autumn_hollow_4k.webp",
+      "85": "day/018-weather_day_light_snow_showers_birch_clearing_4k.webp",
+      "86": "day/019-weather_day_heavy_snow_showers_winter_headland_4k.webp",
+      "95": "day/020-weather_day_thunderstorm_open_moor_4k.webp",
+      "96": "day/020-weather_day_thunderstorm_open_moor_4k.webp",
+      "97": "day/020-weather_day_thunderstorm_open_moor_4k.webp",
+      "99": "day/020-weather_day_thunderstorm_open_moor_4k.webp"
+    },
+    "afternoon": {
+      "0": "afternoon/021-weather_afternoon_clear_sky_sandstone_grassland_scarp_4k.webp",
+      "1": "afternoon/022-weather_afternoon_mostly_clear_hillside_cottage_plum_trees_4k.webp",
+      "2": "afternoon/023-weather_afternoon_partly_cloudy_windy_coastal_grass_shelf_4k.webp",
+      "3": "afternoon/024-weather_afternoon_overcast_fern_hollow_fallen_trunk_4k.webp",
+      "45": "afternoon/025-weather_afternoon_fog_reed_marsh_causeway_4k.webp",
+      "48": "afternoon/026-weather_afternoon_freezing_fog_frosted_larch_ledge_4k.webp",
+      "51": "afternoon/027-weather_afternoon_light_drizzle_chestnut_pasture_4k.webp",
+      "53": "afternoon/028-weather_afternoon_moderate_drizzle_reed_estuary_bank_4k.webp",
+      "55": "afternoon/029-weather_afternoon_heavy_drizzle_beech_saddle_trail_4k.webp",
+      "56": "afternoon/027-weather_afternoon_light_drizzle_chestnut_pasture_4k.webp",
+      "57": "afternoon/028-weather_afternoon_moderate_drizzle_reed_estuary_bank_4k.webp",
+      "61": "afternoon/030-weather_afternoon_light_rain_willow_meadow_pond_4k.webp",
+      "63": "afternoon/031-weather_afternoon_moderate_rain_rural_slope_thatched_huts_4k.webp",
+      "65": "afternoon/032-weather_afternoon_heavy_rain_rocky_alpine_tarn_4k.webp",
+      "66": "afternoon/030-weather_afternoon_light_rain_willow_meadow_pond_4k.webp",
+      "67": "afternoon/032-weather_afternoon_heavy_rain_rocky_alpine_tarn_4k.webp",
+      "71": "afternoon/033-weather_afternoon_light_snow_persimmon_foothill_4k.webp",
+      "73": "afternoon/034-weather_afternoon_moderate_snow_larch_frozen_stream_bend_4k.webp",
+      "75": "afternoon/035-weather_afternoon_heavy_snow_snowbound_mountain_hamlet_4k.webp",
+      "77": "afternoon/033-weather_afternoon_light_snow_persimmon_foothill_4k.webp",
+      "80": "afternoon/036-weather_afternoon_light_rain_showers_olive_terrace_shower_4k.webp",
+      "81": "afternoon/037-weather_afternoon_heavy_rain_showers_red_soil_fern_hollow_4k.webp",
+      "82": "afternoon/037-weather_afternoon_heavy_rain_showers_red_soil_fern_hollow_4k.webp",
+      "85": "afternoon/038-weather_afternoon_light_snow_showers_alpine_lake_shore_4k.webp",
+      "86": "afternoon/039-weather_afternoon_heavy_snow_showers_wind_sculpted_rock_saddle_4k.webp",
+      "95": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp",
+      "96": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp",
+      "97": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp",
+      "99": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp"
+    },
+    "sunset": {
+      "0": "sunset/041-weather_sunset_clear_sky_terracotta_dune_ridge_4k.webp",
+      "1": "sunset/042-weather_sunset_mostly_clear_meadow_river_ford_4k.webp",
+      "2": "sunset/043-weather_sunset_partly_cloudy_pine_ridge_clearing_4k.webp",
+      "3": "sunset/044-weather_sunset_overcast_rural_field_shed_4k.webp",
+      "45": "sunset/045-weather_sunset_fog_alder_backwater_4k.webp",
+      "48": "sunset/046-weather_sunset_freezing_fog_rime_heather_hollow_4k.webp",
+      "51": "sunset/047-weather_sunset_light_drizzle_cypress_red_earth_trail_4k.webp",
+      "53": "sunset/048-weather_sunset_moderate_drizzle_stone_spring_hollow_4k.webp",
+      "55": "sunset/049-weather_sunset_heavy_drizzle_mossy_hillside_steps_4k.webp",
+      "56": "sunset/047-weather_sunset_light_drizzle_cypress_red_earth_trail_4k.webp",
+      "57": "sunset/048-weather_sunset_moderate_drizzle_stone_spring_hollow_4k.webp",
+      "61": "sunset/050-weather_sunset_light_rain_rush_lake_inlet_4k.webp",
+      "63": "sunset/051-weather_sunset_moderate_rain_shingled_grain_store_4k.webp",
+      "65": "sunset/052-weather_sunset_heavy_rain_ochre_cliff_pool_4k.webp",
+      "66": "sunset/050-weather_sunset_light_rain_rush_lake_inlet_4k.webp",
+      "67": "sunset/052-weather_sunset_heavy_rain_ochre_cliff_pool_4k.webp",
+      "71": "sunset/053-weather_sunset_light_snow_copper_beech_meadow_4k.webp",
+      "73": "sunset/054-weather_sunset_moderate_snow_timber_bridge_hollow_4k.webp",
+      "75": "sunset/055-weather_sunset_heavy_snow_frozen_lake_stone_shore_4k.webp",
+      "77": "sunset/053-weather_sunset_light_snow_copper_beech_meadow_4k.webp",
+      "80": "sunset/056-weather_sunset_light_rain_showers_coastal_palm_track_4k.webp",
+      "81": "sunset/057-weather_sunset_heavy_rain_showers_ginkgo_shower_hollow_4k.webp",
+      "82": "sunset/057-weather_sunset_heavy_rain_showers_ginkgo_shower_hollow_4k.webp",
+      "85": "sunset/058-weather_sunset_light_snow_showers_juniper_snow_shelf_4k.webp",
+      "86": "sunset/059-weather_sunset_heavy_snow_showers_snowy_upper_basin_4k.webp",
+      "95": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp",
+      "96": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp",
+      "97": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp",
+      "99": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp"
+    },
+    "evening": {
+      "0": "evening/061-weather_evening_clear_sky_juniper_coastal_knoll_4k.webp",
+      "1": "evening/062-weather_evening_mostly_clear_orchard_roof_edge_4k.webp",
+      "2": "evening/063-weather_evening_partly_cloudy_pine_plateau_puddle_4k.webp",
+      "3": "evening/064-weather_evening_overcast_quiet_fen_causeway_4k.webp",
+      "45": "evening/065-weather_evening_fog_alder_lane_fog_4k.webp",
+      "48": "evening/066-weather_evening_freezing_fog_rime_stone_gate_4k.webp",
+      "51": "evening/067-weather_evening_light_drizzle_oak_stump_track_4k.webp",
+      "53": "evening/068-weather_evening_moderate_drizzle_basalt_brook_ledge_4k.webp",
+      "55": "evening/069-weather_evening_heavy_drizzle_cedar_edge_hollow_4k.webp",
+      "56": "evening/067-weather_evening_light_drizzle_oak_stump_track_4k.webp",
+      "57": "evening/068-weather_evening_moderate_drizzle_basalt_brook_ledge_4k.webp",
+      "61": "evening/070-weather_evening_light_rain_timber_barn_meadow_4k.webp",
+      "63": "evening/071-weather_evening_moderate_rain_mulberry_hillside_4k.webp",
+      "65": "evening/072-weather_evening_heavy_rain_granite_marsh_islet_4k.webp",
+      "66": "evening/070-weather_evening_light_rain_timber_barn_meadow_4k.webp",
+      "67": "evening/072-weather_evening_heavy_rain_granite_marsh_islet_4k.webp",
+      "71": "evening/073-weather_evening_light_snow_rosehip_snow_path_4k.webp",
+      "73": "evening/074-weather_evening_moderate_snow_spruce_log_clearing_4k.webp",
+      "75": "evening/075-weather_evening_heavy_snow_snowbound_well_cottage_4k.webp",
+      "77": "evening/073-weather_evening_light_snow_rosehip_snow_path_4k.webp",
+      "80": "evening/076-weather_evening_light_rain_showers_paddy_edge_shower_4k.webp",
+      "81": "evening/077-weather_evening_heavy_rain_showers_willow_raincut_bank_4k.webp",
+      "82": "evening/077-weather_evening_heavy_rain_showers_willow_raincut_bank_4k.webp",
+      "85": "evening/078-weather_evening_light_snow_showers_snowy_alpine_creek_bank_4k.webp",
+      "86": "evening/079-weather_evening_heavy_snow_showers_snowy_ridge_footway_4k.webp",
+      "95": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp",
+      "96": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp",
+      "97": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp",
+      "99": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp"
+    },
+    "night": {
+      "0": "night/081-weather_night_clear_sky_moonlit_birch_lake_4k.webp",
+      "1": "night/082-weather_night_mostly_clear_silvergrass_hut_knoll_4k.webp",
+      "2": "night/083-weather_night_partly_cloudy_palm_plain_clouds_4k.webp",
+      "3": "night/084-weather_night_overcast_cypress_farm_lane_4k.webp",
+      "45": "night/085-weather_night_fog_stone_footbridge_mist_4k.webp",
+      "48": "night/086-weather_night_freezing_fog_larch_rime_bank_4k.webp",
+      "51": "night/087-weather_night_light_drizzle_chestnut_drizzle_slope_4k.webp",
+      "53": "night/088-weather_night_moderate_drizzle_fern_pond_bank_4k.webp",
+      "55": "night/089-weather_night_heavy_drizzle_rainy_slate_shelter_edge_4k.webp",
+      "56": "night/087-weather_night_light_drizzle_chestnut_drizzle_slope_4k.webp",
+      "57": "night/088-weather_night_moderate_drizzle_fern_pond_bank_4k.webp",
+      "61": "night/090-weather_night_light_rain_maple_meadow_knoll_4k.webp",
+      "63": "night/091-weather_night_moderate_rain_meadow_stone_sluice_4k.webp",
+      "65": "night/092-weather_night_heavy_rain_alpine_gully_pool_4k.webp",
+      "66": "night/090-weather_night_light_rain_maple_meadow_knoll_4k.webp",
+      "67": "night/092-weather_night_heavy_rain_alpine_gully_pool_4k.webp",
+      "71": "night/093-weather_night_light_snow_birch_first_snow_pasture_4k.webp",
+      "73": "night/094-weather_night_moderate_snow_snowy_single_gatehouse_4k.webp",
+      "75": "night/095-weather_night_heavy_snow_spruce_snow_hollow_4k.webp",
+      "77": "night/093-weather_night_light_snow_birch_first_snow_pasture_4k.webp",
+      "80": "night/096-weather_night_light_rain_showers_coastal_palm_shower_bank_4k.webp",
+      "81": "night/097-weather_night_heavy_rain_showers_orchard_granary_shower_4k.webp",
+      "82": "night/097-weather_night_heavy_rain_showers_orchard_granary_shower_4k.webp",
+      "85": "night/098-weather_night_light_snow_showers_larch_ridge_snow_flurry_4k.webp",
+      "86": "night/099-weather_night_heavy_snow_showers_snowy_lake_peninsula_4k.webp",
+      "95": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp",
+      "96": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp",
+      "97": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp",
+      "99": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp"
+    }
+  },
+  "images": [
+    {
+      "number": 1,
+      "phase": "day",
+      "weather": "clear_sky",
+      "file": "day/001-weather_day_clear_sky_aerial_lake_basin_4k.webp",
+      "sha256": "b9a444f7578793ec91428030532fec8126ad3465e2905e54154d0405625cb4c0",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 2,
+      "phase": "day",
+      "weather": "mostly_clear",
+      "file": "day/002-weather_day_mostly_clear_aerial_sky_third_4k.webp",
+      "sha256": "e8c9cb802bdabfbc01925ebf500db2841ca179ef72aed147eeca93dd4a5c749a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 3,
+      "phase": "day",
+      "weather": "partly_cloudy",
+      "file": "day/003-weather_day_partly_cloudy_dry_uplands_4k.webp",
+      "sha256": "28f89e10d72d568d7dcc89074663c1fbbd519561dc0c95475cbc168ccb351b5d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 4,
+      "phase": "day",
+      "weather": "overcast",
+      "file": "day/004-weather_day_overcast_close_mountain_terrace_4k.webp",
+      "sha256": "3b22a9452e0ce78e8f666f029865aa61fa20d28fb151ebcafbf8099673c0da78",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 5,
+      "phase": "day",
+      "weather": "fog",
+      "file": "day/005-weather_day_fog_rural_track_4k.webp",
+      "sha256": "ac0d8117bfad8aaa053571e2fd2fb8ebeee13415bc0855462b363fe833c0e4d1",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 6,
+      "phase": "day",
+      "weather": "freezing_fog",
+      "file": "day/006-weather_day_freezing_fog_frosted_pasture_4k.webp",
+      "sha256": "d3fce532a31e5d58c27d67184bdcc22b38a64c43c75c7b09f954e646edd19059",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 7,
+      "phase": "day",
+      "weather": "light_drizzle",
+      "file": "day/007-weather_day_light_drizzle_bamboo_hamlet_lens_drops_4k.webp",
+      "sha256": "d1b0dfa5033950ea6db47b5370cccad26586a4d0f554b12998a66744a8ef8978",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 8,
+      "phase": "day",
+      "weather": "moderate_drizzle",
+      "file": "day/008-weather_day_moderate_drizzle_coastal_fields_single_rock_group_4k.webp",
+      "sha256": "3bb388677404058929675587a06f54fde4ac32ac5f9ac4d1ae4c395753f176d9",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 9,
+      "phase": "day",
+      "weather": "heavy_drizzle",
+      "file": "day/009-weather_day_heavy_drizzle_volcanic_foothill_4k.webp",
+      "sha256": "ca103afc1b412bb31a006b5eea228d901a4a2de22e329a070ff45b73d67127b7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 10,
+      "phase": "day",
+      "weather": "light_rain",
+      "file": "day/010-weather_day_light_rain_stone_footbridge_4k.webp",
+      "sha256": "8871738c15279879b03592ea4bfca014d67768be7680b1f5cb78193d26f9c623",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 11,
+      "phase": "day",
+      "weather": "moderate_rain",
+      "file": "day/011-weather_day_moderate_rain_rural_garden_4k.webp",
+      "sha256": "7e72ef61edbacc45e4b98a00a0f4220f17fa616cdf259acdaeac1e63ca3adba6",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 12,
+      "phase": "day",
+      "weather": "heavy_rain",
+      "file": "day/012-weather_day_heavy_rain_cedar_gorge_4k.webp",
+      "sha256": "c0deefce50f8ca58db6c0dae868b8d002557a1f1b0869c1dc03cfa79eb136bb6",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 13,
+      "phase": "day",
+      "weather": "light_snow",
+      "file": "day/013-weather_day_light_snow_highland_meadow_4k.webp",
+      "sha256": "f2d5e0ee32324520da0c7575841164db641d38dff8f554b3100f1810612bc136",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 14,
+      "phase": "day",
+      "weather": "moderate_snow",
+      "file": "day/014-weather_day_moderate_snow_rural_crossroads_4k.webp",
+      "sha256": "32742a811c1e619fa7732a97bb21b03d8ba1b1eae3a559a145ce18f07b6e12e3",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 15,
+      "phase": "day",
+      "weather": "heavy_snow",
+      "file": "day/015-weather_day_heavy_snow_sheltered_pass_4k.webp",
+      "sha256": "65d4dff8db511421204cc36bc800f3a8e958f9d564a9bca8f9c8177f36f9ea39",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 16,
+      "phase": "day",
+      "weather": "light_rain_showers",
+      "file": "day/016-weather_day_light_rain_showers_palm_cove_4k.webp",
+      "sha256": "6ca43e02a2cd526d5a5afd37489be25c9ef3984e578896c36ffdabb8115b60ef",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 17,
+      "phase": "day",
+      "weather": "heavy_rain_showers",
+      "file": "day/017-weather_day_heavy_rain_showers_autumn_hollow_4k.webp",
+      "sha256": "88854310b2903d15388ae146d1bb7c65ef938559c281ce213f731fc8cf684077",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 18,
+      "phase": "day",
+      "weather": "light_snow_showers",
+      "file": "day/018-weather_day_light_snow_showers_birch_clearing_4k.webp",
+      "sha256": "0ae0ea526d8a33d86742fe5b668ba7358829d72d005a0e54b11dcf56b69a3cb1",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 19,
+      "phase": "day",
+      "weather": "heavy_snow_showers",
+      "file": "day/019-weather_day_heavy_snow_showers_winter_headland_4k.webp",
+      "sha256": "6860ec18d78edc9c5780365b24715b77a57098a63eec44fd1c93ae26483624e8",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 20,
+      "phase": "day",
+      "weather": "thunderstorm",
+      "file": "day/020-weather_day_thunderstorm_open_moor_4k.webp",
+      "sha256": "9e6fad25870f2a36df1eecb87e846f144934b47a95bc0be7666a902602474447",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 21,
+      "phase": "afternoon",
+      "weather": "clear_sky",
+      "file": "afternoon/021-weather_afternoon_clear_sky_sandstone_grassland_scarp_4k.webp",
+      "sha256": "a844e5471a079c9d4214bb48794ae1a01a2b878402ecccefdf0e95f57af38b7d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 22,
+      "phase": "afternoon",
+      "weather": "mostly_clear",
+      "file": "afternoon/022-weather_afternoon_mostly_clear_hillside_cottage_plum_trees_4k.webp",
+      "sha256": "243194083d0a506057fb12c09e75b7b632d278bb5d5142a374d2cbf415a6fd94",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 23,
+      "phase": "afternoon",
+      "weather": "partly_cloudy",
+      "file": "afternoon/023-weather_afternoon_partly_cloudy_windy_coastal_grass_shelf_4k.webp",
+      "sha256": "76b9e2a9d3f10f3f75f212f16037f4203adbec490fae122f0b2f8c8613c59383",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 24,
+      "phase": "afternoon",
+      "weather": "overcast",
+      "file": "afternoon/024-weather_afternoon_overcast_fern_hollow_fallen_trunk_4k.webp",
+      "sha256": "07be72eb11d3b4131142863438f443264ed37cde29b38acf02a139be80d2427a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 25,
+      "phase": "afternoon",
+      "weather": "fog",
+      "file": "afternoon/025-weather_afternoon_fog_reed_marsh_causeway_4k.webp",
+      "sha256": "220f49b50a123d39fb84709d95d219fb1bdc7ea76c1e0f8d7ac22c609cf4792a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 26,
+      "phase": "afternoon",
+      "weather": "freezing_fog",
+      "file": "afternoon/026-weather_afternoon_freezing_fog_frosted_larch_ledge_4k.webp",
+      "sha256": "36da0bf09768721c77b49cef15fd4d9c9ffa5fbe36f109408833ebe15bf0662f",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 27,
+      "phase": "afternoon",
+      "weather": "light_drizzle",
+      "file": "afternoon/027-weather_afternoon_light_drizzle_chestnut_pasture_4k.webp",
+      "sha256": "08c465879a62d69a37d5e514a5a1c4eb47e40c0103261de3c068d10d905136c9",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 28,
+      "phase": "afternoon",
+      "weather": "moderate_drizzle",
+      "file": "afternoon/028-weather_afternoon_moderate_drizzle_reed_estuary_bank_4k.webp",
+      "sha256": "ab1f50ed8d627b51030d07d8828e207edd7a6b2df72c66cc651393baafce3c5a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 29,
+      "phase": "afternoon",
+      "weather": "heavy_drizzle",
+      "file": "afternoon/029-weather_afternoon_heavy_drizzle_beech_saddle_trail_4k.webp",
+      "sha256": "01b29822c23d469f76ce787626bade829f20c5246a18c0c4e31fc9857a99aa9d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 30,
+      "phase": "afternoon",
+      "weather": "light_rain",
+      "file": "afternoon/030-weather_afternoon_light_rain_willow_meadow_pond_4k.webp",
+      "sha256": "6ea48904ef4bfb8cbc1231ee9df338fe143de490f37ba72bd793e47c753a6438",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 31,
+      "phase": "afternoon",
+      "weather": "moderate_rain",
+      "file": "afternoon/031-weather_afternoon_moderate_rain_rural_slope_thatched_huts_4k.webp",
+      "sha256": "493d373063433b14fdb8720f1cee918804ff7f0e0f212e93f9da9b59e70ef102",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 32,
+      "phase": "afternoon",
+      "weather": "heavy_rain",
+      "file": "afternoon/032-weather_afternoon_heavy_rain_rocky_alpine_tarn_4k.webp",
+      "sha256": "77b7e6e5a02e343d80bf6ed512d7a6950fada633eba17e61be2bd2d384dd264a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 33,
+      "phase": "afternoon",
+      "weather": "light_snow",
+      "file": "afternoon/033-weather_afternoon_light_snow_persimmon_foothill_4k.webp",
+      "sha256": "0a1f5cd0098d65d0553593ddc1e0429b3c8d4b61f49cfb7a66b4528f831ca689",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 34,
+      "phase": "afternoon",
+      "weather": "moderate_snow",
+      "file": "afternoon/034-weather_afternoon_moderate_snow_larch_frozen_stream_bend_4k.webp",
+      "sha256": "1644272249a6b0b858fd0583014eaf943114f63ed64e0414a91b28832e365ccc",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 35,
+      "phase": "afternoon",
+      "weather": "heavy_snow",
+      "file": "afternoon/035-weather_afternoon_heavy_snow_snowbound_mountain_hamlet_4k.webp",
+      "sha256": "714f164fd31441ec213060879e27bd36c09a2b5592dbf6e1c7d695d9a3d13a94",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 36,
+      "phase": "afternoon",
+      "weather": "light_rain_showers",
+      "file": "afternoon/036-weather_afternoon_light_rain_showers_olive_terrace_shower_4k.webp",
+      "sha256": "3bb224abf1e5224032e58b4d6113a4cac85a481218cc6be7406044c68bc21672",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 37,
+      "phase": "afternoon",
+      "weather": "heavy_rain_showers",
+      "file": "afternoon/037-weather_afternoon_heavy_rain_showers_red_soil_fern_hollow_4k.webp",
+      "sha256": "2d18e0dded0f59bf6660ee0f35a0b796e13686925e1fd389390cf03706203f02",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 38,
+      "phase": "afternoon",
+      "weather": "light_snow_showers",
+      "file": "afternoon/038-weather_afternoon_light_snow_showers_alpine_lake_shore_4k.webp",
+      "sha256": "493fe3c092a4f4362ae0aa4a924c8a214c90725f6408397ff960b739b3cbfcbe",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 39,
+      "phase": "afternoon",
+      "weather": "heavy_snow_showers",
+      "file": "afternoon/039-weather_afternoon_heavy_snow_showers_wind_sculpted_rock_saddle_4k.webp",
+      "sha256": "22acf65d69a4968e839cacff529c19b49b4f7209aca39f38dc4edaf5b41263f4",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 40,
+      "phase": "afternoon",
+      "weather": "thunderstorm",
+      "file": "afternoon/040-weather_afternoon_thunderstorm_basalt_coastal_shelf_4k.webp",
+      "sha256": "a8d87791c3695c17196fb29c829a727d4427ad8dc388c9a5eba99c36a51acc7a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 41,
+      "phase": "sunset",
+      "weather": "clear_sky",
+      "file": "sunset/041-weather_sunset_clear_sky_terracotta_dune_ridge_4k.webp",
+      "sha256": "d9a44c500a2ee5d09f9ad32d90dcf76579ec84c9edc66e2174599dc398150019",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 42,
+      "phase": "sunset",
+      "weather": "mostly_clear",
+      "file": "sunset/042-weather_sunset_mostly_clear_meadow_river_ford_4k.webp",
+      "sha256": "b07e21ea06822f39e379836c0ae8673339bfd03b1c3fe871a2beafad58703b17",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 43,
+      "phase": "sunset",
+      "weather": "partly_cloudy",
+      "file": "sunset/043-weather_sunset_partly_cloudy_pine_ridge_clearing_4k.webp",
+      "sha256": "9c7348e0835dc74e20d64284d46ac51be5e2013bebad468e923883e92ccfc68c",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 44,
+      "phase": "sunset",
+      "weather": "overcast",
+      "file": "sunset/044-weather_sunset_overcast_rural_field_shed_4k.webp",
+      "sha256": "f5eb94f05e3becb5a9698de374a1b7b5e1f004b5447eb9f141728be782b96068",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 45,
+      "phase": "sunset",
+      "weather": "fog",
+      "file": "sunset/045-weather_sunset_fog_alder_backwater_4k.webp",
+      "sha256": "893a033b586d21de50ef81d70300ab58bb623acbb8635e8991092abd63b9d589",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 46,
+      "phase": "sunset",
+      "weather": "freezing_fog",
+      "file": "sunset/046-weather_sunset_freezing_fog_rime_heather_hollow_4k.webp",
+      "sha256": "ffe4c01d5a64af8058084b33b97c893193a9f061332ee377a38784a5d9a76512",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 47,
+      "phase": "sunset",
+      "weather": "light_drizzle",
+      "file": "sunset/047-weather_sunset_light_drizzle_cypress_red_earth_trail_4k.webp",
+      "sha256": "366cd0e9a00809be12ac47ef57fd3a8d94f3f3d0d4d3aa57d19d0c4fdad4043c",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 48,
+      "phase": "sunset",
+      "weather": "moderate_drizzle",
+      "file": "sunset/048-weather_sunset_moderate_drizzle_stone_spring_hollow_4k.webp",
+      "sha256": "b4b50a32c190810ccc1f063efb13e70a5d8e20efe016223c5f513899a044ed6f",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 49,
+      "phase": "sunset",
+      "weather": "heavy_drizzle",
+      "file": "sunset/049-weather_sunset_heavy_drizzle_mossy_hillside_steps_4k.webp",
+      "sha256": "4926cb3173c0db41d1e06c2de481537c359633362779c4c7e6e323b800051ca8",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 50,
+      "phase": "sunset",
+      "weather": "light_rain",
+      "file": "sunset/050-weather_sunset_light_rain_rush_lake_inlet_4k.webp",
+      "sha256": "d07540cb3fc0f76a8ffdb1b2b6a3d4f37f0daea38281daa49e3fcff080e9aff3",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 51,
+      "phase": "sunset",
+      "weather": "moderate_rain",
+      "file": "sunset/051-weather_sunset_moderate_rain_shingled_grain_store_4k.webp",
+      "sha256": "b0f328db7c35b725b738914951e5bec45fdf7a51b06b960ca95b9cc617ec3903",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 52,
+      "phase": "sunset",
+      "weather": "heavy_rain",
+      "file": "sunset/052-weather_sunset_heavy_rain_ochre_cliff_pool_4k.webp",
+      "sha256": "bcf283544f318b7f8d750b24b20af056135329ada431ac4887ae6977e50c683f",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 53,
+      "phase": "sunset",
+      "weather": "light_snow",
+      "file": "sunset/053-weather_sunset_light_snow_copper_beech_meadow_4k.webp",
+      "sha256": "fbced4ce8937c66f9e03dd39155ce37e096859eb6817f4b9b9df81fadff9de6f",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 54,
+      "phase": "sunset",
+      "weather": "moderate_snow",
+      "file": "sunset/054-weather_sunset_moderate_snow_timber_bridge_hollow_4k.webp",
+      "sha256": "f71bc0a2f388a079c0bfb23fe21d0ad76483aaf11f846950ffce413e30837c1c",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 55,
+      "phase": "sunset",
+      "weather": "heavy_snow",
+      "file": "sunset/055-weather_sunset_heavy_snow_frozen_lake_stone_shore_4k.webp",
+      "sha256": "9f5e615a62fc95846732391dc71d0b3fbc1c086dc73dfcc960a8db601dbbf79e",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 56,
+      "phase": "sunset",
+      "weather": "light_rain_showers",
+      "file": "sunset/056-weather_sunset_light_rain_showers_coastal_palm_track_4k.webp",
+      "sha256": "71e5546104cdcf440d37c77a51c4e06e017f73f9b0ac91ecf7a362392f2d5ef8",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 57,
+      "phase": "sunset",
+      "weather": "heavy_rain_showers",
+      "file": "sunset/057-weather_sunset_heavy_rain_showers_ginkgo_shower_hollow_4k.webp",
+      "sha256": "62b59fc14aaa5a2e80bd4186f43e349256eac471da410f849b4c645228982544",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 58,
+      "phase": "sunset",
+      "weather": "light_snow_showers",
+      "file": "sunset/058-weather_sunset_light_snow_showers_juniper_snow_shelf_4k.webp",
+      "sha256": "88ef7ed579d7779d52e34f9a07a7ec83fce7249f6d654044258a2c13934f3b27",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 59,
+      "phase": "sunset",
+      "weather": "heavy_snow_showers",
+      "file": "sunset/059-weather_sunset_heavy_snow_showers_snowy_upper_basin_4k.webp",
+      "sha256": "5b6c16fb1d2e80dfd0444fc3516f0ded582de3ba6f5a429355394a17bc4ea5c1",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 60,
+      "phase": "sunset",
+      "weather": "thunderstorm",
+      "file": "sunset/060-weather_sunset_thunderstorm_storm_river_bluff_4k.webp",
+      "sha256": "46c1c3305e8aad2d4d0868a775fa27431a27090cd96ccf54f3d9826e8c1976a0",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 61,
+      "phase": "evening",
+      "weather": "clear_sky",
+      "file": "evening/061-weather_evening_clear_sky_juniper_coastal_knoll_4k.webp",
+      "sha256": "b7b23a3b095def57e28c88045154077db30c1640b77d146951db0d3410ac1ff6",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 62,
+      "phase": "evening",
+      "weather": "mostly_clear",
+      "file": "evening/062-weather_evening_mostly_clear_orchard_roof_edge_4k.webp",
+      "sha256": "e6dfe83596cf9803fb8d85192323117e973eedc61f7a5a5de959e94b8e5e8f59",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 63,
+      "phase": "evening",
+      "weather": "partly_cloudy",
+      "file": "evening/063-weather_evening_partly_cloudy_pine_plateau_puddle_4k.webp",
+      "sha256": "b1d3da49a1fccc9d5eafae75ed78611855f5230a3a8559a16fd9e0821427fecb",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 64,
+      "phase": "evening",
+      "weather": "overcast",
+      "file": "evening/064-weather_evening_overcast_quiet_fen_causeway_4k.webp",
+      "sha256": "78da5e9dad7268161831fc2f40eff57162cb76efbda3bd56bbdb6ca13b919502",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 65,
+      "phase": "evening",
+      "weather": "fog",
+      "file": "evening/065-weather_evening_fog_alder_lane_fog_4k.webp",
+      "sha256": "c52183ec1e42226d248390ce3419725556d3debbb1e3a99450fdeab5ae1dd144",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 66,
+      "phase": "evening",
+      "weather": "freezing_fog",
+      "file": "evening/066-weather_evening_freezing_fog_rime_stone_gate_4k.webp",
+      "sha256": "65679533794705f931e350179fe52f95c557a6a9044aba59d90457a856e288b0",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 67,
+      "phase": "evening",
+      "weather": "light_drizzle",
+      "file": "evening/067-weather_evening_light_drizzle_oak_stump_track_4k.webp",
+      "sha256": "eafcbb8e73d398ddcacf166c359ba22cc3a14783e839a68cc94d62a7a31406d1",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 68,
+      "phase": "evening",
+      "weather": "moderate_drizzle",
+      "file": "evening/068-weather_evening_moderate_drizzle_basalt_brook_ledge_4k.webp",
+      "sha256": "206e84c3a6129acc5cedc57f65bc3a0a0a3d72ced26e6ae6188e817668bfc225",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 69,
+      "phase": "evening",
+      "weather": "heavy_drizzle",
+      "file": "evening/069-weather_evening_heavy_drizzle_cedar_edge_hollow_4k.webp",
+      "sha256": "0aa2547c5ade3ed86a8f0b2dbc32728d36c4e00c2be96bf0ac1625c74cefc6dd",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 70,
+      "phase": "evening",
+      "weather": "light_rain",
+      "file": "evening/070-weather_evening_light_rain_timber_barn_meadow_4k.webp",
+      "sha256": "cba6261b5518063eec41bd19a26c664d6140d1ff1dcec71bc5ebda49b2d4637e",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 71,
+      "phase": "evening",
+      "weather": "moderate_rain",
+      "file": "evening/071-weather_evening_moderate_rain_mulberry_hillside_4k.webp",
+      "sha256": "d62b5fe184e327c67ae0358e3f8846d6e70b7484bcb57814afcf868a5ab693e9",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 72,
+      "phase": "evening",
+      "weather": "heavy_rain",
+      "file": "evening/072-weather_evening_heavy_rain_granite_marsh_islet_4k.webp",
+      "sha256": "09c458f0e5640e1a417aadf824984312696a169d0c0f32d061f612e303976188",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 73,
+      "phase": "evening",
+      "weather": "light_snow",
+      "file": "evening/073-weather_evening_light_snow_rosehip_snow_path_4k.webp",
+      "sha256": "9a684cc19efabf966cfdc1a6b9a55e2cd05fed3601bb2e54fc9d5e492355a740",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 74,
+      "phase": "evening",
+      "weather": "moderate_snow",
+      "file": "evening/074-weather_evening_moderate_snow_spruce_log_clearing_4k.webp",
+      "sha256": "aec7c56fe310d7b224beea7f748d3c7370479ff213c89579292a4d6f5422e0bc",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 75,
+      "phase": "evening",
+      "weather": "heavy_snow",
+      "file": "evening/075-weather_evening_heavy_snow_snowbound_well_cottage_4k.webp",
+      "sha256": "f1712e4cd709360bec3e6e4d7d2febf4e3d13dd3729572193f9f67fac1c6b574",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 76,
+      "phase": "evening",
+      "weather": "light_rain_showers",
+      "file": "evening/076-weather_evening_light_rain_showers_paddy_edge_shower_4k.webp",
+      "sha256": "ade309d2dcb9db6a034dbd5810403e5a000b8ab593435f399556fd1232893456",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 77,
+      "phase": "evening",
+      "weather": "heavy_rain_showers",
+      "file": "evening/077-weather_evening_heavy_rain_showers_willow_raincut_bank_4k.webp",
+      "sha256": "b8ca750f6035236530263b14addf5d65eaf28e7f347ff8ae97b76a9dbdae1d8c",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 78,
+      "phase": "evening",
+      "weather": "light_snow_showers",
+      "file": "evening/078-weather_evening_light_snow_showers_snowy_alpine_creek_bank_4k.webp",
+      "sha256": "56247d801de3ad124ac531c66c284853a62c1b6573e9749efa1cb88eb64be10d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 79,
+      "phase": "evening",
+      "weather": "heavy_snow_showers",
+      "file": "evening/079-weather_evening_heavy_snow_showers_snowy_ridge_footway_4k.webp",
+      "sha256": "f74043d57b225d4cb8d5ebdb65073d577e6bf365f41acfe576f9c116902ab050",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 80,
+      "phase": "evening",
+      "weather": "thunderstorm",
+      "file": "evening/080-weather_evening_thunderstorm_storm_field_store_4k.webp",
+      "sha256": "9715b808408a57a7d81433c95a48069d3a32a5298718648c8eb4c591698c1719",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 81,
+      "phase": "night",
+      "weather": "clear_sky",
+      "file": "night/081-weather_night_clear_sky_moonlit_birch_lake_4k.webp",
+      "sha256": "37f4dce443a3dde76f8b4830086986bb203df604c2c52b335091fbf9d85a7023",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 82,
+      "phase": "night",
+      "weather": "mostly_clear",
+      "file": "night/082-weather_night_mostly_clear_silvergrass_hut_knoll_4k.webp",
+      "sha256": "dba713520cbbf58fb678c35ed9a5b5b9121f57d8fad050f04754ca13c2d579c6",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 83,
+      "phase": "night",
+      "weather": "partly_cloudy",
+      "file": "night/083-weather_night_partly_cloudy_palm_plain_clouds_4k.webp",
+      "sha256": "d1fcad074b308cfbafede9d250e68753db98b1c0b943c649d11449048ec9cfe9",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 84,
+      "phase": "night",
+      "weather": "overcast",
+      "file": "night/084-weather_night_overcast_cypress_farm_lane_4k.webp",
+      "sha256": "4ec78bf66da331a8fe4f25185104a710f77beb2eab6e8a2e62bd41a38c6e07d8",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 85,
+      "phase": "night",
+      "weather": "fog",
+      "file": "night/085-weather_night_fog_stone_footbridge_mist_4k.webp",
+      "sha256": "edd813a6a6bdc703511cbadebd7ead490e0a4f7f88a6ec190dd701ab35cf4071",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 86,
+      "phase": "night",
+      "weather": "freezing_fog",
+      "file": "night/086-weather_night_freezing_fog_larch_rime_bank_4k.webp",
+      "sha256": "faa10f8a47928d80ba65dff0add327cbbfc22be17cc9a3da957097a5b46d2365",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 87,
+      "phase": "night",
+      "weather": "light_drizzle",
+      "file": "night/087-weather_night_light_drizzle_chestnut_drizzle_slope_4k.webp",
+      "sha256": "9df7c89f46299bdfb9049bc8f19e4e5237c1d239bb90c4a539308ed0ee92ab6d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 88,
+      "phase": "night",
+      "weather": "moderate_drizzle",
+      "file": "night/088-weather_night_moderate_drizzle_fern_pond_bank_4k.webp",
+      "sha256": "524d2bd7e30a6416a31ba815582c3bb5678446a9583133c41269827c1462d76e",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 89,
+      "phase": "night",
+      "weather": "heavy_drizzle",
+      "file": "night/089-weather_night_heavy_drizzle_rainy_slate_shelter_edge_4k.webp",
+      "sha256": "3119a9d8117f6371d74f6755f7df3977aca4862d58e38d8d2b500ec843cf0319",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 90,
+      "phase": "night",
+      "weather": "light_rain",
+      "file": "night/090-weather_night_light_rain_maple_meadow_knoll_4k.webp",
+      "sha256": "3d37a2c190c795249b580f48334cd62207d74933dfd92210ee814d075848df8a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 91,
+      "phase": "night",
+      "weather": "moderate_rain",
+      "file": "night/091-weather_night_moderate_rain_meadow_stone_sluice_4k.webp",
+      "sha256": "462bf6b408fae58a66922d72e917996899b19bd5a7291e8142f557b281ac308a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 92,
+      "phase": "night",
+      "weather": "heavy_rain",
+      "file": "night/092-weather_night_heavy_rain_alpine_gully_pool_4k.webp",
+      "sha256": "cef5dc1d35669c15f9d9afafae55a9695b85a71b2ee636fbcb48c20bd56c7352",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 93,
+      "phase": "night",
+      "weather": "light_snow",
+      "file": "night/093-weather_night_light_snow_birch_first_snow_pasture_4k.webp",
+      "sha256": "c88b2f8b0d1b669aadfb027dd2432f7fce6e487b81060e59d339642c52b96c42",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 94,
+      "phase": "night",
+      "weather": "moderate_snow",
+      "file": "night/094-weather_night_moderate_snow_snowy_single_gatehouse_4k.webp",
+      "sha256": "f461d5e0c8c73fd28bf472df7753f20330d37421dd1f997e48261868530d49e7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 95,
+      "phase": "night",
+      "weather": "heavy_snow",
+      "file": "night/095-weather_night_heavy_snow_spruce_snow_hollow_4k.webp",
+      "sha256": "3077bd069dc8fc7e0288a9e47fce44e2d1c9aef8f4dc59cd3d909517214726ea",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 96,
+      "phase": "night",
+      "weather": "light_rain_showers",
+      "file": "night/096-weather_night_light_rain_showers_coastal_palm_shower_bank_4k.webp",
+      "sha256": "3bdec4b7857f99cfbb800f775203fa899f0c461ed4d1e1da04d3f31d938ce16f",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 97,
+      "phase": "night",
+      "weather": "heavy_rain_showers",
+      "file": "night/097-weather_night_heavy_rain_showers_orchard_granary_shower_4k.webp",
+      "sha256": "9ad75003556fcd2b9fb80df6a708b5c84654ca00750100934ca94b6fcbeb99c7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 98,
+      "phase": "night",
+      "weather": "light_snow_showers",
+      "file": "night/098-weather_night_light_snow_showers_larch_ridge_snow_flurry_4k.webp",
+      "sha256": "fd61a71e4200fa82ac11c701315148a7cb451a4e45c8963f6dfdcb85fd426902",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 99,
+      "phase": "night",
+      "weather": "heavy_snow_showers",
+      "file": "night/099-weather_night_heavy_snow_showers_snowy_lake_peninsula_4k.webp",
+      "sha256": "412aa4a0955c5972ff0d90a1dbc7738561581b3b0c2f3ba23b23cbc14902ef15",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 100,
+      "phase": "night",
+      "weather": "thunderstorm",
+      "file": "night/100-weather_night_thunderstorm_storm_rocky_river_bend_4k.webp",
+      "sha256": "b5a4930b60e755ecbdc8394f2a0a8996d7e90d472217effe8c9ebfddbcac143c",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 101,
+      "phase": "dawn",
+      "weather": "clear_sky",
+      "file": "dawn/101-weather_dawn_clear_sky_reed_creek_bend_4k.webp",
+      "sha256": "f2df53355be899531c64aec622b302264e511593f25a61914a00b227681769ac",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 102,
+      "phase": "dawn",
+      "weather": "mostly_clear",
+      "file": "dawn/102-weather_dawn_mostly_clear_palm_dune_meadow_4k.webp",
+      "sha256": "6f109fef4a2e060f5e9cbafe0a755591a9419d58a6f86d1cc84705691dbe49f6",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 103,
+      "phase": "dawn",
+      "weather": "partly_cloudy",
+      "file": "dawn/103-weather_dawn_partly_cloudy_walnut_cottage_hill_4k.webp",
+      "sha256": "c38382fe5d39fe41c5e32ec0a1ae86cdd3e67a1d6bf7f5ff641a545aa65737d5",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 104,
+      "phase": "dawn",
+      "weather": "overcast",
+      "file": "dawn/104-weather_dawn_overcast_limestone_alder_hollow_4k.webp",
+      "sha256": "bae8e46292717a3b3db4c720e26eafee11a4c6fdc2afffdfef9e73b6ae9dbf18",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 105,
+      "phase": "dawn",
+      "weather": "fog",
+      "file": "dawn/105-weather_dawn_fog_rowan_fog_embankment_4k.webp",
+      "sha256": "5cee946bc40cba6e9f5d262cff35af3a87006814a1a4efb89591b293025eb10d",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 106,
+      "phase": "dawn",
+      "weather": "freezing_fog",
+      "file": "dawn/106-weather_dawn_freezing_fog_frosted_heath_field_store_4k.webp",
+      "sha256": "7e924f305bac98842276bd4836d5dd4ba9d8a6788bf7d80c5fe77f5b8d7a1307",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 107,
+      "phase": "dawn",
+      "weather": "light_drizzle",
+      "file": "dawn/107-weather_dawn_light_drizzle_apricot_earthen_terrace_4k.webp",
+      "sha256": "ae1cb2313403678505138af266b30987826257bc991226d887ac830c49335fd1",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 108,
+      "phase": "dawn",
+      "weather": "moderate_drizzle",
+      "file": "dawn/108-weather_dawn_moderate_drizzle_sandy_river_ford_4k.webp",
+      "sha256": "fd24c5810bb4d2fb7c12cf26367b5edf50828a499d0e08dc0158753c0e00cb79",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 109,
+      "phase": "dawn",
+      "weather": "heavy_drizzle",
+      "file": "dawn/109-weather_dawn_heavy_drizzle_bamboo_ravine_footpath_4k.webp",
+      "sha256": "9d47c1d5f602a0e73114a17fe7101406ff899f1cc941aa7f48656a44b1e81268",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 110,
+      "phase": "dawn",
+      "weather": "light_rain",
+      "file": "dawn/110-weather_dawn_light_rain_mossy_birch_track_4k.webp",
+      "sha256": "595967f1b0bbabb47b13aa78fac60c6affd7ee2f69fe4340f6f4dd35968d30e7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 111,
+      "phase": "dawn",
+      "weather": "moderate_rain",
+      "file": "dawn/111-weather_dawn_moderate_rain_stone_barn_grass_shelf_4k.webp",
+      "sha256": "473926931d37fbf10a7b6b55f076ec298db9915e6fdf850ae35fa689df7402e3",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 112,
+      "phase": "dawn",
+      "weather": "heavy_rain",
+      "file": "dawn/112-weather_dawn_heavy_rain_spring_marsh_shallows_4k.webp",
+      "sha256": "e0bbbf5ac4cce1c4ada4befb310a4f6f6a6fe91d020b619989e02964b4caf63a",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 113,
+      "phase": "dawn",
+      "weather": "light_snow",
+      "file": "dawn/113-weather_dawn_light_snow_hazel_snow_copse_4k.webp",
+      "sha256": "b9defd037132a368bcfc8c9684a47e02ae283b6fdf743f9428100e4e72ef928b",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 114,
+      "phase": "dawn",
+      "weather": "moderate_snow",
+      "file": "dawn/114-weather_dawn_moderate_snow_frozen_willow_fen_4k.webp",
+      "sha256": "5e07804d1d7df5dc2ddec395a7c734d1f7553528d5bdec4186e9c23fc8dae153",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 115,
+      "phase": "dawn",
+      "weather": "heavy_snow",
+      "file": "dawn/115-weather_dawn_heavy_snow_snowy_thatch_roof_corner_4k.webp",
+      "sha256": "42d86f3ee56239484c92065289c14b4698fa44d5914cc636df67a1ac352bf9c2",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 116,
+      "phase": "dawn",
+      "weather": "light_rain_showers",
+      "file": "dawn/116-weather_dawn_light_rain_showers_warm_grove_shower_4k.webp",
+      "sha256": "82eaaa1456dabd0d5286f22ab955bbc03e1d41160838f1799ce269d53fd034f9",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 117,
+      "phase": "dawn",
+      "weather": "heavy_rain_showers",
+      "file": "dawn/117-weather_dawn_heavy_rain_showers_clay_riverbank_shower_4k.webp",
+      "sha256": "c21fb0391db2ab69ed63976bebb95587eae189d18e46b80d64ef300ec6563e22",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 118,
+      "phase": "dawn",
+      "weather": "light_snow_showers",
+      "file": "dawn/118-weather_dawn_light_snow_showers_partly_frozen_tarn_4k.webp",
+      "sha256": "50c38fed12d3beb44c4c0b639d874263d9e22f8f77b2494e7ba58f58a5919ff7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 119,
+      "phase": "dawn",
+      "weather": "heavy_snow_showers",
+      "file": "dawn/119-weather_dawn_heavy_snow_showers_snowy_stone_wall_fragment_4k.webp",
+      "sha256": "a455ab78f7c3e27c57f22cd0c90af70926733dd96fe88fac95aec4c8a0a20a2b",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    },
+    {
+      "number": 120,
+      "phase": "dawn",
+      "weather": "thunderstorm",
+      "file": "dawn/120-weather_dawn_thunderstorm_storm_estuary_headland_4k.webp",
+      "sha256": "c3953faa26a980cc44445d5b4c61618bf21c7995409ae4dba6d041e8b7b068d7",
+      "width": 3840,
+      "height": 2160,
+      "status": "approved"
+    }
+  ]
+}
