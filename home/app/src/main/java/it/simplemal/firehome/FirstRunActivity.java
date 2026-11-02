@@ -80,7 +80,9 @@ public final class FirstRunActivity extends CardActivity {
     private static final int PREVIEW_SP = 12;
     private static final int PREVIEW_MARGIN = 24;
     private static final int GUIDE_WIDTH = 680;
-    private static final int GUIDE_HEIGHT = 246;
+    private static final int GUIDE_HEIGHT = 220;
+    /** The same above and below the drawing. */
+    private static final int GUIDE_GAP = 20;
     private static final int DOT = 7;
     private static final int DOT_GAP = 9;
     private static final int DOTS_BOTTOM = 26;
@@ -499,12 +501,14 @@ public final class FirstRunActivity extends CardActivity {
     private void showRemote() {
         heading(words(R.string.first_remote_title), words(R.string.first_remote_text));
         LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(GUIDE_WIDTH), dp(GUIDE_HEIGHT));
-        place.topMargin = dp(24);
+        place.topMargin = dp(GUIDE_GAP);
         page.addView(new Guide(this), place);
         TextView quiet = label(words(R.string.first_remote_note), NOTE_SP);
         quiet.setGravity(Gravity.CENTER);
         quiet.setAlpha(0.55f);
-        page.addView(quiet, new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2));
+        LinearLayout.LayoutParams below = new LinearLayout.LayoutParams(dp(TEXT_WIDTH), -2);
+        below.topMargin = dp(GUIDE_GAP);
+        page.addView(quiet, below);
         View start = button(words(R.string.first_start), BUTTON_SP, this::next);
         page.addView(start, place(WIDE, 14));
         start.requestFocus();
@@ -573,6 +577,8 @@ public final class FirstRunActivity extends CardActivity {
         private static final float KEYS_APART = 31;
         private static final float KEY = 13;
         private static final float REACH = 170;
+        private static final float HOME_LINE_END = 192;
+        private static final float HOME_NAME_Y = 214;
 
         private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint key = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -617,10 +623,13 @@ public final class FirstRunActivity extends CardActivity {
 
             canvas.drawLine(left - px(KEY), y, mid - px(REACH), y, key);
             canvas.drawLine(right + px(KEY), y, mid + px(REACH), y, key);
+            canvas.drawLine(mid, y + px(KEY), mid, px(HOME_LINE_END), key);
 
             float gap = px(REACH + 12);
             write(canvas, words(R.string.first_key_back), words(R.string.first_does_tasks), mid - gap, y, Paint.Align.RIGHT);
             write(canvas, words(R.string.first_key_menu), words(R.string.first_does_panel), mid + gap, y, Paint.Align.LEFT);
+            name.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText(words(R.string.first_key_home), mid, px(HOME_NAME_Y), name);
         }
 
         private void write(Canvas canvas, String title, String does, float x, float y, Paint.Align align) {

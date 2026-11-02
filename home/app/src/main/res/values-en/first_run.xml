@@ -28,6 +28,7 @@
     <string name="first_remote_text">These are Salotto’s shortcuts: you won’t find them written on the remote.</string>
     <string name="first_key_back">Back</string>
     <string name="first_key_menu">Menu</string>
+    <string name="first_key_home">Salotto Home</string>
     <string name="first_does_tasks">Task manager</string>
     <string name="first_does_panel">Control center</string>
     <string name="first_does_settings">Settings</string>

@@ -28,6 +28,7 @@
     <string name="first_remote_text">Ce sont des raccourcis de Salotto : ils ne figurent pas sur la télécommande.</string>
     <string name="first_key_back">Retour</string>
     <string name="first_key_menu">Menu</string>
+    <string name="first_key_home">Accueil de Salotto</string>
     <string name="first_does_tasks">Gestionnaire de tâches</string>
     <string name="first_does_panel">Centre de contrôle</string>
     <string name="first_does_settings">Réglages</string>

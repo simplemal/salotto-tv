@@ -50,9 +50,9 @@ L'installatore salva una copia dello stato in `~/Salotto-backup`, poi fa queste 
 
 | Passo | Cosa fa | Conferma |
 |---|---|---|
-| App | Scarica e installa Fixer, AirPlay, Aurora e Salotto | No |
-| Permessi di Salotto | Lo autorizzano a cambiare salvaschermo e CEC, e a vedere le app aperte | No |
-| Home | Attiva Fixer nell'accessibilità e lo punta su Salotto | Sì |
+| App | Scarica e installa AirPlay, Aurora e Salotto | No |
+| Permessi di Salotto | Lo autorizzano a cambiare salvaschermo e CEC, a vedere le app aperte e a riconoscere il tasto Home | No |
+| Home | Spegne il menu rapido di Fire OS e attiva il servizio di accessibilità di Salotto. Su una Stick vecchia toglie FireStick Fixer, che non serve più | Sì |
 | Pubblicità e telemetria | Disattiva 29 pacchetti | Sì |
 | Alexa | Disattiva 14 pacchetti. **Toglie i comandi vocali** | Sì |
 | Privacy | Limita pubblicità personalizzata e dati di utilizzo | Sì |
@@ -84,9 +84,9 @@ Se qualcosa non va, lo script si ferma e dice perché. Si può rilanciare: salta
 |---|---|
 | `unauthorized` e nessun dialogo sulla TV | Spegni e riaccendi Debug ADB in Opzioni sviluppatore, poi conferma il dialogo |
 | Dopo un'installazione la Stick resta sulla Home Amazon | Apri una qualsiasi app e premi Home: era un doppio Home |
-| Home non apre più Salotto | Fixer scollegato. Non usare `monkey` o `uiautomator`: sospendono l'accessibilità. Riavvia la Stick |
+| Home non apre più Salotto | Servizio di Salotto scollegato. Non usare `monkey` o `uiautomator`: sospendono l'accessibilità. Riavvia la Stick |
 | La rete cade e i tasti non rispondono | È attiva Duplicazione schermo. Via USB: `adb shell am force-stop com.amazon.cast.sink` |
-| Fire OS si aggiorna da solo | Può succedere. Rilancia l'anteprima e controlla Fixer |
+| Fire OS si aggiorna da solo | Può succedere. Rilancia l'anteprima e controlla il tasto Home |
 
 ## Come tornare indietro
 

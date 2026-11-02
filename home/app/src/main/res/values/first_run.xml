@@ -28,6 +28,7 @@
     <string name="first_remote_text">Sono scorciatoie di Salotto: sul telecomando non le trovi scritte.</string>
     <string name="first_key_back">Indietro</string>
     <string name="first_key_menu">Menu</string>
+    <string name="first_key_home">Home di Salotto</string>
     <string name="first_does_tasks">Task manager</string>
     <string name="first_does_panel">Centro di controllo</string>
     <string name="first_does_settings">Impostazioni</string>

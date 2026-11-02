@@ -28,6 +28,7 @@
     <string name="first_remote_text">هذه اختصارات Salotto، ولن تجدها مكتوبة على جهاز التحكم.</string>
     <string name="first_key_back">رجوع</string>
     <string name="first_key_menu">القائمة</string>
+    <string name="first_key_home">الصفحة الرئيسية في Salotto</string>
     <string name="first_does_tasks">مدير المهام</string>
     <string name="first_does_panel">مركز التحكم</string>
     <string name="first_does_settings">الإعدادات</string>

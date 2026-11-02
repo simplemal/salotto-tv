@@ -5,7 +5,8 @@
 set -uo pipefail
 
 SALOTTO=it.simplemal.firehome
-FIXER=io.github.hatim.firestickfixer
+# Only on a Stick set up when it had the Home button.
+OLD_FIXER=io.github.hatim.firestickfixer
 PREVIEW=0
 ARGS=()
 for arg in "$@"; do
@@ -64,8 +65,8 @@ if [[ -s "$BACKUP/privacy-before.txt" ]] && ask "Rimetto le impostazioni di priv
   done < "$BACKUP/privacy-before.txt"
 fi
 
-if ask "Tolgo Fixer dall'accessibilità e rimetto la Home di Amazon?"; then
-  services="$(sed -n 1p "$BACKUP/accessibility-before.txt")"
+if ask "Tolgo Salotto dall'accessibilità e rimetto la Home di Amazon?"; then
+  services="$(sed -n 1p "$BACKUP/accessibility-before.txt" | tr ':' '\n' | grep -v "^$OLD_FIXER/" | paste -sd: -)"
   enabled="$(sed -n 2p "$BACKUP/accessibility-before.txt")"
   if [[ "$services" == null || -z "$services" ]]; then
     W shell settings delete secure enabled_accessibility_services
@@ -75,7 +76,7 @@ if ask "Tolgo Fixer dall'accessibilità e rimetto la Home di Amazon?"; then
   W shell settings put secure accessibility_enabled "${enabled:-0}"
   W shell pm enable --user 0 com.amazon.tv.quicksettings.ui
   W shell settings delete global adb_allowed_connection_time
-  W uninstall "$FIXER"
+  [[ -z "$(A shell pm path "$OLD_FIXER" | tr -d '\r')" ]] || W uninstall "$OLD_FIXER"
   W uninstall "$SALOTTO"
   # Salotto installs it at its first update: it may not be there.
   W uninstall it.simplemal.firehome.cover || true

@@ -28,6 +28,7 @@
     <string name="first_remote_text">Son atajos de Salotto: no aparecen escritos en el mando.</string>
     <string name="first_key_back">Atrás</string>
     <string name="first_key_menu">Menú</string>
+    <string name="first_key_home">Inicio de Salotto</string>
     <string name="first_does_tasks">Administrador de tareas</string>
     <string name="first_does_panel">Centro de control</string>
     <string name="first_does_settings">Ajustes</string>

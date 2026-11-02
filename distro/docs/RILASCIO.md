@@ -74,7 +74,7 @@ Lo strumento controlla versione e dati personali, firma `update.json`, aggiorna 
 
 ## Prima del primo rilascio pubblico
 
-- [ ] Licenza di Salotto scelta. Fixer, AirPlay Server e Aurora sono GPL-3.0, e non vengono ridistribuiti
+- [ ] Licenza di Salotto scelta. AirPlay Server e Aurora sono GPL-3.0, e non vengono ridistribuiti
 - [x] Firma definitiva
 - [ ] Provata su una seconda Stick
 - [ ] Controllo di privacy di tutta la storia Git, non solo dell'ultima versione

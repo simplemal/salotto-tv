@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Handler;
@@ -377,7 +378,9 @@ public final class TaskService extends AccessibilityService {
         return mask;
     }
 
+    /** A mask lies above the veil, and a picture taken for it has none: it carries its own. */
     private void addMask(FrameLayout mask) {
+        mask.setForeground(new ColorDrawable(Veil.color(this)));
         getSystemService(WindowManager.class).addView(mask, new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,

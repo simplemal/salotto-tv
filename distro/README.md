@@ -8,8 +8,7 @@ Non è un sistema operativo: non cambia Fire OS, non sblocca il dispositivo e si
 
 | Parte | Da dove arriva | Cosa fa |
 |---|---|---|
-| Salotto | questo progetto | La nuova Home, con dock, meteo e Impostazioni |
-| [FireStick Fixer](https://github.com/Hornet34/firestick-fixer) 3.1.0 | scaricato dall'originale | Porta il tasto Home e l'accensione su Salotto |
+| Salotto | questo progetto | La nuova Home, con dock, meteo e Impostazioni. Il suo servizio di accessibilità prende il tasto Home e l'accensione |
 | [AirPlay Server](https://github.com/jqssun/android-airplay-server) 0.0.36 | scaricato dall'originale | Riceve video da iPhone, iPad e Mac |
 | [Aurora Store](https://f-droid.org/packages/com.aurora.store/) 4.8.4 | scaricato da F-Droid | Installa app Android TV senza account |
 | Elenchi di pacchetti e impostazioni | questo progetto | Disattivano 29 pacchetti di pubblicità e telemetria e, se vuoi, 14 di Alexa |

@@ -40,6 +40,9 @@ public final class TasksActivity extends CardActivity {
     private static final long SCREEN_WAIT_MS = 500;
     private static final int BUTTON_SIZE = 32;
     private static final int BUTTON_GAP = 56;
+    private static final int BUTTON_RING = 2;
+    /** The grey the thin cross looks: over a dark picture the darker fill alone cannot be seen. */
+    private static final int BUTTON_EDGE = Color.rgb(190, 194, 200);
     private static final int ROW_DROP = 48;
     private static final float OTHER_SCALE = 0.86f;
     private static final float OTHER_ALPHA = 0.5f;
@@ -272,6 +275,7 @@ public final class TasksActivity extends CardActivity {
         // After the others have let it go: one card at a time wears the same edge.
         if (!onButton) cards.get(index).setForeground(edge());
         buttonFill.setColor(onButton ? Color.WHITE : Color.rgb(84, 88, 96));
+        buttonFill.setStroke(dp(BUTTON_RING), onButton ? Color.WHITE : BUTTON_EDGE);
         button.setTextColor(onButton ? Fire.INK : Color.WHITE);
     }
 
