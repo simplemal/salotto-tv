@@ -48,6 +48,7 @@
     <string name="tasks_none">Aucune appli ouverte</string>
     <string name="tasks_no_permission">Pour voir les applis ouvertes, Salotto a besoin de l’autorisation d’accès aux données d’utilisation.</string>
     <string name="tasks_stop_failed">Impossible de la fermer : d’ici, on la ferme avec Forcer l’arrêt</string>
+    <string name="tasks_memory">RAM %1$s · %2$s libres</string>
     <string name="task_press_to_close">Appuyez sur OK pour fermer %1$s</string>
     <string name="task_closing">Fermeture de %1$s</string>
     <string name="task_restart_confirm">Confirmer le redémarrage ? Appuyez sur OK</string>

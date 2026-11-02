@@ -3,6 +3,7 @@ package it.simplemal.firehome;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
+import android.util.Log;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -77,7 +78,10 @@ final class AdbClient implements Closeable {
     private static final int AUTH_PUBLIC_KEY = 3;
     private static final int KEY_BITS = 2048;
     private static final int KEY_WORDS = KEY_BITS / 32;
+    private static final String TAG = "AdbClient";
     private static final String KEY_FOLDER = "adb";
+    /** In the shared folder: the installer reads it from there, a release cannot be read with run-as. */
+    private static final String SHARED_KEY = "adb-public";
     private static final String KEY_NAME = "Salotto";
     private static final String PREFS = "adb";
     private static final String LAST_PORT = "port";
@@ -426,6 +430,27 @@ final class AdbClient implements Closeable {
         folder.mkdirs();
         Files.write(privateFile.toPath(), pair.getPrivate().getEncoded());
         Files.write(publicFile.toPath(), pair.getPublic().getEncoded());
+        share(context, pair.getPublic().getEncoded());
         return pair;
+    }
+
+    /** At every start of the service: the key may be approved already, with no connection tried yet. */
+    static void shareKey(Context context) {
+        File publicFile = new File(new File(context.getFilesDir(), KEY_FOLDER), "public");
+        if (!publicFile.isFile()) return;
+        try {
+            share(context, Files.readAllBytes(publicFile.toPath()));
+        } catch (IOException e) {
+            Log.w(TAG, "Could not read the adb key", e);
+        }
+    }
+
+    /** Only for the installer's check: losing it must not cost the connection. */
+    private static void share(Context context, byte[] publicKey) {
+        try {
+            Files.write(new File(context.getExternalMediaDirs()[0], SHARED_KEY).toPath(), publicKey);
+        } catch (IOException | RuntimeException e) {
+            Log.w(TAG, "Could not share the adb key", e);
+        }
     }
 }

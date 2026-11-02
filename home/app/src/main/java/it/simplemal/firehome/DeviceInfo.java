@@ -100,6 +100,10 @@ final class DeviceInfo {
 
     static boolean wired(Context context) { return wiredLink(context) != null; }
 
+    static boolean online(Context context) {
+        return context.getSystemService(ConnectivityManager.class).getActiveNetwork() != null;
+    }
+
     private static LinkProperties wiredLink(Context context) {
         ConnectivityManager network = context.getSystemService(ConnectivityManager.class);
         Network active = network.getActiveNetwork();

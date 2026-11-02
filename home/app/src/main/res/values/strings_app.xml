@@ -70,6 +70,7 @@
     <string name="tasks_no_permission">Per vedere le app aperte, Salotto ha bisogno del permesso sui dati di utilizzo.</string>
     <!-- Forza arresto is the button of Fire OS itself: use the words Fire OS shows in this language -->
     <string name="tasks_stop_failed">Non è stato possibile chiuderla: da qui si chiude con Forza arresto</string>
+    <string name="tasks_memory">RAM %1$s · %2$s liberi</string>
     <!-- %1$s is the name of an app -->
     <string name="task_press_to_close">Premi OK per chiudere %1$s</string>
     <!-- %1$s is the name of an app -->

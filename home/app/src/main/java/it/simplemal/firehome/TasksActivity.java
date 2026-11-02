@@ -1,5 +1,6 @@
 package it.simplemal.firehome;
 
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -25,8 +27,9 @@ import java.util.List;
 
 /**
  * The task manager, over whatever is on screen: one row of app pictures. Left and right move
- * along it, OK opens the app, down reaches the close button. Keys are handled here rather than
- * through focus, so that button stays one press below whichever card is selected.
+ * along it, OK opens the app, down reaches the close button, up the settings in the pill. Keys are
+ * handled here rather than through focus, so that button stays one press below whichever card is
+ * selected.
  */
 public final class TasksActivity extends CardActivity {
     private static final int SCRIM = Color.argb(200, 8, 10, 14);
@@ -59,6 +62,13 @@ public final class TasksActivity extends CardActivity {
         Art art;
     }
 
+    /** What the pill shows, read with the cards. */
+    private static final class State {
+        boolean online;
+        boolean wired;
+        String memory;
+    }
+
     /** Read by TaskService: Menu held here must not open this again. */
     /** Only the approval of the adb key: opening this page must not make the TV ask anything. */
     static final String CONNECT = "connect";
@@ -81,8 +91,12 @@ public final class TasksActivity extends CardActivity {
     private TextView title;
     private TextView button;
     private TextView message;
+    private TextView memory;
+    private ImageView network;
+    private ImageView settings;
     private int index;
     private boolean onButton;
+    private boolean onPill;
     private boolean stopping;
     private boolean prepareFailed;
     private final Runnable prepareStop = this::prepareStop;
@@ -128,6 +142,7 @@ public final class TasksActivity extends CardActivity {
         message.setGravity(Gravity.CENTER);
         message.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
         root.addView(message, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        root.addView(pill(), pillPlace());
         setContentView(root);
         root.setAlpha(0);
         // Android 11 cannot blur what is behind a window, so the page is hidden until the screen
@@ -138,6 +153,32 @@ public final class TasksActivity extends CardActivity {
             main.removeCallbacks(wallpaper);
             reveal(frame);
         });
+    }
+
+    /** The Home's pill, settings in the same place: only the network is beside it, and it does nothing. */
+    private View pill() {
+        LinearLayout line = new LinearLayout(this);
+        line.setGravity(Gravity.CENTER_VERTICAL);
+        line.setClipToPadding(false);
+        line.setClipChildren(false);
+        line.setPadding(dp(16), dp(6), dp(6), dp(6));
+        memory = new TextView(this);
+        memory.setTextSize(16);
+        memory.setTextColor(Color.WHITE);
+        memory.setPadding(0, 0, dp(10), 0);
+        line.addView(memory);
+        network = pillIcon(R.drawable.ic_wifi, "");
+        network.setFocusable(false);
+        network.setClickable(false);
+        network.setVisibility(View.GONE);
+        LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
+        beside.setMarginEnd(dp(PILL_ICON_GAP));
+        line.addView(network, beside);
+        settings = pillIcon(R.drawable.ic_settings, getString(R.string.first_does_settings));
+        settings.setFocusable(false);
+        settings.setOnClickListener(view -> openSettings());
+        line.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
+        return pillBox(line);
     }
 
     private void reveal(Bitmap frame) {
@@ -171,6 +212,7 @@ public final class TasksActivity extends CardActivity {
     private void load() {
         int load = ++loads;
         Background.run(() -> {
+            State state = state();
             boolean allowed = RunningApps.allowed(this);
             List<Slide> slides = new ArrayList<>();
             if (allowed) {
@@ -183,12 +225,32 @@ public final class TasksActivity extends CardActivity {
                 }
             }
             runOnUiThread(() -> {
-                if (load == loads && !isDestroyed()) fill(slides, allowed);
+                if (load == loads && !isDestroyed()) fill(slides, allowed, state);
             });
         });
     }
 
-    private void fill(List<Slide> slides, boolean allowed) {
+    /** Free is what Android calls available: it counts what it can take back from apps at rest. */
+    private State state() {
+        State state = new State();
+        state.online = DeviceInfo.online(this);
+        state.wired = DeviceInfo.wired(this);
+        ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
+        getSystemService(ActivityManager.class).getMemoryInfo(info);
+        state.memory = getString(R.string.tasks_memory, Formatter.formatShortFileSize(this, info.totalMem),
+            Formatter.formatShortFileSize(this, info.availMem));
+        return state;
+    }
+
+    private void showState(State state) {
+        memory.setText(state.memory);
+        network.setVisibility(state.online ? View.VISIBLE : View.GONE);
+        network.setImageResource(state.wired ? R.drawable.ic_ethernet : R.drawable.ic_wifi);
+        network.setContentDescription(state.wired ? "Ethernet" : "Wi-Fi");
+    }
+
+    private void fill(List<Slide> slides, boolean allowed, State state) {
+        showState(state);
         usageAllowed = allowed;
         apps = new ArrayList<>();
         row.removeAllViews();
@@ -253,11 +315,13 @@ public final class TasksActivity extends CardActivity {
     private void select(int position) {
         index = position;
         onButton = false;
+        onPill = false;
         show(true);
     }
 
     /** Keeps the selected card in the middle of the screen. */
     private void show(boolean animate) {
+        lightPillIcon(settings, onPill);
         boolean any = !apps.isEmpty();
         message.setVisibility(any ? View.GONE : View.VISIBLE);
         title.setVisibility(any ? View.VISIBLE : View.INVISIBLE);
@@ -270,16 +334,17 @@ public final class TasksActivity extends CardActivity {
         int screen = getResources().getDisplayMetrics().widthPixels;
         float offset = screen / 2f - dp(CARD_WIDTH) / 2f - index * (dp(CARD_WIDTH) + dp(CARD_GAP));
         long time = animate ? MOVE_MS : 0;
+        boolean elsewhere = onButton || onPill;
         row.animate().translationX(offset).setDuration(time).start();
         for (int position = 0; position < cards.size(); position++) {
             boolean chosen = position == index;
             View card = cards.get(position);
             card.animate().scaleX(chosen ? 1 : OTHER_SCALE).scaleY(chosen ? 1 : OTHER_SCALE)
                 .alpha(chosen ? 1 : OTHER_ALPHA).setDuration(time).start();
-            if (!chosen || onButton) card.setForeground((Drawable) card.getTag());
+            if (!chosen || elsewhere) card.setForeground((Drawable) card.getTag());
         }
         // After the others have let it go: one card at a time wears the same edge.
-        if (!onButton) {
+        if (!elsewhere) {
             View card = cards.get(index);
             card.setForeground(new LayerDrawable(new Drawable[]{(Drawable) card.getTag(), edge()}));
         }
@@ -303,6 +368,11 @@ public final class TasksActivity extends CardActivity {
     private void openSelected() {
         if (apps.isEmpty()) return;
         openPackage(apps.get(index).pkg);
+        finish();
+    }
+
+    private void openSettings() {
+        open(new Intent(this, SettingsActivity.class));
         finish();
     }
 
@@ -376,6 +446,13 @@ public final class TasksActivity extends CardActivity {
     private void press(int code) {
         if (code == KeyEvent.KEYCODE_BACK || code == KeyEvent.KEYCODE_MENU) {
             finish();
+        } else if (onPill) {
+            if (code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER) {
+                openSettings();
+            } else if (code == KeyEvent.KEYCODE_DPAD_DOWN) {
+                onPill = false;
+                show(false);
+            }
         } else if (code == KeyEvent.KEYCODE_DPAD_LEFT && !onButton && index > 0) {
             select(index - 1);
         } else if (code == KeyEvent.KEYCODE_DPAD_RIGHT && !onButton && index < apps.size() - 1) {
@@ -385,6 +462,7 @@ public final class TasksActivity extends CardActivity {
             prepareFailed = false;
             show(false);
         } else if (code == KeyEvent.KEYCODE_DPAD_UP) {
+            onPill = !onButton;
             onButton = false;
             main.removeCallbacks(prepareStop);
             show(false);

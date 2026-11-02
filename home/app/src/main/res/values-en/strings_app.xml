@@ -48,6 +48,7 @@
     <string name="tasks_none">No apps open</string>
     <string name="tasks_no_permission">To see the open apps, Salotto needs permission for usage data.</string>
     <string name="tasks_stop_failed">It couldn’t be closed: from here, use Force stop</string>
+    <string name="tasks_memory">RAM %1$s · %2$s free</string>
     <string name="task_press_to_close">Press OK to close %1$s</string>
     <string name="task_closing">Closing %1$s</string>
     <string name="task_restart_confirm">Sure you want to restart? Press OK</string>

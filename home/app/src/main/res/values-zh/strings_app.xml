@@ -47,6 +47,7 @@
     <string name="tasks_none">没有打开的应用</string>
     <string name="tasks_no_permission">要查看打开的应用，Salotto 需要使用情况数据的权限。</string>
     <string name="tasks_stop_failed">无法关闭：请在这里用“强行停止”关闭</string>
+    <string name="tasks_memory">内存 %1$s · 可用 %2$s</string>
     <string name="task_press_to_close">按 OK 键关闭 %1$s</string>
     <string name="task_closing">正在关闭 %1$s</string>
     <string name="task_restart_confirm">确认重启？请按 OK 键</string>

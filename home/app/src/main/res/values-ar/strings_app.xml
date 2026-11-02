@@ -52,6 +52,7 @@
     <string name="tasks_none">لا توجد تطبيقات مفتوحة</string>
     <string name="tasks_no_permission">لعرض التطبيقات المفتوحة، يحتاج Salotto إلى إذن الوصول إلى بيانات الاستخدام.</string>
     <string name="tasks_stop_failed">تعذّر إغلاقه: يُغلق من هنا بـ«إيقاف إجباري»</string>
+    <string name="tasks_memory">الذاكرة %1$s · المتاح %2$s</string>
     <string name="task_press_to_close">اضغط OK لإغلاق %1$s</string>
     <string name="task_closing">جارٍ إغلاق %1$s</string>
     <string name="task_restart_confirm">هل تؤكد إعادة التشغيل؟ اضغط OK</string>

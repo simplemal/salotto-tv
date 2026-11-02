@@ -49,6 +49,11 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected static final int GLASS = 3;
     protected static final int MARGIN = 48;
     protected static final int GAP = 10;
+    protected static final int DOCK_MARGIN = 28;
+    protected static final int PILL_ICON = 30;
+    protected static final int PILL_ICON_GAP = 3;
+    private static final int PILL_ICON_OFF = Color.argb(20, 0, 0, 0);
+    private static final int PILL_RADIUS = 21;
     private static final int SOFT_LIGHT = 110;
     private static final int SOFT_DEPTH = 3;
     private static final int BUTTON_RADIUS = 12;
@@ -393,6 +398,45 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         glass.setColor(Color.argb(46, 255, 255, 255));
         glass.setCornerRadius(radius);
         return glass;
+    }
+
+    /** The row goes inside this rather than holding the glass: a foreground stays inside its view's padding. */
+    protected FrameLayout pillBox(View row) {
+        FrameLayout pill = new FrameLayout(this);
+        pill.setClipChildren(false);
+        pill.setBackground(glass(dp(PILL_RADIUS)));
+        pill.setForeground(glassEdge(dp(PILL_RADIUS)));
+        pill.addView(row);
+        return pill;
+    }
+
+    protected FrameLayout.LayoutParams pillPlace() {
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END);
+        place.topMargin = dp(22);
+        place.rightMargin = dp(DOCK_MARGIN);
+        return place;
+    }
+
+    protected ImageView pillIcon(int picture, String name) {
+        ImageView button = new ImageView(this);
+        button.setImageResource(picture);
+        int inset = dp(3);
+        button.setPadding(inset, inset, inset, inset);
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        button.setBackground(circle);
+        lightPillIcon(button, false);
+        button.setFocusable(true);
+        button.setClickable(true);
+        button.setDefaultFocusHighlightEnabled(false);
+        button.setContentDescription(name);
+        button.setOnFocusChangeListener((view, focused) -> lightPillIcon(button, focused));
+        return button;
+    }
+
+    protected void lightPillIcon(ImageView button, boolean lit) {
+        ((GradientDrawable) button.getBackground()).setColor(lit ? Color.WHITE : PILL_ICON_OFF);
+        button.setColorFilter(lit ? Color.BLACK : Color.WHITE);
     }
 
     /** For rows and buttons: flat under the words, the light stays in a few pixels along the edge. */

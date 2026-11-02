@@ -50,7 +50,6 @@ import org.json.JSONException;
 /** Native launcher. No telemetry, billing library or Google services; the network is only for the weather and updates. */
 public final class MainActivity extends CardActivity {
     private static final String ALL_APPS = "salotto:apps";
-    private static final int DOCK_MARGIN = 28;
     private static final int DOCK_SIDE = 28;
     private static final int DOCK_HEIGHT_PADDING = 24;
     private static final int CAPTION_HEIGHT = 38;
@@ -160,8 +159,6 @@ public final class MainActivity extends CardActivity {
     private TextView weather;
     private TextView forecast;
     private TextView hint;
-    private static final int PILL_ICON_GAP = 3;
-    private static final int PILL_ICON_OFF = Color.argb(20, 0, 0, 0);
     private final Handler ticker = new Handler(Looper.getMainLooper());
     private final Runnable weatherCheck = this::checkWeather;
     private List<String> home;
@@ -292,7 +289,6 @@ public final class MainActivity extends CardActivity {
 
     /** Glass pill: weather, date and time when the clock is out of view, then the settings. */
     private View pill() {
-        int radius = dp(21);
         pillRow = new LinearLayout(this);
         pillRow.setGravity(Gravity.CENTER_VERTICAL);
         // The enlarged button would be cut into a square at the row's padding.
@@ -331,40 +327,13 @@ public final class MainActivity extends CardActivity {
             if (event.getAction() == KeyEvent.ACTION_DOWN) panel.first().requestFocus();
             return true;
         });
-        LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(30), dp(30));
+        LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
         beside.setMarginEnd(dp(PILL_ICON_GAP));
         pillRow.addView(controlButton, beside);
-        pillRow.addView(settings, new LinearLayout.LayoutParams(dp(30), dp(30)));
+        pillRow.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillButton = settings;
-        // Separate from the padded row: a foreground stays inside its view's padding.
-        FrameLayout pill = new FrameLayout(this);
-        pill.setClipChildren(false);
-        pill.setBackground(glass(radius));
-        pill.setForeground(glassEdge(radius));
-        pill.addView(pillRow);
-        pillBox = pill;
-        return pill;
-    }
-
-    private ImageView pillIcon(int picture, String name) {
-        ImageView button = new ImageView(this);
-        button.setImageResource(picture);
-        int inset = dp(3);
-        button.setPadding(inset, inset, inset, inset);
-        GradientDrawable circle = new GradientDrawable();
-        circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(PILL_ICON_OFF);
-        button.setBackground(circle);
-        button.setColorFilter(Color.WHITE);
-        button.setFocusable(true);
-        button.setClickable(true);
-        button.setDefaultFocusHighlightEnabled(false);
-        button.setContentDescription(name);
-        button.setOnFocusChangeListener((view, focused) -> {
-            circle.setColor(focused ? Color.WHITE : PILL_ICON_OFF);
-            button.setColorFilter(focused ? Color.BLACK : Color.WHITE);
-        });
-        return button;
+        pillBox = pillBox(pillRow);
+        return pillBox;
     }
 
     /** Open while the focus is on its button or inside it. Touching clears the focus: that says nothing. */
@@ -468,13 +437,6 @@ public final class MainActivity extends CardActivity {
             .addTarget(pillWeather).addTarget(pillButton).addTarget(controlButton);
         change.setDuration(PILL_MS);
         TransitionManager.beginDelayedTransition(root, change);
-    }
-
-    private FrameLayout.LayoutParams pillPlace() {
-        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END);
-        place.topMargin = dp(22);
-        place.rightMargin = dp(DOCK_MARGIN);
-        return place;
     }
 
     /** Menu held on the Home. */

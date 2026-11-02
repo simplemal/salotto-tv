@@ -588,6 +588,7 @@ public final class TaskService extends AccessibilityService {
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
         endFixer();
+        adb.post(() -> AdbClient.shareKey(this));
         // At power-on Amazon's Home comes after this and says so; after a restart it is already up.
         cover.amazonShown();
         if (Updater.installed(this)) {

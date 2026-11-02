@@ -50,6 +50,7 @@
     <string name="tasks_none">Нет открытых приложений</string>
     <string name="tasks_no_permission">Чтобы видеть открытые приложения, Salotto нужно разрешение на доступ к данным об использовании.</string>
     <string name="tasks_stop_failed">Не удалось закрыть: отсюда это делается кнопкой «Остановить»</string>
+    <string name="tasks_memory">ОЗУ %1$s · свободно %2$s</string>
     <string name="task_press_to_close">Нажмите OK, чтобы закрыть %1$s</string>
     <string name="task_closing">Закрываю %1$s</string>
     <string name="task_restart_confirm">Перезагрузить? Нажмите OK</string>

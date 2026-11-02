@@ -48,6 +48,7 @@
     <string name="tasks_none">Keine App geöffnet</string>
     <string name="tasks_no_permission">Um die geöffneten Apps zu sehen, braucht Salotto die Berechtigung für Nutzungsdaten.</string>
     <string name="tasks_stop_failed">Schließen war nicht möglich: Hier geht es mit Beenden erzwingen</string>
+    <string name="tasks_memory">RAM %1$s · %2$s frei</string>
     <string name="task_press_to_close">Drücke OK, um %1$s zu schließen</string>
     <string name="task_closing">%1$s wird geschlossen</string>
     <string name="task_restart_confirm">Neustart bestätigen? Drücke OK</string>

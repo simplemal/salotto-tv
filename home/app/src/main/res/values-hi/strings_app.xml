@@ -48,6 +48,7 @@
     <string name="tasks_none">कोई ऐप खुला नहीं है</string>
     <string name="tasks_no_permission">खुले हुए ऐप देखने के लिए Salotto को उपयोग के डेटा की अनुमति चाहिए।</string>
     <string name="tasks_stop_failed">इसे बंद नहीं किया जा सका: «ज़बरदस्ती रोकें» से बंद करें</string>
+    <string name="tasks_memory">RAM %1$s · %2$s खाली</string>
     <string name="task_press_to_close">%1$s को बंद करने के लिए OK दबाएं</string>
     <string name="task_closing">%1$s को बंद कर रहे हैं</string>
     <string name="task_restart_confirm">रीस्टार्ट पक्का करें? OK दबाएं</string>

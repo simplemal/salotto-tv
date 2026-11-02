@@ -1,0 +1,7 @@
+// Builds Salotto for the Sticks: a debuggable build starts in about twice the time and is late on
+// three times the frames. The project stays debuggable for the rest. Pass it with --init-script.
+allprojects {
+    plugins.withId('com.android.application') {
+        android.buildTypes.all { debuggable = false }
+    }
+}
