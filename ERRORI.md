@@ -164,6 +164,12 @@ Cosa fare: Dal Mac lancia install.sh della distro: reinstalla Salotto senza perd
 
 Cosa fare: Controlla che Salotto funzioni, poi segnala il problema.
 
+### SAL-R304
+
+**Serve Installa Salotto sul computer.** Su questa TV Salotto non può tornare da sola alla versione precedente.
+
+Cosa fare: Apri Installa Salotto sul computer e scegli «Torna alla versione precedente».
+
 ## Il problema resta
 
 [Apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new) indicando codice, versione di Salotto e di Fire OS.
