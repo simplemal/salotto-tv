@@ -453,6 +453,8 @@ public final class MainActivity extends CardActivity {
 
     /** The cover needs the Home as it is now, and a press leaves no time to take it. */
     @Override public void onUserInteraction() {
+        // On its way to the first start this page has built nothing.
+        if (root == null) return;
         root.removeCallbacks(freshPicture);
         root.postDelayed(freshPicture, FRESH_PICTURE_MS);
         waitForSaver();
