@@ -20,6 +20,7 @@ final class FireSteps {
     private static final long FIND_LIMIT_MS = 6000;
     private static final long PRESS_LIMIT_MS = 30000;
     private static final long SETTLE_MS = 700;
+    private static final long FOCUS_WAIT_MS = 1000;
     private static final long LEAVE_MS = 300;
     private static final int MOST_BACKS = 4;
 
@@ -34,8 +35,9 @@ final class FireSteps {
     private volatile boolean okPressed;
     private int step;
     private long limit;
+    private long focusBy;
     private Runnable choose;
-    private boolean wasFocused;
+    private boolean announced;
     private Runnable lost;
     private boolean ended;
 
@@ -91,16 +93,36 @@ final class FireSteps {
         found.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
         entry = found;
         windowId = service.getRootInActiveWindow() == null ? 0 : service.getRootInActiveWindow().getWindowId();
-        limit = SystemClock.elapsedRealtime() + PRESS_LIMIT_MS;
-        selected.accept(step);
+        focusBy = SystemClock.elapsedRealtime() + FOCUS_WAIT_MS;
         main.postDelayed(look, POLL_MS);
     }
 
     /** Told when the entry has to be found again: until `selected` hears of it, OK does nothing. */
     void whenLost(Runnable action) { lost = action; }
 
-    /** The entry is selected, so an OK goes to it. */
-    boolean ready() { return entry != null; }
+    /** Asked as OK goes down: the page may have moved since the last look. */
+    boolean ready() { return announced && selectionHolds(); }
+
+    /**
+     * Whether the row that really has the selection is this step's. Fire OS keeps Launch application
+     * first and selected, so an OK that finds Force stop no longer selected opens the app it was
+     * meant to close: having selected a row says nothing about where the selection is now. A page
+     * that does not say where its selection is gets the benefit of the doubt.
+     */
+    private boolean selectionHolds() {
+        AccessibilityNodeInfo root = service.getRootInActiveWindow();
+        AccessibilityNodeInfo focus = root == null ? null : root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
+        return focus == null || says(focus, steps[step]);
+    }
+
+    private static boolean says(AccessibilityNodeInfo row, String[] names) {
+        for (String name : names) {
+            for (AccessibilityNodeInfo node : row.findAccessibilityNodeInfosByText(name)) {
+                if (name.contentEquals(String.valueOf(node.getText()))) return true;
+            }
+        }
+        return false;
+    }
 
     /** TaskService hears OK. */
     void okPressed() {
@@ -110,30 +132,46 @@ final class FireSteps {
     /**
      * Pressed, an entry may also turn off or open another window. An entry gone is not a press: a
      * page seen for the first time fills in late and builds its rows again. Nor is a selection
-     * that moved away: OK would land on the next row, so until it is back no OK goes through.
+     * that moved away: OK would land on another row, so until it is back no OK goes through.
+     * `selected` hears of a row only once the selection is really on it.
      */
     private void waitForPress() {
         AccessibilityNodeInfo root = service.getRootInActiveWindow();
         boolean there = entry.refresh();
-        boolean focused = there && entry.isFocused();
         boolean pressed = okPressed || root != null && root.getWindowId() != windowId || there && !entry.isEnabled();
         okPressed = false;
-        wasFocused |= focused;
-        if (!pressed && (!there || wasFocused && !focused)) {
+        long now = SystemClock.elapsedRealtime();
+        if (pressed) {
+            if (step + 1 < steps.length) {
+                step++;
+                entry = null;
+                announced = false;
+                limit = now + FIND_LIMIT_MS;
+                main.postDelayed(look, POLL_MS);
+            } else {
+                end(true);
+            }
+        } else if (there && selectionHolds()) {
+            if (!announced) {
+                announced = true;
+                limit = now + PRESS_LIMIT_MS;
+                selected.accept(step);
+            }
+            if (now < limit) main.postDelayed(look, POLL_MS);
+            else end(false);
+        } else if (there && !announced && now < focusBy) {
+            main.postDelayed(look, POLL_MS);
+        } else if (announced) {
             entry = null;
-            wasFocused = false;
+            announced = false;
             if (lost != null) lost.run();
-            limit = SystemClock.elapsedRealtime() + FIND_LIMIT_MS;
+            limit = now + FIND_LIMIT_MS;
             main.postDelayed(look, POLL_MS);
-        } else if (!pressed && SystemClock.elapsedRealtime() < limit) {
-            main.postDelayed(look, POLL_MS);
-        } else if (pressed && step + 1 < steps.length) {
-            step++;
+        } else if (now < limit) {
             entry = null;
-            limit = SystemClock.elapsedRealtime() + FIND_LIMIT_MS;
             main.postDelayed(look, POLL_MS);
         } else {
-            end(pressed);
+            end(false);
         }
     }
 

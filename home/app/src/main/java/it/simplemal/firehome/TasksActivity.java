@@ -309,7 +309,8 @@ public final class TasksActivity extends CardActivity {
 
     private Bitmap picture(String pkg) {
         File file = RunningApps.picture(this, pkg);
-        return file.isFile() ? BitmapFactory.decodeFile(file.getPath()) : null;
+        Bitmap frame = file.isFile() ? BitmapFactory.decodeFile(file.getPath()) : null;
+        return frame == null || RunningApps.blank(frame) ? null : frame;
     }
 
     private void select(int position) {

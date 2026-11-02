@@ -102,7 +102,6 @@ public final class TaskService extends AccessibilityService {
     private static final String ANDROID_CLASS = "android.";
     private static final String PACKAGE_NAME = "[A-Za-z0-9._]+";
     /** Protected video reaches a capture as a black frame: the card art is better than that. */
-    private static final int BLACK_LEVEL = 10;
     /** About 16 by 9 pixels: enough to tell a black frame, and far quicker to decode than the whole of it. */
     private static final int SAMPLE_SIZE = 32;
     private static final String NOTHING = "none";
@@ -152,6 +151,7 @@ public final class TaskService extends AccessibilityService {
     private boolean keyFired;
     private boolean menuKept;
     private FireSteps fireSteps;
+    private boolean okGoesThrough;
     private FrameLayout uninstallMask;
     private final Runnable uncover = this::uncoverUninstall;
     private FrameLayout installMask;
@@ -301,18 +301,26 @@ public final class TaskService extends AccessibilityService {
     }
 
     /** Only OK reaches the page, and only once Force stop is selected: up and Back leave the X. */
-    private boolean keyOnPreparedStop(int key, boolean ok, boolean up) {
-        if (ok) {
-            boolean ready = fireSteps != null && fireSteps.ready();
-            if (ready && up) fireSteps.okPressed();
-            return !ready;
-        }
+    private boolean keyOnPreparedStop(KeyEvent event, int key, boolean ok, boolean up) {
+        if (ok) return !okReachesPage(event);
         boolean leaves = key == KeyEvent.KEYCODE_DPAD_UP || key == KeyEvent.KEYCODE_BACK;
         if (leaves && up && fireSteps != null) {
             stopLeaving = key == KeyEvent.KEYCODE_BACK ? STOP_BACK : STOP_UP;
             fireSteps.cancel();
         }
         return true;
+    }
+
+    /** Decided as OK goes down, and its release follows: half a press would stay held on the page. */
+    private boolean okReachesPage(KeyEvent event) {
+        boolean up = event.getAction() == KeyEvent.ACTION_UP;
+        if (!up && event.getRepeatCount() == 0) okGoesThrough = fireSteps != null && fireSteps.ready();
+        boolean through = okGoesThrough;
+        if (up) {
+            okGoesThrough = false;
+            if (through && fireSteps != null) fireSteps.okPressed();
+        }
+        return through;
     }
 
     /** Fire OS's own Restart, whose pages stay under the mask until the screen goes off. */
@@ -649,10 +657,10 @@ public final class TaskService extends AccessibilityService {
         boolean ok = key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
         if (panelWindow != null && panelWindow.key(event)) return true;
-        if (stopAnswer != null) return keyOnPreparedStop(key, ok, up);
+        if (stopAnswer != null) return keyOnPreparedStop(event, key, ok, up);
         // Under a mask a press would move on a page nobody can see, a step from Reset or Uninstall.
         if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;
-        if (ok && up && fireSteps != null) fireSteps.okPressed();
+        if (ok && fireSteps != null) return !okReachesPage(event);
         if (key != KeyEvent.KEYCODE_MENU && key != KeyEvent.KEYCODE_BACK) return false;
         boolean menu = key == KeyEvent.KEYCODE_MENU;
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -1043,9 +1051,9 @@ public final class TaskService extends AccessibilityService {
         small.inSampleSize = SAMPLE_SIZE;
         Bitmap sample = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.length, small);
         if (sample == null) return false;
-        boolean black = isBlack(sample);
+        boolean blank = RunningApps.blank(sample);
         sample.recycle();
-        if (black) return false;
+        if (blank) return false;
         File file = RunningApps.picture(this, pkg);
         try {
             file.getParentFile().mkdirs();
@@ -1054,16 +1062,5 @@ public final class TaskService extends AccessibilityService {
             file.delete();
         }
         return true;
-    }
-
-    private static boolean isBlack(Bitmap sample) {
-        int brightest = 0;
-        for (int y = 0; y < sample.getHeight(); y++) {
-            for (int x = 0; x < sample.getWidth(); x++) {
-                int pixel = sample.getPixel(x, y);
-                brightest = Math.max(brightest, Math.max(Color.red(pixel), Math.max(Color.green(pixel), Color.blue(pixel))));
-            }
-        }
-        return brightest < BLACK_LEVEL;
     }
 }

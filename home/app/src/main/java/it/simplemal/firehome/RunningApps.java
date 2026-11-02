@@ -7,6 +7,8 @@ import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Process;
 import android.os.SystemClock;
 import java.io.File;
@@ -26,6 +28,9 @@ final class RunningApps {
     /** Stopping AirPlay would stop the receiver, and Fire OS has no Force stop for Ambient. */
     private static final List<String> KEPT = Arrays.asList(Fire.AIRPLAY, Fire.AMBIENT);
     private static final String PICTURES = "anteprime";
+    /** Between the darkest and the brightest of a real picture, out of 255. */
+    private static final int FLAT_RANGE = 40;
+    private static final int BLANK_SAMPLES = 16;
 
     private RunningApps() {}
 
@@ -40,6 +45,27 @@ final class RunningApps {
     /** The last picture of an app, kept by TaskService. */
     static File picture(Context context, String pkg) {
         return new File(new File(context.getFilesDir(), PICTURES), pkg + ".jpg");
+    }
+
+    /**
+     * All one tone, black or not: an app still starting shows Android a plain window before its
+     * first frame, or a protected one none at all, and on a card that would look like a missing
+     * icon. The app's own artwork says more.
+     */
+    static boolean blank(Bitmap picture) {
+        int stepX = Math.max(1, picture.getWidth() / BLANK_SAMPLES);
+        int stepY = Math.max(1, picture.getHeight() / BLANK_SAMPLES);
+        int darkest = 255;
+        int brightest = 0;
+        for (int y = 0; y < picture.getHeight(); y += stepY) {
+            for (int x = 0; x < picture.getWidth(); x += stepX) {
+                int pixel = picture.getPixel(x, y);
+                int level = Math.max(Color.red(pixel), Math.max(Color.green(pixel), Color.blue(pixel)));
+                darkest = Math.min(darkest, level);
+                brightest = Math.max(brightest, level);
+            }
+        }
+        return brightest - darkest < FLAT_RANGE;
     }
 
     static boolean allowed(Context context) {
