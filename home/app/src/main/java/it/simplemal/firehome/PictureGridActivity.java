@@ -1,6 +1,8 @@
 package it.simplemal.firehome;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,13 +19,13 @@ import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -59,6 +61,10 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BUTTON_ROOM = 8;
     private static final int ARROW_SP = 34;
     private static final float ARROW_ALPHA = 0.55f;
+    private static final int PAGE_WHEEL = 48;
+    private static final int CELL_WHEEL = 28;
+    private static final long FADE_MS = 140;
+    private static final int OPAQUE = 255;
 
     /** A row cut by the edge of the screen is what says there are more, as on the Home. */
     private static final class GridScroll extends ScrollView {
@@ -77,7 +83,12 @@ public final class PictureGridActivity extends CardActivity {
     }
 
     private final List<ImageView> cells = new ArrayList<>();
+    private final List<FrameLayout> places = new ArrayList<>();
     private List<String> pictures = new ArrayList<>();
+    private boolean[] asked;
+    private boolean firstShown;
+    private LinearLayout rows;
+    private ProgressBar pageWheel;
     private boolean files;
     private String setName;
     private TextView title;
@@ -109,7 +120,7 @@ public final class PictureGridActivity extends CardActivity {
         title.setPadding(0, dp(TITLE_TOP), 0, dp(TITLE_BOTTOM));
         page.addView(title, new LinearLayout.LayoutParams(-2, -2));
 
-        LinearLayout rows = new LinearLayout(this);
+        rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
         rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(BOTTOM_ROOM));
         LinearLayout row = null;
@@ -122,9 +133,12 @@ public final class PictureGridActivity extends CardActivity {
             }
             ImageView cell = cell(index);
             cells.add(cell);
+            FrameLayout holder = new FrameLayout(this);
+            holder.addView(cell, new FrameLayout.LayoutParams(-1, -1));
+            places.add(holder);
             LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(CELL_WIDTH), dp(CELL_HEIGHT));
             place.setMarginStart(index % COLUMNS == 0 ? 0 : dp(GAP));
-            row.addView(cell, place);
+            row.addView(holder, place);
         }
         scroll = new GridScroll(this, dp(NEXT_ROW));
         scroll.setVerticalScrollBarEnabled(false);
@@ -132,13 +146,22 @@ public final class PictureGridActivity extends CardActivity {
         scroll.addView(rows);
         page.addView(scroll, new LinearLayout.LayoutParams(-2, 0, 1));
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));
+        pageWheel = wheel();
+        pageWheel.setVisibility(View.GONE);
+        root.addView(pageWheel, new FrameLayout.LayoutParams(dp(PAGE_WHEEL), dp(PAGE_WHEEL), Gravity.CENTER));
         preview = previewPage();
         root.addView(preview, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
 
         int chosen = Math.max(0, pictures.indexOf(Look.backdrop(this)));
         if (!cells.isEmpty()) cells.get(chosen).requestFocus();
-        if (files) loadThumbnails(chosen);
+        if (files) {
+            asked = new boolean[pictures.size()];
+            rows.setAlpha(0);
+            scroll.setOnScrollChangeListener((view, x, y, oldX, oldY) -> loadInView());
+            // Only once it is laid out, and scrolled to the selected cell, is it known what is in view.
+            scroll.post(this::showFirstScreen);
+        }
     }
 
     private List<String> pictures(String folder) {
@@ -187,20 +210,86 @@ public final class PictureGridActivity extends CardActivity {
         return edge;
     }
 
-    /** From the selected cell outwards: what is in view comes first. */
-    private void loadThumbnails(int from) {
-        List<Integer> order = new ArrayList<>();
-        for (int index = 0; index < pictures.size(); index++) {
-            if (cells.get(index).getDrawable() == null) order.add(index);
+    private ProgressBar wheel() {
+        ProgressBar wheel = new ProgressBar(this);
+        wheel.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+        return wheel;
+    }
+
+    /** Every cell the screen shows now, the ones its edge cuts too. */
+    private List<Integer> inView() {
+        int top = scroll.getScrollY();
+        int bottom = top + scroll.getHeight();
+        List<Integer> seen = new ArrayList<>();
+        for (int index = 0; index < places.size(); index++) {
+            View row = (View) places.get(index).getParent();
+            if (row.getBottom() > top && row.getTop() < bottom) seen.add(index);
         }
-        order.sort(Comparator.comparingInt(index -> Math.abs(index - from)));
+        return seen;
+    }
+
+    private List<Integer> missing() {
+        List<Integer> missing = new ArrayList<>();
+        for (int index : inView()) {
+            if (cells.get(index).getDrawable() == null && !asked[index]) missing.add(index);
+        }
+        return missing;
+    }
+
+    /** The first screen comes all at once, even when nothing has been read yet. */
+    private void showFirstScreen() {
+        List<Integer> missing = missing();
+        if (missing.isEmpty()) {
+            rows.setAlpha(1);
+            firstShown = true;
+            return;
+        }
+        pageWheel.setVisibility(View.VISIBLE);
+        for (int index : missing) asked[index] = true;
         List<String> names = new ArrayList<>(pictures);
         Background.draw(() -> {
-            for (int index : order) {
+            List<Bitmap> read = new ArrayList<>();
+            for (int index : missing) {
                 if (isDestroyed()) return;
-                Bitmap thumbnail = Thumbnails.read(this, names.get(index));
-                if (thumbnail != null) runOnUiThread(() -> cells.get(index).setImageBitmap(thumbnail));
+                read.add(Thumbnails.read(this, names.get(index)));
             }
+            runOnUiThread(() -> {
+                for (int place = 0; place < missing.size(); place++) {
+                    if (read.get(place) != null) cells.get(missing.get(place)).setImageBitmap(read.get(place));
+                }
+                pageWheel.setVisibility(View.GONE);
+                rows.animate().alpha(1).setDuration(FADE_MS).start();
+                firstShown = true;
+                loadInView();
+            });
+        });
+    }
+
+    /** From there on, only what scrolling brings in: each cell on its own, as it is ready. */
+    private void loadInView() {
+        if (!firstShown) return;
+        for (int index : missing()) {
+            asked[index] = true;
+            load(index);
+        }
+    }
+
+    private void load(int index) {
+        FrameLayout place = places.get(index);
+        ProgressBar wheel = wheel();
+        place.addView(wheel, new FrameLayout.LayoutParams(dp(CELL_WHEEL), dp(CELL_WHEEL), Gravity.CENTER));
+        String name = pictures.get(index);
+        Background.draw(() -> {
+            if (isDestroyed()) return;
+            Bitmap thumbnail = Thumbnails.read(this, name);
+            runOnUiThread(() -> {
+                place.removeView(wheel);
+                if (thumbnail == null) return;
+                ImageView cell = cells.get(index);
+                cell.setImageAlpha(0);
+                cell.setImageBitmap(thumbnail);
+                ObjectAnimator.ofInt(cell, "imageAlpha", 0, OPAQUE).setDuration(FADE_MS).start();
+            });
         });
     }
 
