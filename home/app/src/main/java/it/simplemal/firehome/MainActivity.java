@@ -550,7 +550,10 @@ public final class MainActivity extends CardActivity {
             Background.run(() -> {
                 try {
                     Weather.refresh(getApplicationContext());
-                    runOnUiThread(this::showWeather);
+                    runOnUiThread(() -> {
+                        showWeather();
+                        showBackdrop();
+                    });
                 } catch (IOException | JSONException e) {
                     // The last reading stays on screen; the next check tries again.
                 }
