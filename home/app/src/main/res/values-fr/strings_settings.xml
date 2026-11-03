@@ -42,7 +42,7 @@
     <string name="settings_dock_top">En haut</string>
     <string name="settings_dock_bottom_choice">Dock en bas</string>
     <string name="settings_dock_top_choice">Dock en haut</string>
-    <string name="settings_dock_text">Où l’Accueil commence à chaque appui sur Accueil. En bas : grande horloge et météo au-dessus du dock. En haut : les applis tout de suite, l’heure et la météo dans la pastille ; Haut depuis le dock les remet en grand.</string>
+    <string name="settings_dock_text">Où l’Accueil commence à chaque appui sur Accueil. En bas : grande horloge et météo au-dessus du dock. En haut : les applis tout de suite, l’heure et la météo dans la pastille.</string>
     <string name="settings_app_names">Noms des applis</string>
     <string name="settings_app_names_text">Quand afficher le nom sous les cartes. Jamais dans le dock.</string>
     <string name="settings_all_apps">Toutes les applis</string>

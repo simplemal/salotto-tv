@@ -148,8 +148,6 @@ public final class MainActivity extends CardActivity {
     private static final int FOOTER_INK = Color.rgb(205, 205, 205);
     private boolean bigClock;
     private boolean appsOnly;
-    /** Dock up, and Up pressed on it: the clock and weather are in view until a lower row or Home. */
-    private boolean revealed;
     private String weatherSymbol;
     private boolean pillDrawn;
     private boolean pillClock;
@@ -355,6 +353,8 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
+        // Dock up, the panel would lie over the dock: the Home comes down for it, and goes back up after.
+        if (appsOnly) scroll.smoothScrollTo(0, open ? 0 : shelf);
         panelShade.setVisibility(open ? View.VISIBLE : View.GONE);
         panel.hideHint();
         if (!open) panel.closed();
@@ -452,7 +452,7 @@ public final class MainActivity extends CardActivity {
         }
         View from = getCurrentFocus();
         boolean onCards = from != null && from != controlButton && !isInside(from, panel);
-        scroll.smoothScrollTo(0, appsOnly ? shelf : 0);
+        scroll.smoothScrollTo(0, 0);
         showPanel(true);
         panel.openEmpty(onCards ? from : firstCard());
     }
@@ -719,7 +719,6 @@ public final class MainActivity extends CardActivity {
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
     private void restRaised() {
-        revealed = false;
         if (page.isLaidOut() && !page.isLayoutRequested() && page.getHeight() > shelf) {
             scroll.scrollTo(0, shelf);
             return;
@@ -728,7 +727,7 @@ public final class MainActivity extends CardActivity {
             @Override public void onLayoutChange(View view, int left, int top, int right, int bottom,
                     int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 page.removeOnLayoutChangeListener(this);
-                scroll.post(() -> { if (appsOnly && !revealed) scroll.scrollTo(0, shelf); });
+                scroll.post(() -> { if (appsOnly) scroll.scrollTo(0, shelf); });
             }
         });
     }
@@ -758,8 +757,7 @@ public final class MainActivity extends CardActivity {
     @Override protected void onCardFocus(View tile) {
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
-        if (index > 0) revealed = false;
-        int target = index == 0 ? (appsOnly && !revealed ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
         scroll.smoothScrollTo(0, target);
     }
 
@@ -908,13 +906,10 @@ public final class MainActivity extends CardActivity {
     @Override protected float focusScale() { return moving != null ? 1.12f : super.focusScale(); }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
-        // Dock up, Up on it shows the clock and weather first, as the dock down does from the start.
-        if (moving == null && appsOnly && !revealed && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
+        // Dock up: one Up opens the control panel, as from the dock down. The scroll would take it first.
+        if (moving == null && appsOnly && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
                 && dock != null && isInside(getCurrentFocus(), dock)) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                revealed = true;
-                scroll.smoothScrollTo(0, 0);
-            }
+            if (event.getAction() == KeyEvent.ACTION_DOWN) controlButton.requestFocus();
             return true;
         }
         if (moving == null) return super.dispatchKeyEvent(event);

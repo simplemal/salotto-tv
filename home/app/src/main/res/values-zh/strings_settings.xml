@@ -43,7 +43,7 @@
     <string name="settings_dock_top">顶部</string>
     <string name="settings_dock_bottom_choice">程序坞在底部</string>
     <string name="settings_dock_top_choice">程序坞在顶部</string>
-    <string name="settings_dock_text">每次按主页键时主屏幕的起始位置。底部：程序坞上方显示大时钟和天气。顶部：直接显示应用，时间和天气在小标签里；在程序坞上按上键可重新放大显示。</string>
+    <string name="settings_dock_text">每次按主页键时主屏幕的起始位置。底部：程序坞上方显示大时钟和天气。顶部：直接显示应用，时间和天气在小标签里。</string>
     <string name="settings_app_names">应用名称</string>
     <string name="settings_app_names_text">何时在卡片下方显示名称。程序坞里从不显示。</string>
     <string name="settings_all_apps">所有应用</string>

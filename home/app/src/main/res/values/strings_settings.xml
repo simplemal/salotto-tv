@@ -42,7 +42,7 @@
     <string name="settings_dock_top">In alto</string>
     <string name="settings_dock_bottom_choice">Dock in basso</string>
     <string name="settings_dock_top_choice">Dock in alto</string>
-    <string name="settings_dock_text">Dove parte la Home a ogni pressione di Home. In basso: orologio e meteo in grande sopra il dock. In alto: le app subito, con ora e meteo nella pillola; premendo su dal dock tornano in grande.</string>
+    <string name="settings_dock_text">Dove parte la Home a ogni pressione di Home. In basso: orologio e meteo in grande sopra il dock. In alto: le app subito, con ora e meteo nella pillola.</string>
     <string name="settings_app_names">Nomi delle app</string>
     <string name="settings_app_names_text">Quando mostrare il nome sotto le card. Nel dock non compare mai.</string>
     <string name="settings_all_apps">Tutte le app</string>

@@ -42,7 +42,7 @@
     <string name="settings_dock_top">Em cima</string>
     <string name="settings_dock_bottom_choice">Dock em baixo</string>
     <string name="settings_dock_top_choice">Dock em cima</string>
-    <string name="settings_dock_text">Onde o Início começa sempre que você aperta Início. Em baixo: relógio e tempo grandes acima do dock. Em cima: os apps logo de cara, com hora e tempo no selo; apertando para cima no dock eles voltam grandes.</string>
+    <string name="settings_dock_text">Onde o Início começa sempre que você aperta Início. Em baixo: relógio e tempo grandes acima do dock. Em cima: os apps logo de cara, com hora e tempo no selo.</string>
     <string name="settings_app_names">Nomes dos apps</string>
     <string name="settings_app_names_text">Quando mostrar o nome abaixo dos cartões. No dock nunca aparece.</string>
     <string name="settings_all_apps">Todos os apps</string>

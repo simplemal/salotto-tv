@@ -42,7 +42,7 @@
     <string name="settings_dock_top">ऊपर</string>
     <string name="settings_dock_bottom_choice">डॉक नीचे</string>
     <string name="settings_dock_top_choice">डॉक ऊपर</string>
-    <string name="settings_dock_text">हर बार होम दबाने पर होम कहाँ से शुरू हो। नीचे: डॉक के ऊपर बड़ी घड़ी और मौसम। ऊपर: सीधे ऐप, समय और मौसम छोटे बॉक्स में; डॉक पर ऊपर दबाने से वे फिर बड़े दिखते हैं।</string>
+    <string name="settings_dock_text">हर बार होम दबाने पर होम कहाँ से शुरू हो। नीचे: डॉक के ऊपर बड़ी घड़ी और मौसम। ऊपर: सीधे ऐप, समय और मौसम छोटे बॉक्स में।</string>
     <string name="settings_app_names">ऐप के नाम</string>
     <string name="settings_app_names_text">कार्ड के नीचे नाम कब दिखाएं। डॉक में कभी नहीं दिखता।</string>
     <string name="settings_all_apps">सभी ऐप</string>

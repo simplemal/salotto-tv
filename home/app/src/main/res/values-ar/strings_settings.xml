@@ -42,7 +42,7 @@
     <string name="settings_dock_top">في الأعلى</string>
     <string name="settings_dock_bottom_choice">الدوك في الأسفل</string>
     <string name="settings_dock_top_choice">الدوك في الأعلى</string>
-    <string name="settings_dock_text">من أين تبدأ الرئيسية عند كل ضغطة على زر الرئيسية. في الأسفل: ساعة وطقس كبيران فوق الدوك. في الأعلى: التطبيقات مباشرة، والوقت والطقس في الشارة؛ الضغط لأعلى من الدوك يعيدهما كبيرين.</string>
+    <string name="settings_dock_text">من أين تبدأ الرئيسية عند كل ضغطة على زر الرئيسية. في الأسفل: ساعة وطقس كبيران فوق الدوك. في الأعلى: التطبيقات مباشرة، والوقت والطقس في الشارة.</string>
     <string name="settings_app_names">أسماء التطبيقات</string>
     <string name="settings_app_names_text">متى يظهر الاسم تحت البطاقات. لا يظهر أبدًا في الدوك.</string>
     <string name="settings_all_apps">كل التطبيقات</string>
