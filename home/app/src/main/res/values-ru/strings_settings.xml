@@ -268,6 +268,8 @@
     <string name="settings_saver_start">Запустить сейчас</string>
     <string name="settings_saver_start_text">Сразу запускает заставку. Закрывается кнопкой «Назад».</string>
     <string name="settings_saver_fire">Решает Fire OS</string>
+    <string name="settings_saver_native">Встроенный</string>
+    <string name="settings_backdrop_weather_group">Динамическая погода</string>
     <string name="settings_saver_fire_text">Заставка Amazon с её изображениями.</string>
     <string name="settings_saver_choose">Выбрать</string>
     <string name="settings_saver_choose_text">Открывает меню Fire OS, где можно выбрать заставку: фото, стиль, скорость. Учитывается время запуска, выбранное здесь, в Salotto.</string>

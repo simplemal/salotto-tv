@@ -502,6 +502,7 @@ public final class SettingsActivity extends CardActivity {
 
     private View label(Entry entry) {
         TextView label = label(entry.title, LABEL_SP);
+        label.setText(Brand.mark(this, entry.title));
         label.setAlpha(0.7f);
         label.setPadding(dp(20), dp(LABEL_ROOM), dp(16), dp(8));
         return label;
@@ -1498,16 +1499,15 @@ public final class SettingsActivity extends CardActivity {
         nature.mosaic = Look.NATURE_FOLDER;
         nature.mark = R.drawable.ic_restart;
         timed.add(nature);
-        boolean weatherFirst = Weather.active(this);
-        List<Entry> entries = new ArrayList<>();
-        entries.add(groupLabel(R.string.first_backdrop_dynamic));
-        // It speaks of the sets below it: with any other backdrop there is nothing to change.
+        weather.add(0, groupLabel(R.string.settings_backdrop_weather_group));
+        timed.add(0, groupLabel(R.string.first_backdrop_dynamic));
+        // Under its own heading it is plainly about these sets, so it stays on whatever the backdrop.
         Entry pace = paceEntry();
-        pace.off = !Look.timedBackdrop(this);
-        if (weatherFirst) entries.addAll(weather);
-        entries.add(pace);
-        entries.addAll(timed);
-        if (!weatherFirst) entries.addAll(weather);
+        pace.mark = 0;
+        timed.add(pace);
+        boolean weatherFirst = Weather.active(this);
+        List<Entry> entries = new ArrayList<>(weatherFirst ? weather : timed);
+        entries.addAll(weatherFirst ? timed : weather);
         entries.add(groupLabel(R.string.first_backdrop_static));
         entries.add(standardSet());
         entries.add(pictureSet(Look.ABSTRACT, Look.ABSTRACT_FOLDER));
@@ -1555,7 +1555,11 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private Entry groupLabel(int name) {
-        Entry entry = new Entry(getString(name), null, null, "", false, () -> { });
+        return groupLabel(getString(name));
+    }
+
+    private Entry groupLabel(String name) {
+        Entry entry = new Entry(name, null, null, "", false, () -> { });
         entry.label = true;
         return entry;
     }
@@ -1564,7 +1568,6 @@ public final class SettingsActivity extends CardActivity {
         Entry pace = new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)),
             getDrawable(R.drawable.ic_timer), getString(R.string.settings_abstract_time_text), true,
             () -> enter(this::showAbstractTimes));
-        pace.mark = 0;
         return pace;
     }
 
@@ -1754,17 +1757,20 @@ public final class SettingsActivity extends CardActivity {
         });
     }
 
+    /** The rows stay where they are whatever is chosen, so the selection stays on the row pressed. */
     private void showSaverKinds() {
         boolean own = ownSaver();
         List<Entry> entries = new ArrayList<>();
+        entries.add(groupLabel(Brand.NAME));
+        for (Saver saver : SAVERS) entries.add(saverEntry(saver));
+        entries.add(paceEntry());
+        entries.add(groupLabel(R.string.settings_saver_native));
         entries.add(new Entry(getString(R.string.settings_saver_fire), own ? null : CHECK, getDrawable(R.drawable.ic_image),
             getString(R.string.settings_saver_fire_text), false, () -> chooseSaver(Fire.AMAZON_SAVER)));
-        if (!own) {
-            entries.add(new Entry(getString(R.string.settings_saver_choose), null, getDrawable(R.drawable.ic_s_open),
-                getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
-        }
-        for (Saver saver : SAVERS) entries.add(saverEntry(saver));
-        if (own) entries.add(paceEntry());
+        Entry choose = new Entry(getString(R.string.settings_saver_choose), null, getDrawable(R.drawable.ic_s_open),
+            getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu()));
+        choose.off = own;
+        entries.add(choose);
         show(getString(R.string.settings_saver_kind), entries);
     }
 

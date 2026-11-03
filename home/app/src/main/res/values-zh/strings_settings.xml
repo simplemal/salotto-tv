@@ -269,6 +269,8 @@
     <string name="settings_saver_start">立即启动</string>
     <string name="settings_saver_start_text">马上启动屏保。按返回键退出。</string>
     <string name="settings_saver_fire">由 Fire OS 决定</string>
+    <string name="settings_saver_native">系统自带</string>
+    <string name="settings_backdrop_weather_group">动态天气</string>
     <string name="settings_saver_fire_text">Amazon 的屏保，使用它自己的图片。</string>
     <string name="settings_saver_choose">选择</string>
     <string name="settings_saver_choose_text">打开 Fire OS 的菜单，在它的屏保中选择：照片、样式、速度。启动时间以这里 Salotto 中设置的为准。</string>

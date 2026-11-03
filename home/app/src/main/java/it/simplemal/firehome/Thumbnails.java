@@ -16,8 +16,8 @@ final class Thumbnails {
     private static final String FOLDER = "miniature/";
     /** A smaller copy still, for the first moment: it takes a fraction of the time to read. */
     private static final String TINY_FOLDER = "miniature-piccole/";
-    /** Salotto stays in memory under every app: a set and a bit, not all of them. */
-    private static final int KEPT_BYTES = 16 * 1024 * 1024;
+    /** Salotto stays in memory under every app: a set and a bit, not all of them. Let go when Android asks. */
+    private static final int KEPT_BYTES = 28 * 1024 * 1024;
     /** For a picture with no small copy: a quarter of each side. */
     private static final int FULL_SAMPLE = 4;
     private static final LruCache<String, Bitmap> KEPT = new LruCache<String, Bitmap>(KEPT_BYTES) {
@@ -45,7 +45,8 @@ final class Thumbnails {
     private static Bitmap decode(Context context, String asset, int sample) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = sample;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        // Sixteen bits turn the dark gradients of the sets into steps: full colour, at twice the memory.
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         try (InputStream input = context.getAssets().open(asset)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {

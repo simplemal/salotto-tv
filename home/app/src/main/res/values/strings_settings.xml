@@ -268,6 +268,8 @@
     <string name="settings_saver_start">Avvia adesso</string>
     <string name="settings_saver_start_text">Fa partire subito il salvaschermo. Si chiude con Indietro.</string>
     <string name="settings_saver_fire">Deciso da Fire OS</string>
+    <string name="settings_saver_native">Nativo</string>
+    <string name="settings_backdrop_weather_group">Meteo dinamico</string>
     <string name="settings_saver_fire_text">Il salvaschermo di Amazon, con le sue immagini.</string>
     <string name="settings_saver_choose">Scegli</string>
     <string name="settings_saver_choose_text">Apre il menu di Fire OS per scegliere tra i suoi salvaschermi: foto, stile, velocità. Il tempo di avvio che conta è quello scelto qui in Salotto.</string>

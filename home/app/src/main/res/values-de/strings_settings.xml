@@ -268,6 +268,8 @@
     <string name="settings_saver_start">Jetzt starten</string>
     <string name="settings_saver_start_text">Startet den Bildschirmschoner sofort. Mit Zurück beendest du ihn.</string>
     <string name="settings_saver_fire">Von Fire OS bestimmt</string>
+    <string name="settings_saver_native">Integriert</string>
+    <string name="settings_backdrop_weather_group">Dynamisches Wetter</string>
     <string name="settings_saver_fire_text">Der Bildschirmschoner von Amazon, mit seinen Bildern.</string>
     <string name="settings_saver_choose">Wählen</string>
     <string name="settings_saver_choose_text">Öffnet das Menü von Fire OS, um zwischen seinen Bildschirmschonern zu wählen: Fotos, Stil, Tempo. Es zählt die Startzeit, die du hier in Salotto wählst.</string>

@@ -269,6 +269,8 @@
     <string name="settings_saver_start">Iniciar ahora</string>
     <string name="settings_saver_start_text">Inicia el salvapantallas al instante. Se cierra con Atrás.</string>
     <string name="settings_saver_fire">Lo decide Fire OS</string>
+    <string name="settings_saver_native">Integrado</string>
+    <string name="settings_backdrop_weather_group">Tiempo dinámico</string>
     <string name="settings_saver_fire_text">El salvapantallas de Amazon, con sus imágenes.</string>
     <string name="settings_saver_choose">Elegir</string>
     <string name="settings_saver_choose_text">Abre el menú de Fire OS para elegir entre sus salvapantallas: fotos, estilo, velocidad. El tiempo de inicio que cuenta es el elegido aquí, en Salotto.</string>

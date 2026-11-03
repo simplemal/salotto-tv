@@ -13,7 +13,7 @@ from PIL import Image, ImageOps
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 ASSETS = ROOT / "home/app/src/main/assets"
 SETS = ("astratti", "astratti-3d", "nox-city", "natura-aerea", "meteo-illustrato", "meteo-foto", "meteo-aereo")
-TARGETS = {ASSETS / "miniature": ((432, 244), 70), ASSETS / "miniature-piccole": ((108, 61), 55)}
+TARGETS = {ASSETS / "miniature": ((432, 244), 90), ASSETS / "miniature-piccole": ((108, 61), 55)}
 # The cell of PictureGridActivity on the screen, pixel for pixel. It is not quite 16:9, so a line of
 # the picture goes at the edges: enlarged instead, on the Stick, the whole picture would go soft.
 

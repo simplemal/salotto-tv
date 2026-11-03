@@ -268,6 +268,8 @@
     <string name="settings_saver_start">Start now</string>
     <string name="settings_saver_start_text">Starts the screensaver right away. Press Back to close it.</string>
     <string name="settings_saver_fire">Decided by Fire OS</string>
+    <string name="settings_saver_native">Built in</string>
+    <string name="settings_backdrop_weather_group">Dynamic weather</string>
     <string name="settings_saver_fire_text">The Amazon screensaver, with its own images.</string>
     <string name="settings_saver_choose">Choose</string>
     <string name="settings_saver_choose_text">Opens the Fire OS menu to pick between its screensavers: photos, style, speed. The start time that counts is the one chosen here in Salotto.</string>

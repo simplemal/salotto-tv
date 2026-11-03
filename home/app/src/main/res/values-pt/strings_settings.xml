@@ -268,6 +268,8 @@
     <string name="settings_saver_start">Iniciar agora</string>
     <string name="settings_saver_start_text">Inicia o protetor de tela na hora. Fecha com Voltar.</string>
     <string name="settings_saver_fire">Definido pelo Fire OS</string>
+    <string name="settings_saver_native">Integrado</string>
+    <string name="settings_backdrop_weather_group">Tempo dinâmico</string>
     <string name="settings_saver_fire_text">O protetor de tela da Amazon, com as imagens dele.</string>
     <string name="settings_saver_choose">Escolher</string>
     <string name="settings_saver_choose_text">Abre o menu do Fire OS para escolher entre os protetores de tela dele: fotos, estilo, velocidade. O tempo de início que vale é o escolhido aqui, no Salotto.</string>

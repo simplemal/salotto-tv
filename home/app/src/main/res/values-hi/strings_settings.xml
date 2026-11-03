@@ -268,6 +268,8 @@
     <string name="settings_saver_start">अभी शुरू करें</string>
     <string name="settings_saver_start_text">स्क्रीनसेवर तुरंत शुरू करता है। वापस दबाने पर बंद होता है।</string>
     <string name="settings_saver_fire">Fire OS तय करता है</string>
+    <string name="settings_saver_native">बिल्ट-इन</string>
+    <string name="settings_backdrop_weather_group">डायनामिक मौसम</string>
     <string name="settings_saver_fire_text">Amazon का स्क्रीनसेवर, उसकी अपनी तस्वीरों के साथ।</string>
     <string name="settings_saver_choose">चुनें</string>
     <string name="settings_saver_choose_text">Fire OS का मेनू खोलता है, जहाँ उसके स्क्रीनसेवर चुने जा सकते हैं: फ़ोटो, स्टाइल, स्पीड। शुरू होने का जो समय मायने रखता है, वह यहाँ Salotto में चुना हुआ है।</string>

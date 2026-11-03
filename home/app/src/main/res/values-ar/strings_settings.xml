@@ -268,6 +268,8 @@
     <string name="settings_saver_start">ابدأ الآن</string>
     <string name="settings_saver_start_text">تشغّل شاشة التوقف فورًا. تُغلق بزر رجوع.</string>
     <string name="settings_saver_fire">يحدده Fire OS</string>
+    <string name="settings_saver_native">مدمج</string>
+    <string name="settings_backdrop_weather_group">طقس ديناميكي</string>
     <string name="settings_saver_fire_text">شاشة التوقف من Amazon، بصورها.</string>
     <string name="settings_saver_choose">اختيار</string>
     <string name="settings_saver_choose_text">يفتح قائمة Fire OS للاختيار بين شاشات التوقف فيه: الصور والنمط والسرعة. وقت البدء المعتمد هو ما تختاره هنا في Salotto.</string>
