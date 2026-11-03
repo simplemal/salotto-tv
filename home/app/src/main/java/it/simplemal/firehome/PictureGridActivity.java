@@ -26,7 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Every picture of one set, or Salotto's own backdrops with no set named, four across and down to
@@ -86,6 +89,9 @@ public final class PictureGridActivity extends CardActivity {
     private final List<FrameLayout> places = new ArrayList<>();
     private List<String> pictures = new ArrayList<>();
     private boolean[] asked;
+    private boolean[] sharpened;
+    /** The cells in view when they were last counted: a sharpening asked for one scrolled away is dropped. */
+    private volatile Set<Integer> onScreen = Collections.emptySet();
     private boolean firstShown;
     private LinearLayout rows;
     private ProgressBar pageWheel;
@@ -157,8 +163,12 @@ public final class PictureGridActivity extends CardActivity {
         if (!cells.isEmpty()) cells.get(chosen).requestFocus();
         if (files) {
             asked = new boolean[pictures.size()];
+            sharpened = new boolean[pictures.size()];
             rows.setAlpha(0);
-            scroll.setOnScrollChangeListener((view, x, y, oldX, oldY) -> loadInView());
+            scroll.setOnScrollChangeListener((view, x, y, oldX, oldY) -> {
+                loadInView();
+                sharpenInView();
+            });
             // Only once it is laid out, and scrolled to the selected cell, is it known what is in view.
             scroll.post(this::showFirstScreen);
         }
@@ -242,6 +252,7 @@ public final class PictureGridActivity extends CardActivity {
         if (missing.isEmpty()) {
             rows.setAlpha(1);
             firstShown = true;
+            sharpenInView();
             return;
         }
         pageWheel.setVisibility(View.VISIBLE);
@@ -261,6 +272,7 @@ public final class PictureGridActivity extends CardActivity {
                 rows.animate().alpha(1).setDuration(FADE_MS).start();
                 firstShown = true;
                 loadInView();
+                sharpenInView();
             });
         });
     }
@@ -292,8 +304,30 @@ public final class PictureGridActivity extends CardActivity {
                 if (thumbnail == null) return;
                 if (quick != null) cells.get(index).setImageBitmap(thumbnail);
                 else appear(cells.get(index), thumbnail);
+                sharpenInView();
             });
         });
+    }
+
+    /** Then the cells on screen once more, from the pictures themselves, one at a time behind the small copies. */
+    private void sharpenInView() {
+        if (!firstShown) return;
+        List<Integer> seen = inView();
+        onScreen = new HashSet<>(seen);
+        for (int index : seen) {
+            if (sharpened[index] || cells.get(index).getDrawable() == null) continue;
+            sharpened[index] = true;
+            String name = pictures.get(index);
+            Background.draw(() -> {
+                if (isDestroyed()) return;
+                if (!onScreen.contains(index)) {
+                    runOnUiThread(() -> sharpened[index] = false);
+                    return;
+                }
+                Bitmap sharp = Thumbnails.sharp(this, name);
+                if (sharp != null) runOnUiThread(() -> cells.get(index).setImageBitmap(sharp));
+            });
+        }
     }
 
     private void appear(ImageView cell, Bitmap picture) {

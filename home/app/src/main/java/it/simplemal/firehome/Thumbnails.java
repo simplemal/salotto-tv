@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import android.util.LruCache;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The small copies of the backdrop sets. WebP has no smaller view of itself: asking for a quarter
@@ -20,8 +23,14 @@ final class Thumbnails {
     private static final int KEPT_BYTES = 28 * 1024 * 1024;
     /** For a picture with no small copy: a quarter of each side. */
     private static final int FULL_SAMPLE = 4;
+    /** Kept as read from the picture itself, not from its small copy. */
+    private static final Set<String> SHARP = Collections.synchronizedSet(new HashSet<>());
     private static final LruCache<String, Bitmap> KEPT = new LruCache<String, Bitmap>(KEPT_BYTES) {
         @Override protected int sizeOf(String asset, Bitmap thumbnail) { return thumbnail.getByteCount(); }
+
+        @Override protected void entryRemoved(boolean evicted, String asset, Bitmap old, Bitmap replaced) {
+            if (replaced == null) SHARP.remove(asset);
+        }
     };
 
     private Thumbnails() {}
@@ -40,6 +49,23 @@ final class Thumbnails {
         if (thumbnail == null) thumbnail = decode(context, asset, FULL_SAMPLE);
         if (thumbnail != null) KEPT.put(asset, thumbnail);
         return thumbnail;
+    }
+
+    /**
+     * The picture itself at a quarter of each side, a tenth of a second or more: for the few on
+     * screen. The small copies are lossy, and lossy turns shaded backgrounds into squares at any
+     * quality. Null if it cannot be read.
+     */
+    static Bitmap sharp(Context context, String asset) {
+        if (SHARP.contains(asset)) {
+            Bitmap kept = KEPT.get(asset);
+            if (kept != null) return kept;
+        }
+        Bitmap picture = decode(context, asset, FULL_SAMPLE);
+        if (picture == null) return null;
+        KEPT.put(asset, picture);
+        SHARP.add(asset);
+        return picture;
     }
 
     private static Bitmap decode(Context context, String asset, int sample) {
