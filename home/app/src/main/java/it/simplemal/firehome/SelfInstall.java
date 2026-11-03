@@ -35,6 +35,8 @@ public final class SelfInstall extends BroadcastReceiver {
                 for (int read; (read = input.read(chunk)) > 0; ) output.write(chunk, 0, read);
                 session.fsync(output);
             }
+            // Android has its own copy now: this one would only take room the install needs.
+            apk.delete();
             Intent answer = new Intent(context, SelfInstall.class).putExtra(EXTRA_PACKAGE, pkg);
             session.commit(PendingIntent.getBroadcast(context, id, answer, PendingIntent.FLAG_UPDATE_CURRENT).getIntentSender());
         }
@@ -52,7 +54,9 @@ public final class SelfInstall extends BroadcastReceiver {
             // C202 alone cannot tell a press on Cancel from a full Stick: Segnala un problema reads this line.
             Log.w(TAG, "C202: Fire OS answered " + status + ", " + intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE));
             TaskService.installEnded();
-            Updater.write(Updater.state(context), "failed C202");
+            // No room is something the person can act on, so it is named.
+            boolean full = status == PackageInstaller.STATUS_FAILURE_STORAGE;
+            Updater.write(Updater.state(context), full ? "failed F106" : "failed C202");
             // Over the cover, which goes when it is covered, and so the error can be read.
             context.startActivity(new Intent(context, UpdateActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }

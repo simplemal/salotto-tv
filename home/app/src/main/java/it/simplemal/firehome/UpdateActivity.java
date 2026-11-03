@@ -277,7 +277,8 @@ public final class UpdateActivity extends CardActivity {
             step(CHOICES, getString(R.string.update_detail_choices));
             saveChoices();
             step(COPY, getString(R.string.update_detail_copy));
-            Updater.keepCurrent(this);
+            // Android 9 goes back only from the computer: a copy there would only take room the install needs.
+            if (!Fire.ANDROID_9) Updater.keepCurrent(this);
             allowInstalling();
             Updater.recheck(apk, release);
             install(apk);

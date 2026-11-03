@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.StatFs;
+import android.os.storage.StorageManager;
 import android.provider.Settings;
 import android.util.Base64;
 import java.io.ByteArrayOutputStream;
@@ -67,6 +68,7 @@ final class Updater {
     private static final long NOTHING_NEW = 60 * Fire.MINUTE_MS;
     /** The script reports well within this; a state left older than this has no one behind it. */
     private static final long STALE = 5 * Fire.MINUTE_MS;
+    /** At most three copies at once: the download, the one kept for the way back, Android's own. */
     private static final long ROOM_FACTOR = 3;
     private static final int TIMEOUT_MS = 15000;
     private static final int MAX_MANIFEST = 256 * 1024;
@@ -222,11 +224,20 @@ final class Updater {
         }
     }
 
-    /** Refuses before the download, so a full Stick costs nothing. */
+    /**
+     * Refuses before the download, so a full Stick costs nothing. What counts is what Android lets an
+     * app take: it keeps a reserve of its own, and an install that would reach it fails at the very end,
+     * as on a 4K Max of 2021 with 1.1 GB free (code -4 in its log, 2026-11-03).
+     */
     static void checkRoom(Context context, Release release) throws Failure {
         File folder = mediaFolder(context);
         if (!folder.exists() && !folder.mkdirs()) throw new Failure(UpdateError.F114);
-        long free = new StatFs(folder.getPath()).getAvailableBytes();
+        long free;
+        try {
+            free = context.getSystemService(StorageManager.class).getAllocatableBytes(StorageManager.UUID_DEFAULT);
+        } catch (IOException e) {
+            free = new StatFs(folder.getPath()).getAvailableBytes();
+        }
         if (free < release.size * ROOM_FACTOR) throw new Failure(UpdateError.F106);
     }
 
