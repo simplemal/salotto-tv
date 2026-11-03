@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">Градиенты и сплошные цвета Salotto.</string>
     <string name="settings_backdrop_personal">Личные</string>
     <string name="settings_backdrop_personal_text">Ваши фото, отправленные с телефона через «Загрузить».</string>
+    <string name="settings_backdrop_personal_timed_text">Ваши фото из раздела «Личные», сменяются сами в случайном порядке.</string>
     <string name="settings_backdrop_pick_text">Выберите картинку в сетке: она останется, пока вы её не смените.</string>
     <string name="settings_notifications_text">Уведомления от Fire OS и приложений.</string>
     <string name="settings_notification_count">Число уведомлений</string>

@@ -151,6 +151,7 @@
     <string name="settings_backdrop_standard_text">Salotto 的渐变和纯色。</string>
     <string name="settings_backdrop_personal">个人</string>
     <string name="settings_backdrop_personal_text">你的照片，用“上传”从手机发送。</string>
+    <string name="settings_backdrop_personal_timed_text">“个人”中的照片，自动更换，顺序随机。</string>
     <string name="settings_backdrop_pick_text">从网格中选择一张图片：它会一直保留，直到您更换。</string>
     <string name="settings_notifications_text">来自 Fire OS 和应用的通知。</string>
     <string name="settings_notification_count">通知数量</string>

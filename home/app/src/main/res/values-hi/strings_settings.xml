@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">Salotto के ग्रेडिएंट और ठोस रंग।</string>
     <string name="settings_backdrop_personal">निजी</string>
     <string name="settings_backdrop_personal_text">आपकी फ़ोटो, फ़ोन से «अपलोड» द्वारा भेजी गईं।</string>
+    <string name="settings_backdrop_personal_timed_text">«निजी» की आपकी फ़ोटो, अपने आप बदलती हैं, यादृच्छिक क्रम में।</string>
     <string name="settings_backdrop_pick_text">ग्रिड से एक चित्र चुनें: वह तब तक रहेगा जब तक आप उसे नहीं बदलते।</string>
     <string name="settings_notifications_text">Fire OS और ऐप्स के नोटिफ़िकेशन।</string>
     <string name="settings_notification_count">नोटिफ़िकेशन की संख्या</string>

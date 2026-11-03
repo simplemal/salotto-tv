@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">Dégradés et couleurs unies de Salotto.</string>
     <string name="settings_backdrop_personal">Personnel</string>
     <string name="settings_backdrop_personal_text">Vos photos, envoyées depuis le téléphone avec Envoyer.</string>
+    <string name="settings_backdrop_personal_timed_text">Vos photos de Personnel, qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_backdrop_pick_text">Choisissez une image dans la grille : elle reste jusqu’à ce que vous la changiez.</string>
     <string name="settings_notifications_text">Les notifications de Fire OS et des applis.</string>
     <string name="settings_notification_count">Nombre de notifications</string>

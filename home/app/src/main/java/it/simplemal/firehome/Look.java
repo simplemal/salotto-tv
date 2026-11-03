@@ -73,6 +73,9 @@ final class Look {
     static final String ABSTRACT_3D = "Abstract 3D";
     static final String NOX = "Nox City";
     static final String NATURE = "Aerial Nature";
+    /** The photos of Personale, changing on the timer like the sets: offered from two photos on. */
+    static final String PERSONAL = "Personal";
+    static final int PERSONAL_TIMED_FROM = 2;
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
     static final String AERIAL_FOLDER = "meteo-aereo";
@@ -112,6 +115,7 @@ final class Look {
         if (PICTURES.equals(key)) return context.getString(R.string.first_backdrop_pictures);
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
         if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
+        if (PERSONAL.equals(key)) return context.getString(R.string.settings_backdrop_personal);
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
         return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
@@ -170,7 +174,13 @@ final class Look {
         if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;
         if (ABSTRACT_3D.equals(chosen)) return ABSTRACT_3D_FOLDER;
         if (NOX.equals(chosen)) return NOX_FOLDER;
+        if (PERSONAL.equals(chosen)) return personalFolder(context).getPath();
         return NATURE.equals(chosen) ? NATURE_FOLDER : null;
+    }
+
+    /** A picture to draw whole: one of the app's sets, or a photo of Personale by its full path. */
+    static boolean picture(String name) {
+        return name.endsWith(Weather.PICTURE_FILE) || name.startsWith("/");
     }
 
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
@@ -219,6 +229,12 @@ final class Look {
     /** Any but the one on show. Null if the set cannot be read. */
     static String anyPicture(Context context, String folder, String shown) {
         List<String> files = new ArrayList<>();
+        if (folder.startsWith("/")) {
+            for (File image : images(context)) {
+                if (!image.getPath().equals(shown)) files.add(image.getPath());
+            }
+            return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
+        }
         try {
             for (String name : context.getAssets().list(folder)) {
                 if (!(folder + "/" + name).equals(shown)) files.add(folder + "/" + name);
@@ -261,6 +277,11 @@ final class Look {
         String chosen = prefs(context).getString("backdrop", null);
         boolean place = Weather.active(context);
         if (chosen == null) return place ? PICTURES : ABSTRACT_3D;
+        // Its photos can be gone, after a backup is restored on another Stick.
+        if (PERSONAL.equals(chosen) && images(context).isEmpty()) {
+            setBackdrop(context, ABSTRACT_3D);
+            return ABSTRACT_3D;
+        }
         if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
             setBackdrop(context, ABSTRACT_3D);
@@ -320,7 +341,7 @@ final class Look {
     static void current(Context context, Consumer<Bitmap> done) {
         String name = currentName(context);
         Runnable plain = () -> show(context, drawable -> done.accept(painted(drawable)));
-        if (!weatherPictures(context) || !name.endsWith(Weather.PICTURE_FILE)) {
+        if (!weatherPictures(context) || name == null || !picture(name)) {
             plain.run();
             return;
         }
@@ -338,6 +359,7 @@ final class Look {
     private static Bitmap small(Context context, String asset) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = SMALL_SAMPLE;
+        if (asset.startsWith("/")) return BitmapFactory.decodeFile(asset, options);
         try (InputStream input = context.getAssets().open(asset)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
@@ -385,7 +407,7 @@ final class Look {
     }
 
     /** Decoded close to screen size and cropped to 16:9, so nothing is stretched. */
-    private static Bitmap load(File file) {
+    static Bitmap load(File file) {
         BitmapFactory.Options size = new BitmapFactory.Options();
         size.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getPath(), size);

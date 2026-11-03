@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">Sfumature e colori pieni di Salotto.</string>
     <string name="settings_backdrop_personal">Personale</string>
     <string name="settings_backdrop_personal_text">Le tue foto, inviate dal telefono con Carica.</string>
+    <string name="settings_backdrop_personal_timed_text">Le tue foto di Personale, che cambiano da sole, in ordine casuale.</string>
     <string name="settings_backdrop_pick_text">Scegli un’immagine dalla griglia: resta fissa finché non la cambi.</string>
     <string name="settings_notifications_text">Le notifiche ricevute da Fire OS e dalle app.</string>
     <string name="settings_notification_count">Numero delle notifiche</string>

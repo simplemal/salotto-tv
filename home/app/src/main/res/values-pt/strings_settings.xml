@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">Gradientes e cores sólidas do Salotto.</string>
     <string name="settings_backdrop_personal">Pessoal</string>
     <string name="settings_backdrop_personal_text">As suas fotos, enviadas do telemóvel com Carregar.</string>
+    <string name="settings_backdrop_personal_timed_text">As suas fotos de Pessoal, que mudam sozinhas, por ordem aleatória.</string>
     <string name="settings_backdrop_pick_text">Escolhe uma imagem da grelha: fica até a mudares.</string>
     <string name="settings_notifications_text">As notificações do Fire OS e das apps.</string>
     <string name="settings_notification_count">Número de notificações</string>

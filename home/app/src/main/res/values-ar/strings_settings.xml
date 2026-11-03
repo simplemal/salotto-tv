@@ -150,6 +150,7 @@
     <string name="settings_backdrop_standard_text">تدرّجات وألوان سادة من Salotto.</string>
     <string name="settings_backdrop_personal">شخصي</string>
     <string name="settings_backdrop_personal_text">صورك، مرسلة من الهاتف عبر «تحميل».</string>
+    <string name="settings_backdrop_personal_timed_text">صورك من «شخصي»، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_backdrop_pick_text">اختر صورة من الشبكة: تبقى حتى تغيّرها.</string>
     <string name="settings_notifications_text">إشعارات Fire OS والتطبيقات.</string>
     <string name="settings_notification_count">عدد الإشعارات</string>

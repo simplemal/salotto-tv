@@ -106,7 +106,7 @@ final class WeatherView extends View {
         Context context = getContext().getApplicationContext();
         DisplayMetrics screen = getResources().getDisplayMetrics();
         Background.draw(() -> {
-            Scene loaded = name.endsWith(Weather.PICTURE_FILE) ? RasterScene.load(context, name)
+            Scene loaded = Look.picture(name) ? RasterScene.load(context, name)
                 : WeatherScene.load(context, name, screen.widthPixels, screen.heightPixels);
             post(() -> arrive(loaded, name));
         });

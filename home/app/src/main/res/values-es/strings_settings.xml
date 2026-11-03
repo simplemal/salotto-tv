@@ -151,6 +151,7 @@
     <string name="settings_backdrop_standard_text">Degradados y colores sólidos de Salotto.</string>
     <string name="settings_backdrop_personal">Personal</string>
     <string name="settings_backdrop_personal_text">Tus fotos, enviadas desde el teléfono con Subir.</string>
+    <string name="settings_backdrop_personal_timed_text">Tus fotos de Personal, que cambian solas, en orden aleatorio.</string>
     <string name="settings_backdrop_pick_text">Elige una imagen de la cuadrícula: se queda hasta que la cambies.</string>
     <string name="settings_notifications_text">Las notificaciones de Fire OS y de las apps.</string>
     <string name="settings_notification_count">Número de notificaciones</string>

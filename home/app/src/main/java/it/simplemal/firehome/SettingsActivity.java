@@ -1517,6 +1517,11 @@ public final class SettingsActivity extends CardActivity {
         nature.mosaic = Look.NATURE_FOLDER;
         nature.mark = R.drawable.ic_restart;
         timed.add(nature);
+        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
+            Entry mine = plainBackdrop(Look.PERSONAL, getString(R.string.settings_backdrop_personal_timed_text));
+            mine.mark = R.drawable.ic_restart;
+            timed.add(mine);
+        }
         weather.add(0, groupLabel(R.string.settings_backdrop_weather_group));
         timed.add(0, groupLabel(R.string.first_backdrop_dynamic));
         // Under its own heading it is plainly about these sets, so it stays on whatever the backdrop.
