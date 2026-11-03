@@ -283,10 +283,16 @@ final class Look {
         return columns(context) + "/" + names(context);
     }
 
+    /** Where the images of Personale are, sent from a phone or copied before that. */
+    static File personalFolder(Context context) { return new File(context.getFilesDir(), FOLDER); }
+
+    /** The backdrop is one of them. */
+    static boolean personal(Context context, String name) { return new File(personalFolder(context), name).isFile(); }
+
     /** Images copied into the app's own folder: the Stick has no system image picker. */
     static List<File> images(Context context) {
         List<File> images = new ArrayList<>();
-        File[] files = new File(context.getFilesDir(), FOLDER).listFiles();
+        File[] files = personalFolder(context).listFiles();
         if (files == null) return images;
         Arrays.sort(files);
         for (File file : files) {
@@ -349,7 +355,7 @@ final class Look {
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
         String chosen = backdrop(context);
-        File file = new File(new File(context.getFilesDir(), FOLDER), chosen);
+        File file = new File(personalFolder(context), chosen);
         if (!file.isFile()) {
             trim();
             done.accept(preset(chosen));

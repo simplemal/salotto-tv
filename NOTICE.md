@@ -21,6 +21,7 @@ Tutti i marchi appartengono ai rispettivi proprietari. Fire TV, Alexa, Prime Vid
 | [Android Open Source Project](https://source.android.com/) | Piattaforma e strumenti di compilazione | Apache 2.0 |
 | [Gradle](https://gradle.org/) e [Android Gradle Plugin](https://developer.android.com/build) | Compilazione | Apache 2.0 |
 | [Pillow](https://python-pillow.org/) | Riduzione delle illustrazioni meteo, solo in compilazione | HPND |
+| [QR Code generator](https://www.nayuki.io/page/qr-code-generator-library), di Project Nayuki, versione 1.8.0 | Il codice di Carica, per inviare foto dal telefono | MIT |
 
 Il nome Salotto è scritto in [Space Grotesk](https://github.com/floriankarsten/space-grotesk), di Florian Karsten, con licenza SIL Open Font License 1.1. Il carattere è incluso nell'app.
 

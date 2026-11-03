@@ -1532,9 +1532,7 @@ public final class SettingsActivity extends CardActivity {
         entries.add(pictureSet(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER));
         entries.add(pictureSet(Look.NOX, Look.NOX_FOLDER));
         entries.add(pictureSet(Look.NATURE, Look.NATURE_FOLDER));
-        for (File image : Look.images(this)) {
-            entries.add(plainBackdrop(image.getName(), getString(R.string.settings_backdrop_image_text)));
-        }
+        entries.add(personalSet());
         showFromChosen(getString(R.string.settings_backdrop), entries);
     }
 
@@ -1568,6 +1566,17 @@ public final class SettingsActivity extends CardActivity {
             () -> open(new Intent(this, PictureGridActivity.class)
                 .putExtra(PictureGridActivity.FOLDER, folder).putExtra(PictureGridActivity.TITLE, name)));
         entry.mosaic = folder;
+        entry.mark = 0;
+        return entry;
+    }
+
+    /** The images sent from a phone: a grid like the sets, empty at first, with Carica under it. */
+    private Entry personalSet() {
+        String name = getString(R.string.settings_backdrop_personal);
+        Entry entry = new Entry(name, Look.personal(this, Look.backdrop(this)) ? CHECK : null, getDrawable(R.drawable.ic_photo),
+            getString(R.string.settings_backdrop_personal_text), true,
+            () -> open(new Intent(this, PictureGridActivity.class)
+                .putExtra(PictureGridActivity.PERSONAL, true).putExtra(PictureGridActivity.TITLE, name)));
         entry.mark = 0;
         return entry;
     }

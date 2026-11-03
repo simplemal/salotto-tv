@@ -148,6 +148,8 @@
     <string name="settings_pairing_mode">Versetze das Gerät in den Kopplungsmodus.</string>
     <string name="settings_backdrop_standard">Standard</string>
     <string name="settings_backdrop_standard_text">Farbverläufe und Vollfarben von Salotto.</string>
+    <string name="settings_backdrop_personal">Eigene</string>
+    <string name="settings_backdrop_personal_text">Deine Fotos, vom Handy gesendet mit Hochladen.</string>
     <string name="settings_backdrop_pick_text">Wähle ein Bild aus dem Raster: Es bleibt, bis du es änderst.</string>
     <string name="settings_notifications_text">Benachrichtigungen von Fire OS und Apps.</string>
     <string name="settings_notification_count">Anzahl der Benachrichtigungen</string>
@@ -224,7 +226,6 @@
     <string name="settings_backdrop_abstract_text">Abstrakte Illustrationen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_abstract_time">Bild wechselt alle</string>
     <string name="settings_abstract_time_text">Wie lange jedes Bild von Abstract Illustrated, Abstract 3D und Nox City zu sehen ist.</string>
-    <string name="settings_backdrop_image_text">Eigenes Bild, an den Bildschirm angepasst.</string>
     <string name="settings_clock">Uhr</string>
     <string name="settings_clock_value">%1$s, %2$s</string>
     <string name="settings_show_on_home">Auf Home anzeigen</string>

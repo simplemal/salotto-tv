@@ -278,4 +278,18 @@
     <string name="reenabled_steps">Para as desligar de novo é preciso um computador:\n1. Abra o Install Salotto.\n2. Escolha esta TV.\n3. Siga os passos propostos.</string>
     <string name="update_error_r304">É preciso o Install Salotto num computador</string>
     <string name="update_back_computer">Para voltar à versão anterior, abra o Install Salotto num computador e escolha «Voltar à versão anterior».</string>
+    <string name="grid_upload">Carregar</string>
+    <string name="grid_personal_empty">Ainda não há imagens. Prima Carregar para as enviar do telemóvel.</string>
+    <string name="upload_title">Carregar do telemóvel</string>
+    <string name="upload_text">Aponte a câmara do telemóvel para o código e escolha uma foto. O telemóvel tem de estar na mesma rede que a TV.</string>
+    <string name="upload_no_network">A TV não está ligada a uma rede: ligue-a e tente novamente.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d imagem recebida</item>
+        <item quantity="other">%1$d imagens recebidas</item>
+    </plurals>
+    <string name="upload_web_title">Escolha uma foto: vai aparecer em Pessoal, entre os fundos do Salotto.</string>
+    <string name="upload_web_pick">Carregar imagem</string>
+    <string name="upload_web_sending">A enviar…</string>
+    <string name="upload_web_sent">Enviada. Pode enviar outra.</string>
+    <string name="upload_web_failed">Não foi possível enviar. Tente novamente.</string>
 </resources>

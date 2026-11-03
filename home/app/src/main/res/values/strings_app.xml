@@ -352,4 +352,19 @@
     <string name="reenabled_steps">Per rispegnerle serve un computer:\n1. Apri Installa Salotto.\n2. Scegli questa TV.\n3. Segui i passi che propone.</string>
     <string name="update_error_r304">Serve Installa Salotto sul computer</string>
     <string name="update_back_computer">Per tornare alla versione precedente apri Installa Salotto sul computer e scegli «Torna alla versione precedente».</string>
+    <string name="grid_upload">Carica</string>
+    <string name="grid_personal_empty">Ancora nessuna immagine. Premi Carica per inviarle dal telefono.</string>
+    <string name="grid_personal_title" translatable="false">%1$s · %2$s</string>
+    <string name="upload_title">Carica dal telefono</string>
+    <string name="upload_text">Inquadra il codice con la fotocamera del telefono e scegli una foto. Il telefono deve essere sulla stessa rete della TV.</string>
+    <string name="upload_no_network">La TV non è collegata a una rete: collegala e riprova.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d immagine ricevuta</item>
+        <item quantity="other">%1$d immagini ricevute</item>
+    </plurals>
+    <string name="upload_web_title">Scegli una foto: apparirà in Personale, tra gli sfondi di Salotto.</string>
+    <string name="upload_web_pick">Carica immagine</string>
+    <string name="upload_web_sending">Invio in corso…</string>
+    <string name="upload_web_sent">Inviata. Puoi mandarne un’altra.</string>
+    <string name="upload_web_failed">Non è stato possibile inviarla. Riprova.</string>
 </resources>

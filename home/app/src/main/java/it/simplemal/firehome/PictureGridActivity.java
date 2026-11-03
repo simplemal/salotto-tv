@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,11 +33,14 @@ import java.util.List;
 /**
  * Every picture of one set, or Salotto's own backdrops with no set named, four across and down to
  * the edge of the screen. OK shows one as the whole screen: left and right go through the
- * others there, Confirm keeps the one on show and Back returns to the grid.
+ * others there, Confirm keeps the one on show and Back returns to the grid. Personale shows only
+ * whole rows, to leave room for Carica under them.
  */
 public final class PictureGridActivity extends CardActivity {
     static final String FOLDER = "folder";
     static final String TITLE = "title";
+    static final String PERSONAL = "personal";
+    private static final int UPLOAD = 1;
 
     private static final int COLUMNS = 4;
     private static final int CELL_WIDTH = 216;
@@ -65,11 +70,19 @@ public final class PictureGridActivity extends CardActivity {
     private static final int CELL_WHEEL = 28;
     private static final long FADE_MS = 140;
     private static final int OPAQUE = 255;
+    private static final int UPLOAD_TOP = 14;
+    private static final int UPLOAD_BOTTOM = 28;
+    private static final int EMPTY_SP = 16;
+    /** A cell needs only this much of a picture: a phone's photo is many times larger. */
+    private static final int CELL_PIXELS = 432;
+    private static final int SCREEN_PIXELS = 1920;
 
     /** A row cut by the edge of the screen is what says there are more, as on the Home. */
     private static final class GridScroll extends ScrollView {
         private final Rect wider = new Rect();
         private final int nextRow;
+        /** Personale moves by whole rows itself, from the selected cell. */
+        boolean wholeRows;
 
         GridScroll(Context context, int nextRow) {
             super(context);
@@ -77,6 +90,7 @@ public final class PictureGridActivity extends CardActivity {
         }
 
         @Override protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
+            if (wholeRows) return 0;
             wider.set(rect.left, rect.top - nextRow, rect.right, rect.bottom + nextRow);
             return super.computeScrollDeltaToGetChildRectOnScreen(wider);
         }
@@ -93,6 +107,10 @@ public final class PictureGridActivity extends CardActivity {
     private LinearLayout rows;
     private ProgressBar pageWheel;
     private boolean files;
+    private boolean personal;
+    private int rowsShown;
+    /** Hidden under a preview, where Down would otherwise find it. */
+    private View under;
     private String setName;
     private TextView title;
     private TextView confirmButton;
@@ -111,7 +129,12 @@ public final class PictureGridActivity extends CardActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         String folder = getIntent().getStringExtra(FOLDER);
-        pictures = folder == null ? Arrays.asList(Look.PRESET_NAMES) : pictures(folder);
+        personal = getIntent().getBooleanExtra(PERSONAL, false);
+        if (personal) {
+            for (File image : Look.images(this)) pictures.add(image.getName());
+        } else {
+            pictures = folder == null ? Arrays.asList(Look.PRESET_NAMES) : pictures(folder);
+        }
         files = folder != null;
         setName = getIntent().getStringExtra(TITLE);
         root = new FrameLayout(this);
@@ -143,11 +166,14 @@ public final class PictureGridActivity extends CardActivity {
             place.setMarginStart(index % COLUMNS == 0 ? 0 : dp(GAP));
             row.addView(holder, place);
         }
-        scroll = new GridScroll(this, dp(NEXT_ROW));
+        GridScroll grid = new GridScroll(this, dp(NEXT_ROW));
+        grid.wholeRows = personal;
+        scroll = grid;
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setClipToPadding(false);
         scroll.addView(rows);
         page.addView(scroll, new LinearLayout.LayoutParams(-2, 0, 1));
+        if (personal) addUpload(page);
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));
         pageWheel = wheel();
         pageWheel.setVisibility(View.GONE);
@@ -158,6 +184,7 @@ public final class PictureGridActivity extends CardActivity {
 
         int chosen = Math.max(0, pictures.indexOf(Look.backdrop(this)));
         if (!cells.isEmpty()) cells.get(chosen).requestFocus();
+        if (personal) scroll.post(this::fitWholeRows);
         if (files) {
             asked = new boolean[pictures.size()];
             sharpened = new boolean[pictures.size()];
@@ -169,6 +196,85 @@ public final class PictureGridActivity extends CardActivity {
             // Only once it is laid out, and scrolled to the selected cell, is it known what is in view.
             scroll.post(this::showFirstScreen);
         }
+    }
+
+    /** Carica under the grid, and while there is nothing yet a line that says what it is for. */
+    private void addUpload(LinearLayout page) {
+        if (pictures.isEmpty()) {
+            TextView empty = label(getString(R.string.grid_personal_empty), EMPTY_SP);
+            empty.setGravity(Gravity.CENTER);
+            empty.setAlpha(ARROW_ALPHA);
+            page.addView(empty, new LinearLayout.LayoutParams(-2, 0, 1));
+            ((LinearLayout.LayoutParams) scroll.getLayoutParams()).weight = 0;
+        }
+        TextView upload = button(getString(R.string.grid_upload), BUTTON_SP,
+            () -> startActivityForResult(new Intent(this, UploadActivity.class), UPLOAD));
+        under = upload;
+        LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2);
+        place.setMargins(0, dp(UPLOAD_TOP), 0, dp(UPLOAD_BOTTOM));
+        page.addView(upload, place);
+        if (pictures.isEmpty()) upload.requestFocus();
+    }
+
+    /** The grid takes as many whole rows as fit above Carica: the room left over goes under it. */
+    private void fitWholeRows() {
+        if (pictures.isEmpty()) return;
+        int step = dp(CELL_HEIGHT) + dp(GAP);
+        int room = scroll.getHeight() - 2 * dp(SIDE_ROOM) + dp(GAP);
+        rowsShown = Math.max(1, room / step);
+        rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM));
+        LinearLayout.LayoutParams place = (LinearLayout.LayoutParams) scroll.getLayoutParams();
+        place.height = 2 * dp(SIDE_ROOM) + rowsShown * step - dp(GAP);
+        place.weight = 0;
+        scroll.setLayoutParams(place);
+        ((LinearLayout) scroll.getParent()).addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
+        View focused = getCurrentFocus();
+        if (focused != null && cells.contains(focused)) showRowOf(cells.indexOf(focused), false);
+        loadPersonal();
+    }
+
+    /** The selected row stays in view, and the rows on screen are always whole ones. */
+    private void showRowOf(int index, boolean smooth) {
+        if (rowsShown == 0) return;
+        int row = index / COLUMNS;
+        int step = dp(CELL_HEIGHT) + dp(GAP);
+        int first = scroll.getScrollY() / step;
+        if (row < first) first = row;
+        else if (row >= first + rowsShown) first = row - rowsShown + 1;
+        if (smooth) scroll.smoothScrollTo(0, first * step);
+        else scroll.scrollTo(0, first * step);
+    }
+
+    /** Few pictures, each read small: one after the other, the selected one's row first. */
+    private void loadPersonal() {
+        List<File> found = new ArrayList<>();
+        for (String name : pictures) found.add(new File(Look.personalFolder(this), name));
+        Background.draw(() -> {
+            for (int index = 0; index < found.size(); index++) {
+                if (isDestroyed()) return;
+                Bitmap small = decodeFile(found.get(index), CELL_PIXELS);
+                int place = index;
+                if (small != null) runOnUiThread(() -> appear(cells.get(place), small));
+            }
+        });
+    }
+
+    /** At least `width` pixels across, and never the whole of a phone's photo. */
+    private static Bitmap decodeFile(File file, int width) {
+        BitmapFactory.Options size = new BitmapFactory.Options();
+        size.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getPath(), size);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        int sample = 1;
+        while (size.outWidth / (sample * 2) >= width) sample *= 2;
+        options.inSampleSize = sample;
+        return BitmapFactory.decodeFile(file.getPath(), options);
+    }
+
+    @Override protected void onActivityResult(int request, int result, Intent data) {
+        super.onActivityResult(request, result, data);
+        // Shown again with what came in: a new list of cells is simpler than slotting them in.
+        if (request == UPLOAD && result == RESULT_OK) recreate();
     }
 
     private List<String> pictures(String folder) {
@@ -198,12 +304,14 @@ public final class PictureGridActivity extends CardActivity {
         });
         Bitmap kept = files ? Thumbnails.kept(pictures.get(index)) : null;
         if (kept != null) cell.setImageBitmap(kept);
-        else if (!files) cell.setImageDrawable(Look.preset(pictures.get(index)));
+        else if (!files && !personal) cell.setImageDrawable(Look.preset(pictures.get(index)));
         cell.setOnFocusChangeListener((view, focused) -> {
             view.setForeground(focused ? edge() : null);
             if (focused && files) sharpenInView();
-            if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
-                getString(R.string.grid_position, index + 1, pictures.size())));
+            if (focused && personal) showRowOf(index, true);
+            String position = getString(R.string.grid_position, index + 1, pictures.size());
+            if (focused) title.setText(personal ? getString(R.string.grid_personal_title, setName, position)
+                : getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)), position));
         });
         cell.setOnClickListener(view -> showPreview(index));
         return cell;
@@ -403,16 +511,17 @@ public final class PictureGridActivity extends CardActivity {
         int shown = ++previews;
         before.setVisibility(index > 0 ? View.VISIBLE : View.INVISIBLE);
         after.setVisibility(index < pictures.size() - 1 ? View.VISIBLE : View.INVISIBLE);
-        Drawable quick = files ? cell.getDrawable() : Look.preset(asset);
+        Drawable quick = files || personal ? cell.getDrawable() : Look.preset(asset);
         if (quick != null) full.setImageDrawable(quick);
         preview.setVisibility(View.VISIBLE);
         scroll.setVisibility(View.INVISIBLE);
+        if (under != null) under.setVisibility(View.INVISIBLE);
         confirmButton.requestFocus();
-        if (!files) return;
+        if (!files && !personal) return;
         Background.draw(() -> {
             // Going through them quickly leaves the ones already passed behind.
             if (shown != previews) return;
-            Bitmap picture = decode(asset);
+            Bitmap picture = personal ? decodeFile(new File(Look.personalFolder(this), asset), SCREEN_PIXELS) : decode(asset);
             if (picture == null) return;
             runOnUiThread(() -> {
                 if (shown == previews && preview.getVisibility() == View.VISIBLE) full.setImageBitmap(picture);
@@ -426,6 +535,7 @@ public final class PictureGridActivity extends CardActivity {
         full.setImageDrawable(null);
         preview.setVisibility(View.GONE);
         scroll.setVisibility(View.VISIBLE);
+        if (under != null) under.setVisibility(View.VISIBLE);
         if (opened != null) opened.requestFocus();
     }
 

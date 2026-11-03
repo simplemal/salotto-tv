@@ -286,4 +286,20 @@
     <string name="reenabled_steps">Чтобы снова их отключить, нужен компьютер:\n1. Откройте Install Salotto.\n2. Выберите этот телевизор.\n3. Следуйте предложенным шагам.</string>
     <string name="update_error_r304">Нужен Install Salotto на компьютере</string>
     <string name="update_back_computer">Чтобы вернуться к предыдущей версии, откройте Install Salotto на компьютере и выберите «Вернуться к предыдущей версии».</string>
+    <string name="grid_upload">Загрузить</string>
+    <string name="grid_personal_empty">Пока нет изображений. Нажмите «Загрузить», чтобы отправить их с телефона.</string>
+    <string name="upload_title">Загрузить с телефона</string>
+    <string name="upload_text">Наведите камеру телефона на код и выберите фото. Телефон должен быть в той же сети, что и телевизор.</string>
+    <string name="upload_no_network">Телевизор не подключён к сети: подключите его и повторите попытку.</string>
+    <plurals name="upload_received">
+        <item quantity="one">Получено изображений: %1$d</item>
+        <item quantity="few">Получено изображений: %1$d</item>
+        <item quantity="many">Получено изображений: %1$d</item>
+        <item quantity="other">Получено изображений: %1$d</item>
+    </plurals>
+    <string name="upload_web_title">Выберите фото: оно появится в разделе «Личные» среди фонов Salotto.</string>
+    <string name="upload_web_pick">Загрузить изображение</string>
+    <string name="upload_web_sending">Отправка…</string>
+    <string name="upload_web_sent">Отправлено. Можно отправить ещё одно.</string>
+    <string name="upload_web_failed">Не удалось отправить. Повторите попытку.</string>
 </resources>

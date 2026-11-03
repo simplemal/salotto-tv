@@ -294,4 +294,22 @@
     <string name="reenabled_steps">لإيقافها مجددًا يلزم حاسوب:\n1. افتح Install Salotto.\n2. اختر هذا التلفاز.\n3. اتبع الخطوات المعروضة.</string>
     <string name="update_error_r304">يلزم Install Salotto على حاسوب</string>
     <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
+    <string name="grid_upload">تحميل</string>
+    <string name="grid_personal_empty">لا توجد صور بعد. اضغط «تحميل» لإرسالها من الهاتف.</string>
+    <string name="upload_title">التحميل من الهاتف</string>
+    <string name="upload_text">وجّه كاميرا الهاتف نحو الرمز واختر صورة. يجب أن يكون الهاتف على شبكة التلفزيون نفسها.</string>
+    <string name="upload_no_network">التلفزيون غير متصل بشبكة: اتصل بها ثم حاول مجددًا.</string>
+    <plurals name="upload_received">
+        <item quantity="zero">الصور المستلمة: %1$d</item>
+        <item quantity="one">الصور المستلمة: %1$d</item>
+        <item quantity="two">الصور المستلمة: %1$d</item>
+        <item quantity="few">الصور المستلمة: %1$d</item>
+        <item quantity="many">الصور المستلمة: %1$d</item>
+        <item quantity="other">الصور المستلمة: %1$d</item>
+    </plurals>
+    <string name="upload_web_title">اختر صورة: ستظهر في «شخصي» ضمن خلفيات Salotto.</string>
+    <string name="upload_web_pick">تحميل صورة</string>
+    <string name="upload_web_sending">جارٍ الإرسال…</string>
+    <string name="upload_web_sent">تم الإرسال. يمكنك إرسال صورة أخرى.</string>
+    <string name="upload_web_failed">تعذّر الإرسال. حاول مجددًا.</string>
 </resources>

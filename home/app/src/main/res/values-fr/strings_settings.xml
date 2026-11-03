@@ -148,6 +148,8 @@
     <string name="settings_pairing_mode">Mettez l’appareil en mode appairage.</string>
     <string name="settings_backdrop_standard">Standard</string>
     <string name="settings_backdrop_standard_text">Dégradés et couleurs unies de Salotto.</string>
+    <string name="settings_backdrop_personal">Personnel</string>
+    <string name="settings_backdrop_personal_text">Vos photos, envoyées depuis le téléphone avec Envoyer.</string>
     <string name="settings_backdrop_pick_text">Choisissez une image dans la grille : elle reste jusqu’à ce que vous la changiez.</string>
     <string name="settings_notifications_text">Les notifications de Fire OS et des applis.</string>
     <string name="settings_notification_count">Nombre de notifications</string>
@@ -224,7 +226,6 @@
     <string name="settings_backdrop_abstract_text">Des illustrations abstraites qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_abstract_time">Changer d’image toutes les</string>
     <string name="settings_abstract_time_text">Durée d’affichage de chaque image d’Abstract Illustrated, Abstract 3D et de Nox City.</string>
-    <string name="settings_backdrop_image_text">Image personnelle, adaptée à l’écran.</string>
     <string name="settings_clock">Horloge</string>
     <string name="settings_clock_value">%1$s, %2$s</string>
     <string name="settings_show_on_home">Afficher sur l’Accueil</string>

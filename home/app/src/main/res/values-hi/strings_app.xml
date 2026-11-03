@@ -278,4 +278,18 @@
     <string name="reenabled_steps">इन्हें फिर से बंद करने के लिए कंप्यूटर चाहिए:\n1. Install Salotto खोलें।\n2. यह टीवी चुनें।\n3. बताए गए चरणों का पालन करें।</string>
     <string name="update_error_r304">कंप्यूटर पर Install Salotto चाहिए</string>
     <string name="update_back_computer">पिछले संस्करण पर लौटने के लिए कंप्यूटर पर Install Salotto खोलें और «पिछले संस्करण पर लौटें» चुनें।</string>
+    <string name="grid_upload">अपलोड</string>
+    <string name="grid_personal_empty">अभी कोई चित्र नहीं। फ़ोन से भेजने के लिए «अपलोड» दबाएँ।</string>
+    <string name="upload_title">फ़ोन से अपलोड करें</string>
+    <string name="upload_text">फ़ोन के कैमरे से कोड स्कैन करें और एक फ़ोटो चुनें। फ़ोन और टीवी एक ही नेटवर्क पर होने चाहिए।</string>
+    <string name="upload_no_network">टीवी किसी नेटवर्क से जुड़ा नहीं है: उसे जोड़ें और फिर से कोशिश करें।</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d चित्र मिला</item>
+        <item quantity="other">%1$d चित्र मिले</item>
+    </plurals>
+    <string name="upload_web_title">एक फ़ोटो चुनें: यह Salotto के बैकग्राउंड में «निजी» में दिखेगी।</string>
+    <string name="upload_web_pick">चित्र अपलोड करें</string>
+    <string name="upload_web_sending">भेजा जा रहा है…</string>
+    <string name="upload_web_sent">भेज दी गई। आप एक और भेज सकते हैं।</string>
+    <string name="upload_web_failed">भेजा नहीं जा सका। फिर से कोशिश करें।</string>
 </resources>

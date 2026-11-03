@@ -278,4 +278,18 @@
     <string name="reenabled_steps">Zum erneuten Ausschalten wird ein Computer gebraucht:\n1. Install Salotto öffnen.\n2. Diesen Fernseher wählen.\n3. Den angezeigten Schritten folgen.</string>
     <string name="update_error_r304">Install Salotto wird auf einem Computer gebraucht</string>
     <string name="update_back_computer">Um zur vorherigen Version zurückzukehren, Install Salotto auf einem Computer öffnen und „Zur vorherigen Version zurückkehren“ wählen.</string>
+    <string name="grid_upload">Hochladen</string>
+    <string name="grid_personal_empty">Noch keine Bilder. Drücke Hochladen, um sie vom Handy zu senden.</string>
+    <string name="upload_title">Vom Handy hochladen</string>
+    <string name="upload_text">Richte die Kamera des Handys auf den Code und wähle ein Foto. Das Handy muss im selben Netzwerk wie der Fernseher sein.</string>
+    <string name="upload_no_network">Der Fernseher ist mit keinem Netzwerk verbunden: verbinde ihn und versuche es erneut.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d Bild empfangen</item>
+        <item quantity="other">%1$d Bilder empfangen</item>
+    </plurals>
+    <string name="upload_web_title">Wähle ein Foto: Es erscheint unter Eigene, bei den Hintergründen von Salotto.</string>
+    <string name="upload_web_pick">Bild hochladen</string>
+    <string name="upload_web_sending">Wird gesendet…</string>
+    <string name="upload_web_sent">Gesendet. Du kannst ein weiteres senden.</string>
+    <string name="upload_web_failed">Senden nicht möglich. Versuche es erneut.</string>
 </resources>

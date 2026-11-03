@@ -278,4 +278,18 @@
     <string name="reenabled_steps">Pour les désactiver à nouveau, il faut un ordinateur :\n1. Ouvrez Install Salotto.\n2. Choisissez ce téléviseur.\n3. Suivez les étapes proposées.</string>
     <string name="update_error_r304">Install Salotto est nécessaire sur un ordinateur</string>
     <string name="update_back_computer">Pour revenir à la version précédente, ouvrez Install Salotto sur un ordinateur et choisissez « Revenir à la version précédente ».</string>
+    <string name="grid_upload">Envoyer</string>
+    <string name="grid_personal_empty">Aucune image pour l’instant. Appuyez sur Envoyer pour les envoyer depuis le téléphone.</string>
+    <string name="upload_title">Envoyer depuis le téléphone</string>
+    <string name="upload_text">Visez le code avec l’appareil photo du téléphone et choisissez une photo. Le téléphone doit être sur le même réseau que la TV.</string>
+    <string name="upload_no_network">La TV n’est connectée à aucun réseau : connectez-la et réessayez.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d image reçue</item>
+        <item quantity="other">%1$d images reçues</item>
+    </plurals>
+    <string name="upload_web_title">Choisissez une photo : elle apparaîtra dans Personnel, parmi les fonds de Salotto.</string>
+    <string name="upload_web_pick">Envoyer une image</string>
+    <string name="upload_web_sending">Envoi en cours…</string>
+    <string name="upload_web_sent">Envoyée. Vous pouvez en envoyer une autre.</string>
+    <string name="upload_web_failed">L’envoi a échoué. Réessayez.</string>
 </resources>

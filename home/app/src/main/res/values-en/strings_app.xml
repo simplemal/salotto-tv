@@ -278,4 +278,18 @@
     <string name="reenabled_steps">To turn them off again you need a computer:\n1. Open Install Salotto.\n2. Choose this TV.\n3. Follow the steps it offers.</string>
     <string name="update_error_r304">Install Salotto is needed on a computer</string>
     <string name="update_back_computer">To go back to the previous version, open Install Salotto on a computer and choose “Go back to the previous version”.</string>
+    <string name="grid_upload">Upload</string>
+    <string name="grid_personal_empty">No images yet. Press Upload to send them from your phone.</string>
+    <string name="upload_title">Upload from your phone</string>
+    <string name="upload_text">Point your phone’s camera at the code and choose a photo. The phone must be on the same network as the TV.</string>
+    <string name="upload_no_network">The TV is not connected to a network: connect it and try again.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d image received</item>
+        <item quantity="other">%1$d images received</item>
+    </plurals>
+    <string name="upload_web_title">Choose a photo: it will appear in Personal, among Salotto’s backdrops.</string>
+    <string name="upload_web_pick">Upload image</string>
+    <string name="upload_web_sending">Sending…</string>
+    <string name="upload_web_sent">Sent. You can send another one.</string>
+    <string name="upload_web_failed">It could not be sent. Try again.</string>
 </resources>
