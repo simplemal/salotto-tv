@@ -17,7 +17,7 @@ Installa Salotto guida ogni passo dal computer, e con Togli Salotto rimette tutt
 | Computer | Installer |
 |---|---|
 | Mac Apple Silicon | **[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
-| Windows | Con la prossima versione |
+| Windows | **[Scarica Installa Salotto per Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
 
 ## Cosa fa
 
