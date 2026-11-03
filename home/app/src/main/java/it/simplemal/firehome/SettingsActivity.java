@@ -236,6 +236,8 @@ public final class SettingsActivity extends CardActivity {
         super.onCreate(state);
         getWindow().getDecorView().setLayoutDirection(View.LAYOUT_DIRECTION_LOCALE);
         fire = new FireSettings(this);
+        // Before any row shows a photo's name.
+        Look.tidyPersonal(this);
         DeviceInfo.prepare();
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);

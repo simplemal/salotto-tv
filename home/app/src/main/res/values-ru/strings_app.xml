@@ -288,6 +288,10 @@
     <string name="update_back_computer">Чтобы вернуться к предыдущей версии, откройте Install Salotto на компьютере и выберите «Вернуться к предыдущей версии».</string>
     <string name="grid_upload">Загрузить</string>
     <string name="grid_personal_empty">Пока нет изображений. Нажмите «Загрузить», чтобы отправить их с телефона.</string>
+    <string name="personal_photo">Фото %1$d</string>
+    <string name="grid_delete">Удалить</string>
+    <string name="grid_delete_title">Удалить «%1$s»?</string>
+    <string name="grid_delete_text">Фото будет удалено с этого телевизора. Отменить нельзя.</string>
     <string name="upload_title">Загрузить с телефона</string>
     <string name="upload_text">Наведите камеру телефона на код и выберите фото. Телефон должен быть в той же сети, что и телевизор.</string>
     <string name="upload_no_network">Телевизор не подключён к сети: подключите его и повторите попытку.</string>

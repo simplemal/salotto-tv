@@ -280,6 +280,10 @@
     <string name="update_back_computer">पिछले संस्करण पर लौटने के लिए कंप्यूटर पर Install Salotto खोलें और «पिछले संस्करण पर लौटें» चुनें।</string>
     <string name="grid_upload">अपलोड</string>
     <string name="grid_personal_empty">अभी कोई चित्र नहीं। फ़ोन से भेजने के लिए «अपलोड» दबाएँ।</string>
+    <string name="personal_photo">फ़ोटो %1$d</string>
+    <string name="grid_delete">हटाएँ</string>
+    <string name="grid_delete_title">«%1$s» हटाएँ?</string>
+    <string name="grid_delete_text">फ़ोटो इस टीवी से हटा दी जाएगी। इसे वापस नहीं किया जा सकता।</string>
     <string name="upload_title">फ़ोन से अपलोड करें</string>
     <string name="upload_text">फ़ोन के कैमरे से कोड स्कैन करें और एक फ़ोटो चुनें। फ़ोन और टीवी एक ही नेटवर्क पर होने चाहिए।</string>
     <string name="upload_no_network">टीवी किसी नेटवर्क से जुड़ा नहीं है: उसे जोड़ें और फिर से कोशिश करें।</string>

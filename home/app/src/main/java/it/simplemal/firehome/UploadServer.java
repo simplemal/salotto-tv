@@ -16,9 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Locale;
 import java.util.function.Consumer;
 
@@ -162,13 +160,11 @@ final class UploadServer {
             part.delete();
             return null;
         }
-        return place(folder, part);
+        return place(part);
     }
 
-    private static synchronized File place(File folder, File part) {
-        String stamp = new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date());
-        File target = new File(folder, "foto-" + stamp + ".jpg");
-        for (int count = 2; target.exists(); count++) target = new File(folder, "foto-" + stamp + "-" + count + ".jpg");
+    private File place(File part) {
+        File target = Look.nextPhoto(context, "jpg");
         return part.renameTo(target) ? target : null;
     }
 

@@ -280,6 +280,10 @@
     <string name="update_back_computer">To go back to the previous version, open Install Salotto on a computer and choose “Go back to the previous version”.</string>
     <string name="grid_upload">Upload</string>
     <string name="grid_personal_empty">No images yet. Press Upload to send them from your phone.</string>
+    <string name="personal_photo">Photo %1$d</string>
+    <string name="grid_delete">Delete</string>
+    <string name="grid_delete_title">Delete %1$s?</string>
+    <string name="grid_delete_text">The photo is removed from this TV. This cannot be undone.</string>
     <string name="upload_title">Upload from your phone</string>
     <string name="upload_text">Point your phone’s camera at the code and choose a photo. The phone must be on the same network as the TV.</string>
     <string name="upload_no_network">The TV is not connected to a network: connect it and try again.</string>

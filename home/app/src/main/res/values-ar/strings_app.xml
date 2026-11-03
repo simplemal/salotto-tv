@@ -296,6 +296,10 @@
     <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
     <string name="grid_upload">تحميل</string>
     <string name="grid_personal_empty">لا توجد صور بعد. اضغط «تحميل» لإرسالها من الهاتف.</string>
+    <string name="personal_photo">صورة %1$d</string>
+    <string name="grid_delete">حذف</string>
+    <string name="grid_delete_title">حذف «%1$s»؟</string>
+    <string name="grid_delete_text">ستُزال الصورة من هذا التلفزيون. لا يمكن التراجع.</string>
     <string name="upload_title">التحميل من الهاتف</string>
     <string name="upload_text">وجّه كاميرا الهاتف نحو الرمز واختر صورة. يجب أن يكون الهاتف على شبكة التلفزيون نفسها.</string>
     <string name="upload_no_network">التلفزيون غير متصل بشبكة: اتصل بها ثم حاول مجددًا.</string>

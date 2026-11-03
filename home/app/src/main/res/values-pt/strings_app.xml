@@ -280,6 +280,10 @@
     <string name="update_back_computer">Para voltar à versão anterior, abra o Install Salotto num computador e escolha «Voltar à versão anterior».</string>
     <string name="grid_upload">Carregar</string>
     <string name="grid_personal_empty">Ainda não há imagens. Prima Carregar para as enviar do telemóvel.</string>
+    <string name="personal_photo">Foto %1$d</string>
+    <string name="grid_delete">Eliminar</string>
+    <string name="grid_delete_title">Eliminar %1$s?</string>
+    <string name="grid_delete_text">A foto é removida desta TV. Não é possível anular.</string>
     <string name="upload_title">Carregar do telemóvel</string>
     <string name="upload_text">Aponte a câmara do telemóvel para o código e escolha uma foto. O telemóvel tem de estar na mesma rede que a TV.</string>
     <string name="upload_no_network">A TV não está ligada a uma rede: ligue-a e tente novamente.</string>

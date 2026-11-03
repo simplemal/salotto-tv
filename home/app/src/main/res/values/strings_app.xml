@@ -354,7 +354,10 @@
     <string name="update_back_computer">Per tornare alla versione precedente apri Installa Salotto sul computer e scegli «Torna alla versione precedente».</string>
     <string name="grid_upload">Carica</string>
     <string name="grid_personal_empty">Ancora nessuna immagine. Premi Carica per inviarle dal telefono.</string>
-    <string name="grid_personal_title" translatable="false">%1$s · %2$s</string>
+    <string name="personal_photo">Foto %1$d</string>
+    <string name="grid_delete">Elimina</string>
+    <string name="grid_delete_title">Eliminare %1$s?</string>
+    <string name="grid_delete_text">La foto viene tolta da questa TV. Non si può annullare.</string>
     <string name="upload_title">Carica dal telefono</string>
     <string name="upload_text">Inquadra il codice con la fotocamera del telefono e scegli una foto. Il telefono deve essere sulla stessa rete della TV.</string>
     <string name="upload_no_network">La TV non è collegata a una rete: collegala e riprova.</string>

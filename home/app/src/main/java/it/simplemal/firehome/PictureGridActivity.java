@@ -131,6 +131,7 @@ public final class PictureGridActivity extends CardActivity {
         String folder = getIntent().getStringExtra(FOLDER);
         personal = getIntent().getBooleanExtra(PERSONAL, false);
         if (personal) {
+            Look.tidyPersonal(this);
             for (File image : Look.images(this)) pictures.add(image.getName());
         } else {
             pictures = folder == null ? Arrays.asList(Look.PRESET_NAMES) : pictures(folder);
@@ -309,9 +310,8 @@ public final class PictureGridActivity extends CardActivity {
             view.setForeground(focused ? edge() : null);
             if (focused && files) sharpenInView();
             if (focused && personal) showRowOf(index, true);
-            String position = getString(R.string.grid_position, index + 1, pictures.size());
-            if (focused) title.setText(personal ? getString(R.string.grid_personal_title, setName, position)
-                : getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)), position));
+            if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
+                getString(R.string.grid_position, index + 1, pictures.size())));
         });
         cell.setOnClickListener(view -> showPreview(index));
         return cell;
@@ -488,7 +488,19 @@ public final class PictureGridActivity extends CardActivity {
         buttons.addView(after);
         FrameLayout.LayoutParams bottom = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         bottom.bottomMargin = dp(BUTTON_BOTTOM);
-        page.addView(buttons, bottom);
+        if (personal) {
+            // Under Confirm, as left and right go through the photos: Down reaches it.
+            LinearLayout column = new LinearLayout(this);
+            column.setOrientation(LinearLayout.VERTICAL);
+            column.setGravity(Gravity.CENTER_HORIZONTAL);
+            column.setPadding(0, 0, 0, room);
+            column.addView(buttons);
+            TextView delete = button(getString(R.string.grid_delete), BUTTON_SP, this::askDelete);
+            column.addView(delete, new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2));
+            page.addView(column, bottom);
+        } else {
+            page.addView(buttons, bottom);
+        }
         confirmButton = confirm;
         return page;
     }
@@ -537,6 +549,18 @@ public final class PictureGridActivity extends CardActivity {
         scroll.setVisibility(View.VISIBLE);
         if (under != null) under.setVisibility(View.VISIBLE);
         if (opened != null) opened.requestFocus();
+    }
+
+    /** A photo can be sent by mistake: it goes, after a question, and the grid shows what is left. */
+    private void askDelete() {
+        String name = previewed;
+        if (name == null) return;
+        confirm(getString(R.string.grid_delete_title, Look.backdropName(this, name)), getString(R.string.grid_delete_text),
+            getString(R.string.grid_delete), () -> {
+                Look.deletePersonal(this, name);
+                setResult(RESULT_OK);
+                recreate();
+            });
     }
 
     private void confirm() {

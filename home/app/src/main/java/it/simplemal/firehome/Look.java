@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.function.Consumer;
 
 /** The saved appearance of the Home: grid, clock and backdrop. Only the weather backdrop changes on its own. */
@@ -88,6 +90,8 @@ final class Look {
     private static final long MINUTE_MS = 60 * 1000L;
     private static final String FILE = "look";
     private static final String FOLDER = "sfondi";
+    /** foto-7.jpg is Foto 7: a phone's own names are long strings of numbers. */
+    private static final Pattern PHOTO = Pattern.compile("foto-(\\d+)\\.(jpg|jpeg|png)");
     private static final int WIDE = 1920;
 
     private static String cachedName;
@@ -116,6 +120,8 @@ final class Look {
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
         if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
         if (PERSONAL.equals(key)) return context.getString(R.string.settings_backdrop_personal);
+        Matcher photo = PHOTO.matcher(key);
+        if (photo.matches()) return context.getString(R.string.personal_photo, Integer.parseInt(photo.group(1)));
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
         return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
@@ -310,17 +316,59 @@ final class Look {
     /** The backdrop is one of them. */
     static boolean personal(Context context, String name) { return new File(personalFolder(context), name).isFile(); }
 
-    /** Images copied into the app's own folder: the Stick has no system image picker. */
+    /** Images copied into the app's own folder: the Stick has no system image picker. In the order they came. */
     static List<File> images(Context context) {
         List<File> images = new ArrayList<>();
         File[] files = personalFolder(context).listFiles();
         if (files == null) return images;
-        Arrays.sort(files);
+        Arrays.sort(files, (one, other) -> Long.compare(number(one), number(other)) != 0
+            ? Long.compare(number(one), number(other)) : one.getName().compareTo(other.getName()));
         for (File file : files) {
             String name = file.getName().toLowerCase();
             if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")) images.add(file);
         }
         return images;
+    }
+
+    /** Its number as Foto N, or past every number for a file named some other way. */
+    private static long number(File file) {
+        Matcher photo = PHOTO.matcher(file.getName());
+        return photo.matches() ? Long.parseLong(photo.group(1)) : Long.MAX_VALUE;
+    }
+
+    /** The name for the next photo: one past the highest, so a name never moves to another picture. */
+    static synchronized File nextPhoto(Context context, String extension) {
+        long highest = 0;
+        for (File image : images(context)) {
+            long taken = number(image);
+            if (taken != Long.MAX_VALUE) highest = Math.max(highest, taken);
+        }
+        return new File(personalFolder(context), "foto-" + (highest + 1) + "." + extension);
+    }
+
+    /** Older images, or ones copied by hand, take a Foto N name too; a backdrop chosen among them follows. */
+    static synchronized void tidyPersonal(Context context) {
+        for (File image : images(context)) {
+            if (number(image) != Long.MAX_VALUE) continue;
+            String extension = image.getName().substring(image.getName().lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
+            File named = nextPhoto(context, extension);
+            if (!image.renameTo(named)) continue;
+            SharedPreferences saved = prefs(context);
+            if (image.getName().equals(saved.getString("backdrop", null))) setBackdrop(context, named.getName());
+            if (image.getPath().equals(saved.getString("abstract", null))) saved.edit().putString("abstract", named.getPath()).apply();
+        }
+    }
+
+    /** Gone from the TV. A backdrop that was this photo goes back to the default. */
+    static void deletePersonal(Context context, String name) {
+        File image = new File(personalFolder(context), name);
+        if (!image.delete()) return;
+        SharedPreferences saved = prefs(context);
+        SharedPreferences.Editor change = saved.edit();
+        if (name.equals(saved.getString("backdrop", null))) change.remove("backdrop");
+        if (image.getPath().equals(saved.getString("abstract", null))) change.remove("abstract");
+        change.apply();
+        trim();
     }
 
     /** The backdrop by that name, when it is one of the plain ones. */

@@ -280,6 +280,10 @@
     <string name="update_back_computer">Um zur vorherigen Version zurückzukehren, Install Salotto auf einem Computer öffnen und „Zur vorherigen Version zurückkehren“ wählen.</string>
     <string name="grid_upload">Hochladen</string>
     <string name="grid_personal_empty">Noch keine Bilder. Drücke Hochladen, um sie vom Handy zu senden.</string>
+    <string name="personal_photo">Foto %1$d</string>
+    <string name="grid_delete">Löschen</string>
+    <string name="grid_delete_title">%1$s löschen?</string>
+    <string name="grid_delete_text">Das Foto wird von diesem Fernseher entfernt. Das kann nicht rückgängig gemacht werden.</string>
     <string name="upload_title">Vom Handy hochladen</string>
     <string name="upload_text">Richte die Kamera des Handys auf den Code und wähle ein Foto. Das Handy muss im selben Netzwerk wie der Fernseher sein.</string>
     <string name="upload_no_network">Der Fernseher ist mit keinem Netzwerk verbunden: verbinde ihn und versuche es erneut.</string>
