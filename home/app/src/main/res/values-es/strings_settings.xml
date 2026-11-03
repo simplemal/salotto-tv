@@ -38,6 +38,12 @@
     <string name="settings_grid_text">Cuántas apps caben en cada fila. La primera fila es el dock.</string>
     <string name="settings_grid_six">Como en Apple TV: más apps a la vista, tarjetas algo más pequeñas.</string>
     <string name="settings_grid_five">Tarjetas más grandes, menos apps en cada fila.</string>
+    <string name="settings_dock">Dock</string>
+    <string name="settings_dock_bottom">Abajo</string>
+    <string name="settings_dock_top">Arriba</string>
+    <string name="settings_dock_bottom_choice">Dock abajo</string>
+    <string name="settings_dock_top_choice">Dock arriba</string>
+    <string name="settings_dock_text">Dónde empieza Inicio cada vez que pulsas Inicio. Abajo: reloj y tiempo en grande sobre el dock. Arriba: las apps enseguida, con hora y tiempo en la píldora; pulsando arriba desde el dock vuelven en grande.</string>
     <string name="settings_app_names">Nombres de las apps</string>
     <string name="settings_app_names_text">Cuándo mostrar el nombre bajo las tarjetas. En el dock nunca aparece.</string>
     <string name="settings_all_apps">Todas las apps</string>

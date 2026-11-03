@@ -37,6 +37,12 @@
     <string name="settings_grid_text">हर पंक्ति में कितने ऐप आएं। पहली पंक्ति डॉक है।</string>
     <string name="settings_grid_six">Apple TV जैसा: ज़्यादा ऐप दिखते हैं, कार्ड थोड़े छोटे।</string>
     <string name="settings_grid_five">बड़े कार्ड, हर पंक्ति में कम ऐप।</string>
+    <string name="settings_dock">डॉक</string>
+    <string name="settings_dock_bottom">नीचे</string>
+    <string name="settings_dock_top">ऊपर</string>
+    <string name="settings_dock_bottom_choice">डॉक नीचे</string>
+    <string name="settings_dock_top_choice">डॉक ऊपर</string>
+    <string name="settings_dock_text">हर बार होम दबाने पर होम कहाँ से शुरू हो। नीचे: डॉक के ऊपर बड़ी घड़ी और मौसम। ऊपर: सीधे ऐप, समय और मौसम छोटे बॉक्स में; डॉक पर ऊपर दबाने से वे फिर बड़े दिखते हैं।</string>
     <string name="settings_app_names">ऐप के नाम</string>
     <string name="settings_app_names_text">कार्ड के नीचे नाम कब दिखाएं। डॉक में कभी नहीं दिखता।</string>
     <string name="settings_all_apps">सभी ऐप</string>

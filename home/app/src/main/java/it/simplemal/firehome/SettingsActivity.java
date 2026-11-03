@@ -659,6 +659,8 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
                 getString(R.string.settings_app_names_text),
                 true, () -> enter(this::showNames)),
+            new Entry(getString(R.string.settings_dock), getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom),
+                getDrawable(R.drawable.ic_s_grid), getString(R.string.settings_dock_text), true, () -> enter(this::showDock)),
             new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
                 getString(R.string.settings_saver_text), true, () -> enter(this::showSaver))));
     }
@@ -693,6 +695,15 @@ public final class SettingsActivity extends CardActivity {
             if (values[index] == value) return index;
         }
         return -1;
+    }
+
+    private void showDock() {
+        String[] names = {getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
+        show(getString(R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+            getString(R.string.settings_dock_text), index -> {
+                Look.setAppsOnly(this, index == 1);
+                refresh();
+            }));
     }
 
     private void showNames() {

@@ -37,6 +37,12 @@
     <string name="settings_grid_text">Quante app stanno in ogni fila. La prima fila è il dock.</string>
     <string name="settings_grid_six">Come su Apple TV: più app in vista, card un po’ più piccole.</string>
     <string name="settings_grid_five">Card più grandi, meno app in ogni fila.</string>
+    <string name="settings_dock">Dock</string>
+    <string name="settings_dock_bottom">In basso</string>
+    <string name="settings_dock_top">In alto</string>
+    <string name="settings_dock_bottom_choice">Dock in basso</string>
+    <string name="settings_dock_top_choice">Dock in alto</string>
+    <string name="settings_dock_text">Dove parte la Home a ogni pressione di Home. In basso: orologio e meteo in grande sopra il dock. In alto: le app subito, con ora e meteo nella pillola; premendo su dal dock tornano in grande.</string>
     <string name="settings_app_names">Nomi delle app</string>
     <string name="settings_app_names_text">Quando mostrare il nome sotto le card. Nel dock non compare mai.</string>
     <string name="settings_all_apps">Tutte le app</string>

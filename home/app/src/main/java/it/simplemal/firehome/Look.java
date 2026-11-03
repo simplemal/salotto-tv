@@ -138,6 +138,9 @@ final class Look {
     static boolean seconds(Context context) { return prefs(context).getBoolean("seconds", false); }
     static void setSeconds(Context context, boolean value) { prefs(context).edit().putBoolean("seconds", value).apply(); }
     static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
+    /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
+    static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
+    static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
     static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
 
     /** The clock pattern chosen in Settings. */
@@ -271,7 +274,8 @@ final class Look {
     /** Changes when the Home has to be drawn again. */
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
-            + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context);
+            + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
+            + "/" + appsOnly(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */

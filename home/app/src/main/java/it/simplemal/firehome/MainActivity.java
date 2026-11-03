@@ -147,6 +147,9 @@ public final class MainActivity extends CardActivity {
     private static final int FOOTER_RADIUS = 12;
     private static final int FOOTER_INK = Color.rgb(205, 205, 205);
     private boolean bigClock;
+    private boolean appsOnly;
+    /** Dock up, and Up pressed on it: the clock and weather are in view until a lower row or Home. */
+    private boolean revealed;
     private String weatherSymbol;
     private boolean pillDrawn;
     private boolean pillClock;
@@ -443,10 +446,13 @@ public final class MainActivity extends CardActivity {
     /** Menu held on the Home. */
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (!intent.getBooleanExtra(OPEN_PANEL, false)) return;
+        if (!intent.getBooleanExtra(OPEN_PANEL, false)) {
+            if (appsOnly) restRaised();
+            return;
+        }
         View from = getCurrentFocus();
         boolean onCards = from != null && from != controlButton && !isInside(from, panel);
-        scroll.smoothScrollTo(0, 0);
+        scroll.smoothScrollTo(0, appsOnly ? shelf : 0);
         showPanel(true);
         panel.openEmpty(onCards ? from : firstCard());
     }
@@ -484,6 +490,7 @@ public final class MainActivity extends CardActivity {
             applyLook();
         }
         if (!state(apps).equals(shown)) render(focusedTag(), apps);
+        if (appsOnly) restRaised();
         Look.backHome(this);
         waitForSaver();
         ticker.post(weatherCheck);
@@ -632,6 +639,9 @@ public final class MainActivity extends CardActivity {
         alignInk(clock);
         bigClock = Look.clock(this);
         clock.setVisibility(bigClock ? View.VISIBLE : View.GONE);
+        appsOnly = Look.appsOnly(this);
+        if (appsOnly) restRaised();
+        else if (dock != null && isInside(getCurrentFocus(), dock)) scroll.scrollTo(0, 0);
         date.setVisibility(bigClock && Look.date(this) ? View.VISIBLE : View.GONE);
         String pattern = Look.timePattern(this);
         for (TextClock time : new TextClock[]{clock, pillTime}) {
@@ -707,6 +717,12 @@ public final class MainActivity extends CardActivity {
         if (moving != null && target != null) startJiggle(target);
     }
 
+    /** Dock up: every Home starts there, without a slide, once laid out. */
+    private void restRaised() {
+        revealed = false;
+        scroll.post(() -> scroll.scrollTo(0, shelf));
+    }
+
     private View homeCard(LinearLayout row, String pkg, int width) {
         if (HomeApps.SETTINGS.equals(pkg)) {
             return card(row, pkg, getString(R.string.first_does_settings), getDrawable(R.drawable.ic_settings), null, SHADED, width,
@@ -732,7 +748,8 @@ public final class MainActivity extends CardActivity {
     @Override protected void onCardFocus(View tile) {
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
-        int target = index == 0 ? 0 : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        if (index > 0) revealed = false;
+        int target = index == 0 ? (appsOnly && !revealed ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
         scroll.smoothScrollTo(0, target);
     }
 
@@ -881,6 +898,15 @@ public final class MainActivity extends CardActivity {
     @Override protected float focusScale() { return moving != null ? 1.12f : super.focusScale(); }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        // Dock up, Up on it shows the clock and weather first, as the dock down does from the start.
+        if (moving == null && appsOnly && !revealed && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
+                && dock != null && isInside(getCurrentFocus(), dock)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                revealed = true;
+                scroll.smoothScrollTo(0, 0);
+            }
+            return true;
+        }
         if (moving == null) return super.dispatchKeyEvent(event);
         boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         switch (event.getKeyCode()) {

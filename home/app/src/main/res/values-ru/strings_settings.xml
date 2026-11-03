@@ -37,6 +37,12 @@
     <string name="settings_grid_text">Сколько приложений в одном ряду. Первый ряд — это док.</string>
     <string name="settings_grid_six">Как на Apple TV: больше приложений на виду, карточки чуть меньше.</string>
     <string name="settings_grid_five">Карточки крупнее, приложений в ряду меньше.</string>
+    <string name="settings_dock">Док</string>
+    <string name="settings_dock_bottom">Внизу</string>
+    <string name="settings_dock_top">Вверху</string>
+    <string name="settings_dock_bottom_choice">Док внизу</string>
+    <string name="settings_dock_top_choice">Док вверху</string>
+    <string name="settings_dock_text">С чего начинается главный экран при каждом нажатии «Домой». Внизу: большие часы и погода над доком. Вверху: сразу приложения, время и погода на плашке; кнопка вверх в доке снова показывает их крупно.</string>
     <string name="settings_app_names">Названия приложений</string>
     <string name="settings_app_names_text">Когда показывать название под карточкой. В доке его нет никогда.</string>
     <string name="settings_all_apps">Все приложения</string>
