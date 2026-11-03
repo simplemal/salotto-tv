@@ -71,6 +71,9 @@ public final class PictureGridActivity extends CardActivity {
     private static final long FADE_MS = 140;
     private static final int OPAQUE = 255;
     private static final int UPLOAD_TOP = 14;
+    private static final int TRASH_GAP = 14;
+    /** The icon inside the circle, as large as the X in its own. */
+    private static final int TRASH_INSET = 8;
     private static final int UPLOAD_BOTTOM = 28;
     private static final int EMPTY_SP = 16;
     /** A cell needs only this much of a picture: a phone's photo is many times larger. */
@@ -495,8 +498,9 @@ public final class PictureGridActivity extends CardActivity {
             column.setGravity(Gravity.CENTER_HORIZONTAL);
             column.setPadding(0, 0, 0, room);
             column.addView(buttons);
-            TextView delete = button(getString(R.string.grid_delete), BUTTON_SP, this::askDelete);
-            column.addView(delete, new LinearLayout.LayoutParams(dp(BUTTON_WIDTH), -2));
+            LinearLayout.LayoutParams trashPlace = new LinearLayout.LayoutParams(dp(TasksActivity.BUTTON_SIZE), dp(TasksActivity.BUTTON_SIZE));
+            trashPlace.topMargin = dp(TRASH_GAP);
+            column.addView(trash(), trashPlace);
             page.addView(column, bottom);
         } else {
             page.addView(buttons, bottom);
@@ -549,6 +553,31 @@ public final class PictureGridActivity extends CardActivity {
         scroll.setVisibility(View.VISIBLE);
         if (under != null) under.setVisibility(View.VISIBLE);
         if (opened != null) opened.requestFocus();
+    }
+
+    /** A trash in a circle, the size and colours of the task manager's X. */
+    private ImageView trash() {
+        ImageView trash = new ImageView(this);
+        trash.setImageResource(R.drawable.ic_s_delete);
+        trash.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        int inset = dp(TRASH_INSET);
+        trash.setPadding(inset, inset, inset, inset);
+        trash.setContentDescription(getString(R.string.grid_delete));
+        trash.setFocusable(true);
+        trash.setClickable(true);
+        trash.setDefaultFocusHighlightEnabled(false);
+        GradientDrawable fill = new GradientDrawable();
+        fill.setShape(GradientDrawable.OVAL);
+        trash.setBackground(fill);
+        View.OnFocusChangeListener look = (view, focused) -> {
+            fill.setColor(focused ? Color.WHITE : TasksActivity.BUTTON_REST);
+            fill.setStroke(dp(TasksActivity.BUTTON_RING), focused ? Color.WHITE : TasksActivity.BUTTON_EDGE);
+            trash.setImageTintList(ColorStateList.valueOf(focused ? Fire.INK : Color.WHITE));
+        };
+        look.onFocusChange(trash, false);
+        trash.setOnFocusChangeListener(look);
+        trash.setOnClickListener(view -> askDelete());
+        return trash;
     }
 
     /** A photo can be sent by mistake: it goes, after a question, and the grid shows what is left. */

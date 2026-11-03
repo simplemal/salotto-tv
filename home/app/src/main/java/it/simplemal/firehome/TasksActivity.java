@@ -43,13 +43,15 @@ public final class TasksActivity extends CardActivity {
     /** The backdrop as this page shows it, kept until it changes: working it out takes a moment. */
     private static String veiledName;
     private static Bitmap veiled;
-    private static final int BUTTON_SIZE = 32;
+    /** The round button, shared with the trash of Personale. */
+    static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
     static final int CLOSE_SP = 13;
     private static final int BUTTON_GAP = 56;
-    private static final int BUTTON_RING = 2;
+    static final int BUTTON_RING = 2;
     /** The grey the thin cross looks: over a dark picture the darker fill alone cannot be seen. */
-    private static final int BUTTON_EDGE = Color.rgb(190, 194, 200);
+    static final int BUTTON_EDGE = Color.rgb(190, 194, 200);
+    static final int BUTTON_REST = Color.rgb(84, 88, 96);
     private static final int ROW_DROP = 48;
     private static final float OTHER_SCALE = 0.86f;
     private static final float OTHER_ALPHA = 0.5f;
@@ -352,7 +354,7 @@ public final class TasksActivity extends CardActivity {
             View card = cards.get(index);
             card.setForeground(new LayerDrawable(new Drawable[]{(Drawable) card.getTag(), edge()}));
         }
-        buttonFill.setColor(onButton ? Color.WHITE : Color.rgb(84, 88, 96));
+        buttonFill.setColor(onButton ? Color.WHITE : BUTTON_REST);
         buttonFill.setStroke(dp(BUTTON_RING), onButton ? Color.WHITE : BUTTON_EDGE);
         button.setTextColor(onButton ? Fire.INK : Color.WHITE);
         // While Fire OS's page gets ready a wheel takes this place: no X to press too soon.
