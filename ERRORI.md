@@ -38,9 +38,9 @@ Cosa fare: Non serve fare nulla.
 
 ### SAL-F106
 
-**Spazio insufficiente.** Sulla Stick non c'è spazio per scaricare e installare.
+**Spazio insufficiente.** Sulla Stick non c'è spazio per scaricare e installare la nuova versione.
 
-Cosa fare: Disinstalla un'app che non usi o svuota la cache, poi riprova.
+Cosa fare: Salotto non è stata toccata. Libera spazio togliendo le app che non usi, poi riprova, oppure aggiorna dal computer con Installa Salotto.
 
 ### SAL-F107
 
