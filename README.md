@@ -1,4 +1,4 @@
-<h1 align="center"><img src="distro/docs/immagini/logo.svg" alt="" width="160"><br>Salotto</h1>
+<p align="center"><img src="distro/docs/immagini/logo-nome.svg" alt="Salotto" width="180"></p>
 
 <p align="center"><br><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="100%"></p>
 
