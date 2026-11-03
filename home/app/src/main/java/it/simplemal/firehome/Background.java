@@ -13,6 +13,8 @@ final class Background {
     }, "salotto-background");
     private static final ExecutorService WAITING = Executors.newCachedThreadPool(LOW);
     private static final ExecutorService DRAWING = Executors.newSingleThreadExecutor(LOW);
+    /** Its own line, so that it never waits behind a page's worth of drawing: the picture someone is looking at. */
+    private static final ExecutorService SHARPENING = Executors.newSingleThreadExecutor(LOW);
 
     private Background() {}
 
@@ -21,4 +23,7 @@ final class Background {
 
     /** For what uses the processor: one job at a time, so that four weak cores keep one free. */
     static void draw(Runnable job) { DRAWING.execute(job); }
+
+    /** For reading again, sharper, what is already on screen: one job at a time beside the drawing. */
+    static void sharpen(Runnable job) { SHARPENING.execute(job); }
 }

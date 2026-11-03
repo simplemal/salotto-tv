@@ -26,10 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Every picture of one set, or Salotto's own backdrops with no set named, four across and down to
@@ -90,8 +87,8 @@ public final class PictureGridActivity extends CardActivity {
     private List<String> pictures = new ArrayList<>();
     private boolean[] asked;
     private boolean[] sharpened;
-    /** The cells in view when they were last counted: a sharpening asked for one scrolled away is dropped. */
-    private volatile Set<Integer> onScreen = Collections.emptySet();
+    /** One cell at a time is read again from its picture, so that the next can still be the one selected. */
+    private boolean sharpening;
     private boolean firstShown;
     private LinearLayout rows;
     private ProgressBar pageWheel;
@@ -204,6 +201,7 @@ public final class PictureGridActivity extends CardActivity {
         else if (!files) cell.setImageDrawable(Look.preset(pictures.get(index)));
         cell.setOnFocusChangeListener((view, focused) -> {
             view.setForeground(focused ? edge() : null);
+            if (focused && files) sharpenInView();
             if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
                 getString(R.string.grid_position, index + 1, pictures.size())));
         });
@@ -309,25 +307,37 @@ public final class PictureGridActivity extends CardActivity {
         });
     }
 
-    /** Then the cells on screen once more, from the pictures themselves, one at a time behind the small copies. */
+    /**
+     * Then the cells on screen once more, from the pictures themselves: one at a time, the selected
+     * one first, so that where the selection stops is the next to come.
+     */
     private void sharpenInView() {
-        if (!firstShown) return;
-        List<Integer> seen = inView();
-        onScreen = new HashSet<>(seen);
-        for (int index : seen) {
+        if (!firstShown || sharpening) return;
+        int next = -1;
+        View focused = getCurrentFocus();
+        int chosen = focused == null ? -1 : cells.indexOf(focused);
+        for (int index : inView()) {
             if (sharpened[index] || cells.get(index).getDrawable() == null) continue;
-            sharpened[index] = true;
-            String name = pictures.get(index);
-            Background.draw(() -> {
-                if (isDestroyed()) return;
-                if (!onScreen.contains(index)) {
-                    runOnUiThread(() -> sharpened[index] = false);
-                    return;
-                }
-                Bitmap sharp = Thumbnails.sharp(this, name);
-                if (sharp != null) runOnUiThread(() -> cells.get(index).setImageBitmap(sharp));
-            });
+            if (index == chosen) {
+                next = index;
+                break;
+            }
+            if (next < 0) next = index;
         }
+        if (next < 0) return;
+        int index = next;
+        sharpened[index] = true;
+        sharpening = true;
+        String name = pictures.get(index);
+        Background.sharpen(() -> {
+            Bitmap sharp = isDestroyed() ? null : Thumbnails.sharp(this, name);
+            runOnUiThread(() -> {
+                sharpening = false;
+                if (isDestroyed()) return;
+                if (sharp != null) cells.get(index).setImageBitmap(sharp);
+                sharpenInView();
+            });
+        });
     }
 
     private void appear(ImageView cell, Bitmap picture) {

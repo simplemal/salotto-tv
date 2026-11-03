@@ -3,6 +3,8 @@ package it.simplemal.firehome;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.SystemClock;
+import android.util.Log;
 import android.util.LruCache;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +18,7 @@ import java.util.Set;
  * These come ready made from distro/tools/prepara-miniature.py, and the last ones read stay here.
  */
 final class Thumbnails {
+    private static final String TAG = "Salotto";
     private static final String FOLDER = "miniature/";
     /** A smaller copy still, for the first moment: it takes a fraction of the time to read. */
     private static final String TINY_FOLDER = "miniature-piccole/";
@@ -61,8 +64,10 @@ final class Thumbnails {
             Bitmap kept = KEPT.get(asset);
             if (kept != null) return kept;
         }
+        long start = SystemClock.uptimeMillis();
         Bitmap picture = decode(context, asset, FULL_SAMPLE);
         if (picture == null) return null;
+        Log.i(TAG, "Sharp " + asset + " in " + (SystemClock.uptimeMillis() - start) + " ms");
         KEPT.put(asset, picture);
         SHARP.add(asset);
         return picture;
