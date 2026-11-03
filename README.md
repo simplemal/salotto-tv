@@ -34,9 +34,12 @@ Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamen
 
 ## Com'è
 
-| Centro di controllo | Scelta dello sfondo | Task manager |
-|---|---|---|
-| ![Centro di controllo](distro/docs/immagini/centro-di-controllo.webp) | ![Scelta dello sfondo](distro/docs/immagini/sfondo.webp) | ![Task manager](distro/docs/immagini/task-manager.webp) |
+<p align="center">
+  <img src="distro/docs/immagini/centro-di-controllo.webp" alt="Centro di controllo" width="32%">
+  <img src="distro/docs/immagini/sfondo.webp" alt="Scelta dello sfondo" width="32%">
+  <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="32%">
+</p>
+<p align="center"><sub>Centro di controllo · Scelta dello sfondo · Task manager</sub></p>
 
 ## Come è fatto il repository
 
