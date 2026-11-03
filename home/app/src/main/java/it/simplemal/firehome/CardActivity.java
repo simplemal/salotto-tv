@@ -64,7 +64,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     private static final int MIN_CAPTION = 130;
     private static final int EDGE_SAMPLE = 32;
     private static final long FOCUS_MS = 140;
-    private static final int CARD_ART_BYTES = 16 * 1024 * 1024;
+    /** Half on the Stick of 2020, which has half the memory. */
+    private static final int CARD_ART_BYTES = (Fire.STICK_2020 ? 8 : 16) * 1024 * 1024;
     /** Apps whose TV banner is a small logo: their layered icon fills the card far better. */
     private static final List<String> LAYERED_ICON = Arrays.asList("com.aurora.store");
     /** Each app's artwork at the size of its card: a banner alone can be many times larger. */

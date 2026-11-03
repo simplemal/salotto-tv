@@ -22,8 +22,8 @@ final class Thumbnails {
     private static final String FOLDER = "miniature/";
     /** A smaller copy still, for the first moment: it takes a fraction of the time to read. */
     private static final String TINY_FOLDER = "miniature-piccole/";
-    /** Salotto stays in memory under every app: a set and a bit, not all of them. Let go when Android asks. */
-    private static final int KEPT_BYTES = 28 * 1024 * 1024;
+    /** Salotto stays in memory under every app: a set and a bit, not all of them. Let go when Android asks. Half on the Stick of 2020. */
+    private static final int KEPT_BYTES = (Fire.STICK_2020 ? 14 : 28) * 1024 * 1024;
     /** For a picture with no small copy: a quarter of each side. */
     private static final int FULL_SAMPLE = 4;
     /** Kept as read from the picture itself, not from its small copy. */

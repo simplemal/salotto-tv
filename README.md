@@ -9,6 +9,7 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 - Fire TV Stick 4K 2ª generazione (2023)
 - Fire TV Stick 4K Max 2ª generazione (2023)
 - Fire TV Stick 4K Max 1ª generazione (2021), con alcune funzioni limitate
+- Fire TV Stick 3ª generazione (2020), con alcune funzioni limitate
 
 ## Installazione
 

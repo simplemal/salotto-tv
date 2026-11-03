@@ -53,6 +53,8 @@ final class HomeCover {
     private boolean leftOnAmazon;
     private final Runnable lookForAmazon = this::lookForAmazon;
     private int amazonTries;
+    /** Only the answer to the latest question counts. */
+    private int lastLook;
     private volatile long startedAt;
     private volatile long lastHeard;
     private boolean holding;
@@ -141,8 +143,25 @@ final class HomeCover {
 
     private void lookForAmazon() {
         if (leftOnAmazon || holding) return;
+        if (!Fire.STICK_2020) {
+            answered(amazonActive());
+            return;
+        }
+        // The Stick of 2020 can take seconds to answer, and Salotto's Home has to start on the main thread.
+        int look = ++lastLook;
+        Background.run(() -> {
+            boolean there = amazonActive();
+            main.post(() -> { if (look == lastLook) answered(there); });
+        });
+    }
+
+    private boolean amazonActive() {
         AccessibilityNodeInfo active = service.getRootInActiveWindow();
-        boolean there = active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+        return active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+    }
+
+    private void answered(boolean there) {
+        if (leftOnAmazon || holding) return;
         boolean settling = SystemClock.elapsedRealtime() - startedAt < AMAZON_SETTLE_MS;
         if (there && !settling) {
             show();
@@ -194,6 +213,7 @@ final class HomeCover {
     void close() {
         main.removeCallbacks(hide);
         main.removeCallbacks(lookForAmazon);
+        lastLook++;
         windows.removeView(view);
     }
 }

@@ -981,9 +981,16 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showResolutions(String current) {
-        show(getString(R.string.settings_resolution), choices(strings(RESOLUTION_NAMES), Arrays.asList(RESOLUTIONS).indexOf(current), R.drawable.ic_image,
+        List<String> values = new ArrayList<>(Arrays.asList(RESOLUTIONS));
+        List<String> names = new ArrayList<>(Arrays.asList(strings(RESOLUTION_NAMES)));
+        // The Stick of 2020 stops at 1080p: the two 4K lines, after Auto, would only give a black screen.
+        if (Fire.STICK_2020) {
+            values.subList(1, 3).clear();
+            names.subList(1, 3).clear();
+        }
+        show(getString(R.string.settings_resolution), choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
             resolutionText(), index -> {
-                if (!RESOLUTIONS[index].equals(current)) changeResolution(current, RESOLUTIONS[index]);
+                if (!values.get(index).equals(current)) changeResolution(current, values.get(index));
             }));
     }
 
