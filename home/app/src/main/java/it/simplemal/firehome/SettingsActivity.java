@@ -1797,6 +1797,11 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         entries.add(groupLabel(Brand.NAME));
         for (Saver saver : SAVERS) entries.add(saverEntry(saver));
+        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
+            Entry mine = saverEntry(personalSaver());
+            mine.mosaic = null;
+            entries.add(mine);
+        }
         entries.add(paceEntry());
         entries.add(groupLabel(R.string.settings_saver_native));
         entries.add(new Entry(getString(R.string.settings_saver_fire), own ? null : CHECK, getDrawable(R.drawable.ic_image),
@@ -1819,10 +1824,16 @@ public final class SettingsActivity extends CardActivity {
         return entry;
     }
 
+    /** The photos of Personale, by the folder's full path: offered, like among the backdrops, from two photos on. */
+    private Saver personalSaver() {
+        return new Saver(getString(R.string.settings_backdrop_personal), Look.personalFolder(this).getPath());
+    }
+
     private String ownSaverName() {
         for (Saver saver : SAVERS) {
             if (saver.folder.equals(Look.saverFolder(this))) return saver.name;
         }
+        if (Look.saverFolder(this).startsWith("/")) return personalSaver().name;
         return Brand.NAME;
     }
 

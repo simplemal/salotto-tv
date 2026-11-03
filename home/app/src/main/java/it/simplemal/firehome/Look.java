@@ -252,7 +252,11 @@ final class Look {
     }
 
     /** Which set Salotto's screensaver shows. */
-    static String saverFolder(Context context) { return prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER); }
+    static String saverFolder(Context context) {
+        String folder = prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER);
+        // Personale's photos can be gone, after a backup is restored on another Stick.
+        return folder.startsWith("/") && images(context).isEmpty() ? ABSTRACT_3D_FOLDER : folder;
+    }
     static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
     /** Salotto's screensaver is the one chosen. */

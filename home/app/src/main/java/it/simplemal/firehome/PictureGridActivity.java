@@ -497,7 +497,8 @@ public final class PictureGridActivity extends CardActivity {
             column.setOrientation(LinearLayout.VERTICAL);
             column.setGravity(Gravity.CENTER_HORIZONTAL);
             column.setPadding(0, 0, 0, room);
-            column.addView(buttons);
+            // Its own width: the column is only as wide as what it holds, and the trash alone is narrow.
+            column.addView(buttons, new LinearLayout.LayoutParams(-2, -2));
             LinearLayout.LayoutParams trashPlace = new LinearLayout.LayoutParams(dp(TasksActivity.BUTTON_SIZE), dp(TasksActivity.BUTTON_SIZE));
             trashPlace.topMargin = dp(TRASH_GAP);
             column.addView(trash(), trashPlace);
