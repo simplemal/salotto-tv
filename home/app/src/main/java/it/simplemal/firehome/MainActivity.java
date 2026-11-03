@@ -717,10 +717,20 @@ public final class MainActivity extends CardActivity {
         if (moving != null && target != null) startJiggle(target);
     }
 
-    /** Dock up: every Home starts there, without a slide, once laid out. */
+    /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
     private void restRaised() {
         revealed = false;
-        scroll.post(() -> scroll.scrollTo(0, shelf));
+        if (page.isLaidOut() && !page.isLayoutRequested() && page.getHeight() > shelf) {
+            scroll.scrollTo(0, shelf);
+            return;
+        }
+        page.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                page.removeOnLayoutChangeListener(this);
+                scroll.post(() -> { if (appsOnly && !revealed) scroll.scrollTo(0, shelf); });
+            }
+        });
     }
 
     private View homeCard(LinearLayout row, String pkg, int width) {
