@@ -1,8 +1,6 @@
-<p align="center"><img src="distro/docs/immagini/logo.svg" alt="" width="160"></p>
+<h1 align="center"><img src="distro/docs/immagini/logo.svg" alt="" width="160"><br>Salotto</h1>
 
-<h1 align="center">Salotto</h1>
-
-<p align="center"><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="100%"></p>
+<p align="center"><br><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="100%"></p>
 
 Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
 
