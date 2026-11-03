@@ -66,6 +66,10 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BUTTON_ROOM = 8;
     private static final int ARROW_SP = 34;
     private static final float ARROW_ALPHA = 0.55f;
+    /** The guillemet sits low in its line: raised to the middle of Confirm. */
+    private static final int ARROW_RISE = 3;
+    private static final float ARROW_SHADOW = 8;
+    private static final int ARROW_SHADOW_COLOR = Color.argb(170, 0, 0, 0);
     private static final int PAGE_WHEEL = 48;
     private static final int CELL_WHEEL = 28;
     private static final long FADE_MS = 140;
@@ -153,6 +157,8 @@ public final class PictureGridActivity extends CardActivity {
         rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
         rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(BOTTOM_ROOM));
+        // As wide as four cells even with fewer: one or two photos start on the left, where the rest will follow.
+        rows.setMinimumWidth(COLUMNS * dp(CELL_WIDTH) + (COLUMNS - 1) * dp(GAP) + 2 * dp(SIDE_ROOM));
         LinearLayout row = null;
         for (int index = 0; index < pictures.size(); index++) {
             if (index % COLUMNS == 0) {
@@ -514,7 +520,10 @@ public final class PictureGridActivity extends CardActivity {
     private TextView arrow(String mark) {
         TextView arrow = label(mark, ARROW_SP);
         arrow.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
-        arrow.setAlpha(ARROW_ALPHA);
+        // Full white with a shadow: over a light photo a faded one could not be seen.
+        arrow.setShadowLayer(ARROW_SHADOW, 0, 0, ARROW_SHADOW_COLOR);
+        arrow.setIncludeFontPadding(false);
+        arrow.setTranslationY(-dp(ARROW_RISE));
         return arrow;
     }
 
