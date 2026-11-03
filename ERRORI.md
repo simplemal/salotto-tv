@@ -124,6 +124,8 @@ Cosa fare: Salotto non è stata modificata. Riprova; se resta, riavvia la Stick.
 
 Cosa fare: Salotto è rimasta alla versione precedente. Riavvia la Stick e riprova.
 
+Con una versione di Salotto precedente alla 1.0.18 questo errore indica probabilmente che sulla Fire TV non c'è spazio sufficiente per l'aggiornamento. Di solito si risolve disinstallando qualche app non più in uso, oppure scaricando direttamente la nuova versione dal computer con [Installa Salotto](https://github.com/simplemal/salotto-tv#installazione). Dalla 1.0.18 Salotto controlla lo spazio prima di iniziare e, se non basta, lo dice con SAL-F106.
+
 ### SAL-C203
 
 **La nuova versione non parte.** Dopo l'installazione Salotto non si è avviata correttamente.

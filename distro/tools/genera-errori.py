@@ -16,6 +16,13 @@ GROUPS = (("F", "Prima di modificare qualcosa", "Salotto non è stata modificata
 ISSUES = f"https://github.com/{REPO}/issues/new"
 # The README's table with the Mac and Windows downloads.
 INSTALLER = f"https://github.com/{REPO}#installazione"
+# Only for this page: what a code meant on versions that are still out there.
+NOTES = {
+    "C202": "Con una versione di Salotto precedente alla 1.0.18 questo errore indica probabilmente che sulla Fire TV "
+            "non c'è spazio sufficiente per l'aggiornamento. Di solito si risolve disinstallando qualche app non più "
+            f"in uso, oppure scaricando direttamente la nuova versione dal computer con [Installa Salotto]({INSTALLER}). "
+            "Dalla 1.0.18 Salotto controlla lo spazio prima di iniziare e, se non basta, lo dice con SAL-F106.",
+}
 
 
 def main():
@@ -29,6 +36,8 @@ def main():
         for code, title, cause, fix in found:
             if code.startswith(letter):
                 lines += [f"### SAL-{code}", "", f"**{title}.** {cause}", "", f"Cosa fare: {fix}", ""]
+                if code in NOTES:
+                    lines += [NOTES[code], ""]
     lines += ["## Il problema resta", "",
               f"Aggiorna Salotto dal computer con [Installa Salotto]({INSTALLER}), per Mac e Windows: installa l'ultima versione "
               "senza passare dall'aggiornamento della TV, e le tue scelte restano.", "",
