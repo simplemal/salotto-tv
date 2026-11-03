@@ -277,6 +277,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Para as desligar de novo é preciso um computador:\n1. Abra o Install Salotto.\n2. Escolha esta TV.\n3. Siga os passos propostos.</string>
     <string name="update_error_r304">É preciso o Install Salotto num computador</string>
+    <string name="update_from_computer">Se o problema continuar, atualize o Salotto a partir do computador com o Installa Salotto: %1$s</string>
     <string name="update_back_computer">Para voltar à versão anterior, abra o Install Salotto num computador e escolha «Voltar à versão anterior».</string>
     <string name="grid_upload">Carregar</string>
     <string name="grid_personal_empty">Ainda não há imagens. Prima Carregar para as enviar do telemóvel.</string>

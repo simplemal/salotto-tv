@@ -277,6 +277,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Para volver a desactivarlas hace falta un ordenador:\n1. Abre Install Salotto.\n2. Elige este televisor.\n3. Sigue los pasos que propone.</string>
     <string name="update_error_r304">Hace falta Install Salotto en un ordenador</string>
+    <string name="update_from_computer">Si el problema continúa, actualiza Salotto desde el ordenador con Installa Salotto: %1$s</string>
     <string name="update_back_computer">Para volver a la versión anterior, abre Install Salotto en un ordenador y elige «Volver a la versión anterior».</string>
     <string name="grid_upload">Subir</string>
     <string name="grid_personal_empty">Todavía no hay imágenes. Pulsa Subir para enviarlas desde el teléfono.</string>

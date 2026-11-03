@@ -351,6 +351,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Per rispegnerle serve un computer:\n1. Apri Installa Salotto.\n2. Scegli questa TV.\n3. Segui i passi che propone.</string>
     <string name="update_error_r304">Serve Installa Salotto sul computer</string>
+    <string name="update_from_computer">Se il problema resta, aggiorna Salotto dal computer con Installa Salotto: %1$s</string>
     <string name="update_back_computer">Per tornare alla versione precedente apri Installa Salotto sul computer e scegli «Torna alla versione precedente».</string>
     <string name="grid_upload">Carica</string>
     <string name="grid_personal_empty">Ancora nessuna immagine. Premi Carica per inviarle dal telefono.</string>

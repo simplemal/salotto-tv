@@ -293,6 +293,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">لإيقافها مجددًا يلزم حاسوب:\n1. افتح Install Salotto.\n2. اختر هذا التلفاز.\n3. اتبع الخطوات المعروضة.</string>
     <string name="update_error_r304">يلزم Install Salotto على حاسوب</string>
+    <string name="update_from_computer">إذا استمرت المشكلة، حدّث Salotto من الكمبيوتر باستخدام Installa Salotto: %1$s</string>
     <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
     <string name="grid_upload">تحميل</string>
     <string name="grid_personal_empty">لا توجد صور بعد. اضغط «تحميل» لإرسالها من الهاتف.</string>

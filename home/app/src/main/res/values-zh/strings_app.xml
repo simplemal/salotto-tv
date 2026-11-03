@@ -273,6 +273,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">要再次关闭，需要一台电脑：\n1. 打开 Install Salotto。\n2. 选择这台电视。\n3. 按提示的步骤操作。</string>
     <string name="update_error_r304">需要在电脑上使用 Install Salotto</string>
+    <string name="update_from_computer">如果问题仍然存在，请在电脑上用 Installa Salotto 更新 Salotto：%1$s</string>
     <string name="update_back_computer">要回到上一版本，请在电脑上打开 Install Salotto，然后选择“回到上一版本”。</string>
     <string name="grid_upload">上传</string>
     <string name="grid_personal_empty">还没有图片。按“上传”从手机发送。</string>

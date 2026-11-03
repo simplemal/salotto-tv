@@ -1,6 +1,6 @@
 # Errori dell'aggiornamento di Salotto
 
-Sulla TV compare un codice: cercalo qui. Un aggiornamento che fallisce non lascia mai Salotto a metà.
+Sulla TV compare un codice: cercalo qui. Un aggiornamento che fallisce non lascia mai Salotto a metà. Se l'errore torna ogni volta, in fondo trovi come aggiornare dal computer.
 
 ## Prima di modificare qualcosa
 
@@ -172,4 +172,6 @@ Cosa fare: Apri Installa Salotto sul computer e scegli «Torna alla versione pre
 
 ## Il problema resta
 
-[Apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new) indicando codice, versione di Salotto e di Fire OS.
+Aggiorna Salotto dal computer con [Installa Salotto](https://github.com/simplemal/salotto-tv#installazione), per Mac e Windows: installa l'ultima versione senza passare dall'aggiornamento della TV, e le tue scelte restano.
+
+Se non basta, [apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new) indicando codice, versione di Salotto e di Fire OS.

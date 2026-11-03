@@ -277,6 +277,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">To turn them off again you need a computer:\n1. Open Install Salotto.\n2. Choose this TV.\n3. Follow the steps it offers.</string>
     <string name="update_error_r304">Install Salotto is needed on a computer</string>
+    <string name="update_from_computer">If the problem persists, update Salotto from a computer with Installa Salotto: %1$s</string>
     <string name="update_back_computer">To go back to the previous version, open Install Salotto on a computer and choose “Go back to the previous version”.</string>
     <string name="grid_upload">Upload</string>
     <string name="grid_personal_empty">No images yet. Press Upload to send them from your phone.</string>

@@ -491,6 +491,12 @@ public final class UpdateActivity extends CardActivity {
         TextView help = text(getString(R.string.update_scan_help), CHANGE_SP, false);
         help.setPadding(0, dp(12), 0, 0);
         body.addView(help);
+        // From the computer Salotto is installed another way, which gets past an update that keeps failing here.
+        if (error != UpdateError.R304) {
+            TextView computer = text(getString(R.string.update_from_computer, "github.com/" + Fire.UPDATES_REPO), CHANGE_SP, false);
+            computer.setPadding(0, dp(12), 0, 0);
+            body.addView(computer);
+        }
         // Reopened by the install script, this page has nothing of Salotto beneath it.
         boolean alone = getIntent().getBooleanExtra(EXTRA_AFTER, false);
         actions(action(getString(R.string.card_close), alone ? this::home : this::finish));

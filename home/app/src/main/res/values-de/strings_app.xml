@@ -277,6 +277,7 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Zum erneuten Ausschalten wird ein Computer gebraucht:\n1. Install Salotto öffnen.\n2. Diesen Fernseher wählen.\n3. Den angezeigten Schritten folgen.</string>
     <string name="update_error_r304">Install Salotto wird auf einem Computer gebraucht</string>
+    <string name="update_from_computer">Wenn das Problem bleibt, aktualisiere Salotto am Computer mit Installa Salotto: %1$s</string>
     <string name="update_back_computer">Um zur vorherigen Version zurückzukehren, Install Salotto auf einem Computer öffnen und „Zur vorherigen Version zurückkehren“ wählen.</string>
     <string name="grid_upload">Hochladen</string>
     <string name="grid_personal_empty">Noch keine Bilder. Drücke Hochladen, um sie vom Handy zu senden.</string>
