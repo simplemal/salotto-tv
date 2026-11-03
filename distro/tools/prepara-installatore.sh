@@ -22,7 +22,16 @@ for part in "$DIST"/Installa-Salotto-*-arm64.zip "$DIST"/latest-mac.yml; do
   cp "$part" "$TARGET/"
 done
 # Built only on a computer that can run their tools: when they are there, they go too.
-one 'Installa Salotto Setup *.exe' Installa-Salotto-Windows.exe || true
+# Windows updates itself from latest.yml, so the exe goes only with it and only at the Mac version.
+# The yml then names the fixed name, so one copy of the exe serves both the link and the update.
+version() { sed -n 's/^version: //p' "$1"; }
+if [ -f "$DIST/latest.yml" ] && [ "$(version "$DIST/latest.yml")" = "$(version "$DIST/latest-mac.yml")" ]; then
+  exe="$(sed -n 's/^path: //p' "$DIST/latest.yml")"
+  cp "$DIST/$exe" "$TARGET/Installa-Salotto-Windows.exe"
+  sed "s|$exe|Installa-Salotto-Windows.exe|" "$DIST/latest.yml" > "$TARGET/latest.yml"
+else
+  echo "Senza Windows: in installatore/dist manca, o è di un'altra versione."
+fi
 one 'Installa Salotto-*.AppImage' Installa-Salotto-Linux.AppImage || true
 for image in "$TARGET"/*.dmg; do
   xcrun stapler validate "$image" > /dev/null || { echo "Fermo: $(basename "$image") non è notarizzato."; exit 1; }
