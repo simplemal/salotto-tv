@@ -1,6 +1,8 @@
-# Salotto
+<p align="center"><img src="distro/docs/immagini/logo.svg" alt="" width="160"></p>
 
-<p align="center"><img src="distro/docs/immagini/logo.svg" alt="Salotto" width="160"></p>
+<h1 align="center">Salotto</h1>
+
+<p align="center"><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="100%"></p>
 
 Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
 
@@ -12,15 +14,12 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 
 ## Installazione
 
-**[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)**: solo Mac Apple Silicon, per ora. L'app guida ogni passo, e con Togli Salotto rimette tutto com'era.
+Installa Salotto guida ogni passo dal computer, e con Togli Salotto rimette tutto com'era.
 
-## Com'è
-
-<p align="center"><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="800"></p>
-
-| Centro di controllo | Scelta dello sfondo | Task manager |
-|---|---|---|
-| ![Centro di controllo](distro/docs/immagini/centro-di-controllo.webp) | ![Scelta dello sfondo](distro/docs/immagini/sfondo.webp) | ![Task manager](distro/docs/immagini/task-manager.webp) |
+| Computer | Installer |
+|---|---|
+| Mac Apple Silicon | **[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
+| Windows | Con la prossima versione |
 
 ## Cosa fa
 
@@ -34,6 +33,12 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 - **Aggiornamenti:** firmati e controllati prima di installarli, con un passo per volta a schermo.
 
 Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamenti. Niente root e niente modifiche al sistema: resta una normale app, e si può disinstallare.
+
+## Com'è
+
+| Centro di controllo | Scelta dello sfondo | Task manager |
+|---|---|---|
+| ![Centro di controllo](distro/docs/immagini/centro-di-controllo.webp) | ![Scelta dello sfondo](distro/docs/immagini/sfondo.webp) | ![Task manager](distro/docs/immagini/task-manager.webp) |
 
 ## Come è fatto il repository
 
