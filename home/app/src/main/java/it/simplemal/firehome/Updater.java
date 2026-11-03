@@ -40,9 +40,21 @@ import org.json.JSONObject;
 
 /** Finds and checks a new version. Nothing here changes the installed app. */
 final class Updater {
-    static final class Failure extends Exception {
+    static class Failure extends Exception {
         final UpdateError error;
         Failure(UpdateError error) { this.error = error; }
+    }
+
+    /** Not enough room: the page says how much is needed and how much there is. */
+    static final class NoRoom extends Failure {
+        final long needed;
+        final long free;
+
+        NoRoom(long needed, long free) {
+            super(UpdateError.F106);
+            this.needed = needed;
+            this.free = free;
+        }
     }
 
     static final class Release {
@@ -68,8 +80,14 @@ final class Updater {
     private static final long NOTHING_NEW = 60 * Fire.MINUTE_MS;
     /** The script reports well within this; a state left older than this has no one behind it. */
     private static final long STALE = 5 * Fire.MINUTE_MS;
-    /** At most three copies at once: the download, the one kept for the way back, Android's own. */
-    private static final long ROOM_FACTOR = 3;
+    /**
+     * Copies of the new version on the Stick at the worst moment: the download and Android's own, and
+     * the old version kept for the way back except on Android 9, where the way back is the computer.
+     * Android also checks, as it installs, that one more fits.
+     */
+    private static final int COPIES = Fire.ANDROID_9 ? 2 : 3;
+    /** For what Android adds as it installs: compiled code and its records. */
+    private static final int EXTRA_PART = 10;
     private static final int TIMEOUT_MS = 15000;
     private static final int MAX_MANIFEST = 256 * 1024;
     private static final int PERCENT = 100;
@@ -238,7 +256,10 @@ final class Updater {
         } catch (IOException e) {
             free = new StatFs(folder.getPath()).getAvailableBytes();
         }
-        if (free < release.size * ROOM_FACTOR) throw new Failure(UpdateError.F106);
+        // What an earlier try left behind is replaced, so it counts as free.
+        free += shared(context, APK).length() + previous(context).length();
+        long needed = release.size * COPIES + release.size / EXTRA_PART;
+        if (free < needed) throw new NoRoom(needed, free);
     }
 
     static void checkIdle(Context context) throws Failure {

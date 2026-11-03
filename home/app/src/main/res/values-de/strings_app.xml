@@ -277,6 +277,9 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Zum erneuten Ausschalten wird ein Computer gebraucht:\n1. Install Salotto öffnen.\n2. Diesen Fernseher wählen.\n3. Den angezeigten Schritten folgen.</string>
     <string name="update_error_r304">Install Salotto wird auf einem Computer gebraucht</string>
+    <string name="update_room_title">Der Fire TV hat nicht genug Speicher für das Update</string>
+    <string name="update_room_numbers">Benötigt werden %1$s, frei sind %2$s. Salotto wurde nicht verändert.</string>
+    <string name="update_room_choices">Du kannst Speicher freigeben, indem du Apps entfernst, die du nicht nutzt, und es erneut versuchen, oder Salotto am Computer mit Installa Salotto aktualisieren: %1$s</string>
     <string name="update_from_computer">Wenn das Problem bleibt, aktualisiere Salotto am Computer mit Installa Salotto: %1$s</string>
     <string name="update_back_computer">Um zur vorherigen Version zurückzukehren, Install Salotto auf einem Computer öffnen und „Zur vorherigen Version zurückkehren“ wählen.</string>
     <string name="grid_upload">Hochladen</string>

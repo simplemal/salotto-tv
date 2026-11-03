@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -52,6 +53,7 @@ public final class UpdateActivity extends CardActivity {
     private static final int CHANGE_SP = 12;
     private static final int ACTION_SP = 15;
     private static final int ERROR_SP = 15;
+    private static final int ROOM_WIDTH = 640;
     private static final int BAR_HEIGHT = 5;
     private static final long PAGE_DRAWN_MS = 100;
 
@@ -249,6 +251,8 @@ public final class UpdateActivity extends CardActivity {
         Background.run(() -> {
             try {
                 job.run();
+            } catch (Updater.NoRoom room) {
+                main.post(() -> showNoRoom(room));
             } catch (Updater.Failure failure) {
                 main.post(() -> showError(failure.error));
             }
@@ -470,6 +474,23 @@ public final class UpdateActivity extends CardActivity {
     private void home() {
         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
+    }
+
+    /** Checked before anything is downloaded or changed: Salotto stays exactly as it is. */
+    private void showNoRoom(Updater.NoRoom room) {
+        TaskService.installEnded();
+        busy = false;
+        forget();
+        clear();
+        title.setText(getString(R.string.update_room_title));
+        TextView numbers = text(getString(R.string.update_room_numbers, Formatter.formatShortFileSize(this, room.needed),
+            Formatter.formatShortFileSize(this, Math.max(0, room.free))), ERROR_SP, false);
+        numbers.setPadding(0, 0, 0, dp(16));
+        body.addView(numbers);
+        body.addView(text(getString(R.string.update_room_choices, "github.com/" + Fire.UPDATES_REPO), ERROR_SP, false),
+            new LinearLayout.LayoutParams(dp(ROOM_WIDTH), -2));
+        boolean alone = getIntent().getBooleanExtra(EXTRA_AFTER, false);
+        actions(action(getString(R.string.card_close), alone ? this::home : this::finish));
     }
 
     private void showError(UpdateError error) {

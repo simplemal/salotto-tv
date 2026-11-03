@@ -293,6 +293,9 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">لإيقافها مجددًا يلزم حاسوب:\n1. افتح Install Salotto.\n2. اختر هذا التلفاز.\n3. اتبع الخطوات المعروضة.</string>
     <string name="update_error_r304">يلزم Install Salotto على حاسوب</string>
+    <string name="update_room_title">لا توجد مساحة كافية على Fire TV للتحديث</string>
+    <string name="update_room_numbers">المطلوب %1$s والمتاح %2$s. لم يتم تغيير Salotto.</string>
+    <string name="update_room_choices">يمكنك تحرير مساحة بإزالة التطبيقات التي لا تستخدمها ثم المحاولة مجددًا، أو تحديث Salotto من الكمبيوتر باستخدام Installa Salotto: %1$s</string>
     <string name="update_from_computer">إذا استمرت المشكلة، حدّث Salotto من الكمبيوتر باستخدام Installa Salotto: %1$s</string>
     <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
     <string name="grid_upload">تحميل</string>
