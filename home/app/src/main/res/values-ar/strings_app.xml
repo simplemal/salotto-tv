@@ -117,7 +117,6 @@
     <string name="about_not_included">برامج غير مضمّنة</string>
     <string name="about_not_included_text">يحمّلها التثبيت من مشاريعها الأصلية، دون تعديل.</string>
     <string name="about_use_airplay">يستقبل من iPhone وiPad وMac</string>
-    <string name="about_use_aurora">يثبّت تطبيقات Android، حتى بلا حساب</string>
 
     <string name="device_name">الاسم</string>
     <string name="device_model">الطراز</string>

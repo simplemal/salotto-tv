@@ -102,7 +102,6 @@
     <string name="about_not_included">未包含的程序</string>
     <string name="about_not_included_text">安装时会从原项目下载，不做任何修改。</string>
     <string name="about_use_airplay">接收来自 iPhone、iPad 和 Mac 的内容</string>
-    <string name="about_use_aurora">安装 Android 应用，无需账户</string>
 
     <string name="device_name">名称</string>
     <string name="device_model">型号</string>

@@ -98,8 +98,6 @@ public final class AboutActivity extends CardActivity {
         section(getString(R.string.about_not_included));
         paragraph(getString(R.string.about_not_included_text));
         credit("AirPlay Server", "GPL-3.0", getString(R.string.about_use_airplay), "github.com/jqssun/android-airplay-server");
-        credit("Aurora Store", "GPL-3.0", getString(R.string.about_use_aurora),
-            "f-droid.org/packages/com.aurora.store");
     }
 
     private void section(String name) {

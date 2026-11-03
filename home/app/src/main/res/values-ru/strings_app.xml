@@ -111,7 +111,6 @@
     <string name="about_not_included">Программы не входят в комплект</string>
     <string name="about_not_included_text">При установке они загружаются из оригинальных проектов без изменений.</string>
     <string name="about_use_airplay">Принимает видео с iPhone, iPad и Mac</string>
-    <string name="about_use_aurora">Устанавливает приложения Android, даже без аккаунта</string>
 
     <string name="device_name">Название</string>
     <string name="device_model">Модель</string>

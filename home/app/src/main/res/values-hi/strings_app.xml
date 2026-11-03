@@ -105,7 +105,6 @@
     <string name="about_not_included">शामिल नहीं किए गए प्रोग्राम</string>
     <string name="about_not_included_text">इंस्टॉल के समय इन्हें मूल प्रोजेक्ट से डाउनलोड किया जाता है, बिना बदले।</string>
     <string name="about_use_airplay">iPhone, iPad और Mac से वीडियो पाता है</string>
-    <string name="about_use_aurora">बिना खाते के भी Android ऐप इंस्टॉल करता है</string>
 
     <string name="device_name">नाम</string>
     <string name="device_model">मॉडल</string>

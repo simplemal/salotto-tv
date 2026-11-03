@@ -105,7 +105,6 @@
     <string name="about_not_included">Programas no incluidos</string>
     <string name="about_not_included_text">La instalación los descarga de los proyectos originales, sin modificarlos.</string>
     <string name="about_use_airplay">Recibe de iPhone, iPad y Mac</string>
-    <string name="about_use_aurora">Instala apps de Android, incluso sin cuenta</string>
 
     <string name="device_name">Nombre</string>
     <string name="device_model">Modelo</string>
