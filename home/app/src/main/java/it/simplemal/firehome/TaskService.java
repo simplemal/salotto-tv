@@ -587,8 +587,6 @@ public final class TaskService extends AccessibilityService {
         registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         cover = new HomeCover(this);
         showVeil();
-        // A restart forgets the screen's colour matrix.
-        if (Veil.warm(this) > 0) adb.post(this::connected);
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
         endFixer();
@@ -929,7 +927,6 @@ public final class TaskService extends AccessibilityService {
             if (!"ready".equals(opened.readLine())) throw new IOException("Helper did not start");
             client = opened;
             startHomeLog();
-            if (Veil.warm(this) > 0) run(Veil.WARM_ON);
             return true;
         } catch (IOException | GeneralSecurityException | SecurityException e) {
             Log.w(TAG, "No adb connection", e);

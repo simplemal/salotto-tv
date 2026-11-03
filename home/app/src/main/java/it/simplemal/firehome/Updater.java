@@ -63,6 +63,8 @@ final class Updater {
     private static final String PREVIOUS = "update-previous.apk";
     /** A failed look is usually a network still waking up. */
     private static final long RETRY = 10 * Fire.MINUTE_MS;
+    /** A release may come out any time: a day's wait left the TVs a version behind. */
+    private static final long NOTHING_NEW = 60 * Fire.MINUTE_MS;
     /** The script reports well within this; a state left older than this has no one behind it. */
     private static final long STALE = 5 * Fire.MINUTE_MS;
     private static final long ROOM_FACTOR = 3;
@@ -92,7 +94,7 @@ final class Updater {
     static int target(Context context) { return prefs(context).getInt("target", 0); }
     static void setTarget(Context context, int code) { prefs(context).edit().putInt("target", code).commit(); }
 
-    /** True at every start of Salotto and once a day after that: "later" lasts until then. */
+    /** True at every start of Salotto, then every hour, or a day after an offer: "later" lasts until then. */
     static boolean due() {
         long now = System.currentTimeMillis();
         if (now < nextCheck) return false;
@@ -104,7 +106,7 @@ final class Updater {
     static Release offer(Context context) {
         try {
             Release found = check(context);
-            nextCheck = System.currentTimeMillis() + Fire.DAY_MS;
+            nextCheck = System.currentTimeMillis() + (found == null ? NOTHING_NEW : Fire.DAY_MS);
             return found;
         } catch (Failure e) {
             return null;

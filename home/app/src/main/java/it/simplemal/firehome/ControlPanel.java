@@ -275,9 +275,8 @@ final class ControlPanel extends LinearLayout {
         audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
             () -> change(() -> Veil.nextDim(getContext())));
-        // The filter's matrix takes the shell, which Android 9 does not give, nor Android with a cable.
-        boolean noFilter = Fire.ANDROID_9 || wired() && !TaskService.ready();
-        Tile warm = noFilter ? small(modes, R.drawable.ic_s_tv, getContext().getString(R.string.settings_screen), GAP, this::openScreen) : small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP, this::changeWarm);
+        Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
+            () -> change(() -> Veil.nextWarm(getContext())));
 
         LinearLayout tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver(getContext())));
@@ -297,7 +296,7 @@ final class ControlPanel extends LinearLayout {
         timerTile = timer;
         refreshers.add(this::showTimer);
         refreshers.add(() -> showDim(dim));
-        if (!noFilter) refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
+        refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
     }
 
     private LinearLayout row() {
@@ -361,22 +360,6 @@ final class ControlPanel extends LinearLayout {
         });
     }
 
-    /** Salotto's own page where Fire OS answers it, or else Fire OS's settings. */
-    private void openScreen() {
-        FireSettings settings = fire();
-        Background.run(() -> {
-            boolean ours = settings.read(FireSettings.PICTURE, SettingsActivity.RESOLUTION) != null;
-            host.runOnUiThread(() -> {
-                if (ours) {
-                    settings(SettingsActivity.SCREEN);
-                } else {
-                    TaskService.wantFireSettings();
-                    host.open(Fire.settings());
-                }
-            });
-        });
-    }
-
     private void flip(Tile tile, String id) {
         boolean on = !tile.active;
         showSwitch(tile, on);
@@ -430,14 +413,6 @@ final class ControlPanel extends LinearLayout {
         level.run();
         TaskService.veilChanged();
         refresh();
-    }
-
-    private void changeWarm() {
-        host.shell(Veil.warm(getContext()) == 0 ? Veil.WARM_ON : Veil.WARM_OFF, output -> {
-            if (Veil.accepted(output)) Veil.nextWarm(getContext());
-            else host.say(getContext().getString(R.string.panel_command_failed));
-            refresh();
-        });
     }
 
     /** Counts down in front of whoever is looking, and stops once the panel is shut. */
