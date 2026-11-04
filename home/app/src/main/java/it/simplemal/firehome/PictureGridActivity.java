@@ -609,13 +609,14 @@ public final class PictureGridActivity extends CardActivity {
 
     /**
      * A photo can be sent by mistake: it goes, after a question, and the grid shows what is left.
-     * A picture of the app's sets is inside the app: it is taken away, never shown again, and can come back.
+     * Gone for good, the user's choice: a picture of the app's sets is deleted from the TV if it was
+     * copied there, and if it is inside the app it is never shown again. Only installing again brings it back.
      */
     private void askDelete() {
         String name = previewed;
         if (name == null) return;
         confirm(getString(R.string.grid_delete_title, Look.backdropName(this, name)),
-            getString(personal ? R.string.grid_delete_text : R.string.grid_hide_text), getString(R.string.grid_delete), () -> {
+            getString(R.string.grid_delete_text), getString(R.string.grid_delete), () -> {
                 if (personal) Look.deletePersonal(this, name);
                 else Look.take(this, name);
                 setResult(RESULT_OK);

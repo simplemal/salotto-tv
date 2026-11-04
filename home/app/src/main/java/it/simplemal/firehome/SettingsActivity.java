@@ -1606,16 +1606,6 @@ public final class SettingsActivity extends CardActivity {
             {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
         for (String[] set : sets) if (!Look.setTaken(this, set[1])) entries.add(pictureSet(set[0], set[1]));
         entries.add(personalSet());
-        // Only once something was taken away: everything comes back from here.
-        if (Look.anyTaken(this)) {
-            entries.add(new Entry(getString(R.string.settings_backdrop_give_back), null, getDrawable(R.drawable.ic_s_restore),
-                getString(R.string.settings_backdrop_give_back_text), false,
-                () -> confirm(getString(R.string.settings_backdrop_give_back_question), getString(R.string.settings_backdrop_give_back_text),
-                    getString(R.string.settings_backdrop_give_back_do), () -> {
-                        Look.giveBack(this);
-                        refresh();
-                    })));
-        }
         showFromChosen(getString(R.string.settings_backdrop), entries);
     }
 

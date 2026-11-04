@@ -341,8 +341,9 @@ final class Look {
     private static final String WHOLE = "/*";
 
     /**
-     * Taken away by the user: a picture of a set, or a whole set. The files are inside the app and
-     * stay on the TV; they are only never shown again, as a backdrop, by chance or in the screensaver.
+     * Deleted by the user: a picture of a set, or a whole set. What is inside the app cannot leave it,
+     * so it is never shown again, as a backdrop, by chance or in the screensaver; installing Salotto
+     * again is the only way back, the user's choice of 2026-11-04.
      */
     static boolean taken(Context context, String name) {
         Set<String> taken = prefs(context).getStringSet(TAKEN, Collections.emptySet());
@@ -355,14 +356,18 @@ final class Look {
         return prefs(context).getStringSet(TAKEN, Collections.emptySet()).contains(folder + WHOLE);
     }
 
-    static boolean anyTaken(Context context) { return !prefs(context).getStringSet(TAKEN, Collections.emptySet()).isEmpty(); }
+    /** For good: the file goes from the TV when the installer put it there, and it is never shown again. */
+    static void take(Context context, String picture) {
+        addTaken(context, picture);
+        new File(Packs.root(context), picture).delete();
+    }
 
-    static void take(Context context, String picture) { addTaken(context, picture); }
-
-    static void takeSet(Context context, String folder) { addTaken(context, folder + WHOLE); }
-
-    /** Everything taken away comes back. */
-    static void giveBack(Context context) { prefs(context).edit().remove(TAKEN).apply(); }
+    static void takeSet(Context context, String folder) {
+        addTaken(context, folder + WHOLE);
+        File[] files = new File(Packs.root(context), folder).listFiles();
+        if (files != null) for (File file : files) file.delete();
+        new File(Packs.root(context), folder).delete();
+    }
 
     private static void addTaken(Context context, String entry) {
         Set<String> taken = new HashSet<>(prefs(context).getStringSet(TAKEN, Collections.emptySet()));
