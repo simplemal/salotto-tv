@@ -484,28 +484,10 @@ public final class TaskService extends AccessibilityService {
     }
 
     /** The Home key's cover goes now: the Home under it already shows the same thing. */
-    /** The Home key's closing is running over everything: the Home leaves the colour to it. */
-    static boolean coverCloses() {
+    /** The Home key's cover goes now: the Home under it shows the same colour, and closes it. */
+    static void dropHomeCover() {
         TaskService service = running;
-        return service != null && service.cover != null && service.cover.closingHere();
-    }
-
-    /** Runs once the Home key's cover is gone; at once without the service. */
-    static void afterHomeCover(Runnable then) {
-        TaskService service = running;
-        if (service != null && service.cover != null) service.cover.whenGone(then);
-        else then.run();
-    }
-
-    /** The last picture kept of the app in front, smaller: what the closing ring closes over. */
-    Bitmap frontPicture() {
-        String pkg = front;
-        if (pkg == null) return null;
-        File file = RunningApps.picture(this, pkg);
-        if (!file.isFile()) return null;
-        BitmapFactory.Options half = new BitmapFactory.Options();
-        half.inSampleSize = 2;
-        return BitmapFactory.decodeFile(file.getPath(), half);
+        if (service != null && service.cover != null) service.cover.drop();
     }
 
     static void homeBack() {

@@ -222,7 +222,9 @@ public final class MainActivity extends CardActivity {
     private static final long CORNERS_BACK_MS = 220;
     private static final long PORTAL_GIVE_UP_MS = 2500;
     /** The Home's first frame on screen, under the cover: Amazon's Home must not show through. */
-    private static final long FIRST_FRAME_MS = 120;
+    private static final long CLOSE_LATEST_MS = 450;
+    /** The weather's corner on the wheel: a little lower than the top, the date lined up with it. */
+    private static final int WEATHER_TOP = 34;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
@@ -415,6 +417,12 @@ public final class MainActivity extends CardActivity {
             root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
         }
         panel.setListed(circular);
+        // On the wheel the date goes above the time, where the eye starts reading the corner.
+        hero.removeView(date);
+        hero.addView(date, circular ? 0 : hero.indexOfChild(clock) + 1);
+        hero.post(this::alignDate);
+        // The big digits carry room above them for accents they never have: under the date it reads as a gap.
+        clock.setIncludeFontPadding(!circular);
         panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(circular ? 14 : 40);
@@ -439,7 +447,7 @@ public final class MainActivity extends CardActivity {
         ((LinearLayout.LayoutParams) controlButton.getLayoutParams()).setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
         FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
         weatherSpot.rightMargin = dp(32);
-        weatherSpot.topMargin = dp(22);
+        weatherSpot.topMargin = dp(WEATHER_TOP);
         weatherCorner.setLayoutParams(weatherSpot);
         footer.setTextSize(circular ? 7 : FOOTER_SP);
         tonePill();
@@ -526,7 +534,19 @@ public final class MainActivity extends CardActivity {
         LinearLayout.LayoutParams below = new LinearLayout.LayoutParams(-2, -2);
         below.topMargin = dp(8);
         weatherCorner.addView(cornerDays, below);
+        // On the wheel the date sits on the line of the weather's first row, whatever their sizes.
+        weatherCorner.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> alignDate());
         return weatherCorner;
+    }
+
+    private void alignDate() {
+        if (!circular || hero == null || date.getParent() != hero || cornerLine.getVisibility() != View.VISIBLE) {
+            if (hero != null) hero.setTranslationY(0);
+            return;
+        }
+        int weatherLine = weatherCorner.getTop() + cornerLine.getTop() + cornerLine.getBaseline();
+        int dateLine = hero.getTop() + date.getTop() + date.getBaseline();
+        hero.setTranslationY(weatherLine - dateLine);
     }
 
     private FrameLayout.LayoutParams weatherCornerPlace() {
@@ -787,16 +807,13 @@ public final class MainActivity extends CardActivity {
         Packs.fetchChosen(this);
         // The colour closes from the Home's first frame. The Home key's cover shows the same colour, so it
         // goes at once instead of after its usual wait: waiting for both left the colour still for seconds.
-        if (wheel.portalOpen()) root.postOnAnimation(() -> root.postDelayed(() -> {
-            if (TaskService.coverCloses()) {
-                // The Home key: the cover closes it all, ring and disc, over this Home's picture.
-                wheel.dropPortal();
-                TaskService.afterHomeCover(() -> fadeCorners(true, null));
-            } else {
-                // Back: the app has gone already, only the second half is left, here.
-                closePortal();
-            }
-        }, FIRST_FRAME_MS));
+        // Simple and quick, the user's choice: the screen is the app's colour at once (the Home key's
+        // cover shows it too), and the colour closes into the circle as soon as Fire OS's own
+        // animation has ended, which would hide it; at the latest after a moment.
+        if (wheel.portalOpen()) {
+            root.removeCallbacks(closeNow);
+            root.postDelayed(closeNow, CLOSE_LATEST_MS);
+        }
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -1259,7 +1276,7 @@ public final class MainActivity extends CardActivity {
                 boolean over = TaskService.portal(HomeCover.lastPicture(), colour, spot[0], spot[1], spot[2], () -> {
                     wheel.cover();
                     open(intent);
-                }, () -> HomeCover.armClose(colour, spot[0], spot[1], spot[2]));
+                }, () -> HomeCover.armClose(colour));
                 if (!over) wheel.openPortal(() -> open(intent));
                 // An app that cannot start leaves the Home in front: the colour goes.
                 root.postDelayed(() -> {
@@ -1278,6 +1295,19 @@ public final class MainActivity extends CardActivity {
             if (index == 0 && then != null) fade.withEndAction(then);
             fade.start();
         }
+    }
+
+    private final Runnable closeNow = () -> {
+        if (!wheel.portalOpen()) return;
+        TaskService.dropHomeCover();
+        closePortal();
+    };
+
+    @Override public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+        if (!wheel.portalOpen()) return;
+        root.removeCallbacks(closeNow);
+        closeNow.run();
     }
 
     private void closePortal() {

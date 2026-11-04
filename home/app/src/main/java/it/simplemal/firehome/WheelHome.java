@@ -87,8 +87,8 @@ final class WheelHome extends FrameLayout {
     private static final long PORTAL_MS = 460;
     /** While moving, a circle this close to the top would touch the lit one: it is not drawn, and comes back by the next place. */
     private static final float CROSS_HIDDEN = 0.6f;
-    /** Coming back is a little slower than going: the colour is seen closing into its circle. */
-    private static final long CLOSE_MS = 650;
+    /** Coming back is quick: the colour closes into its circle in a third of a second. */
+    private static final long CLOSE_MS = 350;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
     private static final float GLOW_REACH = 1.3f;
     private static final int GLOW_ALPHA = 105;
@@ -404,14 +404,6 @@ final class WheelHome extends FrameLayout {
             portal.setTranslationZ(dp(20));
         }
         portal.setProgress(1f);
-    }
-
-    /** Gone at once: the Home key's cover has closed the colour over everything already. */
-    void dropPortal() {
-        if (portal == null) return;
-        removeView(portal);
-        portal = null;
-        closing = false;
     }
 
     /** Back on the Home: the colour closes back into the app's circle, as the opening went but backwards. */
