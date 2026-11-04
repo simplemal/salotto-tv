@@ -392,7 +392,7 @@ public final class MainActivity extends CardActivity {
             root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
         }
         panel.placeCentred(circular);
-        panelShade.setBackground(circular ? new ColorDrawable(Color.argb(128, 0, 0, 0)) : null);
+        panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(circular ? 14 : 40);
         hero.setLayoutParams(heroPlace);
