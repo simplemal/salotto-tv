@@ -1,6 +1,8 @@
 package it.simplemal.firehome;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.StatFs;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.DigestInputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -27,6 +30,10 @@ import org.json.JSONObject;
  * in the folder Salotto shares with the computer; Salotto downloads them from the release "sfondi"
  * on GitHub, each into a folder of the same name, which counts only once `.completo` is written in
  * it after its last file. A collection not on the TV is read from inside the app, while it carries it.
+ *
+ * Before the Home shows, only the picture it opens on comes, cut out of the archive by its place in
+ * the signed list; the collections follow quietly, the user's design of 2026-11-04. Each is opened
+ * as it arrives, so it needs no more room than itself.
  */
 final class Packs {
     /** Every collection, by its folder: the weather's three and the four that change on a timer. */
@@ -35,12 +42,17 @@ final class Packs {
     static final String ROOT = "sfondi";
     /** Written last, after the last file: a folder without it is a download that stopped half way. */
     static final String COMPLETE = ".completo";
+    /** Written after the first picture of a collection whose rest is still to come. */
+    static final String PARTIAL = ".inizio";
+    /** A collection being opened, before it takes the place of the one there. */
+    private static final String INCOMING = ".in-arrivo";
+    /** One picture cut out of an archive is never larger than this. */
+    private static final long MAX_PART = 16L * 1024 * 1024;
+    /** Called on the main thread when something arrives that the Home could show. */
+    static volatile Runnable arrived;
     /** Written by the installer: the collections chosen, one per line. Salotto fetches the missing ones. */
     static final String CHOSEN = "scelte";
     private static final String BASE = "https://github.com/" + Fire.UPDATES_REPO + "/releases/download/sfondi/";
-    /** Room for the archive and for what comes out of it, with something to spare. */
-    private static final int ROOM_TIMES = 2;
-    private static final long ROOM_SPARE = 200L * 1024 * 1024;
     private static final AtomicBoolean fetching = new AtomicBoolean();
     /** What is coming in now, for the page that waits for it. */
     private static volatile String coming;
@@ -63,8 +75,15 @@ final class Packs {
         return new File(new File(root(context), pack), COMPLETE).isFile();
     }
 
-    /** On the TV or inside the app: a collection that is neither has no row anywhere. */
-    static boolean present(Context context, String pack) { return onTv(context, pack) || inside(context, pack); }
+    /** Only its first picture so far: the Home can show it, the rest is coming. */
+    static boolean partial(Context context, String pack) {
+        return new File(new File(root(context), pack), PARTIAL).isFile();
+    }
+
+    /** On the TV, whole or with its first picture, or inside the app: a collection that is none has no row anywhere. */
+    static boolean present(Context context, String pack) {
+        return onTv(context, pack) || partial(context, pack) || inside(context, pack);
+    }
 
     private static boolean inside(Context context, String pack) {
         try {
@@ -85,7 +104,7 @@ final class Packs {
     /** What a folder holds, sorted, without the installer's mark: from the TV when the collection is there. */
     static String[] list(Context context, String path) throws IOException {
         String pack = packOf(path);
-        if (pack != null && onTv(context, pack)) {
+        if (pack != null && (onTv(context, pack) || partial(context, pack))) {
             String[] names = new File(root(context), path).list((folder, name) -> !name.startsWith("."));
             if (names == null) return new String[0];
             Arrays.sort(names);
@@ -123,27 +142,52 @@ final class Packs {
         return present(context, pack) || wanted(context).contains(pack);
     }
 
+    /** The list signed with the update key: its collections, each with the place of every file in its archive. */
+    private static JSONArray signedList() throws Updater.Failure, JSONException {
+        byte[] list = Updater.fetch(BASE + "sfondi.json");
+        Updater.verify(list, Updater.fetch(BASE + "sfondi.json.sig"));
+        return new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
+    }
+
+    /** Where each file sits in its archive, signed apart from the list: by collection, then by path. */
+    private static JSONObject signedIndex() throws Updater.Failure, JSONException {
+        byte[] index = Updater.fetch(BASE + "sfondi-indice.json");
+        Updater.verify(index, Updater.fetch(BASE + "sfondi-indice.json.sig"));
+        return new JSONObject(new String(index, StandardCharsets.UTF_8)).getJSONObject("index");
+    }
+
+    private static JSONObject itemOf(JSONArray packs, String pack) throws JSONException {
+        for (int index = 0; index < packs.length(); index++) {
+            JSONObject item = packs.getJSONObject(index);
+            if (pack.equals(item.getString("id"))) return item;
+        }
+        return null;
+    }
+
     /**
-     * Away from the main thread: fetches the list signed with the update key, then each missing
-     * collection, checks its fingerprint, opens it in its folder and marks it whole. A failure
-     * leaves nothing half done, and the next start of the Home tries again.
+     * Away from the main thread: fetches the signed list, then the first picture of the chosen
+     * backdrop's collection, then each missing collection whole. A failure leaves nothing half
+     * done, and the next start of the Home tries again.
      */
     static void fetchChosen(Context context) {
         if (missing(context).isEmpty() || !fetching.compareAndSet(false, true)) return;
         Background.run(() -> {
             try {
-                byte[] list = Updater.fetch(BASE + "sfondi.json");
-                Updater.verify(list, Updater.fetch(BASE + "sfondi.json.sig"));
-                JSONArray packs = new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
-                // The chosen backdrop's collection first: the Home waits for that one, the rest can follow.
+                JSONArray packs = signedList();
                 List<String> order = missing(context);
                 String first = Look.chosenPack(context);
-                if (first != null && order.remove(first)) order.add(0, first);
-                for (String pack : order) {
-                    for (int index = 0; index < packs.length(); index++) {
-                        JSONObject item = packs.getJSONObject(index);
-                        if (pack.equals(item.getString("id"))) fetch(context, pack, item);
+                if (first != null && order.remove(first)) {
+                    order.add(0, first);
+                    JSONObject item = itemOf(packs, first);
+                    try {
+                        if (item != null && !partial(context, first)) firstPicture(context, first, item, signedIndex());
+                    } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
+                        // Without its first picture the collection still comes whole, below.
                     }
+                }
+                for (String pack : order) {
+                    JSONObject item = itemOf(packs, pack);
+                    if (item != null) fetch(context, pack, item);
                 }
             } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
                 // Not now: the network, the room or GitHub. The next look tries again.
@@ -154,38 +198,161 @@ final class Packs {
         });
     }
 
+    /**
+     * Blocking, away from the main thread: only what the Home opens on, out of `pack`. False if it
+     * could not come; the Home then shows something else until the collection arrives.
+     */
+    static boolean fetchFirst(Context context, String pack) {
+        if (onTv(context, pack) || partial(context, pack) || inside(context, pack)) return true;
+        try {
+            JSONObject item = itemOf(signedList(), pack);
+            return item != null && firstPicture(context, pack, item, signedIndex());
+        } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
+            return false;
+        }
+    }
+
+    /** A weather collection needs its table first, to know which of its pictures this hour and weather want. */
+    private static boolean firstPicture(Context context, String pack, JSONObject item, JSONObject indexes)
+            throws JSONException, IOException, GeneralSecurityException {
+        JSONObject index = indexes.optJSONObject(pack);
+        if (index == null) return false;
+        String url = item.getString("url");
+        String picture;
+        if (Weather.weatherPack(pack)) {
+            part(context, url, index, Weather.tableOf(pack));
+            picture = Weather.pictureIn(context, pack);
+        } else {
+            List<String> names = new ArrayList<>();
+            for (java.util.Iterator<String> keys = index.keys(); keys.hasNext(); ) names.add(keys.next());
+            java.util.Collections.sort(names);
+            picture = Look.firstPicture(context, pack, names);
+        }
+        if (picture == null || !index.has(picture)) return false;
+        part(context, url, index, picture);
+        Files.write(new File(new File(root(context), pack), PARTIAL).toPath(), new byte[0]);
+        tell();
+        return true;
+    }
+
+    /** One file cut out of the archive by its place in the signed list, checked against its fingerprint. */
+    private static void part(Context context, String url, JSONObject index, String name)
+            throws JSONException, IOException, GeneralSecurityException {
+        JSONArray at = index.getJSONArray(name);
+        long offset = at.getLong(0);
+        long size = at.getLong(1);
+        if (offset < 0 || size <= 0 || size > MAX_PART || !url.startsWith("https://") || name.contains("..")) throw new IOException("index");
+        File target = new File(root(context), name);
+        if (!target.getCanonicalPath().startsWith(root(context).getCanonicalPath() + File.separator)) throw new IOException("path");
+        HttpURLConnection connection = Updater.openPart(url, offset, size);
+        byte[] body = new byte[(int) size];
+        try (InputStream input = connection.getInputStream()) {
+            int done = 0;
+            for (int read; done < body.length && (read = input.read(body, done, body.length - done)) > 0; ) done += read;
+            if (done != body.length) throw new IOException("short");
+        }
+        if (!hex(MessageDigest.getInstance("SHA-256").digest(body)).equals(at.getString(2))) throw new IOException("fingerprint");
+        File parent = target.getParentFile();
+        if (!parent.exists() && !parent.mkdirs()) throw new IOException("room");
+        File temporary = new File(parent, "." + target.getName() + ".part");
+        Files.write(temporary.toPath(), body);
+        if (!temporary.renameTo(target)) throw new IOException("rename");
+    }
+
+    private static String hex(byte[] bytes) {
+        StringBuilder hex = new StringBuilder();
+        for (byte value : bytes) hex.append(String.format(Locale.ROOT, "%02x", value));
+        return hex.toString();
+    }
+
+    private static void tell() {
+        Runnable then = arrived;
+        if (then != null) new Handler(Looper.getMainLooper()).post(then);
+    }
+
+    /**
+     * The whole collection, opened as it arrives into a folder of its own, its fingerprint checked
+     * over every byte; only then does it take the place of what was there. It needs the room of
+     * itself, not of an archive and its contents.
+     */
     private static void fetch(Context context, String pack, JSONObject item)
             throws JSONException, IOException, GeneralSecurityException {
         long size = item.getLong("bytes");
         File root = root(context);
         if (!root.exists() && !root.mkdirs()) throw new IOException("room");
-        if (new StatFs(root.getPath()).getAvailableBytes() < size * ROOM_TIMES + ROOM_SPARE) throw new IOException("room");
+        if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new IOException("room");
         String url = item.getString("url");
         if (!url.startsWith("https://")) throw new IOException("url");
-        File archive = new File(root, pack + ".tar");
+        File incoming = new File(root, INCOMING);
+        empty(incoming);
+        if (!incoming.exists() && !incoming.mkdirs()) throw new IOException("room");
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         received = 0;
         expected = size;
         coming = pack;
         HttpURLConnection connection = Updater.open(url);
-        try (InputStream input = connection.getInputStream(); OutputStream output = new FileOutputStream(archive)) {
-            byte[] chunk = new byte[65536];
-            for (int read; (read = input.read(chunk)) > 0; ) {
-                output.write(chunk, 0, read);
-                digest.update(chunk, 0, read);
-                received += read;
-            }
-        }
-        StringBuilder hex = new StringBuilder();
-        for (byte value : digest.digest()) hex.append(String.format(Locale.ROOT, "%02x", value));
         try {
-            if (archive.length() != size || !hex.toString().equals(item.getString("sha256"))) throw new IOException("fingerprint");
+            // Skipping must read too: a skipped byte would be missing from the fingerprint.
+            try (InputStream input = new Reading(new DigestInputStream(new Counting(connection.getInputStream()), digest))) {
+                Tar.unpack(input, incoming, pack);
+                // What is left after the end marker counts for the fingerprint too.
+                byte[] rest = new byte[65536];
+                while (input.read(rest) > 0) { }
+            }
+            if (received != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
             File folder = new File(root, pack);
-            empty(folder);
-            Tar.unpack(archive, root, pack);
+            File old = new File(root, INCOMING + "-" + pack);
+            empty(old);
+            old.delete();
+            if (folder.exists() && !folder.renameTo(old)) throw new IOException("rename");
+            if (!new File(incoming, pack).renameTo(folder)) throw new IOException("rename");
             Files.write(new File(folder, COMPLETE).toPath(), new byte[0]);
+            empty(old);
+            old.delete();
+            tell();
         } finally {
-            archive.delete();
+            empty(incoming);
+            incoming.delete();
+        }
+    }
+
+    /** Skips by reading. */
+    private static final class Reading extends java.io.FilterInputStream {
+        private final byte[] waste = new byte[65536];
+
+        Reading(InputStream input) { super(input); }
+
+        @Override public long skip(long count) throws IOException {
+            long gone = 0;
+            while (gone < count) {
+                int read = read(waste, 0, (int) Math.min(waste.length, count - gone));
+                if (read < 0) break;
+                gone += read;
+            }
+            return gone;
+        }
+    }
+
+    /** Counts what comes, for the page that shows how much has. */
+    private static final class Counting extends java.io.FilterInputStream {
+        Counting(InputStream input) { super(input); }
+
+        @Override public int read() throws IOException {
+            int value = super.read();
+            if (value >= 0) received++;
+            return value;
+        }
+
+        @Override public int read(byte[] buffer, int offset, int length) throws IOException {
+            int read = super.read(buffer, offset, length);
+            if (read > 0) received += read;
+            return read;
+        }
+
+        @Override public long skip(long count) throws IOException {
+            long gone = super.skip(count);
+            if (gone > 0) received += gone;
+            return gone;
         }
     }
 
@@ -197,10 +364,11 @@ final class Packs {
         }
     }
 
-    /** One file of a collection, from the TV when the collection is there; anything else from inside the app. */
+    /** One file of a collection, from the TV when it is there, even before the rest; anything else from inside the app. */
     static InputStream open(Context context, String path) throws IOException {
         String pack = packOf(path);
-        if (pack != null && onTv(context, pack)) return new FileInputStream(new File(root(context), path));
+        File file = new File(root(context), path);
+        if (pack != null && (onTv(context, pack) || file.isFile())) return new FileInputStream(file);
         return context.getAssets().open(path);
     }
 }

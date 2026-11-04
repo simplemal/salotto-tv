@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Publishes the collections of backdrops on the fixed release "sfondi", apart from the versions of
 # Salotto: one archive for each, a strip of small pictures to show what it holds, ten larger ones
-# for the installer's gallery, and sfondi.json
+# for the installer's gallery, sfondi.json, and sfondi-indice.json with the place of every file in its archive
 # signed with the key of the updates. Salotto downloads from there only the collections chosen,
 # and checks each archive against the signed list before opening it.
 # Usage: distro/tools/pubblica-sfondi.sh [--prova]   (with --prova it builds everything and uploads nothing)
@@ -28,7 +28,7 @@ for pack in $PACKS; do
 done
 
 python3 - "$WORK" "$ASSETS" "$PACKS_DIR" "$REPO" $PACKS <<'PY'
-import hashlib, json, os, sys
+import hashlib, json, os, sys, tarfile
 from PIL import Image
 work, assets, packs_dir, repo, *packs = sys.argv[1:]
 base = f"https://github.com/{repo}/releases/download/sfondi/"
@@ -36,6 +36,7 @@ SAMPLES, WIDTH, HEIGHT, GAP = 6, 216, 122, 6
 # Seen large in the installer: 10 pictures of each collection, 1280 x 720, asked for only when opened.
 VIEWS, VIEW_SIZE = 10, (1280, 720)
 listed = []
+indexes = {}
 for pack in packs:
     # The weather's illustrations sit in a folder for each moment of the day.
     small = sorted(os.path.relpath(os.path.join(where, name), os.path.join(assets, "miniature", pack))
@@ -66,6 +67,13 @@ for pack in packs:
         gallery.append({"url": base + os.path.basename(view), "sha256": hashlib.sha256(open(view, "rb").read()).hexdigest()})
     archive = os.path.join(work, f"{pack}.tar")
     data = open(archive, "rb").read()
+    # Where each file sits in the archive: Salotto cuts out only the picture the Home opens on.
+    index = {}
+    with tarfile.open(archive) as opened:
+        for member in opened.getmembers():
+            if member.isfile():
+                body = data[member.offset_data:member.offset_data + member.size]
+                index[member.name] = [member.offset_data, member.size, hashlib.sha256(body).hexdigest()]
     files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(packs_dir, pack)))
     listed.append({
         "id": pack, "bytes": len(data), "files": files,
@@ -74,12 +82,16 @@ for pack in packs:
         "sample_sha256": hashlib.sha256(open(sample, "rb").read()).hexdigest(),
         "gallery": gallery,
     })
+    indexes[pack] = index
 json.dump({"version": 1, "packs": listed}, open(os.path.join(work, "sfondi.json"), "w"), indent=2)
+# Apart, and signed apart: the installer reads sfondi.json only up to 64 KB, and this is larger.
+json.dump({"version": 1, "index": indexes}, open(os.path.join(work, "sfondi-indice.json"), "w"), separators=(",", ":"))
 for item in listed:
     print(f"{item['id']}: {item['files']} file, {item['bytes'] / 1048576:.1f} MB")
 PY
 
 openssl dgst -sha256 -sign "$KEY" -out "$WORK/sfondi.json.sig" "$WORK/sfondi.json"
+openssl dgst -sha256 -sign "$KEY" -out "$WORK/sfondi-indice.json.sig" "$WORK/sfondi-indice.json"
 openssl dgst -sha256 -verify <(openssl pkey -in "$KEY" -pubout 2>/dev/null) -signature "$WORK/sfondi.json.sig" "$WORK/sfondi.json"
 
 if $TRY; then
@@ -92,5 +104,5 @@ fi
 gh release view sfondi --repo "$REPO" > /dev/null 2>&1 ||
   gh release create sfondi --repo "$REPO" --title "Salotto: collezioni di sfondi" --prerelease --latest=false \
     --notes "Le collezioni di sfondi che Salotto scarica quando si scelgono. Non si installano a mano."
-gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK"/vista-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" --repo "$REPO" --clobber
+gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK"/vista-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" "$WORK/sfondi-indice.json" "$WORK/sfondi-indice.json.sig" --repo "$REPO" --clobber
 echo "Pubblicate le collezioni di sfondi."

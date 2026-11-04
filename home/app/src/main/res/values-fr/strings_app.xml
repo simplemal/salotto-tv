@@ -241,6 +241,7 @@
     <string name="update_done">Mise à jour terminée</string>
     <string name="update_done_text">Vous avez maintenant Salotto %1$s.</string>
     <string name="update_backdrops">Téléchargement des fonds depuis GitHub : %1$d %%</string>
+    <string name="update_backdrop_first">Préparation du fond…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Scannez-le avec votre téléphone pour en savoir plus</string>
     <string name="update_outcome_untouched">Salotto n’a pas été modifié</string>

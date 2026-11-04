@@ -46,8 +46,8 @@ public final class UpdateActivity extends CardActivity {
     private static final String OLD_SCRIPT = "starting";
     private static final long HOME_AFTER_MS = 2500;
     /** A download that has not started by then will not: the network, or GitHub. */
-    private static final long BACKDROP_START_MS = 15000;
-    private static final long BACKDROP_LONGEST_MS = 5 * 60 * 1000;
+    /** The first picture is small: should it not come, the Home goes on with something else. */
+    private static final long FIRST_LONGEST_MS = 30000;
     /** Fixed, so these pages stay readable whatever the Home wallpaper is. */
     static final int BACKGROUND = Color.rgb(24, 26, 32);
     private static final int BOX = Color.rgb(14, 15, 19);
@@ -470,31 +470,29 @@ public final class UpdateActivity extends CardActivity {
         title.setText(getString(R.string.update_done));
         body.addView(text(getString(R.string.update_done_text, BuildVersion.name(this)), 19, false));
         forget();
-        // The backdrops left the app: the Home is shown only once its own has come, never a stand-in.
+        // The backdrops left the app: before the Home, only the picture it opens on comes, the user's
+        // design of 2026-11-04. The collections follow from the Home, quietly.
         String pack = Look.chosenPack(this);
-        if (pack != null && Packs.missing(this).contains(pack)) {
-            TextView coming = text(getString(R.string.update_backdrops, 0), 16, false);
-            body.addView(coming);
-            Packs.fetchChosen(this);
-            waitBackdrop(pack, coming, SystemClock.uptimeMillis());
+        if (pack != null && !Packs.present(this, pack)) {
+            body.addView(text(getString(R.string.update_backdrop_first), 16, false));
+            main.postDelayed(this::home, FIRST_LONGEST_MS);
+            Background.run(() -> {
+                Packs.fetchFirst(this, pack);
+                main.post(this::home);
+            });
         } else {
             main.postDelayed(this::home, HOME_AFTER_MS);
         }
     }
 
-    /** Until the collection is whole, the download has ended without it, or a few minutes have gone. */
-    private void waitBackdrop(String pack, TextView coming, long since) {
-        int percent = Packs.percent(pack);
-        if (percent >= 0) coming.setText(getString(R.string.update_backdrops, percent));
-        boolean over = Packs.present(this, pack) || !Packs.fetching() && percent < 0 && SystemClock.uptimeMillis() - since > BACKDROP_START_MS
-            || SystemClock.uptimeMillis() - since > BACKDROP_LONGEST_MS;
-        if (over) home();
-        else main.postDelayed(() -> waitBackdrop(pack, coming, since), POLL_MS);
-    }
-
     private void forget() { Updater.clean(this); }
 
+    private boolean leaving;
+
     private void home() {
+        if (leaving) return;
+        leaving = true;
+        main.removeCallbacksAndMessages(null);
         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }

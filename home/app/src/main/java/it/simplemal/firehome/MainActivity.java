@@ -241,6 +241,8 @@ public final class MainActivity extends CardActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        // A backdrop that arrives while the Home is on screen shows at once.
+        Packs.arrived = this::backdropArrived;
         TaskService.keysByDefault(this);
         TaskService.quickAnimationsByDefault(this);
         TaskService.alarmsAtOnce(this);
@@ -1317,6 +1319,14 @@ public final class MainActivity extends CardActivity {
                 }, PORTAL_GIVE_UP_MS);
             }));
         }
+    }
+
+    private void backdropArrived() {
+        if (!showing) return;
+        String look = Look.signature(this);
+        if (look.equals(lookShown)) return;
+        lookShown = look;
+        applyLook();
     }
 
     /** Time, weather and the buttons leave at once when an app opens, and come back with the Home. */

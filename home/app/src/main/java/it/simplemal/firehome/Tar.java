@@ -16,8 +16,15 @@ final class Tar {
 
     /** A plain tar, as pubblica-sfondi.sh makes it: only files and folders, all inside the collection's own. */
     static void unpack(File archive, File root, String pack) throws IOException {
-        String rootPath = root.getCanonicalPath() + File.separator;
         try (InputStream input = new FileInputStream(archive)) {
+            unpack(input, root, pack);
+        }
+    }
+
+    /** The same from a stream, as it arrives: no copy of the archive is kept. It stops at the end marker. */
+    static void unpack(InputStream input, File root, String pack) throws IOException {
+        String rootPath = root.getCanonicalPath() + File.separator;
+        {
             byte[] header = new byte[BLOCK];
             while (readFully(input, header) && header[0] != 0) {
                 String name = text(header, 0, 100);

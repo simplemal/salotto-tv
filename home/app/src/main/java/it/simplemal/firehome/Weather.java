@@ -123,6 +123,24 @@ final class Weather {
         return path;
     }
 
+    static boolean weatherPack(String pack) {
+        return (pack + "/").equals(PICTURES) || (pack + "/").equals(PHOTOS) || (pack + "/").equals(AERIAL);
+    }
+
+    static String tableOf(String pack) { return pack + "/" + PICTURE_TABLE; }
+
+    /**
+     * The picture of `pack` for this hour and this weather, read from its table alone: the one
+     * Salotto downloads before the rest of the collection, so the Home opens on it.
+     */
+    static String pictureIn(Context context, String pack) {
+        String folder = pack + "/";
+        SharedPreferences saved = prefs(context);
+        String key = active(context) && saved.contains("code") ? phase(saved) + "/" + saved.getInt("code", 0) : null;
+        String path = key == null ? null : file(context, folder, key);
+        return path != null ? path : byClock(context, folder);
+    }
+
     /** A weather with two pictures takes them in turn by the day, so it does not change at every look. */
     private static String file(Context context, String folder, String key) {
         String files = pictures(context, folder).getProperty(key);

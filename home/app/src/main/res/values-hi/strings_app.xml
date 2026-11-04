@@ -241,6 +241,7 @@
     <string name="update_done">अपडेट पूरा हुआ</string>
     <string name="update_done_text">अब आपके पास Salotto %1$s है।</string>
     <string name="update_backdrops">GitHub से बैकग्राउंड डाउनलोड हो रहे हैं: %1$d%%</string>
+    <string name="update_backdrop_first">बैकग्राउंड तैयार हो रहा है…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">फ़ोन से स्कैन करके और जानें</string>
     <string name="update_outcome_untouched">Salotto में कोई बदलाव नहीं हुआ</string>

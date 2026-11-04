@@ -257,6 +257,7 @@
     <string name="update_done">اكتمل التحديث</string>
     <string name="update_done_text">لديك الآن Salotto %1$s.</string>
     <string name="update_backdrops">جارٍ تنزيل الخلفيات من GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">جارٍ تجهيز الخلفية…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">امسحه بالهاتف لمعرفة المزيد</string>
     <string name="update_outcome_untouched">لم يتغير Salotto</string>

@@ -241,6 +241,7 @@
     <string name="update_done">Update complete</string>
     <string name="update_done_text">You now have Salotto %1$s.</string>
     <string name="update_backdrops">Downloading the backdrops from GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">Getting the backdrop ready…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Scan it with your phone to learn more</string>
     <string name="update_outcome_untouched">Salotto was not changed</string>

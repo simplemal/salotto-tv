@@ -427,6 +427,22 @@ final class Look {
         return folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
     }
 
+    /**
+     * The picture of `pack` the chosen backdrop opens on, among `names`: a picture chosen on its own,
+     * the one last shown, or the first one not deleted. What Salotto downloads before the rest.
+     */
+    static String firstPicture(Context context, String pack, List<String> names) {
+        String chosen = prefs(context).getString("backdrop", null);
+        if (chosen != null && chosen.startsWith(pack + "/") && names.contains(chosen)) return chosen;
+        String shown = prefs(context).getString("abstract", null);
+        if (shown != null && shown.startsWith(pack + "/") && names.contains(shown) && !taken(context, shown)) return shown;
+        for (String name : names) {
+            String lower = name.toLowerCase(Locale.ROOT);
+            if (!taken(context, name) && (lower.endsWith(".webp") || lower.endsWith(".jpg") || lower.endsWith(".png"))) return name;
+        }
+        return null;
+    }
+
     /** Abstract 3D, or the first set still there, or the first plain colour. */
     private static String fallback(Context context) {
         String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};

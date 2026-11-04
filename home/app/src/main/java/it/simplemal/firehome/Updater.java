@@ -231,6 +231,16 @@ final class Updater {
         }
     }
 
+    /** `length` bytes from `offset`: only a server that answers with that part is used. */
+    static HttpURLConnection openPart(String url, long offset, long length) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setConnectTimeout(TIMEOUT_MS);
+        connection.setReadTimeout(TIMEOUT_MS);
+        connection.setRequestProperty("Range", "bytes=" + offset + "-" + (offset + length - 1));
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_PARTIAL) throw new IOException("HTTP");
+        return connection;
+    }
+
     static HttpURLConnection open(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setConnectTimeout(TIMEOUT_MS);
