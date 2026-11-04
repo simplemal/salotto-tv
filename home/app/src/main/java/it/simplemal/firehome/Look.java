@@ -392,6 +392,13 @@ final class Look {
         return slash > 0 && !name.startsWith("/") ? name.substring(0, slash) : null;
     }
 
+    /** The collection the chosen backdrop needs, even while it is not here yet. Null for a colour or Personale. */
+    static String chosenPack(Context context) {
+        String chosen = prefs(context).getString("backdrop", null);
+        if (chosen == null) return Weather.active(context) ? PICTURES_FOLDER : ABSTRACT_3D_FOLDER;
+        return folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+    }
+
     /** Abstract 3D, or the first set still there, or the first plain colour. */
     private static String fallback(Context context) {
         String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};

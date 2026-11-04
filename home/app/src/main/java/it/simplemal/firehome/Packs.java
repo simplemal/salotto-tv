@@ -42,6 +42,17 @@ final class Packs {
     private static final int ROOM_TIMES = 2;
     private static final long ROOM_SPARE = 200L * 1024 * 1024;
     private static final AtomicBoolean fetching = new AtomicBoolean();
+    /** What is coming in now, for the page that waits for it. */
+    private static volatile String coming;
+    private static volatile long received;
+    private static volatile long expected = 1;
+
+    static boolean fetching() { return fetching.get(); }
+
+    /** How much of `pack` has come, 0 to 100, or -1 if it is not the one coming in now. */
+    static int percent(String pack) {
+        return pack != null && pack.equals(coming) ? (int) Math.min(100, received * 100 / Math.max(1, expected)) : -1;
+    }
 
     private Packs() {}
 
@@ -124,7 +135,11 @@ final class Packs {
                 byte[] list = Updater.fetch(BASE + "sfondi.json");
                 Updater.verify(list, Updater.fetch(BASE + "sfondi.json.sig"));
                 JSONArray packs = new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
-                for (String pack : missing(context)) {
+                // The chosen backdrop's collection first: the Home waits for that one, the rest can follow.
+                List<String> order = missing(context);
+                String first = Look.chosenPack(context);
+                if (first != null && order.remove(first)) order.add(0, first);
+                for (String pack : order) {
                     for (int index = 0; index < packs.length(); index++) {
                         JSONObject item = packs.getJSONObject(index);
                         if (pack.equals(item.getString("id"))) fetch(context, pack, item);
@@ -133,6 +148,7 @@ final class Packs {
             } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
                 // Not now: the network, the room or GitHub. The next look tries again.
             } finally {
+                coming = null;
                 fetching.set(false);
             }
         });
@@ -148,12 +164,16 @@ final class Packs {
         if (!url.startsWith("https://")) throw new IOException("url");
         File archive = new File(root, pack + ".tar");
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        received = 0;
+        expected = size;
+        coming = pack;
         HttpURLConnection connection = Updater.open(url);
         try (InputStream input = connection.getInputStream(); OutputStream output = new FileOutputStream(archive)) {
             byte[] chunk = new byte[65536];
             for (int read; (read = input.read(chunk)) > 0; ) {
                 output.write(chunk, 0, read);
                 digest.update(chunk, 0, read);
+                received += read;
             }
         }
         StringBuilder hex = new StringBuilder();

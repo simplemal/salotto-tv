@@ -310,6 +310,7 @@
     <string name="update_done">Aggiornamento completato</string>
     <!-- %1$s is a version -->
     <string name="update_done_text">Ora hai Salotto %1$s.</string>
+    <string name="update_backdrops">Scarico gli sfondi da GitHub: %1$d%%</string>
     <!-- %1$s is the problem, %2$s its code, such as SAL-F101 -->
     <string name="update_problem_line">%1$s (%2$s)</string>
     <!-- Under a QR code: "it" is the code -->

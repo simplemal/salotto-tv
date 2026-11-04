@@ -248,6 +248,7 @@
     <string name="update_detail_back">Что-то пошло не так: возвращаюсь к предыдущей версии.</string>
     <string name="update_done">Обновление завершено</string>
     <string name="update_done_text">Теперь у вас Salotto %1$s.</string>
+    <string name="update_backdrops">Загрузка фонов с GitHub: %1$d%%</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Наведите на него камеру телефона, чтобы узнать больше</string>
     <string name="update_outcome_untouched">Salotto не изменялось</string>

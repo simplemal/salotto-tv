@@ -240,6 +240,7 @@
     <string name="update_detail_back">Algo no va bien: vuelvo a la versión anterior.</string>
     <string name="update_done">Actualización completada</string>
     <string name="update_done_text">Ahora tienes Salotto %1$s.</string>
+    <string name="update_backdrops">Descargando los fondos de GitHub: %1$d%%</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Escanéalo con el móvil para saber más</string>
     <string name="update_outcome_untouched">Salotto no se ha modificado</string>

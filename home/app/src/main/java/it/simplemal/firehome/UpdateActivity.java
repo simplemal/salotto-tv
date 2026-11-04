@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -44,6 +45,9 @@ public final class UpdateActivity extends CardActivity {
     /** Versions up to 0.12.20 install the next one from a script, which waits for its word. */
     private static final String OLD_SCRIPT = "starting";
     private static final long HOME_AFTER_MS = 2500;
+    /** A download that has not started by then will not: the network, or GitHub. */
+    private static final long BACKDROP_START_MS = 15000;
+    private static final long BACKDROP_LONGEST_MS = 5 * 60 * 1000;
     /** Fixed, so these pages stay readable whatever the Home wallpaper is. */
     static final int BACKGROUND = Color.rgb(24, 26, 32);
     private static final int BOX = Color.rgb(14, 15, 19);
@@ -466,7 +470,26 @@ public final class UpdateActivity extends CardActivity {
         title.setText(getString(R.string.update_done));
         body.addView(text(getString(R.string.update_done_text, BuildVersion.name(this)), 19, false));
         forget();
-        main.postDelayed(this::home, HOME_AFTER_MS);
+        // The backdrops left the app: the Home is shown only once its own has come, never a stand-in.
+        String pack = Look.chosenPack(this);
+        if (pack != null && Packs.missing(this).contains(pack)) {
+            TextView coming = text(getString(R.string.update_backdrops, 0), 16, false);
+            body.addView(coming);
+            Packs.fetchChosen(this);
+            waitBackdrop(pack, coming, SystemClock.uptimeMillis());
+        } else {
+            main.postDelayed(this::home, HOME_AFTER_MS);
+        }
+    }
+
+    /** Until the collection is whole, the download has ended without it, or a few minutes have gone. */
+    private void waitBackdrop(String pack, TextView coming, long since) {
+        int percent = Packs.percent(pack);
+        if (percent >= 0) coming.setText(getString(R.string.update_backdrops, percent));
+        boolean over = Packs.present(this, pack) || !Packs.fetching() && percent < 0 && SystemClock.uptimeMillis() - since > BACKDROP_START_MS
+            || SystemClock.uptimeMillis() - since > BACKDROP_LONGEST_MS;
+        if (over) home();
+        else main.postDelayed(() -> waitBackdrop(pack, coming, since), POLL_MS);
     }
 
     private void forget() { Updater.clean(this); }

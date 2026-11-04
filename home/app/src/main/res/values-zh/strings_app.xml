@@ -236,6 +236,7 @@
     <string name="update_detail_back">出了点问题：正在退回之前的版本。</string>
     <string name="update_done">更新完成</string>
     <string name="update_done_text">现在你用的是 Salotto %1$s。</string>
+    <string name="update_backdrops">正在从 GitHub 下载背景：%1$d%%</string>
     <string name="update_problem_line">%1$s（%2$s）</string>
     <string name="update_scan_help">用手机扫描，了解更多</string>
     <string name="update_outcome_untouched">Salotto 没有被改动</string>
