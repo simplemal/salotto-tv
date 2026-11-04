@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -68,6 +69,7 @@ final class ControlPanel extends LinearLayout {
     private static final int LIST_ICON = 22;
     private static final int LIST_VALUE = 110;
     private static final int LIST_LIFT = 12;
+    private static final int LIST_FILL = Color.rgb(28, 29, 32);
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
 
     private final class Tile {
@@ -255,6 +257,8 @@ final class ControlPanel extends LinearLayout {
         hint.setVisibility(GONE);
         if (list) buildList();
         else build();
+        // The list is one plain colour: no sheen, nothing to blend with what is behind it.
+        setBackground(list ? solid() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
         addRest();
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
         spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | Gravity.END;
@@ -278,11 +282,16 @@ final class ControlPanel extends LinearLayout {
         spot.leftMargin = Math.max(host.dp(16), Math.min(left, parent.getWidth() - getMeasuredWidth() - host.dp(16)));
         spot.bottomMargin = parent.getHeight() - (at[1] - base[1]) + host.dp(LIST_LIFT);
         setLayoutParams(spot);
-        setPivotX(getMeasuredWidth() / 2f);
-        setPivotY(getMeasuredHeight());
     }
 
     boolean listed() { return listed; }
+
+    private Drawable solid() {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(LIST_FILL);
+        fill.setCornerRadius(host.dp(PANEL_RADIUS));
+        return fill;
+    }
 
     /** On the Home, the last row leads down to the apps. */
     void leadDownTo(Supplier<View> view) { below = view; }
@@ -386,7 +395,8 @@ final class ControlPanel extends LinearLayout {
             host.panelDone();
             TaskService.restart();
         });
-        Tile[] all = {power, wifi, bluetooth, dialogue, leveler, dim, warm, saver, timer, tasks, restart};
+        // From the bottom up, in the order the user asked: what is used most is nearest the button.
+        Tile[] all = {power, timer, dim, warm, dialogue, leveler, wifi, bluetooth, saver, tasks, restart};
         for (int index = all.length - 1; index >= 0; index--) {
             addView(all[index].view, new LayoutParams(host.dp(LIST_WIDTH), host.dp(LIST_ROW)));
         }

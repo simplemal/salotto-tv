@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.transition.ChangeBounds;
@@ -203,9 +204,13 @@ public final class MainActivity extends CardActivity {
     private static final int FREE_ICON = 24;
     private static final int ALL_APPS_CIRCLE = 60;
     private static final int BESIDE_ALL_APPS = 22;
-    private static final float LIST_FOLDED = 0.15f;
     private static final float LIGHT_CORNER = 0.72f;
     private static final int WEATHER_DAY_WIDTH = 50;
+    /** One press opens one app: a second one while the first is starting is ignored. */
+    private boolean opening;
+    private static final long CORNERS_GONE_MS = 110;
+    private static final long CORNERS_BACK_MS = 220;
+    private static final long PORTAL_GIVE_UP_MS = 2500;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
@@ -609,6 +614,24 @@ public final class MainActivity extends CardActivity {
         if (open == panelOpen) return;
         panelOpen = open;
         panelShade.animate().cancel();
+        panel.hideHint();
+        if (!open) panel.closed();
+        panel.animate().cancel();
+        boolean list = panel.listed();
+        // The list appears and goes at once: an animation over the whole picture could stutter on the Stick.
+        if (list) {
+            panelShade.setAlpha(1f);
+            panelShade.setVisibility(open ? View.VISIBLE : View.GONE);
+            if (open) {
+                panel.refresh();
+                panel.placeOver(controlButton);
+            }
+            panel.setAlpha(1f);
+            panel.setTranslationY(0);
+            panel.setScaleY(1f);
+            panel.setVisibility(open ? View.VISIBLE : View.GONE);
+            return;
+        }
         if (open) {
             panelShade.setVisibility(View.VISIBLE);
             panelShade.setAlpha(0f);
@@ -616,21 +639,15 @@ public final class MainActivity extends CardActivity {
         } else {
             panelShade.animate().alpha(0f).setDuration(PILL_MS).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
         }
-        panel.hideHint();
-        if (!open) panel.closed();
-        panel.animate().cancel();
-        // The list grows up from its button and folds back into it; the tiles drop in from the pill.
-        boolean list = panel.listed();
+        // The tiles drop in from the pill.
         if (open) {
             panel.refresh();
-            if (list) panel.placeOver(controlButton);
             panel.setVisibility(View.VISIBLE);
             panel.setAlpha(0f);
-            panel.setTranslationY(list ? 0 : -dp(12));
-            panel.setScaleY(list ? LIST_FOLDED : 1f);
-            panel.animate().alpha(1f).translationY(0).scaleY(1f).setDuration(PILL_MS).start();
+            panel.setTranslationY(-dp(12));
+            panel.animate().alpha(1f).translationY(0).setDuration(PILL_MS).start();
         } else {
-            panel.animate().alpha(0f).translationY(list ? 0 : -dp(12)).scaleY(list ? LIST_FOLDED : 1f).setDuration(PILL_MS)
+            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(PILL_MS)
                 .withEndAction(() -> panel.setVisibility(View.GONE)).start();
         }
     }
@@ -748,7 +765,8 @@ public final class MainActivity extends CardActivity {
         super.onResume();
         inFront = true;
         showing = true;
-        wheel.closePortal();
+        opening = false;
+        if (wheel.portalOpen()) closePortal();
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -1087,10 +1105,7 @@ public final class MainActivity extends CardActivity {
         }
     }
 
-    /**
-     * The app's artwork in a square for the circle: a banner a little wider than the circle on its
-     * own edge colour, so the logo stays whole; an icon in the middle of its background.
-     */
+    /** Salotto's own two circles are drawn here; an app's comes from its artwork, see CircleArt. */
     private Bitmap circleArt(String tag, int size) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
@@ -1109,55 +1124,11 @@ public final class MainActivity extends CardActivity {
         }
         Art art = art(tag);
         if (art.image == null) {
-            canvas.drawColor(Color.rgb(60, 64, 72));
+            canvas.drawColor(CircleArt.PLAIN);
             return made;
         }
-        if (art.look == BANNER) {
-            canvas.drawColor(edgeColour(art.image));
-            if (art.back != null) {
-                art.back.setBounds(0, 0, size, size);
-                art.back.draw(canvas);
-            }
-            int width = size * 5 / 4;
-            int height = width * 9 / 16;
-            art.image.setBounds((size - width) / 2, (size - height) / 2, (size + width) / 2, (size + height) / 2);
-            art.image.draw(canvas);
-        } else {
-            if (art.back != null) {
-                art.back.setBounds(0, 0, size, size);
-                art.back.draw(canvas);
-            } else {
-                canvas.drawColor(Color.rgb(60, 64, 72));
-            }
-            int inset = size / (art.back != null ? 10 : 4);
-            art.image.setBounds(inset, inset, size - inset, size - inset);
-            art.image.draw(canvas);
-        }
-        return made;
-    }
-
-    /** The colour along a banner's edges, which fills the circle above and below it. */
-    private static int edgeColour(Drawable banner) {
-        int width = 32;
-        int height = 18;
-        Bitmap small = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        banner.setBounds(0, 0, width, height);
-        banner.draw(new Canvas(small));
-        long red = 0;
-        long green = 0;
-        long blue = 0;
-        int count = 0;
-        for (int x = 0; x < width; x++) {
-            for (int y : new int[]{0, 1, height - 2, height - 1}) {
-                int pixel = small.getPixel(x, y);
-                red += Color.red(pixel);
-                green += Color.green(pixel);
-                blue += Color.blue(pixel);
-                count++;
-            }
-        }
-        small.recycle();
-        return Color.rgb((int) (red / count), (int) (green / count), (int) (blue / count));
+        made.recycle();
+        return CircleArt.make(art.image, art.back, art.look == BANNER, size);
     }
 
     /**
@@ -1204,12 +1175,43 @@ public final class MainActivity extends CardActivity {
         } else if (HomeApps.SETTINGS.equals(tag)) {
             open(new Intent(this, SettingsActivity.class));
         } else {
-            wheel.openPortal(() -> {
-                openPackage(tag);
-                // An app that cannot start leaves the Home in front: the ring goes.
-                root.postDelayed(() -> { if (inFront) wheel.closePortal(); }, 1500);
-            });
+            if (opening) return;
+            Intent intent = launchIntent(tag);
+            if (intent == null) {
+                say(getString(R.string.card_app_unavailable));
+                return;
+            }
+            // Fire OS's own opening runs under the colour, unseen; it also puts up the app's first screen at once.
+            opening = true;
+            fadeCorners(false, () -> HomeCover.take(getWindow(), () -> {
+                float[] spot = wheel.litSpot();
+                int colour = wheel.litColour();
+                boolean over = TaskService.portal(HomeCover.lastPicture(), tag, colour, spot[0], spot[1], spot[2], () -> {
+                    wheel.cover();
+                    open(intent);
+                }, () -> HomeCover.fill(colour));
+                if (!over) wheel.openPortal(() -> open(intent));
+                // An app that cannot start leaves the Home in front: the colour goes.
+                root.postDelayed(() -> {
+                    opening = false;
+                    if (inFront) closePortal();
+                }, PORTAL_GIVE_UP_MS);
+            }));
         }
+    }
+
+    /** Time, weather and the buttons leave at once when an app opens, and come back with the Home. */
+    private void fadeCorners(boolean show, Runnable then) {
+        View[] corners = {hero, clockShade, weatherCorner, weatherShade, pillBox, footer};
+        for (int index = 0; index < corners.length; index++) {
+            ViewPropertyAnimator fade = corners[index].animate().alpha(show ? 1f : 0f).setDuration(show ? CORNERS_BACK_MS : CORNERS_GONE_MS);
+            if (index == 0 && then != null) fade.withEndAction(then);
+            fade.start();
+        }
+    }
+
+    private void closePortal() {
+        wheel.closePortal(() -> fadeCorners(true, null));
     }
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
@@ -1319,9 +1321,12 @@ public final class MainActivity extends CardActivity {
         int to = from + delta;
         if (from < 0 || to < 0 || to >= shownApps.size()) return;
         String other = shownApps.get(to);
+        // The wheel has no cards to glide: it turns to the moved app instead.
         Map<String, int[]> before = new HashMap<>();
-        before.put(moving, spot(moving));
-        before.put(other, spot(other));
+        if (!circular) {
+            before.put(moving, spot(moving));
+            before.put(other, spot(other));
+        }
         Collections.swap(shownApps, from, to);
         List<String> order = new ArrayList<>(shownApps);
         for (String pkg : home) if (!order.contains(pkg)) order.add(pkg);

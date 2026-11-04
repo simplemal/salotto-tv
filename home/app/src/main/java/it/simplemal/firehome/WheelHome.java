@@ -17,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import java.util.ArrayList;
@@ -84,6 +85,8 @@ final class WheelHome extends FrameLayout {
     private static final float GLOW_IN = 1f;
     private static final float MOVED = 0.0005f;
     private static final long PORTAL_MS = 460;
+    /** Coming back is a little slower than going: the colour is seen closing into its circle. */
+    private static final long CLOSE_MS = 650;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
     private static final float GLOW_REACH = 1.45f;
     private static final int GLOW_ALPHA = 105;
@@ -116,6 +119,7 @@ final class WheelHome extends FrameLayout {
     private int lit;
     private Listener listener;
     private Portal portal;
+    private boolean closing;
     private ObjectAnimator sway;
 
     WheelHome(Context context) {
@@ -344,7 +348,7 @@ final class WheelHome extends FrameLayout {
         sway.start();
     }
 
-    /** The lit circle opens into a ring of its colour that fills the screen, then the app starts. */
+    /** Without the service: the lit circle opens into a disc of its colour that fills the screen, then the app starts. */
     void openPortal(Runnable then) {
         ImageView circle = litCircle();
         if (circle == null || portal != null) {
@@ -368,11 +372,46 @@ final class WheelHome extends FrameLayout {
 
     boolean portalOpen() { return portal != null; }
 
-    /** Back on the Home: the ring is gone. */
-    void closePortal() {
-        if (portal == null) return;
-        removeView(portal);
-        portal = null;
+    /** Where the lit circle is on the screen, and its colour: the window over the app starts from there. */
+    float[] litSpot() {
+        int[] at = new int[2];
+        getLocationOnScreen(at);
+        return new float[]{at[0] + getWidth() / 2f, at[1] + dp(shape.top()), dp(shape.big) / 2f};
+    }
+
+    int litColour() { return colourOf(litTag()); }
+
+    /** The Home all in the app's colour at once, under the window that opens on the app. */
+    void cover() {
+        if (portal == null) {
+            portal = new Portal(getContext(), litColour(), getWidth() / 2f, dp(shape.top()), dp(shape.big) / 2f);
+            addView(portal, new LayoutParams(-1, -1));
+            portal.setTranslationZ(dp(20));
+        }
+        portal.setProgress(1f);
+    }
+
+    /** Back on the Home: the colour closes back into the app's circle, as the opening went but backwards. */
+    void closePortal(Runnable done) {
+        if (portal == null || closing) {
+            if (portal == null) done.run();
+            return;
+        }
+        closing = true;
+        Portal leaving = portal;
+        ValueAnimator shrink = ValueAnimator.ofFloat(1f, 0f);
+        shrink.setDuration(CLOSE_MS);
+        shrink.setInterpolator(new DecelerateInterpolator());
+        shrink.addUpdateListener(step -> leaving.setProgress((float) step.getAnimatedValue()));
+        shrink.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                removeView(leaving);
+                if (portal == leaving) portal = null;
+                closing = false;
+                done.run();
+            }
+        });
+        shrink.start();
     }
 
     @Override public boolean onKeyDown(int code, KeyEvent event) {
@@ -416,10 +455,9 @@ final class WheelHome extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
-    /** A ring of the app's colour that widens from its circle to past the corners of the screen. */
+    /** A disc of the app's colour that widens from its circle to past the corners of the screen. */
     private static final class Portal extends View {
         private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint hole = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final int colour;
         private final float x;
         private final float y;
@@ -433,7 +471,6 @@ final class WheelHome extends FrameLayout {
             this.y = y;
             this.start = start;
             ring.setColor(colour);
-            hole.setColor(Color.rgb(Color.red(colour) * 2 / 3, Color.green(colour) * 2 / 3, Color.blue(colour) * 2 / 3));
         }
 
         void setProgress(float value) {
@@ -443,10 +480,9 @@ final class WheelHome extends FrameLayout {
 
         @Override protected void onDraw(Canvas canvas) {
             float far = (float) Math.hypot(Math.max(x, getWidth() - x), Math.max(y, getHeight() - y));
-            float outer = start + (far * 1.6f - start) * progress;
+            float outer = start + (far * 1.05f - start) * progress;
             canvas.drawColor(withAlpha(colour, Math.round(120 * progress)));
             canvas.drawCircle(x, y, outer, ring);
-            canvas.drawCircle(x, y, outer * (0.35f + 0.3f * progress), hole);
         }
     }
 }

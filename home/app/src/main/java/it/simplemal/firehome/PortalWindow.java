@@ -1,0 +1,193 @@
+package it.simplemal.firehome;
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+
+/**
+ * Opening an app from the wheel, over every window for a moment: the Home's picture, and a disc of
+ * the app's colour that widens from its circle until it covers the screen. The app starts underneath;
+ * when Android says its window is up, a hole with nothing drawn in it opens from the middle of the
+ * disc, so the app shows through a ring that runs off the screen.
+ * Only Salotto's accessibility service can put a window over another app, so it lives there.
+ */
+final class PortalWindow extends View {
+    private static final long COVER_MS = 380;
+    private static final long OPEN_MS = 480;
+    /** Android names the app's page a moment before the page has drawn anything: give it that moment. */
+    private static final long FIRST_FRAME_MS = 350;
+    /** An app slow to show its window, or one that never does, gets the hole anyway after this. */
+    private static final long WAIT_MS = 2500;
+    /** The disc ends past the farthest corner, and the hole goes almost as far: its ring is off the screen. */
+    private static final float RING_END = 1.25f;
+    private static final float HOLE_END = 1.2f;
+
+    /** The one waiting for its app's window, if any: the service tells it. */
+    private static PortalWindow waiting;
+
+    private final WindowManager windows;
+    private final Bitmap home;
+    private final Paint ring = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint picture = new Paint(Paint.FILTER_BITMAP_FLAG);
+    private final Path outside = new Path();
+    private final Path band = new Path();
+    private final Rect whole = new Rect();
+    private final float x;
+    private final float y;
+    private final float start;
+    private Runnable shown;
+    private final Runnable opened;
+    private final String app;
+    private float progress;
+    private float hole;
+    private boolean holeOpening;
+    private boolean appNamed;
+    private boolean gone;
+    private final Runnable giveUp = this::openHole;
+    private boolean grown;
+    /** The app has had its moment to draw: the hole opens as soon as the disc covers the screen. */
+    private boolean drawn;
+    private final Runnable ready = () -> {
+        drawn = true;
+        if (grown) openHole();
+    };
+
+    private PortalWindow(Context context, Bitmap home, String app, int colour, float x, float y, float start, Runnable shown, Runnable opened) {
+        super(context);
+        this.app = app;
+        windows = context.getSystemService(WindowManager.class);
+        this.home = home.copy(Bitmap.Config.ARGB_8888, false);
+        this.x = x;
+        this.y = y;
+        this.start = start;
+        this.shown = shown;
+        this.opened = opened;
+        ring.setColor(colour);
+    }
+
+    /** `shown` runs once the window covers the screen, `opened` when it has gone. */
+    static void open(Context service, Bitmap home, String app, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+        if (waiting != null) waiting.close();
+        PortalWindow view = new PortalWindow(service, home, app, colour, x, y, radius, shown, opened);
+        waiting = view;
+        view.windows.addView(view, new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+            PixelFormat.TRANSLUCENT));
+        view.postDelayed(view::close, COVER_MS + WAIT_MS + OPEN_MS * 2);
+    }
+
+    /** From the service, for every page that comes up: the app's own opens the hole. */
+    static void windowShown(String pkg) {
+        PortalWindow view = waiting;
+        if (view != null && view.app.equals(pkg) && !view.appNamed) {
+            view.appNamed = true;
+            view.removeCallbacks(view.giveUp);
+            view.postDelayed(view.ready, FIRST_FRAME_MS);
+        }
+    }
+
+    @Override protected void onDraw(Canvas canvas) {
+        int width = getWidth();
+        int height = getHeight();
+        float far = (float) Math.hypot(Math.max(x, width - x), Math.max(y, height - y));
+        // What a frame does not draw keeps the last one's pixels: the hole must be cleared each time.
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        float outer = start + (far * RING_END - start) * progress;
+        float inner = Math.min(outer, far * HOLE_END * hole);
+
+        outside.rewind();
+        outside.addCircle(x, y, outer, Path.Direction.CW);
+        canvas.save();
+        canvas.clipOutPath(outside);
+        whole.set(0, 0, width, height);
+        canvas.drawBitmap(home, null, whole, picture);
+        canvas.restore();
+
+        band.rewind();
+        // Rewinding also puts the fill back to winding, which would paint the hole too.
+        band.setFillType(Path.FillType.EVEN_ODD);
+        band.addCircle(x, y, outer, Path.Direction.CW);
+        if (inner > 0) band.addCircle(x, y, inner, Path.Direction.CW);
+        canvas.drawPath(band, ring);
+
+        if (shown != null) {
+            // This frame now covers the Home exactly as it was: the app can start under it.
+            Runnable now = shown;
+            shown = null;
+            post(() -> {
+                now.run();
+                cover();
+            });
+        }
+    }
+
+    /** The disc widens; the app may already be up when it has covered the screen. */
+    private void cover() {
+        ValueAnimator grow = ValueAnimator.ofFloat(0f, 1f);
+        grow.setDuration(COVER_MS);
+        grow.setInterpolator(new AccelerateInterpolator(1.2f));
+        grow.addUpdateListener(step -> {
+            progress = (float) step.getAnimatedValue();
+            invalidate();
+        });
+        grow.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                grown = true;
+                if (drawn) openHole();
+                else if (!appNamed) postDelayed(giveUp, WAIT_MS);
+            }
+        });
+        grow.start();
+    }
+
+    /** Nothing drawn inside: the app is seen through it as it widens past the corners. */
+    private void openHole() {
+        if (gone || holeOpening) return;
+        holeOpening = true;
+        removeCallbacks(giveUp);
+        if (waiting == this) waiting = null;
+        ValueAnimator open = ValueAnimator.ofFloat(0f, 1f);
+        open.setDuration(OPEN_MS);
+        open.setInterpolator(new DecelerateInterpolator(1.4f));
+        open.addUpdateListener(step -> {
+            hole = (float) step.getAnimatedValue();
+            invalidate();
+        });
+        open.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) { close(); }
+        });
+        open.start();
+    }
+
+    private void close() {
+        if (gone) return;
+        gone = true;
+        if (waiting == this) waiting = null;
+        removeCallbacks(giveUp);
+        removeCallbacks(ready);
+        try {
+            windows.removeView(this);
+        } catch (IllegalArgumentException e) {
+            // Already gone with the service.
+        }
+        // The picture is not recycled: the window may still draw one last frame as it goes.
+        opened.run();
+    }
+}

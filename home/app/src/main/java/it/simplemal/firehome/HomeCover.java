@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
@@ -79,12 +80,20 @@ final class HomeCover {
 
     static Bitmap lastPicture() { return picture; }
 
+    /**
+     * After an app opened from the wheel: the Home key shows its colour at once, and the Home then
+     * closes that colour back into the app's circle. The next time the Home leaves, a real picture comes back.
+     */
+    static void fill(int colour) {
+        if (picture != null) new Canvas(picture).drawColor(colour);
+    }
+
     static void homeShown(Window window) { home = window; }
 
     /** From the Home, as it leaves the screen: half size, the cover is up for a moment only. */
     static void take(Window window) { take(window, () -> { }); }
 
-    private static void take(Window window, Runnable taken) {
+    static void take(Window window, Runnable taken) {
         if (picture == null) picture = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
         try {
             PixelCopy.request(window, picture, result -> taken.run(), new Handler(Looper.getMainLooper()));

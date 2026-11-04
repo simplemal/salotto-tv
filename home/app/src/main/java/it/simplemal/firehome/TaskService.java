@@ -185,6 +185,14 @@ public final class TaskService extends AccessibilityService {
 
     static boolean running() { return running != null; }
 
+    /** False when the service is off: only it can draw over the app that is starting. */
+    static boolean portal(Bitmap home, String app, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+        TaskService service = running;
+        if (service == null || home == null) return false;
+        PortalWindow.open(service, home, app, colour, x, y, radius, shown, opened);
+        return true;
+    }
+
     /** Fire OS's Settings stay open until Salotto is in front again. */
     static void wantFireSettings() { fireSettingsWanted = true; }
 
@@ -624,6 +632,7 @@ public final class TaskService extends AccessibilityService {
         String page = String.valueOf(event.getClassName());
         // Masks, the veil and messages are windows of Android's own classes, not pages: the app under them stays.
         boolean realPage = !page.startsWith(ANDROID_CLASS);
+        if (realPage) PortalWindow.windowShown(name);
         if (name.equals(getPackageName()) && !realPage) return;
         if (panelWindow != null && realPage && !name.equals(panelApp)
             && (HomeApps.isHome(this, name) || HomeApps.isUserApp(this, name))) panelWindow.close();
