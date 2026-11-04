@@ -79,7 +79,12 @@ final class Updater {
 
     interface Progress { void percent(int done); }
 
-    private static final String BASE = "https://github.com/" + Fire.UPDATES_REPO + "/releases/latest/download/";
+    private static final String LATEST = "https://github.com/" + Fire.UPDATES_REPO + "/releases/latest/download/";
+    /**
+     * A fixed pre-release, which GitHub's "latest" never points to: only a TV with the betas on looks
+     * here. Its update.json is replaced at every beta and names the APK of that beta's own pre-release.
+     */
+    private static final String BETA = "https://github.com/" + Fire.UPDATES_REPO + "/releases/download/beta/";
     /** Only updates signed by the private half of this key are ever considered. */
     private static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+Xr4FLe8cXoDAqAen4eIgxam1dviQ81GfwoMv51vrd0sajsazDnwlEzdFR3+VfTHJDTFK7qeOebtfvoWzgePQ==";
     private static final String FILE = "update";
@@ -121,6 +126,14 @@ final class Updater {
     static File state(Context context) { return shared(context, "update-state"); }
     static File health(Context context) { return shared(context, "update-health"); }
     static File previous(Context context) { return shared(context, PREVIOUS); }
+
+    static boolean beta(Context context) { return prefs(context).getBoolean("beta", false); }
+
+    /** Turned on, the next look happens at once. Turned off, nothing goes back: a newer stable version follows. */
+    static void setBeta(Context context, boolean on) {
+        prefs(context).edit().putBoolean("beta", on).apply();
+        askAgain();
+    }
 
     static int target(Context context) { return prefs(context).getInt("target", 0); }
     static void setTarget(Context context, int code) { prefs(context).edit().putInt("target", code).commit(); }
@@ -182,15 +195,28 @@ final class Updater {
         if (link == null || !link.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             throw new Failure(UpdateError.F101);
         }
-        byte[] manifest = fetch("update.json");
-        verify(manifest, fetch("update.json.sig"));
-        Release release = parse(manifest);
+        Release release = newest(LATEST);
+        if (beta(context)) {
+            try {
+                Release trial = newest(BETA);
+                if (trial.versionCode > release.versionCode) release = trial;
+            } catch (Failure e) {
+                // No beta out yet, or not reachable now: the stable version still counts.
+            }
+        }
         return release.versionCode > installedCode(context) ? release : null;
     }
 
-    private static byte[] fetch(String name) throws Failure {
+    /** Betas and stable versions share one row of version codes, so the higher one is the newer. */
+    private static Release newest(String base) throws Failure {
+        byte[] manifest = fetch(base + "update.json");
+        verify(manifest, fetch(base + "update.json.sig"));
+        return parse(manifest);
+    }
+
+    private static byte[] fetch(String url) throws Failure {
         try {
-            HttpURLConnection connection = open(BASE + name);
+            HttpURLConnection connection = open(url);
             ByteArrayOutputStream body = new ByteArrayOutputStream();
             try (InputStream input = connection.getInputStream()) {
                 byte[] chunk = new byte[8192];

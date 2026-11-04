@@ -26,6 +26,9 @@
     <string name="settings_tools_text">AirPlay и двойное нажатие «Домой».</string>
     <string name="settings_update">Обновление</string>
     <string name="settings_update_text">Ищет новую версию Salotto. Всё проверяется, прежде чем что-то менять.</string>
+    <string name="settings_update_check">Проверить обновления</string>
+    <string name="settings_beta">Бета-версии</string>
+    <string name="settings_beta_text">Получайте тестовые версии раньше всех: в них могут быть недочёты. Если отключить, Salotto останется на бете, пока не выйдет более новая обычная версия.</string>
     <string name="settings_about">О Salotto</string>
     <string name="settings_about_text">Проект, лицензия и программы других авторов, которые в нём используются.</string>
     <string name="settings_fire">Настройки Fire TV</string>

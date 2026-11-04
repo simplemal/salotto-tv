@@ -26,6 +26,9 @@
     <string name="settings_tools_text">AirPlay und doppeltes Drücken von Home.</string>
     <string name="settings_update">Update</string>
     <string name="settings_update_text">Sucht nach einer neuen Version von Salotto. Prüft alles, bevor etwas geändert wird.</string>
+    <string name="settings_update_check">Nach Updates suchen</string>
+    <string name="settings_beta">Beta-Versionen</string>
+    <string name="settings_beta_text">Erhalte die Testversionen, bevor sie für alle erscheinen: Sie können kleine Fehler haben. Schaltest du sie aus, bleibt Salotto auf der Beta, bis eine neuere normale Version erscheint.</string>
     <string name="settings_about">Über Salotto</string>
     <string name="settings_about_text">Das Projekt, die Lizenz und die Software anderer, die verwendet wird.</string>
     <string name="settings_fire">Fire TV Einstellungen</string>

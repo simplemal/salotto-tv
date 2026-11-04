@@ -613,7 +613,7 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_tools_text), true, () -> enter(this::showTools)),
             new Entry(getString(R.string.settings_update), null, getDrawable(R.drawable.ic_s_update),
                 getString(R.string.settings_update_text),
-                true, () -> open(new Intent(this, UpdateActivity.class))),
+                true, () -> enter(this::showUpdate)),
             new Entry(getString(R.string.settings_about), BuildVersion.name(this), getDrawable(R.drawable.ic_s_info),
                 getString(R.string.settings_about_text), true,
                 () -> open(new Intent(this, AboutActivity.class))),
@@ -1449,6 +1449,18 @@ public final class SettingsActivity extends CardActivity {
                     } catch (IOException | JSONException e) {
                         sayLong(getString(R.string.settings_nothing_to_restore));
                     }
+                })));
+    }
+
+    private void showUpdate() {
+        boolean beta = Updater.beta(this);
+        show(getString(R.string.settings_update), Arrays.asList(
+            new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), getDrawable(R.drawable.ic_s_update),
+                getString(R.string.settings_update_text), true, () -> open(new Intent(this, UpdateActivity.class))),
+            new Entry(getString(R.string.settings_beta), beta ? YES : NO, getDrawable(R.drawable.ic_s_build),
+                getString(R.string.settings_beta_text), false, () -> {
+                    Updater.setBeta(this, !beta);
+                    refresh();
                 })));
     }
 

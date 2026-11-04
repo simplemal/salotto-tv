@@ -26,6 +26,9 @@
     <string name="settings_tools_text">AirPlay et double appui sur Accueil.</string>
     <string name="settings_update">Mise à jour</string>
     <string name="settings_update_text">Cherche une nouvelle version de Salotto. Tout est vérifié avant de toucher à quoi que ce soit.</string>
+    <string name="settings_update_check">Rechercher des mises à jour</string>
+    <string name="settings_beta">Versions bêta</string>
+    <string name="settings_beta_text">Recevez les versions d’essai avant leur sortie pour tous : elles peuvent avoir quelques défauts. Si vous les désactivez, Salotto reste sur la bêta jusqu’à la sortie d’une version normale plus récente.</string>
     <string name="settings_about">À propos de Salotto</string>
     <string name="settings_about_text">Le projet, la licence et les logiciels d’autres auteurs qu’il utilise.</string>
     <string name="settings_fire">Réglages Fire TV</string>

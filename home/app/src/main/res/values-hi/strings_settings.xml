@@ -26,6 +26,9 @@
     <string name="settings_tools_text">AirPlay और होम बटन को दो बार दबाना।</string>
     <string name="settings_update">अपडेट</string>
     <string name="settings_update_text">Salotto का नया वर्ज़न खोजता है। कुछ भी बदलने से पहले सब जाँच लेता है।</string>
+    <string name="settings_update_check">अपडेट खोजें</string>
+    <string name="settings_beta">बीटा संस्करण</string>
+    <string name="settings_beta_text">नए संस्करण सबके लिए आने से पहले उनके परीक्षण संस्करण पाएँ: इनमें कुछ कमियाँ हो सकती हैं। इन्हें बंद करने पर Salotto बीटा पर ही रहता है, जब तक कोई नया सामान्य संस्करण नहीं आता।</string>
     <string name="settings_about">Salotto के बारे में</string>
     <string name="settings_about_text">प्रोजेक्ट, लाइसेंस और इसमें इस्तेमाल हुआ दूसरों का सॉफ़्टवेयर।</string>
     <string name="settings_fire">Fire TV सेटिंग</string>

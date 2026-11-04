@@ -27,6 +27,9 @@
     <string name="settings_tools_text">AirPlay 和双击主页键。</string>
     <string name="settings_update">更新</string>
     <string name="settings_update_text">检查 Salotto 的新版本。动手之前，会先全部检查一遍。</string>
+    <string name="settings_update_check">检查更新</string>
+    <string name="settings_beta">测试版</string>
+    <string name="settings_beta_text">在正式发布前抢先获得测试版本：可能会有一些小问题。关闭后，Salotto 会保留测试版，直到有更新的正式版本发布。</string>
     <string name="settings_about">关于 Salotto</string>
     <string name="settings_about_text">项目介绍、许可，以及它用到的他人软件。</string>
     <string name="settings_fire">Fire TV 设置</string>

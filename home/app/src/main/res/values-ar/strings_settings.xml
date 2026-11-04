@@ -26,6 +26,9 @@
     <string name="settings_tools_text">AirPlay والضغط المزدوج على الرئيسية.</string>
     <string name="settings_update">التحديث</string>
     <string name="settings_update_text">يبحث عن إصدار جديد من Salotto. يفحص كل شيء قبل أن يغيّر أي شيء.</string>
+    <string name="settings_update_check">البحث عن تحديثات</string>
+    <string name="settings_beta">الإصدارات التجريبية</string>
+    <string name="settings_beta_text">احصل على الإصدارات التجريبية قبل صدورها للجميع: قد تحتوي على بعض العيوب. إذا أوقفتها، يبقى Salotto على الإصدار التجريبي حتى يصدر إصدار عادي أحدث.</string>
     <string name="settings_about">عن Salotto</string>
     <string name="settings_about_text">المشروع والترخيص وبرامج الآخرين التي يستخدمها.</string>
     <string name="settings_fire">إعدادات Fire TV</string>
