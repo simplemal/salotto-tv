@@ -353,8 +353,6 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
-        // Dock up, the panel would lie over the dock: the Home comes down for it, and goes back up after.
-        if (appsOnly) scroll.smoothScrollTo(0, open ? 0 : shelf);
         panelShade.setVisibility(open ? View.VISIBLE : View.GONE);
         panel.hideHint();
         if (!open) panel.closed();
@@ -452,7 +450,8 @@ public final class MainActivity extends CardActivity {
         }
         View from = getCurrentFocus();
         boolean onCards = from != null && from != controlButton && !isInside(from, panel);
-        scroll.smoothScrollTo(0, 0);
+        // Dock up, the Home stays where it is and the panel opens over it: no slide down and back.
+        if (!appsOnly) scroll.smoothScrollTo(0, 0);
         showPanel(true);
         panel.openEmpty(onCards ? from : firstCard());
     }
