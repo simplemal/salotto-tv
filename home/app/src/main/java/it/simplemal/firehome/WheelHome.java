@@ -36,18 +36,35 @@ final class WheelHome extends FrameLayout {
         void down();
     }
 
-    /** Sizes in dp on the TV's 960 × 540: the lit circle, the wheel's radius, the angle between two apps and their sizes. */
+    /**
+     * Sizes in dp on the TV's 960 × 540: the lit circle, the wheel's radius, the free space between
+     * two neighbouring circles and their sizes. The angles follow from these, so every gap is the same.
+     */
     private static final class Shape {
         final int big;
         final int radius;
-        final float step;
         final float[] scales;
+        /** Angle of each place away from the top, in radians: 0 for the lit one, then one per place. */
+        final float[] angles;
 
-        Shape(int big, int radius, float degrees, float[] scales) {
+        Shape(int big, int radius, int gap, float[] scales) {
             this.big = big;
             this.radius = radius;
-            this.step = (float) Math.toRadians(degrees);
             this.scales = scales;
+            angles = new float[scales.length];
+            for (int place = 1; place < scales.length; place++) {
+                float apart = big * (scales[place - 1] + scales[place]) / 2f + gap;
+                angles[place] = angles[place - 1] + 2 * (float) Math.asin(Math.min(1f, apart / (2f * radius)));
+            }
+        }
+
+        /** In between two places the angle goes straight from one to the other, so the turn is smooth. */
+        float angle(float place) {
+            float away = Math.abs(place);
+            int below = Math.min((int) away, angles.length - 2);
+            float part = away - below;
+            float angle = angles[below] + (angles[below + 1] - angles[below]) * part;
+            return place < 0 ? -angle : angle;
         }
 
         /** Where the lit circle's centre is. */
@@ -56,8 +73,8 @@ final class WheelHome extends FrameLayout {
 
     /** The centre of both wheels, below the screen: with five apps the wheel is the same one, only a little smaller. */
     private static final int CENTRE = 566;
-    private static final Shape THREE = new Shape(230, 330, 62, new float[]{1f, 0.62f, 0.5f, 0.45f});
-    private static final Shape FIVE = new Shape(200, 300, 36, new float[]{1f, 0.62f, 0.5f, 0.44f, 0.4f});
+    private static final Shape THREE = new Shape(230, 330, 153, new float[]{1f, 0.62f, 0.5f, 0.45f});
+    private static final Shape FIVE = new Shape(200, 300, 34, new float[]{1f, 0.62f, 0.5f, 0.44f, 0.4f});
     /** A spring with no bounce: it keeps its speed from one press to the next, so a held key turns smoothly. */
     private static final float SPRING = 15f;
     private static final float SUBSTEP = 0.008f;
@@ -237,7 +254,7 @@ final class WheelHome extends FrameLayout {
             float place = wrap(wrap(index - turned) + apart[index]);
             float away = Math.abs(place);
             places.put((String) circle.getTag(), place);
-            double angle = place * shape.step;
+            double angle = shape.angle(place);
             float x = middle + side * (float) (radius * Math.sin(angle));
             float y = top + (float) (radius * (1 - Math.cos(angle)));
             float scale = scale(away) * (index == lit && !hasFocus() ? AWAY_SCALE : 1f);

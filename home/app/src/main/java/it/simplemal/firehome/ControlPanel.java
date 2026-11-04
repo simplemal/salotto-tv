@@ -144,6 +144,9 @@ final class ControlPanel extends LinearLayout {
     /** The selection when the panel's window has no focus to keep it in. See PanelWindow. */
     private View chosen;
     private Supplier<View> below;
+    /** On the circular Home the panel opens in the middle of the screen: the arrows stay inside, Back leaves. */
+    private boolean centred;
+    private View line;
     /** Holds the focus when the panel opens with nothing chosen, so that OK does nothing. */
     private View rest;
     private View backTo;
@@ -166,6 +169,7 @@ final class ControlPanel extends LinearLayout {
         under.width = host.dp(WIDTH);
         root.addView(line, under);
         ControlPanel panel = new ControlPanel(host, opener, hint);
+        panel.line = line;
         root.addView(panel, place(host, top));
         return panel;
     }
@@ -201,9 +205,10 @@ final class ControlPanel extends LinearLayout {
 
     /** The panel floats above the Home: the arrows must not reach the cards underneath. */
     @Override public View focusSearch(View focused, int direction) {
-        if (focused == rest) return direction == FOCUS_UP && opener != null ? opener : first;
+        if (focused == rest) return direction == FOCUS_UP && opener != null && !centred ? opener : first;
         View next = FocusFinder.getInstance().findNextFocus(this, focused, direction);
         if (next != null) return next;
+        if (centred) return focused;
         View out = direction == FOCUS_UP ? opener : direction == FOCUS_DOWN && below != null ? below.get() : null;
         return out != null ? out : focused;
     }
@@ -218,6 +223,22 @@ final class ControlPanel extends LinearLayout {
     void closed() {
         backTo = null;
         letGoOfFire();
+    }
+
+    /** In the middle of the screen, with the hint just under it; or in its usual place under the pill, top right. */
+    void placeCentred(boolean middle) {
+        centred = middle;
+        FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
+        FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
+        spot.gravity = middle ? Gravity.CENTER : Gravity.TOP | Gravity.END;
+        spot.topMargin = middle ? 0 : host.dp(TOP);
+        spot.rightMargin = middle ? 0 : host.dp(EDGE);
+        under.gravity = middle ? Gravity.CENTER : Gravity.TOP | Gravity.END;
+        under.topMargin = middle ? 0 : host.dp(TOP + HEIGHT + 6);
+        under.rightMargin = middle ? 0 : host.dp(EDGE);
+        line.setTranslationY(middle ? host.dp(HEIGHT / 2 + 18) : 0);
+        setLayoutParams(spot);
+        line.setLayoutParams(under);
     }
 
     /** On the Home, the last row leads down to the apps. */

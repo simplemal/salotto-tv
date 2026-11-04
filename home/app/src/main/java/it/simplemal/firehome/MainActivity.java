@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -201,6 +202,7 @@ public final class MainActivity extends CardActivity {
     private final Map<ImageView, Drawable> pillRings = new HashMap<>();
     private static final int FREE_ICON = 24;
     private static final int ALL_APPS_CIRCLE = 60;
+    private static final int BESIDE_ALL_APPS = 22;
     private static final float LIGHT_CORNER = 0.72f;
     private static final int WEATHER_DAY_WIDTH = 50;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
@@ -294,7 +296,7 @@ public final class MainActivity extends CardActivity {
         wheel.setListener(new WheelHome.Listener() {
             @Override public void open(String tag) { openFromWheel(tag); }
             @Override public void hold(String tag) { showMenu(tag); }
-            @Override public void up() { controlButton.requestFocus(); }
+            @Override public void up() { footer.requestFocus(); }
             @Override public void down() { allAppsCircle.requestFocus(); }
         });
         root.addView(wheel, new FrameLayout.LayoutParams(-1, -1));
@@ -376,14 +378,29 @@ public final class MainActivity extends CardActivity {
         return place;
     }
 
-    /** On the wheel the pill has no glass: two small free icons in the corner, the clock and weather higher and wider. */
+    /**
+     * On the wheel the pill has no glass and sits at the bottom in the middle: Tutte le app between
+     * the control centre and the settings, as small free icons. The clock and weather go higher and wider.
+     */
     private void placeCorners() {
+        if (allAppsCircle.getParent() != null) ((ViewGroup) allAppsCircle.getParent()).removeView(allAppsCircle);
+        if (circular) {
+            LinearLayout.LayoutParams middle = new LinearLayout.LayoutParams(dp(ALL_APPS_CIRCLE), dp(ALL_APPS_CIRCLE));
+            middle.setMarginEnd(dp(BESIDE_ALL_APPS));
+            pillRow.addView(allAppsCircle, pillRow.indexOfChild(pillButton), middle);
+        } else {
+            root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
+        }
+        panel.placeCentred(circular);
+        panelShade.setBackground(circular ? new ColorDrawable(Color.argb(128, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(circular ? 14 : 40);
         hero.setLayoutParams(heroPlace);
         FrameLayout.LayoutParams pillSpot = (FrameLayout.LayoutParams) pillBox.getLayoutParams();
-        pillSpot.topMargin = dp(circular ? 12 : 22);
-        pillSpot.rightMargin = dp(circular ? 20 : DOCK_MARGIN);
+        pillSpot.gravity = circular ? Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL : Gravity.TOP | Gravity.END;
+        pillSpot.topMargin = circular ? 0 : dp(22);
+        pillSpot.rightMargin = circular ? 0 : dp(DOCK_MARGIN);
+        pillSpot.bottomMargin = circular ? dp(12) : 0;
         pillBox.setLayoutParams(pillSpot);
         pillBox.setBackground(circular ? null : pillGlass);
         pillBox.setForeground(circular ? null : pillEdge);
@@ -396,10 +413,10 @@ public final class MainActivity extends CardActivity {
             int inset = dp(circular ? 2 : 3);
             button.setPadding(inset, inset, inset, inset);
         }
-        ((LinearLayout.LayoutParams) controlButton.getLayoutParams()).setMarginEnd(dp(circular ? 8 : PILL_ICON_GAP));
+        ((LinearLayout.LayoutParams) controlButton.getLayoutParams()).setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
         FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
         weatherSpot.rightMargin = dp(32);
-        weatherSpot.topMargin = dp(48);
+        weatherSpot.topMargin = dp(22);
         weatherCorner.setLayoutParams(weatherSpot);
         footer.setTextSize(circular ? 7 : FOOTER_SP);
         tonePill();
@@ -449,7 +466,7 @@ public final class MainActivity extends CardActivity {
         return new BitmapDrawable(getResources(), shadow);
     }
 
-    /** How light the top right of the picture is, read again only when the picture changes. */
+    /** How light the picture is around the buttons at the bottom, read again only when it changes. */
     private void readCorner() {
         String name = Look.currentName(this);
         if (!circular || Objects.equals(name, cornerRead)) return;
@@ -459,8 +476,8 @@ public final class MainActivity extends CardActivity {
             int height = picture.getHeight();
             double sum = 0;
             int count = 0;
-            for (int x = width * 3 / 4; x < width; x += 4) {
-                for (int y = 0; y < height / 6; y += 4) {
+            for (int x = width * 3 / 8; x < width * 5 / 8; x += 4) {
+                for (int y = height * 5 / 6; y < height; y += 4) {
                     int pixel = picture.getPixel(x, y);
                     sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
                     count++;
@@ -553,8 +570,10 @@ public final class MainActivity extends CardActivity {
             else panel.first().requestFocus();
         });
         controlButton.setOnKeyListener((view, code, event) -> {
-            if (code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
-            if (event.getAction() == KeyEvent.ACTION_DOWN) panel.first().requestFocus();
+            int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
+            if (code != toPanel) return false;
+            // On the wheel Up goes back to the apps: the panel opens with the button itself.
+            if (event.getAction() == KeyEvent.ACTION_DOWN) (circular ? wheel : panel.first()).requestFocus();
             return true;
         });
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
@@ -562,13 +581,20 @@ public final class MainActivity extends CardActivity {
         pillRow.addView(controlButton, beside);
         pillRow.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillButton = settings;
+        // The wheel covers the whole screen, so the arrows would not find it from the buttons by themselves.
+        settings.setOnKeyListener((view, code, event) -> {
+            if (!circular || code != KeyEvent.KEYCODE_DPAD_UP) return false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
+            return true;
+        });
         pillBox = pillBox(pillRow);
         return pillBox;
     }
 
     /** Open while the focus is on its button or inside it. Touching clears the focus: that says nothing. */
     private void followFocus(View focus) {
-        if (focus != null) showPanel(focus == controlButton || isInside(focus, panel));
+        // On the wheel the panel covers the middle of the screen: it opens only when the button is pressed.
+        if (focus != null) showPanel(focus == controlButton && !circular || isInside(focus, panel));
     }
 
     private boolean isInside(View view, View parent) {
@@ -581,7 +607,14 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
-        panelShade.setVisibility(open ? View.VISIBLE : View.GONE);
+        panelShade.animate().cancel();
+        if (open) {
+            panelShade.setVisibility(View.VISIBLE);
+            panelShade.setAlpha(0f);
+            panelShade.animate().alpha(1f).setDuration(PILL_MS).start();
+        } else {
+            panelShade.animate().alpha(0f).setDuration(PILL_MS).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
+        }
         panel.hideHint();
         if (!open) panel.closed();
         panel.animate().cancel();
@@ -635,6 +668,11 @@ public final class MainActivity extends CardActivity {
             if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
+        view.setOnKeyListener((changed, code, event) -> {
+            if (!circular || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
+            return true;
+        });
         return view;
     }
 
