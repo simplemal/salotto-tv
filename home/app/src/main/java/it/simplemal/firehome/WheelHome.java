@@ -123,6 +123,8 @@ final class WheelHome extends FrameLayout {
     private Portal portal;
     /** An app is being moved: the one it changes place with crosses the top behind it, not over it. */
     private boolean moving;
+    /** The halo of the app's colour: off, the circles keep only their dark shadow. */
+    private boolean tinted = true;
     private boolean closing;
     private ObjectAnimator sway;
 
@@ -283,7 +285,7 @@ final class WheelHome extends FrameLayout {
             glow.setTranslationY(y - reach);
             glow.setScaleX(scale);
             glow.setScaleY(scale);
-            float glowing = glowing(index, away) * alpha * (hasFocus() ? 1f : AWAY_GLOW);
+            float glowing = tinted ? glowing(index, away) * alpha * (hasFocus() ? 1f : AWAY_GLOW) : 0f;
             glow.setAlpha(glowing);
             glow.setVisibility(glowing > 0 ? VISIBLE : INVISIBLE);
         }
@@ -338,6 +340,12 @@ final class WheelHome extends FrameLayout {
 
     private static int withAlpha(int colour, int alpha) {
         return Color.argb(alpha, Color.red(colour), Color.green(colour), Color.blue(colour));
+    }
+
+    void setTinted(boolean on) {
+        if (tinted == on) return;
+        tinted = on;
+        place();
     }
 
     /** While it is being moved the lit circle sways, like a card of the grid. */

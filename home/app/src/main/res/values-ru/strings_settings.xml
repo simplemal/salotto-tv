@@ -340,4 +340,10 @@
     <string name="settings_wheel_three">3 приложения</string>
     <string name="settings_wheel_five">5 приложений</string>
     <string name="settings_wheel_text">Сколько приложений видно на колесе: выбранное и одно-два с каждой стороны.</string>
+    <string name="settings_glow">Цветное свечение</string>
+    <string name="settings_glow_text">За выбранным приложением — ореол его цвета. Если выключить, остаётся только тёмная тень кругов.</string>
+    <string name="settings_wheel_motion">Анимация открытия и закрытия</string>
+    <string name="settings_wheel_motion_text">Приложение открывается из круга своего цвета, который расширяется, а при возврате на главный экран цвет снова сжимается в круг. Пока в тестировании.</string>
+    <string name="settings_wheel_blur">Размытый фон</string>
+    <string name="settings_wheel_blur_text">Фон за колесом размыт, чтобы приложения, время и погода выделялись. Анимированные сцены погоды показываются неподвижными.</string>
 </resources>

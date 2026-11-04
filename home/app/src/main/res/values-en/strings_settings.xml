@@ -328,4 +328,10 @@
     <string name="settings_wheel_three">3 apps</string>
     <string name="settings_wheel_five">5 apps</string>
     <string name="settings_wheel_text">How many apps you see on the wheel: the lit one and one or two on each side.</string>
+    <string name="settings_glow">Tinted glow</string>
+    <string name="settings_glow_text">Behind the lit app, a halo of its colour. Off, only the dark shadow of the circles stays.</string>
+    <string name="settings_wheel_motion">Animated opening and closing</string>
+    <string name="settings_wheel_motion_text">The app opens from a circle of its colour that widens, and back on the Home the colour closes into the circle. Still being tried out.</string>
+    <string name="settings_wheel_blur">Blurred backdrop</string>
+    <string name="settings_wheel_blur_text">The backdrop behind the wheel is blurred, so apps, time and weather stand out. Animated weather scenes look still.</string>
 </resources>

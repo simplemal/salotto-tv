@@ -665,6 +665,24 @@ public final class SettingsActivity extends CardActivity {
             entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), getDrawable(R.drawable.ic_s_grid),
                 getString(R.string.settings_wheel_text),
                 true, () -> enter(this::showWheel)));
+            boolean glow = Look.tintGlow(this);
+            entries.add(new Entry(getString(R.string.settings_glow), glow ? YES : NO, getDrawable(R.drawable.ic_s_palette),
+                getString(R.string.settings_glow_text), false, () -> {
+                    Look.setTintGlow(this, !glow);
+                    refresh();
+                }));
+            boolean motion = Look.wheelMotion(this);
+            entries.add(new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, getDrawable(R.drawable.ic_s_open),
+                getString(R.string.settings_wheel_motion_text), false, () -> {
+                    Look.setWheelMotion(this, !motion);
+                    refresh();
+                }));
+            boolean blur = Look.wheelBlur(this);
+            entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, getDrawable(R.drawable.ic_s_wallpaper),
+                getString(R.string.settings_wheel_blur_text), false, () -> {
+                    Look.setWheelBlur(this, !blur);
+                    refresh();
+                }));
         } else {
             entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), getDrawable(R.drawable.ic_s_grid),
                 getString(R.string.settings_grid_text),

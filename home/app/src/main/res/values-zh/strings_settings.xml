@@ -323,4 +323,10 @@
     <string name="settings_wheel_three">3 个应用</string>
     <string name="settings_wheel_five">5 个应用</string>
     <string name="settings_wheel_text">圆环上显示几个应用：选中的一个，每边再一到两个。</string>
+    <string name="settings_glow">彩色光晕</string>
+    <string name="settings_glow_text">选中的应用后面有一圈它自己颜色的光晕。关闭后只保留圆形的深色阴影。</string>
+    <string name="settings_wheel_motion">打开和关闭动画</string>
+    <string name="settings_wheel_motion_text">应用从一个自己颜色的圆圈扩展打开，回到主屏幕时颜色收回到圆圈里。仍在测试中。</string>
+    <string name="settings_wheel_blur">模糊背景</string>
+    <string name="settings_wheel_blur_text">转盘后面的背景会被模糊，让应用、时间和天气更醒目。动态天气场景会显示为静止。</string>
 </resources>

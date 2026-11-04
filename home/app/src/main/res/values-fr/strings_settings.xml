@@ -328,4 +328,10 @@
     <string name="settings_wheel_three">3 applis</string>
     <string name="settings_wheel_five">5 applis</string>
     <string name="settings_wheel_text">Combien d’applis sont visibles sur la roue : celle sélectionnée et une ou deux de chaque côté.</string>
+    <string name="settings_glow">Halo coloré</string>
+    <string name="settings_glow_text">Derrière l’app allumée, un halo de sa couleur. Désactivé, il ne reste que l’ombre sombre des cercles.</string>
+    <string name="settings_wheel_motion">Ouverture et fermeture animées</string>
+    <string name="settings_wheel_motion_text">L’app s’ouvre depuis un cercle de sa couleur qui s’agrandit, et au retour sur l’Accueil la couleur se referme dans le cercle. Encore à l’essai.</string>
+    <string name="settings_wheel_blur">Fond flou</string>
+    <string name="settings_wheel_blur_text">Le fond derrière la roue est flou, pour que les apps, l’heure et la météo ressortent. Les scènes météo animées restent figées.</string>
 </resources>

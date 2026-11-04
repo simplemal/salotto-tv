@@ -210,6 +210,13 @@ public final class MainActivity extends CardActivity {
     /** One press opens one app: a second one while the first is starting is ignored. */
     private boolean opening;
     private static final long CORNERS_GONE_MS = 110;
+    private ImageView blurred;
+    private static final int BLUR_WIDTH = 480;
+    private static final int BLUR_HEIGHT = 270;
+    /** As behind the task manager. */
+    private static final int BLUR_RADIUS = 6;
+    private static final long BLUR_SCENE_MS = 700;
+    private static final long BLUR_SETTLED_MS = 3300;
     private static final long WHEEL_MOVE_MS = 180;
     private long lastMove;
     private static final long CORNERS_BACK_MS = 220;
@@ -240,6 +247,11 @@ public final class MainActivity extends CardActivity {
         // Once the scene covers the screen, the plain background underneath is wasted drawing.
         weatherView.setOnShown(() -> root.setBackground(null));
         root.addView(weatherView, new FrameLayout.LayoutParams(-1, -1));
+        // The backdrop blurred, over it and under everything else: only on the wheel, when chosen.
+        blurred = new ImageView(this);
+        blurred.setScaleType(ImageView.ScaleType.FIT_XY);
+        blurred.setVisibility(View.GONE);
+        root.addView(blurred, new FrameLayout.LayoutParams(-1, -1));
         clockShade = cornerShade(0);
         pillShade = cornerShade(1);
         pillShade.setAlpha(0);
@@ -844,9 +856,40 @@ public final class MainActivity extends CardActivity {
         if (plain != null && !plain.equals(before)) {
             Look.show(this, picture -> {
                 if (plain.equals(plainBackdrop)) root.setBackground(picture);
+                blurLater(0);
             });
         }
         weatherView.show(scene);
+        // A scene loads away from the main thread and comes in with a short entry: blurred once it has settled.
+        blurLater(BLUR_SCENE_MS);
+        blurLater(BLUR_SETTLED_MS);
+    }
+
+    private void blurLater(long delay) {
+        if (blurred.getVisibility() != View.VISIBLE) return;
+        root.postDelayed(this::blurBackdrop, delay);
+    }
+
+    /**
+     * What is behind the wheel, drawn small and blurred by Blur, the same as behind the task
+     * manager: Android 11 cannot blur a view. A moving weather scene is seen still, as last drawn.
+     */
+    private void blurBackdrop() {
+        if (blurred.getVisibility() != View.VISIBLE || root.getWidth() == 0) return;
+        // At the screen's own size: a picture scene fills whatever canvas it is given, scaled or not.
+        Bitmap whole = Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(whole);
+        canvas.drawColor(Color.BLACK);
+        Drawable behind = root.getBackground();
+        if (behind != null) behind.draw(canvas);
+        weatherView.draw(canvas);
+        Bitmap small = Bitmap.createScaledBitmap(whole, BLUR_WIDTH, BLUR_HEIGHT, true);
+        whole.recycle();
+        Background.draw(() -> {
+            Bitmap soft = Blur.veiled(small, BLUR_RADIUS, Color.TRANSPARENT);
+            small.recycle();
+            runOnUiThread(() -> blurred.setImageBitmap(soft));
+        });
     }
 
     /** Runs while the Home is in front: a TV can stay on it for hours. */
@@ -931,6 +974,11 @@ public final class MainActivity extends CardActivity {
     }
 
     private void applyLook() {
+        // Read before the backdrop, which blurs itself only when the wheel is shown and the blur chosen.
+        boolean wasCircular = circular;
+        circular = Look.circular(this);
+        wheel.setTinted(Look.tintGlow(this));
+        blurred.setVisibility(circular && Look.wheelBlur(this) ? View.VISIBLE : View.GONE);
         showBackdrop();
         if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
         columns = Look.columns(this);
@@ -939,8 +987,6 @@ public final class MainActivity extends CardActivity {
         alignInk(clock);
         bigClock = Look.clock(this);
         clock.setVisibility(bigClock ? View.VISIBLE : View.GONE);
-        boolean wasCircular = circular;
-        circular = Look.circular(this);
         appsOnly = Look.appsOnly(this) && !circular;
         scroll.setVisibility(circular ? View.GONE : View.VISIBLE);
         wheel.setVisibility(circular ? View.VISIBLE : View.GONE);
@@ -1188,6 +1234,11 @@ public final class MainActivity extends CardActivity {
             Intent intent = launchIntent(tag);
             if (intent == null) {
                 say(getString(R.string.card_app_unavailable));
+                return;
+            }
+            // Off by default while it is improved: then the app opens as from the grid.
+            if (!Look.wheelMotion(this)) {
+                open(intent);
                 return;
             }
             // Fire OS's own opening runs under the colour, unseen; it also puts up the app's first screen at once.

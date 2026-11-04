@@ -329,4 +329,10 @@
     <string name="settings_wheel_three">3 apps</string>
     <string name="settings_wheel_five">5 apps</string>
     <string name="settings_wheel_text">Cuántas apps se ven en la rueda: la seleccionada y una o dos a cada lado.</string>
+    <string name="settings_glow">Brillo de color</string>
+    <string name="settings_glow_text">Detrás de la app encendida, un halo de su color. Apagado, solo queda la sombra oscura de los círculos.</string>
+    <string name="settings_wheel_motion">Apertura y cierre animados</string>
+    <string name="settings_wheel_motion_text">La app se abre desde un círculo de su color que se agranda, y al volver al Inicio el color se cierra en el círculo. Todavía en prueba.</string>
+    <string name="settings_wheel_blur">Fondo desenfocado</string>
+    <string name="settings_wheel_blur_text">El fondo detrás de la rueda se desenfoca, así las apps, la hora y el tiempo resaltan. Las escenas animadas del tiempo se ven quietas.</string>
 </resources>

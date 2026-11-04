@@ -160,6 +160,15 @@ final class Look {
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
     static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
+    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. */
+    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
+    static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
+    /** An app opening from a circle of its colour and closing back into it: off until it is better, the user's choice. */
+    static boolean wheelMotion(Context context) { return prefs(context).getBoolean("wheel_motion", false); }
+    static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
+    /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
+    static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }
+    static void setWheelBlur(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_blur", on).apply(); }
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
@@ -314,7 +323,8 @@ final class Look {
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
-            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context);
+            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
+            + "/" + tintGlow(context) + "/" + wheelBlur(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
