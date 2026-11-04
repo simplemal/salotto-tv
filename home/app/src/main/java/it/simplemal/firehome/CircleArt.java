@@ -69,6 +69,9 @@ final class CircleArt {
         // Prime Video: its banner goes from a deep blue at the bottom left to a light one at the top
         // right, read from the banner itself (2026-11-04); on the plain fill it showed a box.
         CARDS.put("com.amazon.firebat", new Card(GradientDrawable.Orientation.BL_TR, Color.rgb(0, 111, 166), Color.rgb(0, 168, 225)));
+        // NOW: its banner's teal, from near black at the bottom left (lifted a little) to the top
+        // right; the rays of light around the O go, only a glow next to it stays with the logo.
+        CARDS.put("com.nowtv.it", new Card(GradientDrawable.Orientation.BL_TR, Color.rgb(10, 51, 55), Color.rgb(4, 122, 130)));
     }
 
     private CircleArt() {}
