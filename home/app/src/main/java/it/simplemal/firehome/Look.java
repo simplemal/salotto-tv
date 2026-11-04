@@ -388,7 +388,7 @@ final class Look {
     /** Abstract 3D, or the first set still there, or the first plain colour. */
     private static String fallback(Context context) {
         String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
-        for (String name : names) if (!taken(context, name)) return name;
+        for (String name : names) if (!taken(context, name) && Packs.present(context, folderOf(name))) return name;
         return PRESET_NAMES[0];
     }
 

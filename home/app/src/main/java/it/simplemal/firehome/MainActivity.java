@@ -783,6 +783,8 @@ public final class MainActivity extends CardActivity {
         inFront = true;
         showing = true;
         opening = false;
+        // The collections chosen in the installer and not yet on the TV, quietly.
+        Packs.fetchChosen(this);
         // The colour closes once the Home is really seen: after Fire OS's own animation and the Home key's cover.
         if (wheel.portalOpen()) {
             root.removeCallbacks(closeWhenSeen);

@@ -214,7 +214,7 @@ final class Updater {
         return parse(manifest);
     }
 
-    private static byte[] fetch(String url) throws Failure {
+    static byte[] fetch(String url) throws Failure {
         try {
             HttpURLConnection connection = open(url);
             ByteArrayOutputStream body = new ByteArrayOutputStream();
@@ -231,7 +231,7 @@ final class Updater {
         }
     }
 
-    private static HttpURLConnection open(String url) throws IOException {
+    static HttpURLConnection open(String url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setConnectTimeout(TIMEOUT_MS);
         connection.setReadTimeout(TIMEOUT_MS);
@@ -239,7 +239,7 @@ final class Updater {
         return connection;
     }
 
-    private static void verify(byte[] manifest, byte[] signed) throws Failure {
+    static void verify(byte[] manifest, byte[] signed) throws Failure {
         try {
             PublicKey key = KeyFactory.getInstance("EC")
                 .generatePublic(new X509EncodedKeySpec(Base64.decode(PUBLIC_KEY, Base64.DEFAULT)));
