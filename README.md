@@ -38,6 +38,9 @@ Salotto connects only to Open-Meteo for the weather and to GitHub for updates. N
 
 ## How it looks
 
+<p align="center"><img src="distro/docs/immagini/home-circolare.webp" alt="Circular Home" width="100%"></p>
+<p align="center"><sub>Circular Home, chosen in Appearance › Layout</sub></p>
+
 <p align="center">
   <img src="distro/docs/immagini/centro-di-controllo.webp" alt="Control center" width="32%">
   <img src="distro/docs/immagini/sfondo.webp" alt="Choosing the backdrop" width="32%">
