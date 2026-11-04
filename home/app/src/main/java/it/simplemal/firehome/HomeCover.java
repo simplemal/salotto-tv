@@ -41,6 +41,8 @@ final class HomeCover {
     private static final long AMAZON_SETTLE_MS = Fire.ANDROID_9 ? 1500 : 600;
     private static final long CLOSING_SETTLE_MS = 2000;
     private static final long FADE_IN_MS = 220;
+    /** A frame or two after the fade, before the circle starts to close. */
+    private static final long FADE_SETTLE_MS = 50;
     /** The circle waits for the Home; should nothing say it has come, it closes all the same after this. */
     private static final long CLOSE_LIMIT_MS = 2500;
 
@@ -126,6 +128,8 @@ final class HomeCover {
     private final Runnable shrink = this::shrink;
     private final Runnable quiet = this::whenQuiet;
     private boolean shrunk;
+    /** When the fade in ends. */
+    private long fadedAt;
     /** While the circle is closing the remote's arrows would move the wheel under it: the Home ignores them. */
     static volatile boolean busy;
 
@@ -147,6 +151,7 @@ final class HomeCover {
         frame.setAlpha(0f);
         frame.setVisibility(View.VISIBLE);
         frame.animate().alpha(1f).setDuration(FADE_IN_MS).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+        fadedAt = SystemClock.uptimeMillis() + FADE_IN_MS;
         shrinking = true;
         main.removeCallbacks(shrink);
         shrunk = false;
@@ -165,6 +170,13 @@ final class HomeCover {
     private void shrink() {
         // Once only: a second start, from the limit and from the Home both, made it bounce.
         if (layer == null || shrunk) return;
+        // Never while it is still fading in: the two together stuttered, as the user saw.
+        long fading = fadedAt + FADE_SETTLE_MS - SystemClock.uptimeMillis();
+        if (fading > 0) {
+            main.removeCallbacks(shrink);
+            main.postDelayed(shrink, fading);
+            return;
+        }
         shrunk = true;
         main.removeCallbacks(shrink);
         main.removeCallbacks(hide);
