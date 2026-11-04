@@ -473,7 +473,8 @@ public final class UpdateActivity extends CardActivity {
         // The backdrops left the app: before the Home, only the picture it opens on comes, the user's
         // design of 2026-11-04. The collections follow from the Home, quietly.
         String pack = Look.chosenPack(this);
-        if (pack != null && !Packs.present(this, pack)) {
+        // Only one this TV wants: a collection the user deleted never comes back.
+        if (pack != null && Packs.missing(this).contains(pack) && !Packs.partial(this, pack)) {
             body.addView(text(getString(R.string.update_backdrop_first), 16, false));
             main.postDelayed(this::home, FIRST_LONGEST_MS);
             Background.run(() -> {

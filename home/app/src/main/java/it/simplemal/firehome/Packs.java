@@ -203,6 +203,7 @@ final class Packs {
      * could not come; the Home then shows something else until the collection arrives.
      */
     static boolean fetchFirst(Context context, String pack) {
+        if (!wanted(context).contains(pack)) return false;
         if (onTv(context, pack) || partial(context, pack) || inside(context, pack)) return true;
         try {
             JSONObject item = itemOf(signedList(), pack);
