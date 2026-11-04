@@ -439,6 +439,8 @@ public final class FirstRunActivity extends CardActivity {
         rows.addView(groupLabel(R.string.first_backdrop_dynamic));
         boolean statics = false;
         for (Choice choice : choices) {
+            // A collection not chosen in the installer, or deleted, is not offered; one on its way is.
+            if (choice.folder != null && !Packs.offered(this, choice.folder)) continue;
             if (choice.folder == null && !statics) {
                 statics = true;
                 rows.addView(groupLabel(R.string.first_backdrop_static));

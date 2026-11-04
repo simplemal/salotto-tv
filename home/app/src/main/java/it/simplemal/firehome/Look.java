@@ -282,8 +282,8 @@ final class Look {
         String folder = prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER);
         // Personale's photos can be gone, after a backup is restored on another Stick.
         if (folder.startsWith("/") && images(context).isEmpty()) folder = ABSTRACT_3D_FOLDER;
-        if (setTaken(context, folder)) {
-            for (String set : SETS) if (!setTaken(context, set)) return set;
+        if (setTaken(context, folder) || !folder.startsWith("/") && !Packs.present(context, folder)) {
+            for (String set : SETS) if (!setTaken(context, set) && Packs.present(context, set)) return set;
         }
         return folder;
     }
@@ -316,13 +316,17 @@ final class Look {
     static String backdrop(Context context) {
         String chosen = prefs(context).getString("backdrop", null);
         boolean place = Weather.active(context);
-        if (chosen == null) return place ? PICTURES : fallback(context);
+        if (chosen == null) return place && Packs.present(context, PICTURES_FOLDER) ? PICTURES : fallback(context);
         // Its photos can be gone, after a backup is restored on another Stick; or taken away by the user.
         if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) {
             String other = fallback(context);
             setBackdrop(context, other);
             return other;
         }
+        // A collection still on its way, after the installer or the update that took it out of the app:
+        // something else for now, without forgetting the choice.
+        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        if (folder != null && !Packs.present(context, folder)) return fallback(context);
         if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
             String other = fallback(context);
@@ -377,6 +381,9 @@ final class Look {
 
     /** The set a backdrop belongs to: a picture's folder, or the folder of a set that changes on its own. */
     private static String folderOf(String name) {
+        if (PICTURES.equals(name)) return PICTURES_FOLDER;
+        if (PHOTOS.equals(name)) return PHOTOS_FOLDER;
+        if (AERIAL.equals(name)) return AERIAL_FOLDER;
         if (ABSTRACT.equals(name)) return ABSTRACT_FOLDER;
         if (ABSTRACT_3D.equals(name)) return ABSTRACT_3D_FOLDER;
         if (NOX.equals(name)) return NOX_FOLDER;

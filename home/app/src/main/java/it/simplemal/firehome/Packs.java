@@ -83,17 +83,33 @@ final class Packs {
         return context.getAssets().list(path);
     }
 
-    /** The collections the installer was told to bring, still missing on the TV. */
-    static List<String> missing(Context context) {
-        List<String> wanted = new ArrayList<>();
+    /**
+     * The collections this TV should have: those chosen in the installer, or every one on a TV
+     * installed before the choice existed, the user's decision of 2026-11-04. Never one deleted
+     * with the trash.
+     */
+    static List<String> wanted(Context context) {
+        List<String> names = new ArrayList<>();
         File chosen = new File(root(context), CHOSEN);
-        if (!chosen.isFile()) return wanted;
-        for (String line : Updater.read(chosen).split("\\s+")) {
-            String pack = line.trim();
-            // One still inside the app would only be a second copy: it comes once the app no longer carries it.
-            if (Arrays.asList(ALL).contains(pack) && !onTv(context, pack) && !inside(context, pack)) wanted.add(pack);
+        List<String> listed = chosen.isFile() ? Arrays.asList(Updater.read(chosen).split("\\s+")) : Arrays.asList(ALL);
+        for (String pack : ALL) {
+            if (listed.contains(pack) && !Look.setTaken(context, pack)) names.add(pack);
         }
-        return wanted;
+        return names;
+    }
+
+    /** Wanted and not yet here. One still inside the app would only be a second copy. */
+    static List<String> missing(Context context) {
+        List<String> names = new ArrayList<>();
+        for (String pack : wanted(context)) {
+            if (!onTv(context, pack) && !inside(context, pack)) names.add(pack);
+        }
+        return names;
+    }
+
+    /** Offered where a backdrop is chosen before it may have arrived: on the TV, or on its way. */
+    static boolean offered(Context context, String pack) {
+        return present(context, pack) || wanted(context).contains(pack);
     }
 
     /**

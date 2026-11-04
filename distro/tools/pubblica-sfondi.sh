@@ -8,6 +8,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 ASSETS="$ROOT/home/app/src/main/assets"
+# The collections themselves are kept out of the app, here.
+PACKS_DIR="$ROOT/home/sfondi"
 KEY="$ROOT/chiavi-aggiornamento/privata.pem"
 REPO="$(sed -n 's/.*UPDATES_REPO = "\(.*\)".*/\1/p' "$ROOT/home/app/src/main/java/it/simplemal/firehome/Fire.java")"
 [ -n "$REPO" ] || { echo "Fermo: repository non trovato in Fire.java."; exit 1; }
@@ -19,15 +21,15 @@ PACKS="meteo-illustrato meteo-foto meteo-aereo astratti astratti-3d nox-city nat
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
 for pack in $PACKS; do
-  [ -d "$ASSETS/$pack" ] || { echo "Fermo: manca la cartella $pack."; exit 1; }
+  [ -d "$PACKS_DIR/$pack" ] || { echo "Fermo: manca la cartella $pack."; exit 1; }
   # Plain tar, without the Mac's own extra files: the pictures are compressed already.
-  (cd "$ASSETS" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/$pack.tar" "$pack")
+  (cd "$PACKS_DIR" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/$pack.tar" "$pack")
 done
 
-python3 - "$WORK" "$ASSETS" "$REPO" $PACKS <<'PY'
+python3 - "$WORK" "$ASSETS" "$PACKS_DIR" "$REPO" $PACKS <<'PY'
 import hashlib, json, os, sys
 from PIL import Image
-work, assets, repo, *packs = sys.argv[1:]
+work, assets, packs_dir, repo, *packs = sys.argv[1:]
 base = f"https://github.com/{repo}/releases/download/sfondi/"
 SAMPLES, WIDTH, HEIGHT, GAP = 6, 216, 122, 6
 listed = []
@@ -45,7 +47,7 @@ for pack in packs:
     strip.save(sample, quality=80)
     archive = os.path.join(work, f"{pack}.tar")
     data = open(archive, "rb").read()
-    files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(assets, pack)))
+    files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(packs_dir, pack)))
     listed.append({
         "id": pack, "bytes": len(data), "files": files,
         "sha256": hashlib.sha256(data).hexdigest(), "url": base + f"{pack}.tar",
