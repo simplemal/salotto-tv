@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">ऊपर से दिखते प्राकृतिक दृश्य, चट्टानों, पानी और पौधों के बीच, जो अपने आप बदलते हैं, बिना किसी क्रम के।</string>
     <string name="settings_backdrop_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो अपने आप बदलती हैं, किसी भी क्रम में।</string>
     <string name="settings_saver_set_text">इसकी तस्वीरें बारी-बारी से बदलती हैं, साथ में सिर्फ़ समय और तारीख़।</string>
+    <string name="settings_home">व्यवस्था</string>
+    <string name="settings_home_grid">ग्रिड</string>
+    <string name="settings_home_circle">गोल</string>
+    <string name="settings_home_grid_text">ऐप कार्ड की पंक्तियों में। पहली पंक्ति डॉक है।</string>
+    <string name="settings_home_circle_text">ऐप गोलों के एक पहिये पर: चुना हुआ ऊपर, बड़ा, अपने रंग की चमक के साथ। समय और मौसम ऊपर, दोनों कोनों में।</string>
+    <string name="settings_wheel">अर्धवृत्त</string>
+    <string name="settings_wheel_three">3 ऐप</string>
+    <string name="settings_wheel_five">5 ऐप</string>
+    <string name="settings_wheel_text">पहिये पर कितने ऐप दिखें: चुना हुआ और हर तरफ़ एक या दो।</string>
 </resources>

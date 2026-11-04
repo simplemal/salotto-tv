@@ -328,4 +328,13 @@
     <string name="settings_backdrop_nature_text">Природные пейзажи с высоты, среди скал, воды и растений, которые сами меняются в случайном порядке.</string>
     <string name="settings_backdrop_abstract3d_text">Абстрактные 3D-скульптуры на тёмном фоне, которые сами меняются в случайном порядке.</string>
     <string name="settings_saver_set_text">Изображения сменяют друг друга, на экране только время и дата.</string>
+    <string name="settings_home">Расположение</string>
+    <string name="settings_home_grid">Сетка</string>
+    <string name="settings_home_circle">Круг</string>
+    <string name="settings_home_grid_text">Приложения рядами карточек. Первый ряд — док.</string>
+    <string name="settings_home_circle_text">Приложения на колесе из кругов: выбранное наверху, крупнее, с сиянием своего цвета. Время и погода наверху, в двух углах.</string>
+    <string name="settings_wheel">Полукруг</string>
+    <string name="settings_wheel_three">3 приложения</string>
+    <string name="settings_wheel_five">5 приложений</string>
+    <string name="settings_wheel_text">Сколько приложений видно на колесе: выбранное и одно-два с каждой стороны.</string>
 </resources>

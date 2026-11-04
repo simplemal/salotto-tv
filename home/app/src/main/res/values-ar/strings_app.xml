@@ -320,4 +320,5 @@
     <string name="upload_web_sending">جارٍ الإرسال…</string>
     <string name="upload_web_sent">تم الإرسال. يمكنك إرسال صورة أخرى.</string>
     <string name="upload_web_failed">تعذّر الإرسال. حاول مجددًا.</string>
+    <string name="weather_today">اليوم</string>
 </resources>

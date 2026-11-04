@@ -300,4 +300,5 @@
     <string name="upload_web_sending">Enviando…</string>
     <string name="upload_web_sent">Enviada. Puedes enviar otra.</string>
     <string name="upload_web_failed">No se ha podido enviar. Vuelve a intentarlo.</string>
+    <string name="weather_today">Hoy</string>
 </resources>

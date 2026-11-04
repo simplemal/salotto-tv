@@ -300,4 +300,5 @@
     <string name="upload_web_sending">Envoi en cours…</string>
     <string name="upload_web_sent">Envoyée. Vous pouvez en envoyer une autre.</string>
     <string name="upload_web_failed">L’envoi a échoué. Réessayez.</string>
+    <string name="weather_today">Auj.</string>
 </resources>

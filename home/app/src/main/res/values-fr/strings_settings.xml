@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">Des paysages naturels vus du ciel, entre roches, eau et plantes, qui changent tout seuls, dans un ordre aléatoire.</string>
     <string name="settings_backdrop_abstract3d_text">Des sculptures abstraites en 3D sur fond sombre, qui changent toutes seules, dans un ordre aléatoire.</string>
     <string name="settings_saver_set_text">Ses images se succèdent, avec seulement l’heure et la date.</string>
+    <string name="settings_home">Disposition</string>
+    <string name="settings_home_grid">Grille</string>
+    <string name="settings_home_circle">Circulaire</string>
+    <string name="settings_home_grid_text">Les applis en rangées de cartes. La première rangée est le dock.</string>
+    <string name="settings_home_circle_text">Les applis sur une roue de cercles : celle sélectionnée en haut, plus grande, avec une lueur de sa couleur. L’heure et la météo en haut, dans les deux coins.</string>
+    <string name="settings_wheel">Demi-cercle</string>
+    <string name="settings_wheel_three">3 applis</string>
+    <string name="settings_wheel_five">5 applis</string>
+    <string name="settings_wheel_text">Combien d’applis sont visibles sur la roue : celle sélectionnée et une ou deux de chaque côté.</string>
 </resources>

@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">Paesaggi naturali visti dall’alto, tra rocce, acqua e piante, che cambiano da soli, in ordine casuale.</string>
     <string name="settings_backdrop_abstract3d_text">Sculture astratte in 3D su fondo scuro, che cambiano da sole, in ordine casuale.</string>
     <string name="settings_saver_set_text">Le sue immagini si alternano a tempo, con solo orario e data.</string>
+    <string name="settings_home">Disposizione</string>
+    <string name="settings_home_grid">A griglia</string>
+    <string name="settings_home_circle">Circolare</string>
+    <string name="settings_home_grid_text">Le app in file di card. La prima fila è il dock.</string>
+    <string name="settings_home_circle_text">Le app su una ruota di cerchi: quella accesa sta in alto, più grande, con un bagliore del suo colore. Ora e meteo stanno in alto, ai due angoli.</string>
+    <string name="settings_wheel">Semicerchio</string>
+    <string name="settings_wheel_three">3 app</string>
+    <string name="settings_wheel_five">5 app</string>
+    <string name="settings_wheel_text">Quante app si vedono sulla ruota: quella accesa e una o due per lato.</string>
 </resources>

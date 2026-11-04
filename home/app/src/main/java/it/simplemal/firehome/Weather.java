@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -251,6 +252,53 @@ final class Weather {
             description(context, code));
     }
 
+    /** One day of the forecast on the circular Home. */
+    static final class Day {
+        final String name;
+        final String symbol;
+        final int highest;
+        final int lowest;
+
+        Day(String name, String symbol, int highest, int lowest) {
+            this.name = name;
+            this.symbol = symbol;
+            this.highest = highest;
+            this.lowest = lowest;
+        }
+    }
+
+    /** Code, highest and lowest of each day, today first. */
+    private static String days(JSONObject daily) throws JSONException {
+        StringBuilder days = new StringBuilder();
+        JSONArray codes = daily.getJSONArray("weather_code");
+        for (int index = 0; index < codes.length(); index++) {
+            if (index > 0) days.append(';');
+            days.append(codes.getInt(index)).append(',')
+                .append(Math.round(daily.getJSONArray("temperature_2m_max").getDouble(index))).append(',')
+                .append(Math.round(daily.getJSONArray("temperature_2m_min").getDouble(index)));
+        }
+        return days.toString();
+    }
+
+    /** Today and the next days, or an empty list when there is nothing recent to show. */
+    static List<Day> days(Context context) {
+        List<Day> days = new ArrayList<>();
+        String saved = prefs(context).getString("days", null);
+        if (!recent(context) || saved == null) return days;
+        Calendar day = Calendar.getInstance();
+        SimpleDateFormat weekday = new SimpleDateFormat("EEE", Locale.getDefault());
+        for (String one : saved.split(";")) {
+            String[] parts = one.split(",");
+            if (parts.length != 3) return new ArrayList<>();
+            String name = days.isEmpty() ? context.getString(R.string.weather_today) : weekday.format(day.getTime());
+            name = name.replace(".", "");
+            name = name.substring(0, 1).toUpperCase(Locale.getDefault()) + name.substring(1);
+            days.add(new Day(name, symbol(Integer.parseInt(parts[0])), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])));
+            day.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return days;
+    }
+
     /** Blocking: call it away from the main thread. A failure keeps the last reading. */
     static void refresh(Context context) throws IOException, JSONException {
         if (!REFRESHING.compareAndSet(false, true)) return;
@@ -260,7 +308,7 @@ final class Weather {
             SharedPreferences saved = prefs(context);
             String url = "https://api.open-meteo.com/v1/forecast?latitude=" + saved.getString("latitude", "")
                 + "&longitude=" + saved.getString("longitude", "") + "&current=temperature_2m,weather_code,is_day"
-                + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=2"
+                + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=4"
                 + "&timezone=auto&timeformat=unixtime"
                 + (saved.getBoolean("fahrenheit", false) ? "&temperature_unit=fahrenheit" : "");
             JSONObject forecast = new JSONObject(get(url));
@@ -275,6 +323,7 @@ final class Weather {
                 .putInt("tomorrow_code", daily.getJSONArray("weather_code").getInt(1))
                 .putFloat("tomorrow_max", (float) daily.getJSONArray("temperature_2m_max").getDouble(1))
                 .putFloat("tomorrow_min", (float) daily.getJSONArray("temperature_2m_min").getDouble(1))
+                .putString("days", days(daily))
                 .putLong("updated", System.currentTimeMillis()).apply();
             failedAt = 0;
         } finally {

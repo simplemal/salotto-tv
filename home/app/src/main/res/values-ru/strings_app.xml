@@ -310,4 +310,5 @@
     <string name="upload_web_sending">Отправка…</string>
     <string name="upload_web_sent">Отправлено. Можно отправить ещё одно.</string>
     <string name="upload_web_failed">Не удалось отправить. Повторите попытку.</string>
+    <string name="weather_today">Сегодня</string>
 </resources>

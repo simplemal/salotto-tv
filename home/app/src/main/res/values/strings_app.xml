@@ -374,4 +374,5 @@
     <string name="upload_web_sending">Invio in corso…</string>
     <string name="upload_web_sent">Inviata. Puoi mandarne un’altra.</string>
     <string name="upload_web_failed">Non è stato possibile inviarla. Riprova.</string>
+    <string name="weather_today">Oggi</string>
 </resources>

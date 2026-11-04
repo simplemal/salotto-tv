@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">Naturlandschaften von oben, mit Felsen, Wasser und Pflanzen, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_backdrop_abstract3d_text">Abstrakte 3D-Skulpturen auf dunklem Grund, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_saver_set_text">Die Bilder wechseln sich ab, nur mit Uhrzeit und Datum.</string>
+    <string name="settings_home">Anordnung</string>
+    <string name="settings_home_grid">Raster</string>
+    <string name="settings_home_circle">Kreis</string>
+    <string name="settings_home_grid_text">Die Apps in Reihen von Karten. Die erste Reihe ist das Dock.</string>
+    <string name="settings_home_circle_text">Die Apps auf einem Rad aus Kreisen: die ausgewählte oben, größer, mit einem Leuchten in ihrer Farbe. Uhrzeit und Wetter oben, in den beiden Ecken.</string>
+    <string name="settings_wheel">Halbkreis</string>
+    <string name="settings_wheel_three">3 Apps</string>
+    <string name="settings_wheel_five">5 Apps</string>
+    <string name="settings_wheel_text">Wie viele Apps auf dem Rad zu sehen sind: die ausgewählte und eine oder zwei auf jeder Seite.</string>
 </resources>

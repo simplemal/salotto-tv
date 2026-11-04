@@ -651,20 +651,57 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showLook() {
-        show(getString(R.string.settings_look), Arrays.asList(
-            new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_wallpaper),
-                getString(R.string.settings_backdrop_text),
-                true, () -> enter(this::showBackdrops)),
-            new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), getDrawable(R.drawable.ic_s_grid),
+        boolean circular = Look.circular(this);
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_wallpaper),
+            getString(R.string.settings_backdrop_text),
+            true, () -> enter(this::showBackdrops)));
+        entries.add(new Entry(getString(R.string.settings_home),
+            getString(circular ? R.string.settings_home_circle : R.string.settings_home_grid), getDrawable(R.drawable.ic_s_grid),
+            getString(circular ? R.string.settings_home_circle_text : R.string.settings_home_grid_text),
+            true, () -> enter(this::showHomes)));
+        if (circular) {
+            // The wheel has no rows, no dock and no names under the circles.
+            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), getDrawable(R.drawable.ic_s_grid),
+                getString(R.string.settings_wheel_text),
+                true, () -> enter(this::showWheel)));
+        } else {
+            entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), getDrawable(R.drawable.ic_s_grid),
                 getString(R.string.settings_grid_text),
-                true, () -> enter(this::showColumns)),
-            new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
+                true, () -> enter(this::showColumns)));
+            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
                 getString(R.string.settings_app_names_text),
-                true, () -> enter(this::showNames)),
-            new Entry(getString(R.string.settings_dock), getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom),
-                getDrawable(R.drawable.ic_s_grid), getString(R.string.settings_dock_text), true, () -> enter(this::showDock)),
-            new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
-                getString(R.string.settings_saver_text), true, () -> enter(this::showSaver))));
+                true, () -> enter(this::showNames)));
+            entries.add(new Entry(getString(R.string.settings_dock), getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom),
+                getDrawable(R.drawable.ic_s_grid), getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
+        }
+        entries.add(new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
+            getString(R.string.settings_saver_text), true, () -> enter(this::showSaver)));
+        show(getString(R.string.settings_look), entries);
+    }
+
+    private String wheelName(int count) {
+        return getString(count == 5 ? R.string.settings_wheel_five : R.string.settings_wheel_three);
+    }
+
+    private void showHomes() {
+        String[] names = {getString(R.string.settings_home_grid), getString(R.string.settings_home_circle)};
+        show(getString(R.string.settings_home), choices(names, Look.circular(this) ? 1 : 0, R.drawable.ic_s_grid,
+            index -> getString(index == 1 ? R.string.settings_home_circle_text : R.string.settings_home_grid_text), index -> {
+                Look.setCircular(this, index == 1);
+                refresh();
+            }));
+    }
+
+    private void showWheel() {
+        int[] counts = Look.WHEEL_CHOICES;
+        String[] names = new String[counts.length];
+        for (int index = 0; index < counts.length; index++) names[index] = wheelName(counts[index]);
+        show(getString(R.string.settings_wheel), choices(names, indexOf(counts, Look.wheel(this)), R.drawable.ic_apps,
+            getString(R.string.settings_wheel_text), index -> {
+                Look.setWheel(this, counts[index]);
+                refresh();
+            }));
     }
 
     /** The rows of a list with one choice marked: each runs `choose` with its own index. */

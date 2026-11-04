@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">Natural landscapes seen from above, among rocks, water and plants, that change on their own, in random order.</string>
     <string name="settings_backdrop_abstract3d_text">Abstract 3D sculptures on a dark background, changing on their own, in random order.</string>
     <string name="settings_saver_set_text">Its pictures take turns, with only the time and date.</string>
+    <string name="settings_home">Layout</string>
+    <string name="settings_home_grid">Grid</string>
+    <string name="settings_home_circle">Circular</string>
+    <string name="settings_home_grid_text">The apps in rows of cards. The first row is the dock.</string>
+    <string name="settings_home_circle_text">The apps on a wheel of circles: the lit one sits at the top, bigger, with a glow in its colour. Time and weather sit at the top, in the two corners.</string>
+    <string name="settings_wheel">Half circle</string>
+    <string name="settings_wheel_three">3 apps</string>
+    <string name="settings_wheel_five">5 apps</string>
+    <string name="settings_wheel_text">How many apps you see on the wheel: the lit one and one or two on each side.</string>
 </resources>

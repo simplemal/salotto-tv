@@ -152,6 +152,13 @@ final class Look {
     static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
     static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
     static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
+    /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
+    static boolean circular(Context context) { return prefs(context).getBoolean("circular", false); }
+    static void setCircular(Context context, boolean value) { prefs(context).edit().putBoolean("circular", value).apply(); }
+    /** How many circles of the wheel are in view: the lit one and one or two on each side. */
+    static final int[] WHEEL_CHOICES = {3, 5};
+    static int wheel(Context context) { return prefs(context).getInt("wheel", 3); }
+    static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
@@ -306,12 +313,12 @@ final class Look {
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
-            + "/" + appsOnly(context);
+            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
     static String cardsSignature(Context context) {
-        return columns(context) + "/" + names(context);
+        return columns(context) + "/" + names(context) + "/" + circular(context) + "/" + wheel(context);
     }
 
     /** Where the images of Personale are, sent from a phone or copied before that. */

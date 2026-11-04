@@ -340,4 +340,13 @@
     <string name="settings_backdrop_nature_text">مناظر طبيعية من الأعلى بين الصخور والماء والنباتات، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_backdrop_abstract3d_text">منحوتات تجريدية ثلاثية الأبعاد على خلفية داكنة، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_saver_set_text">تتناوب صوره مع عرض الوقت والتاريخ فقط.</string>
+    <string name="settings_home">الترتيب</string>
+    <string name="settings_home_grid">شبكة</string>
+    <string name="settings_home_circle">دائري</string>
+    <string name="settings_home_grid_text">التطبيقات في صفوف من البطاقات. الصف الأول هو الدوك.</string>
+    <string name="settings_home_circle_text">التطبيقات على عجلة من الدوائر: المحدد في الأعلى، أكبر، مع توهج بلونه. الوقت والطقس في الأعلى، في الزاويتين.</string>
+    <string name="settings_wheel">نصف دائرة</string>
+    <string name="settings_wheel_three">3 تطبيقات</string>
+    <string name="settings_wheel_five">5 تطبيقات</string>
+    <string name="settings_wheel_text">كم تطبيقًا يظهر على العجلة: المحدد وواحد أو اثنان على كل جانب.</string>
 </resources>

@@ -316,4 +316,13 @@
     <string name="settings_backdrop_nature_text">Paisagens naturais vistas de cima, entre rochas, água e plantas, que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_backdrop_abstract3d_text">Esculturas abstratas em 3D sobre fundo escuro, que mudam sozinhas, em ordem aleatória.</string>
     <string name="settings_saver_set_text">As imagens se alternam, só com a hora e a data.</string>
+    <string name="settings_home">Disposição</string>
+    <string name="settings_home_grid">Grade</string>
+    <string name="settings_home_circle">Circular</string>
+    <string name="settings_home_grid_text">Os apps em linhas de cartões. A primeira linha é o dock.</string>
+    <string name="settings_home_circle_text">Os apps numa roda de círculos: o selecionado fica em cima, maior, com um brilho da sua cor. Hora e tempo ficam em cima, nos dois cantos.</string>
+    <string name="settings_wheel">Semicírculo</string>
+    <string name="settings_wheel_three">3 apps</string>
+    <string name="settings_wheel_five">5 apps</string>
+    <string name="settings_wheel_text">Quantos apps aparecem na roda: o selecionado e um ou dois de cada lado.</string>
 </resources>

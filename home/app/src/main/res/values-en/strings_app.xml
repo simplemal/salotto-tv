@@ -300,4 +300,5 @@
     <string name="upload_web_sending">Sending…</string>
     <string name="upload_web_sent">Sent. You can send another one.</string>
     <string name="upload_web_failed">It could not be sent. Try again.</string>
+    <string name="weather_today">Today</string>
 </resources>

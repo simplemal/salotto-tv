@@ -5,9 +5,15 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -19,6 +25,7 @@ import android.text.Editable;
 import android.text.format.DateFormat;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.LruCache;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -106,7 +113,8 @@ public final class MainActivity extends CardActivity {
     private ControlPanel panel;
     private WeatherView weatherView;
     private final Runnable freshPicture = () -> {
-        if (showing) HomeCover.take(getWindow());
+        // The ring of an app on its way is not the Home to show again.
+        if (showing && !this.wheel.portalOpen()) HomeCover.take(getWindow());
     };
     private final Runnable saver = () -> startActivity(new Intent(this, SaverActivity.class));
     private View panelShade;
@@ -176,6 +184,32 @@ public final class MainActivity extends CardActivity {
     private int columns;
     private int shelf;
     private int rowHeight;
+    /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
+    private boolean circular;
+    private WheelHome wheel;
+    private LinearLayout weatherCorner;
+    private TextView cornerLine;
+    private LinearLayout cornerDays;
+    private View weatherShade;
+    private ImageView allAppsCircle;
+    private FrameLayout.LayoutParams heroPlace;
+    private Drawable pillGlass;
+    private Drawable pillEdge;
+    /** The circular Home's free icons are dark over a light corner of the picture. */
+    private boolean lightCorner;
+    private String cornerRead;
+    private final Map<ImageView, Drawable> pillRings = new HashMap<>();
+    private static final int FREE_ICON = 24;
+    private static final int ALL_APPS_CIRCLE = 60;
+    private static final float LIGHT_CORNER = 0.72f;
+    private static final int WEATHER_DAY_WIDTH = 50;
+    private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
+    private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
+        @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
+    };
+    private static final Map<String, Integer> CIRCLE_GLOW = new HashMap<>();
+    private static final int GLOW_SAMPLE = 24;
+    private static final int GLOW_HUES = 12;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -196,6 +230,8 @@ public final class MainActivity extends CardActivity {
         clockShade = cornerShade(0);
         pillShade = cornerShade(1);
         pillShade.setAlpha(0);
+        weatherShade = cornerShade(1);
+        weatherShade.setVisibility(View.GONE);
 
         hero = new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
@@ -229,7 +265,7 @@ public final class MainActivity extends CardActivity {
                 revealClock();
             }
         });
-        FrameLayout.LayoutParams heroPlace = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.START);
+        heroPlace = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.START);
         heroPlace.leftMargin = dp(DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(40);
         root.addView(hero, heroPlace);
@@ -253,10 +289,23 @@ public final class MainActivity extends CardActivity {
         page = page();
         scroll.addView(page);
         root.addView(scroll);
+        wheel = new WheelHome(this);
+        wheel.setVisibility(View.GONE);
+        wheel.setListener(new WheelHome.Listener() {
+            @Override public void open(String tag) { openFromWheel(tag); }
+            @Override public void hold(String tag) { showMenu(tag); }
+            @Override public void up() { controlButton.requestFocus(); }
+            @Override public void down() { allAppsCircle.requestFocus(); }
+        });
+        root.addView(wheel, new FrameLayout.LayoutParams(-1, -1));
+        root.addView(allAppsCircle(), allAppsPlace());
+        root.addView(weatherCorner(), weatherCornerPlace());
         // While the backdrop fades the cards cost one picture, instead of all their shadows and glass.
         weatherView.setOnFade(fading -> scroll.setLayerType(fading ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null));
 
         root.addView(pill(), pillPlace());
+        pillGlass = pillBox.getBackground();
+        pillEdge = pillBox.getForeground();
         footer = footer();
         panelShade = new View(this);
         panelShade.setVisibility(View.GONE);
@@ -287,6 +336,185 @@ public final class MainActivity extends CardActivity {
         forecast.setShadowLayer(dp(5), 0, dp(1), Color.argb(190, 0, 0, 0));
         weatherRow.addView(forecast);
         return weatherRow;
+    }
+
+    /** Tutte le app on the circular Home: a glass circle under the wheel, in the middle. */
+    private View allAppsCircle() {
+        allAppsCircle = new ImageView(this);
+        allAppsCircle.setImageResource(R.drawable.ic_apps);
+        int inset = dp(17);
+        allAppsCircle.setPadding(inset, inset, inset, inset);
+        allAppsCircle.setFocusable(true);
+        allAppsCircle.setClickable(true);
+        allAppsCircle.setDefaultFocusHighlightEnabled(false);
+        allAppsCircle.setContentDescription(getString(R.string.main_all_apps));
+        allAppsCircle.setVisibility(View.GONE);
+        int radius = dp(ALL_APPS_CIRCLE) / 2;
+        Drawable rest = new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)});
+        Drawable lit = selectedFill(radius);
+        allAppsCircle.setBackground(rest);
+        allAppsCircle.setColorFilter(Color.WHITE);
+        allAppsCircle.setOnFocusChangeListener((view, focused) -> {
+            allAppsCircle.setBackground(focused ? lit : rest);
+            allAppsCircle.setColorFilter(focused ? Fire.INK : Color.WHITE);
+            float scale = focused ? 1.12f : 1f;
+            allAppsCircle.animate().scaleX(scale).scaleY(scale).setDuration(PILL_MS).start();
+        });
+        allAppsCircle.setOnClickListener(view -> open(new Intent(this, AppsActivity.class)));
+        allAppsCircle.setOnKeyListener((view, code, event) -> {
+            if (code != KeyEvent.KEYCODE_DPAD_UP) return false;
+            if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
+            return true;
+        });
+        return allAppsCircle;
+    }
+
+    private FrameLayout.LayoutParams allAppsPlace() {
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(dp(ALL_APPS_CIRCLE), dp(ALL_APPS_CIRCLE),
+            Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        place.bottomMargin = dp(18);
+        return place;
+    }
+
+    /** On the wheel the pill has no glass: two small free icons in the corner, the clock and weather higher and wider. */
+    private void placeCorners() {
+        heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
+        heroPlace.topMargin = dp(circular ? 14 : 40);
+        hero.setLayoutParams(heroPlace);
+        FrameLayout.LayoutParams pillSpot = (FrameLayout.LayoutParams) pillBox.getLayoutParams();
+        pillSpot.topMargin = dp(circular ? 12 : 22);
+        pillSpot.rightMargin = dp(circular ? 20 : DOCK_MARGIN);
+        pillBox.setLayoutParams(pillSpot);
+        pillBox.setBackground(circular ? null : pillGlass);
+        pillBox.setForeground(circular ? null : pillEdge);
+        int icon = dp(circular ? FREE_ICON : PILL_ICON);
+        for (ImageView button : new ImageView[]{controlButton, pillButton}) {
+            LinearLayout.LayoutParams size = (LinearLayout.LayoutParams) button.getLayoutParams();
+            size.width = icon;
+            size.height = icon;
+            button.setLayoutParams(size);
+            int inset = dp(circular ? 2 : 3);
+            button.setPadding(inset, inset, inset, inset);
+        }
+        ((LinearLayout.LayoutParams) controlButton.getLayoutParams()).setMarginEnd(dp(circular ? 8 : PILL_ICON_GAP));
+        FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
+        weatherSpot.rightMargin = dp(32);
+        weatherSpot.topMargin = dp(48);
+        weatherCorner.setLayoutParams(weatherSpot);
+        footer.setTextSize(circular ? 7 : FOOTER_SP);
+        tonePill();
+    }
+
+    /** White with a small shadow over a medium or dark picture, black over a very light one. */
+    private void tonePill() {
+        int ink = circular && lightCorner ? Color.BLACK : Color.WHITE;
+        for (TextView text : new TextView[]{pillTime, pillDate, pillWeather}) {
+            text.setTextColor(ink);
+            if (circular && !lightCorner) text.setShadowLayer(dp(3), 0, dp(1), Color.argb(170, 0, 0, 0));
+            else text.setShadowLayer(0, 0, 0, 0);
+        }
+        lightPillIcon(controlButton, controlButton.hasFocus());
+        lightPillIcon(pillButton, pillButton.hasFocus());
+    }
+
+    @Override protected void lightPillIcon(ImageView button, boolean lit) {
+        if (!pillRings.containsKey(button)) pillRings.put(button, button.getBackground());
+        if (!circular || lit) {
+            button.setBackground(pillRings.get(button));
+            super.lightPillIcon(button, lit);
+            return;
+        }
+        button.setBackground(lightCorner ? null : iconShadow(button));
+        button.setColorFilter(lightCorner ? Color.BLACK : Color.WHITE);
+    }
+
+    /** A soft dark copy of the icon, a little lower, drawn under it. */
+    private Drawable iconShadow(ImageView button) {
+        int size = dp(FREE_ICON);
+        Bitmap shape = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Drawable icon = button.getDrawable().getConstantState().newDrawable().mutate();
+        int inset = dp(2);
+        icon.setBounds(inset, inset, size - inset, size - inset);
+        icon.draw(new Canvas(shape));
+        Paint blur = new Paint();
+        blur.setMaskFilter(new BlurMaskFilter(dp(2), BlurMaskFilter.Blur.NORMAL));
+        int[] offset = new int[2];
+        Bitmap alpha = shape.extractAlpha(blur, offset);
+        Bitmap shadow = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Paint dark = new Paint();
+        dark.setColor(Color.argb(150, 0, 0, 0));
+        new Canvas(shadow).drawBitmap(alpha, offset[0], offset[1] + dp(1), dark);
+        shape.recycle();
+        alpha.recycle();
+        return new BitmapDrawable(getResources(), shadow);
+    }
+
+    /** How light the top right of the picture is, read again only when the picture changes. */
+    private void readCorner() {
+        String name = Look.currentName(this);
+        if (!circular || Objects.equals(name, cornerRead)) return;
+        cornerRead = name;
+        Look.current(this, picture -> {
+            int width = picture.getWidth();
+            int height = picture.getHeight();
+            double sum = 0;
+            int count = 0;
+            for (int x = width * 3 / 4; x < width; x += 4) {
+                for (int y = 0; y < height / 6; y += 4) {
+                    int pixel = picture.getPixel(x, y);
+                    sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
+                    count++;
+                }
+            }
+            boolean light = count > 0 && sum / count > LIGHT_CORNER;
+            if (light == lightCorner) return;
+            lightCorner = light;
+            tonePill();
+        });
+    }
+
+    /** The circular Home's weather: the line of now, then today and the next days in columns. */
+    private View weatherCorner() {
+        weatherCorner = new LinearLayout(this);
+        weatherCorner.setOrientation(LinearLayout.VERTICAL);
+        weatherCorner.setGravity(Gravity.END);
+        weatherCorner.setVisibility(View.GONE);
+        cornerLine = label("", 16);
+        cornerLine.setShadowLayer(dp(5), 0, dp(1), Color.argb(190, 0, 0, 0));
+        weatherCorner.addView(cornerLine);
+        cornerDays = new LinearLayout(this);
+        LinearLayout.LayoutParams below = new LinearLayout.LayoutParams(-2, -2);
+        below.topMargin = dp(8);
+        weatherCorner.addView(cornerDays, below);
+        return weatherCorner;
+    }
+
+    private FrameLayout.LayoutParams weatherCornerPlace() {
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END);
+        place.topMargin = dp(78);
+        place.rightMargin = dp(DOCK_MARGIN + DOCK_SIDE);
+        return place;
+    }
+
+    private void showWeatherCorner() {
+        String line = Weather.line(this);
+        cornerLine.setVisibility(line != null ? View.VISIBLE : View.GONE);
+        if (line != null && !line.contentEquals(cornerLine.getText())) cornerLine.setText(line);
+        cornerDays.removeAllViews();
+        for (Weather.Day day : Weather.days(this)) {
+            LinearLayout column = new LinearLayout(this);
+            column.setOrientation(LinearLayout.VERTICAL);
+            column.setGravity(Gravity.CENTER_HORIZONTAL);
+            for (TextView part : new TextView[]{label(day.name, 13), label(day.symbol, 20),
+                    label(day.highest + "°", 15), label(day.lowest + "°", 13)}) {
+                part.setGravity(Gravity.CENTER);
+                part.setShadowLayer(dp(4), 0, dp(1), Color.argb(190, 0, 0, 0));
+                column.addView(part);
+            }
+            ((TextView) column.getChildAt(2)).setTypeface(Typeface.DEFAULT_BOLD);
+            column.getChildAt(3).setAlpha(0.75f);
+            cornerDays.addView(column, new LinearLayout.LayoutParams(dp(WEATHER_DAY_WIDTH), -2));
+        }
     }
 
     /** Glass pill: weather, date and time when the clock is out of view, then the settings. */
@@ -404,7 +632,7 @@ public final class MainActivity extends CardActivity {
         view.setOnFocusChangeListener((changed, focused) -> {
             view.setBackground(focused ? new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}) : null);
             view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
-            if (focused) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
+            if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
         return view;
@@ -477,6 +705,7 @@ public final class MainActivity extends CardActivity {
         super.onResume();
         inFront = true;
         showing = true;
+        wheel.closePortal();
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -536,6 +765,7 @@ public final class MainActivity extends CardActivity {
 
     /** Runs every minute: the same backdrop is not fetched and drawn again. */
     private void showBackdrop() {
+        if (circular) readCorner();
         String scene = Look.weatherPictures(this) ? Weather.picture(this)
             : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
         String plain = scene == null ? Look.backdrop(this) : null;
@@ -580,6 +810,7 @@ public final class MainActivity extends CardActivity {
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(tomorrow);
         weatherSymbol = Weather.symbol(this);
+        if (circular) showWeatherCorner();
         showPillClock();
     }
 
@@ -587,7 +818,7 @@ public final class MainActivity extends CardActivity {
         super.onPause();
         showing = false;
         root.removeCallbacks(offerStart);
-        HomeCover.take(getWindow());
+        if (!wheel.portalOpen()) HomeCover.take(getWindow());
         inFront = false;
         Look.leaveHome(this);
         root.removeCallbacks(saver);
@@ -638,7 +869,27 @@ public final class MainActivity extends CardActivity {
         alignInk(clock);
         bigClock = Look.clock(this);
         clock.setVisibility(bigClock ? View.VISIBLE : View.GONE);
-        appsOnly = Look.appsOnly(this);
+        boolean wasCircular = circular;
+        circular = Look.circular(this);
+        appsOnly = Look.appsOnly(this) && !circular;
+        scroll.setVisibility(circular ? View.GONE : View.VISIBLE);
+        wheel.setVisibility(circular ? View.VISIBLE : View.GONE);
+        weatherRow.setVisibility(circular ? View.GONE : View.VISIBLE);
+        weatherCorner.setVisibility(circular ? View.VISIBLE : View.GONE);
+        weatherShade.setVisibility(circular ? View.VISIBLE : View.GONE);
+        if (circular) {
+            scroll.scrollTo(0, 0);
+            hero.setAlpha(1);
+            clockShade.setAlpha(1);
+            showWeatherCorner();
+        }
+        allAppsCircle.setVisibility(circular ? View.VISIBLE : View.GONE);
+        if (circular != wasCircular) {
+            placeFooter();
+            placeCorners();
+            cornerRead = null;
+        }
+        readCorner();
         if (appsOnly) restRaised();
         else if (dock != null && isInside(getCurrentFocus(), dock)) scroll.scrollTo(0, 0);
         date.setVisibility(bigClock && Look.date(this) ? View.VISIBLE : View.GONE);
@@ -662,6 +913,10 @@ public final class MainActivity extends CardActivity {
 
     private void render(String focus, List<String> apps) {
         stopJiggle();
+        if (circular) {
+            renderWheel(focus, apps);
+            return;
+        }
         page.removeAllViews();
         startCards();
         shownApps = apps;
@@ -711,9 +966,207 @@ public final class MainActivity extends CardActivity {
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
         foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
+        if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
         if (moving != null && target != null) startJiggle(target);
+    }
+
+    /** The grid keeps the credits after its last row; the wheel has them small, at the top edge, in the middle. */
+    private void placeFooter() {
+        if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
+        if (!circular) return;
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        place.topMargin = dp(4);
+        root.addView(footer, root.indexOfChild(pillBox), place);
+    }
+
+    /** The same apps as the grid, in the same order: Tutte le app has its own circle underneath. */
+    private void renderWheel(String focus, List<String> apps) {
+        page.removeAllViews();
+        shownApps = apps;
+        shown = state(apps);
+        placeFooter();
+        int size = dp(Look.wheel(this) == 5 ? 200 : 230);
+        List<ImageView> circles = new ArrayList<>();
+        List<String> tags = new ArrayList<>(apps);
+        for (String tag : tags) {
+            ImageView circle = new ImageView(this);
+            circle.setTag(tag);
+            circle.setContentDescription(circleName(tag));
+            String key = circleKey(tag, size);
+            Bitmap known = CIRCLE_ART.get(key);
+            if (known != null) {
+                circle.setImageBitmap(known);
+            } else {
+                circle.setBackgroundColor(Color.rgb(60, 64, 72));
+                Background.draw(() -> {
+                    Bitmap made = circleArt(tag, size);
+                    int glow = glowOf(made);
+                    CIRCLE_ART.put(key, made);
+                    synchronized (CIRCLE_GLOW) { CIRCLE_GLOW.put(key, glow); }
+                    runOnUiThread(() -> {
+                        circle.setBackground(null);
+                        circle.setImageBitmap(made);
+                        wheel.setGlow(tag, glow);
+                    });
+                });
+            }
+            circles.add(circle);
+        }
+        String litTag = focus != null && tags.contains(focus) ? focus : wheel.litTag() != null && tags.contains(wheel.litTag())
+            ? wheel.litTag() : tags.get(0);
+        wheel.setCircles(circles, Look.wheel(this), litTag);
+        for (String tag : tags) {
+            Integer glow;
+            synchronized (CIRCLE_GLOW) { glow = CIRCLE_GLOW.get(circleKey(tag, size)); }
+            if (glow != null) wheel.setGlow(tag, glow);
+        }
+        wheel.setMoving(moving != null);
+        if (!isInside(getCurrentFocus(), panel) && getCurrentFocus() != controlButton && getCurrentFocus() != pillButton
+                && getCurrentFocus() != footer && getCurrentFocus() != allAppsCircle) {
+            wheel.requestFocus();
+        }
+    }
+
+    private String circleName(String tag) {
+        if (ALL_APPS.equals(tag)) return getString(R.string.main_all_apps);
+        if (HomeApps.SETTINGS.equals(tag)) return getString(R.string.first_does_settings);
+        return HomeApps.label(this, tag);
+    }
+
+    /** An update can change the artwork, so its date is part of the name. */
+    private String circleKey(String tag, int size) {
+        try {
+            return tag + "/" + getPackageManager().getPackageInfo(tag, 0).lastUpdateTime + "/" + size;
+        } catch (PackageManager.NameNotFoundException e) {
+            return tag + "/" + size;
+        }
+    }
+
+    /**
+     * The app's artwork in a square for the circle: a banner a little wider than the circle on its
+     * own edge colour, so the logo stays whole; an icon in the middle of its background.
+     */
+    private Bitmap circleArt(String tag, int size) {
+        Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        if (ALL_APPS.equals(tag) || HomeApps.SETTINGS.equals(tag)) {
+            boolean all = ALL_APPS.equals(tag);
+            GradientDrawable fill = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, all
+                ? new int[]{Color.rgb(96, 100, 112), Color.rgb(58, 62, 72)} : new int[]{Color.rgb(142, 146, 154), Color.rgb(84, 88, 96)});
+            fill.setBounds(0, 0, size, size);
+            fill.draw(canvas);
+            Drawable icon = getDrawable(all ? R.drawable.ic_apps : R.drawable.ic_settings).mutate();
+            icon.setTint(Color.WHITE);
+            int inset = size * 3 / 10;
+            icon.setBounds(inset, inset, size - inset, size - inset);
+            icon.draw(canvas);
+            return made;
+        }
+        Art art = art(tag);
+        if (art.image == null) {
+            canvas.drawColor(Color.rgb(60, 64, 72));
+            return made;
+        }
+        if (art.look == BANNER) {
+            canvas.drawColor(edgeColour(art.image));
+            if (art.back != null) {
+                art.back.setBounds(0, 0, size, size);
+                art.back.draw(canvas);
+            }
+            int width = size * 5 / 4;
+            int height = width * 9 / 16;
+            art.image.setBounds((size - width) / 2, (size - height) / 2, (size + width) / 2, (size + height) / 2);
+            art.image.draw(canvas);
+        } else {
+            if (art.back != null) {
+                art.back.setBounds(0, 0, size, size);
+                art.back.draw(canvas);
+            } else {
+                canvas.drawColor(Color.rgb(60, 64, 72));
+            }
+            int inset = size / (art.back != null ? 10 : 4);
+            art.image.setBounds(inset, inset, size - inset, size - inset);
+            art.image.draw(canvas);
+        }
+        return made;
+    }
+
+    /** The colour along a banner's edges, which fills the circle above and below it. */
+    private static int edgeColour(Drawable banner) {
+        int width = 32;
+        int height = 18;
+        Bitmap small = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        banner.setBounds(0, 0, width, height);
+        banner.draw(new Canvas(small));
+        long red = 0;
+        long green = 0;
+        long blue = 0;
+        int count = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y : new int[]{0, 1, height - 2, height - 1}) {
+                int pixel = small.getPixel(x, y);
+                red += Color.red(pixel);
+                green += Color.green(pixel);
+                blue += Color.blue(pixel);
+                count++;
+            }
+        }
+        small.recycle();
+        return Color.rgb((int) (red / count), (int) (green / count), (int) (blue / count));
+    }
+
+    /**
+     * The app's own colour: the hue that covers most of the circle among the vivid ones, so the
+     * red of Netflix's N wins over its black. A grey or white app glows a soft white.
+     */
+    private static int glowOf(Bitmap art) {
+        Bitmap small = Bitmap.createScaledBitmap(art, GLOW_SAMPLE, GLOW_SAMPLE, true);
+        float[] weight = new float[GLOW_HUES];
+        float[][] sum = new float[GLOW_HUES][3];
+        float[] hsv = new float[3];
+        int inside = 0;
+        float centre = (GLOW_SAMPLE - 1) / 2f;
+        for (int x = 0; x < GLOW_SAMPLE; x++) {
+            for (int y = 0; y < GLOW_SAMPLE; y++) {
+                if (Math.hypot(x - centre, y - centre) > GLOW_SAMPLE / 2f) continue;
+                inside++;
+                int pixel = small.getPixel(x, y);
+                Color.colorToHSV(pixel, hsv);
+                if (hsv[1] < 0.35f || hsv[2] < 0.3f) continue;
+                int hue = Math.min(GLOW_HUES - 1, (int) (hsv[0] / 360f * GLOW_HUES));
+                float strength = hsv[1] * hsv[2];
+                weight[hue] += strength;
+                sum[hue][0] += Color.red(pixel) * strength;
+                sum[hue][1] += Color.green(pixel) * strength;
+                sum[hue][2] += Color.blue(pixel) * strength;
+            }
+        }
+        if (small != art) small.recycle();
+        int best = 0;
+        for (int hue = 1; hue < GLOW_HUES; hue++) if (weight[hue] > weight[best]) best = hue;
+        if (weight[best] < inside * 0.02f) return WheelHome.REST_GLOW;
+        int colour = Color.rgb(Math.round(sum[best][0] / weight[best]), Math.round(sum[best][1] / weight[best]),
+            Math.round(sum[best][2] / weight[best]));
+        Color.colorToHSV(colour, hsv);
+        hsv[1] = Math.min(hsv[1], 0.85f);
+        hsv[2] = Math.max(hsv[2], 0.9f);
+        return Color.HSVToColor(hsv);
+    }
+
+    private void openFromWheel(String tag) {
+        if (ALL_APPS.equals(tag)) {
+            open(new Intent(this, AppsActivity.class));
+        } else if (HomeApps.SETTINGS.equals(tag)) {
+            open(new Intent(this, SettingsActivity.class));
+        } else {
+            wheel.openPortal(() -> {
+                openPackage(tag);
+                // An app that cannot start leaves the Home in front: the ring goes.
+                root.postDelayed(() -> { if (inFront) wheel.closePortal(); }, 1500);
+            });
+        }
     }
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
@@ -832,6 +1285,10 @@ public final class MainActivity extends CardActivity {
         home = order;
         HomeApps.save(this, home);
         stopJiggle();
+        if (circular) {
+            renderWheel(moving, shownApps);
+            return;
+        }
         View tile = page.findViewWithTag(moving);
         swap(tile, page.findViewWithTag(other));
         tile.requestFocus();
@@ -913,6 +1370,9 @@ public final class MainActivity extends CardActivity {
         }
         if (moving == null) return super.dispatchKeyEvent(event);
         boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        if (circular && (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN)) {
+            return true;
+        }
         switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_DPAD_LEFT: if (down) move(-1); return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT: if (down) move(1); return true;
@@ -929,10 +1389,20 @@ public final class MainActivity extends CardActivity {
     /** Back leaves a move or returns to the first row; the Home itself has nothing behind it. */
     @Override public void onBackPressed() {
         if (moving != null) stopMoving();
-        else if (firstCard() != null) firstCard().requestFocus();
+        else if (circular) {
+            wheel.requestFocus();
+            wheel.turnToFirst();
+        } else if (firstCard() != null) firstCard().requestFocus();
+    }
+
+    /** The wheel is one view: what has the focus is the app at its top. */
+    @Override protected String focusedTag() {
+        if (circular && wheel.hasFocus()) return wheel.litTag();
+        return super.focusedTag();
     }
 
     private View firstCard() {
+        if (circular) return wheel;
         return page.getChildCount() > 0 ? ((LinearLayout) page.getChildAt(0)).getChildAt(0) : null;
     }
 }

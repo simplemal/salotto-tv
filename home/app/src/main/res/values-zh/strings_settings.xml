@@ -311,4 +311,13 @@
     <string name="settings_backdrop_nature_text">从空中俯瞰的自然风光，岩石、流水与植物交织，自动更换，顺序随机。</string>
     <string name="settings_backdrop_abstract3d_text">深色背景上的抽象 3D 雕塑，自动更换，顺序随机。</string>
     <string name="settings_saver_set_text">图片轮流显示，只显示时间和日期。</string>
+    <string name="settings_home">布局</string>
+    <string name="settings_home_grid">网格</string>
+    <string name="settings_home_circle">圆形</string>
+    <string name="settings_home_grid_text">应用排成一行行卡片。第一行是程序坞。</string>
+    <string name="settings_home_circle_text">应用排在一圈圆形上：选中的在顶部，更大，带有它自己颜色的光晕。时间和天气在顶部的两个角。</string>
+    <string name="settings_wheel">半圆</string>
+    <string name="settings_wheel_three">3 个应用</string>
+    <string name="settings_wheel_five">5 个应用</string>
+    <string name="settings_wheel_text">圆环上显示几个应用：选中的一个，每边再一到两个。</string>
 </resources>
