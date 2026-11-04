@@ -90,6 +90,8 @@
     <string name="about_others_text">AirPlay Server empfängt von iPhone, iPad und Mac. Aurora Store installiert Android-Apps, auch ohne Konto.</string>
     <string name="about_only">Nur in Salotto.</string>
     <string name="about_only_text">Illustrierte oder fotografische Hintergründe, die Wetter und Uhrzeit deiner Stadt folgen. Kontrollzentrum in jeder App durch langes Drücken von Menü: Wi-Fi, Bluetooth, Timer, Helligkeit und Blaulichtfilter. Task-Manager durch langes Drücken von Zurück. Eine Seite mit den Audio- und Videostandards von Stick und Fernseher. Klarere Dialoge und Einheitliche Lautstärke griffbereit: Das sind Filter von Fire OS, an einem Ort gesammelt. Signierte Updates, die vor der Installation geprüft werden.</string>
+    <string name="about_thanks">Danke</string>
+    <string name="about_thanks_text">An meinen Freund Lorenzo Salomone, für die Idee des runden Home.</string>
     <string name="about_license">Lizenz</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto darf kostenlos für nicht kommerzielle Zwecke genutzt, studiert, verändert und weiterentwickelt werden. Zum Verkaufen braucht es die Erlaubnis des Autors.</string>
     <string name="about_marks">Marken</string>

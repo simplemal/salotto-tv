@@ -81,6 +81,9 @@ public final class AboutActivity extends CardActivity {
         lead(getString(R.string.about_others), getString(R.string.about_others_text));
         lead(getString(R.string.about_only), getString(R.string.about_only_text));
 
+        section(getString(R.string.about_thanks));
+        paragraph(getString(R.string.about_thanks_text));
+
         section(getString(R.string.about_license));
         paragraph(getString(R.string.about_license_text));
 

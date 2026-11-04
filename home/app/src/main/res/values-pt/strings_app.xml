@@ -90,6 +90,8 @@
     <string name="about_others_text">O AirPlay Server recebe de iPhone, iPad e Mac. O Aurora Store instala apps Android, mesmo sem conta.</string>
     <string name="about_only">Só no Salotto.</string>
     <string name="about_only_text">Fundos ilustrados ou fotográficos que seguem o clima e a hora da sua cidade. Central de controle em qualquer app, mantendo Menu pressionado: Wi-Fi, Bluetooth, timer, brilho e filtro de luz azul. Gerenciador de tarefas mantendo Voltar pressionado. Uma página com os padrões de áudio e vídeo do Stick e da TV. Diálogos mais claros e volume uniforme à mão: são filtros do Fire OS, reunidos num lugar só. Atualizações assinadas e verificadas antes de instalar.</string>
+    <string name="about_thanks">Agradecimentos</string>
+    <string name="about_thanks_text">Ao meu amigo Lorenzo Salomone, pela ideia do Início circular.</string>
     <string name="about_license">Licença</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. O Salotto pode ser usado, estudado, modificado e derivado de graça para fins não comerciais. Para vendê-lo, é preciso a permissão do autor.</string>
     <string name="about_marks">Marcas</string>
