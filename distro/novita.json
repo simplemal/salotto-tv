@@ -1,41 +1,77 @@
 {
-  "versionName": "1.0.19",
+  "versionName": "1.0.20",
   "changes": {
     "en": [
-      "With the Dock at the top, the control center opens without moving the Home",
-      "Update notes appear in the language chosen in Salotto"
+      "New circular Home: choose it in Appearance › Layout",
+      "Backdrop collections download separately: the app is much lighter",
+      "You can delete single photos or whole collections",
+      "Clock and date: font, size and format for the date too, font and size for the weather",
+      "Settings reopen where you left them",
+      "Beta versions: turn them on in Settings › Update"
     ],
     "es": [
-      "Con el Dock arriba, el centro de control se abre sin mover la Home",
-      "Las novedades de las actualizaciones aparecen en el idioma elegido en Salotto"
+      "Nueva Home circular: elígela en Aspecto › Disposición",
+      "Las colecciones de fondos se descargan aparte: la app pesa mucho menos",
+      "Puedes borrar fotos sueltas o colecciones enteras",
+      "Hora y fecha: tipo de letra, tamaño y formato también para la fecha, tipo de letra y tamaño para el tiempo",
+      "Los Ajustes se vuelven a abrir donde los dejaste",
+      "Versiones beta: actívalas en Ajustes › Actualización"
     ],
     "fr": [
-      "Avec le Dock en haut, le centre de contrôle s’ouvre sans déplacer la Home",
-      "Les nouveautés des mises à jour s’affichent dans la langue choisie dans Salotto"
+      "Nouvelle Home circulaire : choisis-la dans Apparence › Disposition",
+      "Les collections de fonds se téléchargent à part : l’app est bien plus légère",
+      "Tu peux supprimer des photos une à une ou des collections entières",
+      "Heure et date : police, taille et format aussi pour la date, police et taille pour la météo",
+      "Les Réglages se rouvrent là où tu les as laissés",
+      "Versions bêta : active-les dans Réglages › Mise à jour"
     ],
     "de": [
-      "Mit dem Dock oben öffnet sich das Kontrollzentrum, ohne die Home zu verschieben",
-      "Die Neuerungen der Updates erscheinen in der in Salotto gewählten Sprache"
+      "Neue runde Home: wähle sie unter Aussehen › Anordnung",
+      "Hintergrund-Sammlungen werden separat geladen: die App ist viel kleiner",
+      "Du kannst einzelne Fotos oder ganze Sammlungen löschen",
+      "Uhrzeit und Datum: Schrift, Größe und Format auch für das Datum, Schrift und Größe für das Wetter",
+      "Die Einstellungen öffnen sich dort, wo du sie verlassen hast",
+      "Beta-Versionen: einschalten unter Einstellungen › Update"
     ],
     "pt": [
-      "Com o Dock em cima, o centro de controlo abre sem mover a Home",
-      "As novidades das atualizações aparecem no idioma escolhido no Salotto"
+      "Nova Home circular: escolhe-a em Aparência › Disposição",
+      "As coleções de fundos descarregam-se à parte: a app fica muito mais leve",
+      "Podes apagar fotos soltas ou coleções inteiras",
+      "Hora e data: letra, tamanho e formato também para a data, letra e tamanho para o tempo",
+      "As Configurações voltam a abrir onde as deixaste",
+      "Versões beta: ativa-as em Configurações › Atualização"
     ],
     "ru": [
-      "Когда Dock наверху, центр управления открывается, не сдвигая главный экран",
-      "Описание обновлений показывается на языке, выбранном в Salotto"
+      "Новый круглый главный экран: выберите его в Оформление › Расположение",
+      "Коллекции фонов загружаются отдельно: приложение стало намного легче",
+      "Можно удалять отдельные фото или целые коллекции",
+      "Время и дата: шрифт, размер и формат теперь и для даты, шрифт и размер для погоды",
+      "Настройки открываются там, где вы их оставили",
+      "Бета-версии: включите в Настройки › Обновление"
     ],
     "ar": [
-      "مع وضع Dock في الأعلى، يُفتح مركز التحكم دون تحريك الشاشة الرئيسية",
-      "تظهر مستجدات التحديثات باللغة المختارة في Salotto"
+      "شاشة رئيسية دائرية جديدة: اخترها من المظهر › الترتيب",
+      "مجموعات الخلفيات تُنزَّل على حدة: أصبح التطبيق أخف بكثير",
+      "يمكنك حذف صور مفردة أو مجموعات كاملة",
+      "الوقت والتاريخ: الخط والحجم والتنسيق للتاريخ أيضًا، والخط والحجم للطقس",
+      "تُفتح الإعدادات حيث تركتها",
+      "النسخ التجريبية: فعّلها من الإعدادات › التحديث"
     ],
     "hi": [
-      "Dock ऊपर होने पर कंट्रोल सेंटर होम को हिलाए बिना खुलता है",
-      "अपडेट की नई बातें Salotto में चुनी गई भाषा में दिखती हैं"
+      "नया गोल होम: इसे रूप-रंग › व्यवस्था में चुनें",
+      "बैकग्राउंड संग्रह अलग से डाउनलोड होते हैं: ऐप अब बहुत हल्का है",
+      "आप अलग-अलग फ़ोटो या पूरे संग्रह हटा सकते हैं",
+      "समय और तारीख: तारीख के लिए भी फ़ॉन्ट, आकार और फ़ॉर्मैट, मौसम के लिए फ़ॉन्ट और आकार",
+      "सेटिंग वहीं खुलती हैं जहाँ आपने छोड़ी थीं",
+      "बीटा वर्ज़न: सेटिंग › अपडेट में चालू करें"
     ],
     "zh": [
-      "Dock 在上方时，控制中心打开时主屏幕不再移动",
-      "更新内容以 Salotto 中选择的语言显示"
+      "全新圆形主屏幕：在“外观 › 布局”中选择",
+      "背景合集单独下载：应用体积大大减小",
+      "可以删除单张照片或整个合集",
+      "时间和日期：日期也可设置字体、大小和格式，天气可设置字体和大小",
+      "设置会在你离开的位置重新打开",
+      "测试版：在“设置 › 更新”中开启"
     ]
   }
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Publishes the collections of backdrops on the fixed release "sfondi", apart from the versions of
-# Salotto: one archive for each, a strip of small pictures to show what it holds, and sfondi.json
+# Salotto: one archive for each, a strip of small pictures to show what it holds, ten larger ones
+# for the installer's gallery, and sfondi.json
 # signed with the key of the updates. Salotto downloads from there only the collections chosen,
 # and checks each archive against the signed list before opening it.
 # Usage: distro/tools/pubblica-sfondi.sh [--prova]   (with --prova it builds everything and uploads nothing)
@@ -32,6 +33,8 @@ from PIL import Image
 work, assets, packs_dir, repo, *packs = sys.argv[1:]
 base = f"https://github.com/{repo}/releases/download/sfondi/"
 SAMPLES, WIDTH, HEIGHT, GAP = 6, 216, 122, 6
+# Seen large in the installer: 10 pictures of each collection, 1280 x 720, asked for only when opened.
+VIEWS, VIEW_SIZE = 10, (1280, 720)
 listed = []
 for pack in packs:
     # The weather's illustrations sit in a folder for each moment of the day.
@@ -45,6 +48,22 @@ for pack in packs:
             strip.paste(picture.convert("RGB").resize((WIDTH, HEIGHT)), (index * (WIDTH + GAP), 0))
     sample = os.path.join(work, f"campione-{pack}.webp")
     strip.save(sample, quality=80)
+    full = sorted(os.path.relpath(os.path.join(where, name), os.path.join(packs_dir, pack))
+                  for where, _, names in os.walk(os.path.join(packs_dir, pack))
+                  for name in names if not name.startswith(".")
+                  and name.lower().endswith((".webp", ".jpg", ".jpeg", ".png")))
+    gallery = []
+    for index in range(VIEWS):
+        name = full[round(index * (len(full) - 1) / (VIEWS - 1))]
+        view = os.path.join(work, f"vista-{pack}-{index + 1:02d}.webp")
+        with Image.open(os.path.join(packs_dir, pack, name)) as picture:
+            picture = picture.convert("RGB")
+            # Filled and cut to 16:9, like the TV shows it.
+            scale = max(VIEW_SIZE[0] / picture.width, VIEW_SIZE[1] / picture.height)
+            picture = picture.resize((round(picture.width * scale), round(picture.height * scale)), Image.LANCZOS)
+            left, top = (picture.width - VIEW_SIZE[0]) // 2, (picture.height - VIEW_SIZE[1]) // 2
+            picture.crop((left, top, left + VIEW_SIZE[0], top + VIEW_SIZE[1])).save(view, quality=78)
+        gallery.append({"url": base + os.path.basename(view), "sha256": hashlib.sha256(open(view, "rb").read()).hexdigest()})
     archive = os.path.join(work, f"{pack}.tar")
     data = open(archive, "rb").read()
     files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(packs_dir, pack)))
@@ -53,6 +72,7 @@ for pack in packs:
         "sha256": hashlib.sha256(data).hexdigest(), "url": base + f"{pack}.tar",
         "sample": base + f"campione-{pack}.webp",
         "sample_sha256": hashlib.sha256(open(sample, "rb").read()).hexdigest(),
+        "gallery": gallery,
     })
 json.dump({"version": 1, "packs": listed}, open(os.path.join(work, "sfondi.json"), "w"), indent=2)
 for item in listed:
@@ -72,5 +92,5 @@ fi
 gh release view sfondi --repo "$REPO" > /dev/null 2>&1 ||
   gh release create sfondi --repo "$REPO" --title "Salotto: collezioni di sfondi" --prerelease --latest=false \
     --notes "Le collezioni di sfondi che Salotto scarica quando si scelgono. Non si installano a mano."
-gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" --repo "$REPO" --clobber
+gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK"/vista-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" --repo "$REPO" --clobber
 echo "Pubblicate le collezioni di sfondi."
