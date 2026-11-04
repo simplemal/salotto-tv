@@ -334,4 +334,14 @@
     <string name="settings_wheel_motion_text">L’app s’ouvre depuis un cercle de sa couleur qui s’agrandit, et au retour sur l’Accueil la couleur se referme dans le cercle. Encore à l’essai.</string>
     <string name="settings_wheel_blur">Fond flou</string>
     <string name="settings_wheel_blur_text">Le fond derrière la roue est flou, pour que les apps, l’heure et la météo ressortent. Les scènes météo animées restent figées.</string>
+    <string name="settings_time_group">Heure</string>
+    <string name="settings_date_show_text">Affiche la date sur l’accueil, même sans l’horloge.</string>
+    <string name="settings_date_font_text">Le style des lettres de la date.</string>
+    <string name="settings_date_size_text">La taille de la date.</string>
+    <string name="settings_date_long">Long</string>
+    <string name="settings_date_numeric">Numérique</string>
+    <string name="settings_date_format_text">Comme l’écrit la langue du Fire TV.</string>
+    <string name="settings_like_date">Comme la date</string>
+    <string name="settings_weather_font_text">Le style de la première ligne de la météo.</string>
+    <string name="settings_weather_size_text">La taille de la première ligne de la météo.</string>
 </resources>

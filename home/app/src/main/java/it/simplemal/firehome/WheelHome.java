@@ -128,7 +128,7 @@ final class WheelHome extends FrameLayout {
     /** An app is being moved: the one it changes place with crosses the top behind it, not over it. */
     private boolean moving;
     /** The halo of the app's colour: off, the circles keep only their dark shadow. */
-    private boolean tinted;
+    private boolean tinted = true;
     private boolean closing;
     private ObjectAnimator sway;
 
@@ -395,7 +395,10 @@ final class WheelHome extends FrameLayout {
     float[] litSpot() {
         int[] at = new int[2];
         getLocationOnScreen(at);
-        return new float[]{at[0] + getWidth() / 2f, at[1] + dp(shape.top()), dp(shape.big) / 2f};
+        // As large as it is drawn: lit, it is scaled up, and a smaller start made the opening bounce.
+        ImageView circle = litCircle();
+        float radius = circle != null && circle.getWidth() > 0 ? circle.getWidth() * circle.getScaleX() / 2f : dp(shape.big) / 2f;
+        return new float[]{at[0] + getWidth() / 2f, at[1] + dp(shape.top()), radius};
     }
 
     int litColour() { return colourOf(litTag()); }
@@ -442,6 +445,22 @@ final class WheelHome extends FrameLayout {
         }
         closing = true;
         Portal leaving = portal;
+        Bitmap art = litArt();
+        if (art != null) {
+            // The circle's background closing onto the app's circle, on the drawing thread: smooth
+            // while the Home is busy coming back.
+            CircleClose circle = new CircleClose(getContext(), CircleArt.rim(art), art, leaving.x, leaving.y, leaving.start);
+            addView(circle, new LayoutParams(-1, -1));
+            circle.setTranslationZ(dp(20));
+            removeView(leaving);
+            circle.close(() -> {
+                removeView(circle);
+                if (portal == leaving) portal = null;
+                closing = false;
+                done.run();
+            });
+            return;
+        }
         ValueAnimator shrink = ValueAnimator.ofFloat(1f, 0f);
         shrink.setDuration(CLOSE_MS);
         shrink.setInterpolator(new DecelerateInterpolator());

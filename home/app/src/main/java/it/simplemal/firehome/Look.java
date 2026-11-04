@@ -138,6 +138,34 @@ final class Look {
 
     static int columns(Context context) { return prefs(context).getInt("columns", 6); }
     static void setColumns(Context context, int value) { prefs(context).edit().putInt("columns", value).apply(); }
+    /** The date's sizes, small to large; the middle one is what it always had. */
+    static final int[] DATE_SIZES = {16, 20, 26};
+    /** The date's letters: the medium sans it always had. */
+    private static final int DATE_FONT = 3;
+    /** The weather's first line: like the date unless chosen apart, the first choice offered. */
+    static final int LIKE_DATE = -1;
+
+    static int dateFont(Context context) { return prefs(context).getInt("date_font", DATE_FONT); }
+    static void setDateFont(Context context, int value) { prefs(context).edit().putInt("date_font", value).apply(); }
+    static int dateSize(Context context) { return prefs(context).getInt("date_size", 1); }
+    static void setDateSize(Context context, int value) { prefs(context).edit().putInt("date_size", value).apply(); }
+    static boolean dateNumeric(Context context) { return prefs(context).getBoolean("date_numeric", false); }
+    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean("date_numeric", value).apply(); }
+    static int weatherFont(Context context) { return prefs(context).getInt("weather_font", LIKE_DATE); }
+    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt("weather_font", value).apply(); }
+    static int weatherSize(Context context) { return prefs(context).getInt("weather_size", LIKE_DATE); }
+    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt("weather_size", value).apply(); }
+
+    /** The weather's first line, resolved: its own choice, or the date's. */
+    static int weatherFontShown(Context context) { int own = weatherFont(context); return own == LIKE_DATE ? dateFont(context) : own; }
+    static int weatherSizeShown(Context context) { int own = weatherSize(context); return own == LIKE_DATE ? dateSize(context) : own; }
+
+    /** In the way of the language: the day and month spelt out, or numbers only. */
+    static String datePattern(Context context) {
+        return android.text.format.DateFormat.getBestDateTimePattern(Locale.getDefault(),
+            dateNumeric(context) ? "ddMMyyyy" : "EEEEdMMMM");
+    }
+
     static int font(Context context) { return prefs(context).getInt("font", 2); }
     static void setFont(Context context, int value) { prefs(context).edit().putInt("font", value).apply(); }
     static int size(Context context) { return prefs(context).getInt("size", 1); }
@@ -163,8 +191,8 @@ final class Look {
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
     static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
-    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays: off unless chosen, the user's default. */
-    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", false); }
+    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. On unless chosen: the user's default again, 2026-11-04. */
+    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
     static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
     /** An app opening from a circle of its colour and closing back into it: off until it is better, the user's choice. */
     static boolean wheelMotion(Context context) { return prefs(context).getBoolean("wheel_motion", false); }
@@ -411,7 +439,8 @@ final class Look {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
             + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
-            + "/" + tintGlow(context) + "/" + wheelBlur(context);
+            + "/" + tintGlow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */

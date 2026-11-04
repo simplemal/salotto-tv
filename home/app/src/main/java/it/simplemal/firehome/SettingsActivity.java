@@ -195,6 +195,8 @@ public final class SettingsActivity extends CardActivity {
         final Runnable show;
         int focus;
         Runnable leave;
+        /** The title of the row that opened the level below this one. */
+        String opened;
         /** The real page is on screen: reading it again must not replace it with the waiting one. */
         boolean drawn;
         Level(Runnable show) { this.show = show; }
@@ -209,6 +211,24 @@ public final class SettingsActivity extends CardActivity {
     static final String PACKAGE = "package";
 
     private final Deque<Level> levels = new ArrayDeque<>();
+    /** The rows on screen, in the order of their views. */
+    private List<Entry> shownEntries;
+
+    /** One level of the way to where the user left the settings with Home. */
+    private static final class Spot {
+        final int focus;
+        final String opened;
+        Spot(int focus, String opened) {
+            this.focus = focus;
+            this.opened = opened;
+        }
+    }
+
+    /**
+     * Where the settings were left, from the first level down, while Salotto runs: opened again they
+     * go back there, the user's wish of 2026-11-04. Leaving them with Back forgets it.
+     */
+    private static List<Spot> leftAt;
     private LinearLayout root;
     private TextView heading;
     private ImageView picture;
@@ -319,7 +339,41 @@ public final class SettingsActivity extends CardActivity {
         else if (REMOTES.equals(section)) enter(this::showRemotes);
         else if (SCREEN.equals(section)) enter(this::showScreen);
         else if (APP.equals(section)) enter(() -> showApp(getIntent().getStringExtra(PACKAGE)));
-        else enter(this::showRoot);
+        else {
+            enter(this::showRoot);
+            goBack(leftAt);
+        }
+    }
+
+    /** Down the same rows as last time, as long as they are still there and still open a level. */
+    private void goBack(List<Spot> way) {
+        if (way == null || way.isEmpty()) return;
+        for (int step = 0; step < way.size() - 1; step++) {
+            Spot spot = way.get(step);
+            if (shownEntries == null || spot.focus >= shownEntries.size()) return;
+            Entry entry = shownEntries.get(spot.focus);
+            if (!entry.branch || !entry.title.equals(spot.opened)) return;
+            int depth = levels.size();
+            levels.peek().focus = spot.focus;
+            levels.peek().opened = entry.title;
+            entry.action.run();
+            if (levels.size() != depth + 1) return;
+        }
+        levels.peek().focus = way.get(way.size() - 1).focus;
+        refresh();
+    }
+
+    /** Leaving with Home keeps the way here; only the settings opened on their own first page. */
+    @Override protected void onPause() {
+        super.onPause();
+        if (getIntent().getStringExtra(SECTION) != null || levels.isEmpty()) return;
+        List<Spot> way = new ArrayList<>();
+        java.util.Iterator<Level> down = levels.descendingIterator();
+        while (down.hasNext()) {
+            Level level = down.next();
+            way.add(new Spot(level.focus, level.opened));
+        }
+        leftAt = way;
     }
 
     /** Coming back from an app or a page elsewhere, what is listed here may have changed. The first time it is fresh. */
@@ -372,8 +426,10 @@ public final class SettingsActivity extends CardActivity {
         if (levels.isEmpty()) return;
         Level left = levels.pop();
         if (left.leave != null) left.leave.run();
-        if (levels.isEmpty()) finish();
-        else refresh();
+        if (levels.isEmpty()) {
+            leftAt = null;
+            finish();
+        } else refresh();
     }
 
     private void show(String title, List<Entry> entries) {
@@ -390,6 +446,7 @@ public final class SettingsActivity extends CardActivity {
         scroll.setClipChildren(table);
         explanation.setTextSize(table ? 14 : EXPLANATION_SP);
         rows.removeAllViews();
+        shownEntries = entries;
         for (Entry entry : entries) {
             if (entry.label) rows.addView(label(entry));
             else rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
@@ -474,6 +531,7 @@ public final class SettingsActivity extends CardActivity {
         row.setBackground(rest);
         row.setOnClickListener(v -> {
             levels.peek().focus = rows.indexOfChild(v);
+            levels.peek().opened = entry.title;
             entry.action.run();
         });
         row.setOnFocusChangeListener((view, focused) -> {
@@ -1686,6 +1744,7 @@ public final class SettingsActivity extends CardActivity {
     private void showClock() {
         boolean visible = Look.clock(this);
         show(getString(R.string.settings_clock), Arrays.asList(
+            groupLabel(R.string.settings_time_group),
             new Entry(getString(R.string.settings_show_on_home), visible ? YES : NO, getDrawable(R.drawable.ic_clock),
                 getString(R.string.settings_clock_show_text), false, () -> {
                     Look.setClock(this, !visible);
@@ -1705,11 +1764,92 @@ public final class SettingsActivity extends CardActivity {
                     Look.setSeconds(this, !Look.seconds(this));
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_date), Look.date(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_date_text), false, () -> {
+            groupLabel(R.string.settings_date),
+            new Entry(getString(R.string.settings_show_on_home), Look.date(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_date_show_text), false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();
-                })));
+                }),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_date_font_text), true, () -> enter(this::showDateFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_date_size_text), true, () -> enter(this::showDateSizes)),
+            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), getDrawable(R.drawable.ic_clock),
+                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats))));
+    }
+
+    private String dateFormatName(boolean numeric) {
+        return getString(numeric ? R.string.settings_date_numeric : R.string.settings_date_long);
+    }
+
+    /** Today, written as the language writes it, long or in numbers. */
+    private String today(boolean numeric) {
+        return android.text.format.DateFormat.format(android.text.format.DateFormat.getBestDateTimePattern(
+            java.util.Locale.getDefault(), numeric ? "ddMMyyyy" : "EEEEdMMMM"), System.currentTimeMillis()).toString();
+    }
+
+    private void showDateFonts() {
+        List<Entry> entries = choices(Look.fontNames(this), Look.dateFont(this), R.drawable.ic_clock,
+            getString(R.string.settings_date_font_text), index -> {
+                Look.setDateFont(this, index);
+                refresh();
+            });
+        for (int index = 0; index < entries.size(); index++) entries.get(index).family = Look.FONT_FAMILIES[index];
+        show(getString(R.string.settings_font), entries);
+    }
+
+    private void showDateSizes() {
+        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.dateSize(this), R.drawable.ic_clock,
+            getString(R.string.settings_date_size_text), index -> {
+                Look.setDateSize(this, index);
+                refresh();
+            }));
+    }
+
+    private void showDateFormats() {
+        String[] names = {dateFormatName(false), dateFormatName(true)};
+        show(getString(R.string.settings_hours), choices(names, Look.dateNumeric(this) ? 1 : 0, R.drawable.ic_clock,
+            index -> today(index == 1), index -> {
+                Look.setDateNumeric(this, index == 1);
+                refresh();
+            }));
+    }
+
+    /** «Like the date» first, then the same choices as the date's. */
+    private String[] likeDate(String[] names) {
+        String[] all = new String[names.length + 1];
+        all[0] = getString(R.string.settings_like_date);
+        System.arraycopy(names, 0, all, 1, names.length);
+        return all;
+    }
+
+    private String weatherFontName() {
+        int own = Look.weatherFont(this);
+        return own == Look.LIKE_DATE ? getString(R.string.settings_like_date) : Look.fontNames(this)[own];
+    }
+
+    private String weatherSizeName() {
+        int own = Look.weatherSize(this);
+        return own == Look.LIKE_DATE ? getString(R.string.settings_like_date) : Look.sizeNames(this)[own];
+    }
+
+    private void showWeatherFonts() {
+        List<Entry> entries = choices(likeDate(Look.fontNames(this)), Look.weatherFont(this) + 1, R.drawable.ic_cloud,
+            getString(R.string.settings_weather_font_text), index -> {
+                Look.setWeatherFont(this, index - 1);
+                refresh();
+            });
+        entries.get(0).family = Look.FONT_FAMILIES[Look.dateFont(this)];
+        for (int index = 1; index < entries.size(); index++) entries.get(index).family = Look.FONT_FAMILIES[index - 1];
+        show(getString(R.string.settings_font), entries);
+    }
+
+    private void showWeatherSizes() {
+        show(getString(R.string.settings_size), choices(likeDate(Look.sizeNames(this)), Look.weatherSize(this) + 1, R.drawable.ic_cloud,
+            getString(R.string.settings_weather_size_text), index -> {
+                Look.setWeatherSize(this, index - 1);
+                refresh();
+            }));
     }
 
     private String weatherValue() {
@@ -1733,7 +1873,11 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_units_text), false, () -> {
                     Weather.setFahrenheit(this, !Weather.fahrenheit(this));
                     refresh();
-                })));
+                }),
+            new Entry(getString(R.string.settings_font), weatherFontName(), getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts)),
+            new Entry(getString(R.string.settings_size), weatherSizeName(), getDrawable(R.drawable.ic_cloud),
+                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes))));
     }
 
     private void askPlace() {

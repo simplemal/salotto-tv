@@ -334,4 +334,14 @@
     <string name="settings_wheel_motion_text">Die App öffnet sich aus einem Kreis in ihrer Farbe, der wächst, und zurück auf Home schließt sich die Farbe wieder im Kreis. Noch im Test.</string>
     <string name="settings_wheel_blur">Unscharfer Hintergrund</string>
     <string name="settings_wheel_blur_text">Der Hintergrund hinter dem Rad ist unscharf, damit Apps, Uhrzeit und Wetter hervortreten. Animierte Wetterszenen stehen still.</string>
+    <string name="settings_time_group">Uhrzeit</string>
+    <string name="settings_date_show_text">Zeigt das Datum auf dem Home, auch ohne Uhr.</string>
+    <string name="settings_date_font_text">Der Stil der Buchstaben des Datums.</string>
+    <string name="settings_date_size_text">Wie groß das Datum ist.</string>
+    <string name="settings_date_long">Ausgeschrieben</string>
+    <string name="settings_date_numeric">Numerisch</string>
+    <string name="settings_date_format_text">So, wie die Sprache des Fire TV es schreibt.</string>
+    <string name="settings_like_date">Wie Datum</string>
+    <string name="settings_weather_font_text">Der Stil der ersten Wetterzeile.</string>
+    <string name="settings_weather_size_text">Wie groß die erste Wetterzeile ist.</string>
 </resources>

@@ -329,4 +329,14 @@
     <string name="settings_wheel_motion_text">应用从一个自己颜色的圆圈扩展打开，回到主屏幕时颜色收回到圆圈里。仍在测试中。</string>
     <string name="settings_wheel_blur">模糊背景</string>
     <string name="settings_wheel_blur_text">转盘后面的背景会被模糊，让应用、时间和天气更醒目。动态天气场景会显示为静止。</string>
+    <string name="settings_time_group">时间</string>
+    <string name="settings_date_show_text">在主屏幕上显示日期，即使没有时钟。</string>
+    <string name="settings_date_font_text">日期文字的样式。</string>
+    <string name="settings_date_size_text">日期的大小。</string>
+    <string name="settings_date_long">完整</string>
+    <string name="settings_date_numeric">数字</string>
+    <string name="settings_date_format_text">按照 Fire TV 语言的写法。</string>
+    <string name="settings_like_date">与日期相同</string>
+    <string name="settings_weather_font_text">天气第一行的样式。</string>
+    <string name="settings_weather_size_text">天气第一行的大小。</string>
 </resources>

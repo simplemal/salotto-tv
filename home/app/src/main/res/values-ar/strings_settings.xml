@@ -358,4 +358,14 @@
     <string name="settings_wheel_motion_text">يُفتح التطبيق من دائرة بلونه تتسع، وعند العودة إلى الرئيسية ينغلق اللون في الدائرة. ما زالت قيد التجربة.</string>
     <string name="settings_wheel_blur">خلفية ضبابية</string>
     <string name="settings_wheel_blur_text">تصبح الخلفية خلف العجلة ضبابية فتبرز التطبيقات والوقت والطقس. تظهر مشاهد الطقس المتحركة ثابتة.</string>
+    <string name="settings_time_group">الوقت</string>
+    <string name="settings_date_show_text">يعرض التاريخ على الشاشة الرئيسية، حتى بدون الساعة.</string>
+    <string name="settings_date_font_text">نمط حروف التاريخ.</string>
+    <string name="settings_date_size_text">حجم التاريخ.</string>
+    <string name="settings_date_long">كامل</string>
+    <string name="settings_date_numeric">رقمي</string>
+    <string name="settings_date_format_text">كما تكتبه لغة Fire TV.</string>
+    <string name="settings_like_date">مثل التاريخ</string>
+    <string name="settings_weather_font_text">نمط السطر الأول من الطقس.</string>
+    <string name="settings_weather_size_text">حجم السطر الأول من الطقس.</string>
 </resources>

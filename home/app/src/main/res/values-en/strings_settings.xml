@@ -334,4 +334,14 @@
     <string name="settings_wheel_motion_text">The app opens from a circle of its colour that widens, and back on the Home the colour closes into the circle. Still being tried out.</string>
     <string name="settings_wheel_blur">Blurred backdrop</string>
     <string name="settings_wheel_blur_text">The backdrop behind the wheel is blurred, so apps, time and weather stand out. Animated weather scenes look still.</string>
+    <string name="settings_time_group">Time</string>
+    <string name="settings_date_show_text">Shows the date on the Home, even without the clock.</string>
+    <string name="settings_date_font_text">The style of the date’s letters.</string>
+    <string name="settings_date_size_text">How big the date is.</string>
+    <string name="settings_date_long">Long</string>
+    <string name="settings_date_numeric">Numeric</string>
+    <string name="settings_date_format_text">As the Fire TV’s language writes it.</string>
+    <string name="settings_like_date">Like the date</string>
+    <string name="settings_weather_font_text">The style of the weather’s first line.</string>
+    <string name="settings_weather_size_text">How big the weather’s first line is.</string>
 </resources>

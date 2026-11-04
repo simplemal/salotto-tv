@@ -334,4 +334,14 @@
     <string name="settings_wheel_motion_text">ऐप अपने रंग के फैलते गोले से खुलता है, और होम पर लौटने पर रंग वापस गोले में सिमट जाता है। अभी परीक्षण में।</string>
     <string name="settings_wheel_blur">धुंधली पृष्ठभूमि</string>
     <string name="settings_wheel_blur_text">पहिए के पीछे की पृष्ठभूमि धुंधली होती है, ताकि ऐप, समय और मौसम उभरकर दिखें। मौसम के एनिमेटेड दृश्य स्थिर दिखते हैं।</string>
+    <string name="settings_time_group">समय</string>
+    <string name="settings_date_show_text">होम पर तारीख दिखाता है, घड़ी के बिना भी।</string>
+    <string name="settings_date_font_text">तारीख के अक्षरों की शैली।</string>
+    <string name="settings_date_size_text">तारीख कितनी बड़ी है।</string>
+    <string name="settings_date_long">पूरा</string>
+    <string name="settings_date_numeric">अंकों में</string>
+    <string name="settings_date_format_text">जैसे Fire TV की भाषा लिखती है।</string>
+    <string name="settings_like_date">तारीख जैसा</string>
+    <string name="settings_weather_font_text">मौसम की पहली पंक्ति की शैली।</string>
+    <string name="settings_weather_size_text">मौसम की पहली पंक्ति कितनी बड़ी है।</string>
 </resources>

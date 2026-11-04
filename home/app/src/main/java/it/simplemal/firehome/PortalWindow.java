@@ -19,9 +19,9 @@ import android.view.animation.DecelerateInterpolator;
 
 /**
  * Opening an app from the wheel, over every window for a moment: the Home's picture, and a disc of
- * the app's colour that widens from its circle until it covers the screen. The app starts underneath,
- * and straight away a hole with nothing drawn in it opens from the middle of the disc, so the app
- * shows through a ring that runs off the screen.
+ * the app's colour that widens from under its circle, which stays on top, until it covers the screen.
+ * The app starts underneath, and straight away a hole with nothing drawn in it opens from the middle
+ * of the circle, through its logo, so the app shows through a ring that runs off the screen.
  * Only Salotto's accessibility service can put a window over another app, so it lives there.
  */
 final class PortalWindow extends View {
@@ -42,6 +42,11 @@ final class PortalWindow extends View {
     private final Paint picture = new Paint(Paint.FILTER_BITMAP_FLAG);
     private final Path outside = new Path();
     private final Path band = new Path();
+    private final Path round = new Path();
+    private final Path gap = new Path();
+    private final android.graphics.RectF place = new android.graphics.RectF();
+    /** The app's circle as the wheel shows it, or null. */
+    private final Bitmap art;
     private final Rect whole = new Rect();
     private final float x;
     private final float y;
@@ -54,8 +59,9 @@ final class PortalWindow extends View {
     private boolean gone;
 
 
-    private PortalWindow(Context context, Bitmap home, int colour, float x, float y, float start, Runnable shown, Runnable opened) {
+    private PortalWindow(Context context, Bitmap home, Bitmap art, int colour, float x, float y, float start, Runnable shown, Runnable opened) {
         super(context);
+        this.art = art;
         windows = context.getSystemService(WindowManager.class);
         this.home = home.copy(Bitmap.Config.ARGB_8888, false);
         this.x = x;
@@ -67,9 +73,9 @@ final class PortalWindow extends View {
     }
 
     /** `shown` runs once the window covers the screen, `opened` when it has gone. */
-    static void open(Context service, Bitmap home, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+    static void open(Context service, Bitmap home, Bitmap art, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
         if (current != null) current.close();
-        PortalWindow view = new PortalWindow(service, home, colour, x, y, radius, shown, opened);
+        PortalWindow view = new PortalWindow(service, home, art, colour, x, y, radius, shown, opened);
         current = view;
         view.windows.addView(view, new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
@@ -104,6 +110,22 @@ final class PortalWindow extends View {
         band.addCircle(x, y, outer, Path.Direction.CW);
         if (inner > 0) band.addCircle(x, y, inner, Path.Direction.CW);
         canvas.drawPath(band, ring);
+
+        if (art != null && inner < start) {
+            // The circle stays on top, in its place, and the hole eats it from the middle.
+            place.set(x - start, y - start, x + start, y + start);
+            round.rewind();
+            round.addCircle(x, y, start, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(round);
+            if (inner > 0) {
+                gap.rewind();
+                gap.addCircle(x, y, inner, Path.Direction.CW);
+                canvas.clipOutPath(gap);
+            }
+            canvas.drawBitmap(art, null, place, picture);
+            canvas.restore();
+        }
 
         if (shown != null) {
             // This frame now covers the Home exactly as it was: the app can start under it.

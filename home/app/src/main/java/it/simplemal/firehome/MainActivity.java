@@ -223,7 +223,6 @@ public final class MainActivity extends CardActivity {
     private static final long PORTAL_GIVE_UP_MS = 2500;
     /** The Home's first frame on screen, under the cover: Amazon's Home must not show through. */
     private static final long CLOSE_LATEST_MS = 450;
-    private static final int DATE_SP = 20;
     /** The weather's corner on the wheel: a little lower than the top, the date lined up with it. */
     private static final int WEATHER_TOP = 34;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
@@ -270,14 +269,10 @@ public final class MainActivity extends CardActivity {
         clock.setShadowLayer(dp(6), 0, dp(2), Color.argb(120, 0, 0, 0));
         hero.addView(clock);
         date = new TextClock(this);
-        String longDate = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM");
-        date.setFormat24Hour(longDate);
-        date.setFormat12Hour(longDate);
-        date.setTextSize(DATE_SP);
         date.setTextColor(Color.WHITE);
         // Thin letters over a detailed picture: only a tight, dark shadow keeps them apart from it.
-        date.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         date.setShadowLayer(dp(3), 0, dp(1), Color.argb(225, 0, 0, 0));
+        styleDate();
         hero.addView(date);
         timeSeen = getSharedPreferences(CLOCK_FILE, MODE_PRIVATE).getLong(TIME_SEEN, 0);
         revealClock();
@@ -529,8 +524,7 @@ public final class MainActivity extends CardActivity {
         weatherCorner.setGravity(Gravity.END);
         weatherCorner.setVisibility(View.GONE);
         // As the date across the screen, which sits on the same line: same size, letters and shadow.
-        cornerLine = label("", DATE_SP);
-        cornerLine.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        cornerLine = label("", Look.DATE_SIZES[1]);
         cornerLine.setShadowLayer(dp(3), 0, dp(1), Color.argb(225, 0, 0, 0));
         cornerLine.setSingleLine(true);
         // As wide as its own words: by default it would be as wide as the days under it, and cut.
@@ -559,6 +553,18 @@ public final class MainActivity extends CardActivity {
         place.topMargin = dp(78);
         place.rightMargin = dp(DOCK_MARGIN + DOCK_SIDE);
         return place;
+    }
+
+    /** Letters, size and format of the date, and of the weather's first line, as chosen in Settings. */
+    private void styleDate() {
+        String pattern = Look.datePattern(this);
+        date.setFormat24Hour(pattern);
+        date.setFormat12Hour(pattern);
+        date.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.dateFont(this)], Typeface.NORMAL));
+        date.setTextSize(Look.DATE_SIZES[Look.dateSize(this)]);
+        if (cornerLine == null) return;
+        cornerLine.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.weatherFontShown(this)], Typeface.NORMAL));
+        cornerLine.setTextSize(Look.DATE_SIZES[Look.weatherSizeShown(this)]);
     }
 
     private void showWeatherCorner() {
@@ -816,8 +822,8 @@ public final class MainActivity extends CardActivity {
         // cover shows it too), and the colour closes into the circle as soon as Fire OS's own
         // animation has ended, which would hide it; at the latest after a moment.
         if (wheel.portalOpen()) {
-            if (TaskService.coverCloses()) {
-                // The Home key: the cover is already closing the circle over everything.
+            if (TaskService.closeOverAll()) {
+                // The Home key or Back: the cover closes the circle over everything.
                 wheel.dropPortal();
                 TaskService.afterHomeCover(() -> {
                     HomeCover.disarm();
@@ -1050,7 +1056,8 @@ public final class MainActivity extends CardActivity {
         readCorner();
         if (appsOnly) restRaised();
         else if (dock != null && isInside(getCurrentFocus(), dock)) scroll.scrollTo(0, 0);
-        date.setVisibility(bigClock && Look.date(this) ? View.VISIBLE : View.GONE);
+        date.setVisibility(Look.date(this) ? View.VISIBLE : View.GONE);
+        styleDate();
         String pattern = Look.timePattern(this);
         for (TextClock time : new TextClock[]{clock, pillTime}) {
             time.setFormat24Hour(pattern);
@@ -1289,12 +1296,12 @@ public final class MainActivity extends CardActivity {
             fadeCorners(false, () -> HomeCover.take(getWindow(), () -> {
                 float[] spot = wheel.litSpot();
                 int colour = wheel.litColour();
-                boolean over = TaskService.portal(HomeCover.lastPicture(), colour, spot[0], spot[1], spot[2], () -> {
+                boolean over = TaskService.portal(HomeCover.lastPicture(), wheel.litArt(), colour, spot[0], spot[1], spot[2], () -> {
                     wheel.cover();
                     open(intent);
                 }, () -> {
                     Bitmap art = wheel.litArt();
-                    if (art != null) HomeCover.armClose(art, CircleArt.rim(art), spot[0], spot[1], spot[2]);
+                    if (art != null) HomeCover.armClose(art, wheel.litColour(), spot[0], spot[1], spot[2]);
                 });
                 if (!over) wheel.openPortal(() -> open(intent));
                 // An app that cannot start leaves the Home in front: the colour goes.
@@ -1536,9 +1543,16 @@ public final class MainActivity extends CardActivity {
         render(pkg);
     }
 
+    private static boolean isArrowOrOk(int key) {
+        return key == KeyEvent.KEYCODE_DPAD_LEFT || key == KeyEvent.KEYCODE_DPAD_RIGHT || key == KeyEvent.KEYCODE_DPAD_UP
+            || key == KeyEvent.KEYCODE_DPAD_DOWN || key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
+    }
+
     @Override protected float focusScale() { return moving != null ? 1.12f : super.focusScale(); }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        // The circle is closing over the Home: the arrows would move the wheel under it.
+        if (HomeCover.busy && isArrowOrOk(event.getKeyCode())) return true;
         // Dock up: one Up opens the control panel, as from the dock down. The scroll would take it first.
         if (moving == null && appsOnly && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
                 && dock != null && isInside(getCurrentFocus(), dock)) {

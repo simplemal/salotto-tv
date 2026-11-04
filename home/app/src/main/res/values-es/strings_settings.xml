@@ -335,4 +335,14 @@
     <string name="settings_wheel_motion_text">La app se abre desde un círculo de su color que se agranda, y al volver al Inicio el color se cierra en el círculo. Todavía en prueba.</string>
     <string name="settings_wheel_blur">Fondo desenfocado</string>
     <string name="settings_wheel_blur_text">El fondo detrás de la rueda se desenfoca, así las apps, la hora y el tiempo resaltan. Las escenas animadas del tiempo se ven quietas.</string>
+    <string name="settings_time_group">Hora</string>
+    <string name="settings_date_show_text">Muestra la fecha en el Home, incluso sin el reloj.</string>
+    <string name="settings_date_font_text">El estilo de las letras de la fecha.</string>
+    <string name="settings_date_size_text">El tamaño de la fecha.</string>
+    <string name="settings_date_long">Largo</string>
+    <string name="settings_date_numeric">Numérico</string>
+    <string name="settings_date_format_text">Como la escribe el idioma del Fire TV.</string>
+    <string name="settings_like_date">Como la fecha</string>
+    <string name="settings_weather_font_text">El estilo de la primera línea del tiempo.</string>
+    <string name="settings_weather_size_text">El tamaño de la primera línea del tiempo.</string>
 </resources>

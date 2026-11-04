@@ -186,10 +186,10 @@ public final class TaskService extends AccessibilityService {
     static boolean running() { return running != null; }
 
     /** False when the service is off: only it can draw over the app that is starting. */
-    static boolean portal(Bitmap home, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+    static boolean portal(Bitmap home, Bitmap art, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
         TaskService service = running;
         if (service == null || home == null) return false;
-        PortalWindow.open(service, home, colour, x, y, radius, shown, opened);
+        PortalWindow.open(service, home, art, colour, x, y, radius, shown, opened);
         return true;
     }
 
@@ -494,6 +494,12 @@ public final class TaskService extends AccessibilityService {
     static boolean coverCloses() {
         TaskService service = running;
         return service != null && service.cover != null && service.cover.closingHere();
+    }
+
+    /** Back from an app opened from the wheel: its circle closes over everything. False if it cannot. */
+    static boolean closeOverAll() {
+        TaskService service = running;
+        return service != null && service.cover != null && service.cover.closeOverAll();
     }
 
     /** Runs once the Home key's cover is gone; at once without the service. */

@@ -346,4 +346,14 @@
     <string name="settings_wheel_motion_text">Приложение открывается из круга своего цвета, который расширяется, а при возврате на главный экран цвет снова сжимается в круг. Пока в тестировании.</string>
     <string name="settings_wheel_blur">Размытый фон</string>
     <string name="settings_wheel_blur_text">Фон за колесом размыт, чтобы приложения, время и погода выделялись. Анимированные сцены погоды показываются неподвижными.</string>
+    <string name="settings_time_group">Время</string>
+    <string name="settings_date_show_text">Показывает дату на главном экране, даже без часов.</string>
+    <string name="settings_date_font_text">Стиль букв даты.</string>
+    <string name="settings_date_size_text">Размер даты.</string>
+    <string name="settings_date_long">Полный</string>
+    <string name="settings_date_numeric">Цифровой</string>
+    <string name="settings_date_format_text">Так, как пишет язык Fire TV.</string>
+    <string name="settings_like_date">Как дата</string>
+    <string name="settings_weather_font_text">Стиль первой строки погоды.</string>
+    <string name="settings_weather_size_text">Размер первой строки погоды.</string>
 </resources>
