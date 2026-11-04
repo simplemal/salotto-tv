@@ -490,6 +490,19 @@ public final class TaskService extends AccessibilityService {
         if (service != null && service.cover != null) service.cover.drop();
     }
 
+    /** The Home key's closing is being drawn by the cover: the Home leaves it to it. */
+    static boolean coverCloses() {
+        TaskService service = running;
+        return service != null && service.cover != null && service.cover.closingHere();
+    }
+
+    /** Runs once the Home key's cover is gone; at once without the service. */
+    static void afterHomeCover(Runnable then) {
+        TaskService service = running;
+        if (service != null && service.cover != null) service.cover.whenGone(then);
+        else then.run();
+    }
+
     static void homeBack() {
         TaskService service = running;
         if (service != null && service.cover != null) service.cover.homeBack();

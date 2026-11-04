@@ -9,7 +9,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
+import android.graphics.Bitmap;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -396,6 +400,27 @@ final class WheelHome extends FrameLayout {
 
     int litColour() { return colourOf(litTag()); }
 
+    /** The lit circle's own picture, as the wheel shows it. */
+    Bitmap litArt() {
+        ImageView circle = litCircle();
+        Drawable picture = circle == null ? null : circle.getDrawable();
+        return picture instanceof BitmapDrawable ? ((BitmapDrawable) picture).getBitmap() : null;
+    }
+
+    /** Gone at once: the Home key's cover has closed it over everything already. */
+    void dropPortal() {
+        if (portal == null) return;
+        removeView(portal);
+        portal = null;
+        closing = false;
+    }
+
+    /** From now the portal is the circle's background, wide, with the app's circle small in its place. */
+    void portalToCircle() {
+        Bitmap art = litArt();
+        if (portal != null && art != null) portal.toCircle(CircleArt.rim(art), art);
+    }
+
     /** The Home all in the app's colour at once, under the window that opens on the app. */
     void cover() {
         if (portal == null) {
@@ -404,6 +429,9 @@ final class WheelHome extends FrameLayout {
             portal.setTranslationZ(dp(20));
         }
         portal.setProgress(1f);
+        // Already as the closing starts: Android keeps a picture of the Home as it leaves and shows it
+        // on the way back, and a plain colour there stood still before the closing.
+        portalToCircle();
     }
 
     /** Back on the Home: the colour closes back into the app's circle, as the opening went but backwards. */
@@ -478,6 +506,10 @@ final class WheelHome extends FrameLayout {
         private final float y;
         private final float start;
         private float progress;
+        private Bitmap art;
+        private final Paint picture = new Paint(Paint.FILTER_BITMAP_FLAG);
+        private final Path round = new Path();
+        private final RectF place = new RectF();
 
         Portal(Context context, int colour, float x, float y, float start) {
             super(context);
@@ -493,11 +525,26 @@ final class WheelHome extends FrameLayout {
             invalidate();
         }
 
+        /** The closing: the circle's own background shrinks onto the app's circle, which stays small in its place. */
+        void toCircle(int background, Bitmap circle) {
+            ring.setColor(background);
+            art = circle;
+            invalidate();
+        }
+
         @Override protected void onDraw(Canvas canvas) {
             float far = (float) Math.hypot(Math.max(x, getWidth() - x), Math.max(y, getHeight() - y));
             float outer = start + (far * 1.05f - start) * progress;
-            canvas.drawColor(withAlpha(colour, Math.round(120 * progress)));
+            if (art == null) canvas.drawColor(withAlpha(colour, Math.round(120 * progress)));
             canvas.drawCircle(x, y, outer, ring);
+            if (art == null) return;
+            place.set(x - start, y - start, x + start, y + start);
+            round.rewind();
+            round.addCircle(x, y, start, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(round);
+            canvas.drawBitmap(art, null, place, picture);
+            canvas.restore();
         }
     }
 }

@@ -7,7 +7,17 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
+import android.view.animation.DecelerateInterpolator;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,6 +45,9 @@ final class HomeCover {
     private static final long SHOW_LIMIT_MS = Fire.ANDROID_9 ? 2000 : 1200;
     private static final long HOLD_LIMIT_MS = 3000;
     private static final long DOUBLE_PRESS_MS = 900;
+    /** As quick as the Home's own closing; the background starts just past the farthest corner. */
+    private static final long SHRINK_MS = 350;
+    private static final float SHRINK_FROM = 1.05f;
     private static final int AMAZON_TRIES = 30;
     private static final long AMAZON_TRY_MS = 50;
     /** The Home just started needs this long to take over from Amazon's. */
@@ -73,7 +86,8 @@ final class HomeCover {
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
             PixelFormat.OPAQUE));
     }
 
@@ -84,12 +98,112 @@ final class HomeCover {
 
     static void homeShown(Window window) { home = window; }
 
-    /** The colour of the app opened from the wheel: the Home key shows it at once, plain. */
-    private static volatile Integer closing;
+    /** The app opened from the wheel: its circle, the colour of its background, and where it sits. */
+    private static final class Closing {
+        final Bitmap art;
+        final int background;
+        final float x;
+        final float y;
+        final float radius;
 
-    static void armClose(int colour) { closing = colour; }
+        Closing(Bitmap art, int background, float x, float y, float radius) {
+            this.art = art;
+            this.background = background;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+        }
+    }
+
+    private static volatile Closing closing;
+
+    static void armClose(Bitmap art, int background, float x, float y, float radius) {
+        closing = new Closing(art, background, x, y, radius);
+    }
 
     static void disarm() { closing = null; }
+
+    /**
+     * The Home key after an app from the wheel, drawn at once over everything: the circle's own
+     * background, as wide as the screen, shrinks onto the app's circle, which stays small in its
+     * place over the Home's picture, until the two are one.
+     */
+    private final class Shrink extends Drawable {
+        private final Closing where;
+        private final Bitmap under;
+        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint pictures = new Paint(Paint.FILTER_BITMAP_FLAG);
+        private final Path round = new Path();
+        private final RectF place = new RectF();
+        private float progress;
+
+        Shrink(Closing where, Bitmap under) {
+            this.where = where;
+            this.under = under;
+            fill.setColor(where.background);
+        }
+
+        void setProgress(float value) {
+            progress = value;
+            invalidateSelf();
+        }
+
+        @Override public void draw(Canvas canvas) {
+            Rect bounds = getBounds();
+            if (under != null) canvas.drawBitmap(under, null, bounds, pictures);
+            else canvas.drawColor(Color.BLACK);
+            float far = (float) Math.hypot(Math.max(where.x, bounds.width() - where.x), Math.max(where.y, bounds.height() - where.y));
+            float start = far * SHRINK_FROM;
+            canvas.drawCircle(where.x, where.y, start + (where.radius - start) * progress, fill);
+            place.set(where.x - where.radius, where.y - where.radius, where.x + where.radius, where.y + where.radius);
+            round.rewind();
+            round.addCircle(where.x, where.y, where.radius, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(round);
+            canvas.drawBitmap(where.art, null, place, pictures);
+            canvas.restore();
+        }
+
+        @Override public void setAlpha(int alpha) { }
+        @Override public void setColorFilter(ColorFilter filter) { }
+        @Override public int getOpacity() { return PixelFormat.OPAQUE; }
+    }
+
+    private Shrink shrink;
+    private boolean shrinking;
+    /** The Home has drawn itself under it: the cover goes as soon as the circle has closed. */
+    private boolean homeIsBack;
+    private Runnable whenGone;
+
+    private void startShrink(Closing where) {
+        shrink = new Shrink(where, picture);
+        view.setImageDrawable(shrink);
+        shrinking = true;
+        homeIsBack = false;
+        ValueAnimator close = ValueAnimator.ofFloat(0f, 1f);
+        close.setDuration(SHRINK_MS);
+        close.setInterpolator(new DecelerateInterpolator());
+        close.addUpdateListener(step -> { if (shrink != null) shrink.setProgress((float) step.getAnimatedValue()); });
+        close.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                shrinking = false;
+                // The last frame is the Home as it will be: the real one takes over as soon as it is there.
+                main.removeCallbacks(hide);
+                if (homeIsBack) hide();
+                else main.postDelayed(hide, SHOW_LIMIT_MS);
+            }
+        });
+        close.start();
+    }
+
+    /** The Home key's closing is being drawn here: the Home leaves it to the cover. */
+    boolean closingHere() { return shrink != null; }
+
+    /** `then` runs once the cover is gone, at once if it is not up. */
+    void whenGone(Runnable then) {
+        if (view.getVisibility() != View.VISIBLE) then.run();
+        else whenGone = then;
+    }
 
     /** From the Home, as it leaves the screen: half size, the cover is up for a moment only. */
     static void take(Window window) { take(window, () -> { }); }
@@ -198,10 +312,11 @@ final class HomeCover {
     }
 
     private void show() {
-        Integer colour = closing;
-        // After an app opened from the wheel, its colour: the Home then closes it into the app's circle.
-        if (colour != null && !holding) view.setImageDrawable(new ColorDrawable(colour));
-        else if (picture != null) view.setImageBitmap(picture);
+        Closing where = closing;
+        // After an app opened from the wheel its circle closes at once; a second look at Amazon's Home lets it run.
+        if (where != null && !holding) {
+            if (shrink == null) startShrink(where);
+        } else if (picture != null) view.setImageBitmap(picture);
         else view.setImageDrawable(new ColorDrawable(Color.BLACK));
         view.invalidate();
         view.setVisibility(View.VISIBLE);
@@ -211,8 +326,15 @@ final class HomeCover {
 
     /** The Home has drawn itself. */
     void homeBack() {
-        // After an app from the wheel the Home takes the cover away itself, as it starts closing the colour.
-        if (view.getVisibility() != View.VISIBLE || closing != null) return;
+        if (shrinking) {
+            homeIsBack = true;
+            return;
+        }
+        if (shrink != null && view.getVisibility() == View.VISIBLE) {
+            hide();
+            return;
+        }
+        if (view.getVisibility() != View.VISIBLE) return;
         main.removeCallbacks(hide);
         main.postDelayed(hide, AFTER_HOME_MS);
     }
@@ -222,6 +344,13 @@ final class HomeCover {
         held = null;
         main.removeCallbacks(hide);
         view.setVisibility(View.GONE);
+        if (shrink != null) {
+            shrink = null;
+            closing = null;
+        }
+        Runnable then = whenGone;
+        whenGone = null;
+        if (then != null) then.run();
     }
 
     /** Gone now: the Home under it shows the same colour. A hold over a Fire OS page is not this cover's to drop. */

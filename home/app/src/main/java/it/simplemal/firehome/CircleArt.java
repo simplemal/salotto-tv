@@ -41,6 +41,8 @@ final class CircleArt {
     /** How far the background's blur reaches, in parts of the sample's width: enough to fill a long name. */
     private static final int BACK_REACH = 16;
     private static final int BACK_PASSES = 3;
+    private static final int RIM_SAMPLES = 48;
+    private static final float[] RIM_AT = {0.86f, 0.93f};
 
     /** Below this distance from the background a pixel of a cut-out logo is clear, above the second it is whole. */
     private static final int CUT_CLEAR = 25;
@@ -232,6 +234,29 @@ final class CircleArt {
             best = Math.min(best, dr * dr + dg * dg + db * db);
         }
         return best;
+    }
+
+    /** The colour along the inside of a circle's edge: its background, where the logo never reaches. */
+    static int rim(Bitmap art) {
+        int size = Math.min(art.getWidth(), art.getHeight());
+        float centre = size / 2f;
+        long red = 0;
+        long green = 0;
+        long blue = 0;
+        int count = 0;
+        for (int step = 0; step < RIM_SAMPLES; step++) {
+            double angle = 2 * Math.PI * step / RIM_SAMPLES;
+            for (float share : RIM_AT) {
+                int x = Math.round(centre + (float) Math.cos(angle) * centre * share);
+                int y = Math.round(centre + (float) Math.sin(angle) * centre * share);
+                int pixel = art.getPixel(Math.max(0, Math.min(size - 1, x)), Math.max(0, Math.min(size - 1, y)));
+                red += Color.red(pixel);
+                green += Color.green(pixel);
+                blue += Color.blue(pixel);
+                count++;
+            }
+        }
+        return Color.rgb((int) (red / count), (int) (green / count), (int) (blue / count));
     }
 
     /** A see-through picture is seen on the plain grey, as on the grid. */

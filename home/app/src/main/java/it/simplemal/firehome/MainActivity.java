@@ -223,6 +223,7 @@ public final class MainActivity extends CardActivity {
     private static final long PORTAL_GIVE_UP_MS = 2500;
     /** The Home's first frame on screen, under the cover: Amazon's Home must not show through. */
     private static final long CLOSE_LATEST_MS = 450;
+    private static final int DATE_SP = 20;
     /** The weather's corner on the wheel: a little lower than the top, the date lined up with it. */
     private static final int WEATHER_TOP = 34;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
@@ -272,7 +273,7 @@ public final class MainActivity extends CardActivity {
         String longDate = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM");
         date.setFormat24Hour(longDate);
         date.setFormat12Hour(longDate);
-        date.setTextSize(20);
+        date.setTextSize(DATE_SP);
         date.setTextColor(Color.WHITE);
         // Thin letters over a detailed picture: only a tight, dark shadow keeps them apart from it.
         date.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -527,9 +528,13 @@ public final class MainActivity extends CardActivity {
         weatherCorner.setOrientation(LinearLayout.VERTICAL);
         weatherCorner.setGravity(Gravity.END);
         weatherCorner.setVisibility(View.GONE);
-        cornerLine = label("", 16);
-        cornerLine.setShadowLayer(dp(5), 0, dp(1), Color.argb(190, 0, 0, 0));
-        weatherCorner.addView(cornerLine);
+        // As the date across the screen, which sits on the same line: same size, letters and shadow.
+        cornerLine = label("", DATE_SP);
+        cornerLine.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        cornerLine.setShadowLayer(dp(3), 0, dp(1), Color.argb(225, 0, 0, 0));
+        cornerLine.setSingleLine(true);
+        // As wide as its own words: by default it would be as wide as the days under it, and cut.
+        weatherCorner.addView(cornerLine, new LinearLayout.LayoutParams(-2, -2));
         cornerDays = new LinearLayout(this);
         LinearLayout.LayoutParams below = new LinearLayout.LayoutParams(-2, -2);
         below.topMargin = dp(8);
@@ -811,8 +816,19 @@ public final class MainActivity extends CardActivity {
         // cover shows it too), and the colour closes into the circle as soon as Fire OS's own
         // animation has ended, which would hide it; at the latest after a moment.
         if (wheel.portalOpen()) {
-            root.removeCallbacks(closeNow);
-            root.postDelayed(closeNow, CLOSE_LATEST_MS);
+            if (TaskService.coverCloses()) {
+                // The Home key: the cover is already closing the circle over everything.
+                wheel.dropPortal();
+                TaskService.afterHomeCover(() -> {
+                    HomeCover.disarm();
+                    fadeCorners(true, null);
+                });
+            } else {
+                // Back: the app has gone by itself; the same closing, drawn here.
+                wheel.portalToCircle();
+                root.removeCallbacks(closeNow);
+                root.postDelayed(closeNow, CLOSE_LATEST_MS);
+            }
         }
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
@@ -1276,7 +1292,10 @@ public final class MainActivity extends CardActivity {
                 boolean over = TaskService.portal(HomeCover.lastPicture(), colour, spot[0], spot[1], spot[2], () -> {
                     wheel.cover();
                     open(intent);
-                }, () -> HomeCover.armClose(colour));
+                }, () -> {
+                    Bitmap art = wheel.litArt();
+                    if (art != null) HomeCover.armClose(art, CircleArt.rim(art), spot[0], spot[1], spot[2]);
+                });
                 if (!over) wheel.openPortal(() -> open(intent));
                 // An app that cannot start leaves the Home in front: the colour goes.
                 root.postDelayed(() -> {
