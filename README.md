@@ -1,63 +1,65 @@
 <p align="center"><img src="distro/docs/immagini/logo-nome.svg" alt="Salotto" width="180"></p>
 
-<p align="center"><br><img src="distro/docs/immagini/home.webp" alt="La Home di Salotto" width="100%"></p>
+<p align="center"><b>English</b> · <a href="README.it.md">Italiano</a></p>
 
-Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
+<p align="center"><br><img src="distro/docs/immagini/home.webp" alt="Salotto's Home" width="100%"></p>
 
-## Fire TV supportate
+A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weather. No ads, no recommended content and no autoplaying videos.
 
-- Fire TV Stick 4K 2ª generazione (2023)
-- Fire TV Stick 4K Max 2ª generazione (2023)
-- Fire TV Stick 4K Max 1ª generazione (2021), con alcune funzioni limitate
-- Fire TV Stick 3ª generazione (2020), con alcune funzioni limitate
+## Supported Fire TVs
 
-## Installazione
+- Fire TV Stick 4K 2nd generation (2023)
+- Fire TV Stick 4K Max 2nd generation (2023)
+- Fire TV Stick 4K Max 1st generation (2021), with some features limited
+- Fire TV Stick 3rd generation (2020), with some features limited
 
-Installa Salotto guida ogni passo dal computer, e con Togli Salotto rimette tutto com'era.
+## Installation
+
+Installa Salotto guides every step from the computer, and with Remove Salotto it puts everything back as it was.
 
 | Computer | Installer |
 |---|---|
-| Mac Apple Silicon | **[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
-| Windows | **[Scarica Installa Salotto per Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
+| Mac Apple Silicon | **[Download Installa Salotto for Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
+| Windows | **[Download Installa Salotto for Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
 
-## Cosa fa
+## What it does
 
-- **Home:** griglia delle tue app, sfondi che seguono il meteo e l'ora della tua città, oppure illustrazioni, sculture 3D e città notturne che cambiano da sole.
-- **Dieci lingue:** italiano, inglese, spagnolo, francese, tedesco, portoghese, russo, arabo, hindi e cinese.
-- **Primo avvio:** una presentazione guidata prima della Home.
-- **Salvaschermi:** le stesse immagini, con solo ora e data.
-- **Centro di controllo:** tieni premuto Menu per Wi-Fi, Bluetooth, timer, luminosità e, dove possibile, filtro luce blu.
-- **Task manager:** tieni premuto Indietro.
-- **Meno tracciamento:** l'installazione spegne i pacchetti di pubblicità, telemetria e Alexa, limita l'identificativo pubblicitario e ferma l'invio dei dati d'uso. Se Fire OS li riattiva, Salotto te lo dice.
-- **Aggiornamenti:** firmati e controllati prima di installarli, con un passo per volta a schermo.
+- **Home:** a grid of your apps, backdrops that follow the weather and the time of your city, or illustrations, 3D sculptures and night cities that change on their own.
+- **Ten languages:** Italian, English, Spanish, French, German, Portuguese, Russian, Arabic, Hindi and Chinese.
+- **First start:** a guided tour before the Home.
+- **Screensavers:** the same pictures, with just the time and date.
+- **Control center:** hold Menu for Wi-Fi, Bluetooth, timer, brightness and, where possible, the blue light filter.
+- **Task manager:** hold Back.
+- **Less tracking:** the installation turns off the advertising, telemetry and Alexa packages, limits the advertising ID and stops sending usage data. If Fire OS turns them back on, Salotto tells you.
+- **Updates:** signed and checked before they are installed, one step at a time on screen.
 
-Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamenti. Niente root e niente modifiche al sistema: resta una normale app, e si può disinstallare.
+Salotto connects only to Open-Meteo for the weather and to GitHub for updates. No root and no changes to the system: it stays a normal app, and it can be uninstalled.
 
-## Com'è
+## How it looks
 
 <p align="center">
-  <img src="distro/docs/immagini/centro-di-controllo.webp" alt="Centro di controllo" width="32%">
-  <img src="distro/docs/immagini/sfondo.webp" alt="Scelta dello sfondo" width="32%">
+  <img src="distro/docs/immagini/centro-di-controllo.webp" alt="Control center" width="32%">
+  <img src="distro/docs/immagini/sfondo.webp" alt="Choosing the backdrop" width="32%">
   <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="32%">
 </p>
-<p align="center"><sub>Centro di controllo · Scelta dello sfondo · Task manager</sub></p>
+<p align="center"><sub>Control center · Choosing the backdrop · Task manager</sub></p>
 
-## Come è fatto il repository
+## How the repository is made
 
-- `home/app`: l'app Salotto, in Java, senza librerie esterne.
-- `home/cover`: una piccola app che tiene a schermo la pagina di aggiornamento mentre Android sostituisce Salotto.
-- `distro`: script di installazione e disinstallazione, elenchi dei pacchetti, guide e strumenti di pubblicazione.
+- `home/app`: the Salotto app, in Java, with no external libraries apart from a small QR code generator.
+- `home/cover`: a small app that keeps the update page on screen while Android replaces Salotto.
+- `distro`: install and uninstall scripts, package lists, guides and publishing tools.
 
-Per compilare servono JDK 17, Android SDK e Gradle 8.9: `gradle :app:assembleDebug` dalla cartella `home`.
+To build you need JDK 17, the Android SDK and Gradle 8.9: `gradle :app:assembleDebug` from the `home` folder.
 
-## Aggiornamenti ed errori
+## Updates and errors
 
-Ogni versione è una [release](https://github.com/simplemal/salotto-tv/releases) con l'APK, `update.json` e la sua firma. Salotto installa solo ciò che è firmato con la chiave giusta.
+Every version is a [release](https://github.com/simplemal/salotto-tv/releases) with the APK, `update.json` and its signature. Salotto installs only what is signed with the right key.
 
-Se sulla TV compare un codice, cercalo in [ERRORI.md](ERRORI.md). Per tutto il resto [apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new).
+If a code appears on the TV, look for it in [ERRORI.md](ERRORI.md). For anything else [open an issue](https://github.com/simplemal/salotto-tv/issues/new).
 
-## Licenza
+## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE): si può usare, studiare, modificare e derivare gratis per scopi non commerciali. Per venderlo serve il permesso dell'autore. Crediti e software di altri sono in [NOTICE.md](NOTICE.md).
+[PolyForm Noncommercial 1.0.0](LICENSE): it can be used, studied, modified and built upon for free for non-commercial purposes. Selling it requires the author's permission. Credits and third-party software are in [NOTICE.md](NOTICE.md).
 
-Salotto è un progetto indipendente. Non è affiliato, sponsorizzato né approvato da Amazon, Apple o dagli altri marchi citati, che appartengono ai rispettivi proprietari.
+Salotto is an independent project. It is not affiliated with, sponsored or endorsed by Amazon, Apple or the other brands mentioned, which belong to their respective owners.
