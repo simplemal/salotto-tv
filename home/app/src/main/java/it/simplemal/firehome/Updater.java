@@ -32,8 +32,11 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,7 +66,15 @@ final class Updater {
         String url;
         String sha256;
         long size;
+        /** In Italian, the only list before 1.0.19: older versions still read it. */
         final List<String> changes = new ArrayList<>();
+        final Map<String, List<String>> changesByLanguage = new HashMap<>();
+
+        /** In Salotto's language when the release has it, otherwise in Italian. */
+        List<String> changes(Context context) {
+            List<String> own = changesByLanguage.get(Language.code(context));
+            return own != null && !own.isEmpty() ? own : changes;
+        }
     }
 
     interface Progress { void percent(int done); }
@@ -226,6 +237,16 @@ final class Updater {
             release.size = json.getLong("size");
             JSONArray changes = json.getJSONArray("changes");
             for (int index = 0; index < changes.length(); index++) release.changes.add(changes.getString(index));
+            JSONObject languages = json.optJSONObject("changes_by_language");
+            if (languages != null) {
+                for (Iterator<String> codes = languages.keys(); codes.hasNext(); ) {
+                    String code = codes.next();
+                    JSONArray lines = languages.getJSONArray(code);
+                    List<String> list = new ArrayList<>();
+                    for (int index = 0; index < lines.length(); index++) list.add(lines.getString(index));
+                    release.changesByLanguage.put(code, list);
+                }
+            }
             if (!release.url.startsWith("https://") || release.size <= 0) throw new Failure(UpdateError.F103);
             return release;
         } catch (JSONException e) {

@@ -159,7 +159,7 @@ public final class UpdateActivity extends CardActivity {
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
         list.setPadding(dp(20), dp(2), dp(15), dp(2));
-        for (String change : found.changes) {
+        for (String change : found.changes(this)) {
             TextView item = label("•  " + change, CHANGE_SP);
             item.setPadding(0, dp(3), 0, dp(3));
             list.addView(item);

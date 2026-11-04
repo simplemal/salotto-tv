@@ -2,6 +2,8 @@
 # Publishes the built Salotto as a release of this repository: APK, signed update.json, error page,
 # and next to them the latest installer, which is what people download.
 # Usage: distro/tools/pubblica-aggiornamento.sh "first change" "second change" ...
+# The changes are in Italian; distro/novita.json holds them in every other language of the app, for
+# this same version, and each TV shows its own. Older versions read only the Italian list.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -33,14 +35,31 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
 cp "$APK" "$WORK/salotto.apk"
 "$ROOT/distro/tools/prepara-installatore.sh" "$WORK/installatore"
-python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$@" <<'PY'
-import hashlib, json, os, sys
-work, code, name, repo, *changes = sys.argv[1:]
+python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$ROOT" "$@" <<'PY'
+import hashlib, json, os, re, sys
+work, code, name, repo, root, *changes = sys.argv[1:]
+java = open(os.path.join(root, "home/app/src/main/java/it/simplemal/firehome/Language.java"), encoding="utf-8").read()
+codes = re.findall(r'"([a-z]{2})"', re.search(r"CODES = \{([^}]*)\}", java).group(1))
+try:
+    notes = json.load(open(os.path.join(root, "distro/novita.json"), encoding="utf-8"))
+except FileNotFoundError:
+    sys.exit("Fermo: mancano le novità nelle altre lingue, in distro/novita.json.")
+if notes.get("versionName") != name:
+    sys.exit(f"Fermo: distro/novita.json è per la {notes.get('versionName')}, non per la {name}.")
+languages = {"it": changes}
+for language in codes:
+    if language == "it":
+        continue
+    lines = notes.get("changes", {}).get(language)
+    if not lines or len(lines) != len(changes):
+        sys.exit(f"Fermo: in distro/novita.json la lingua {language} non ha {len(changes)} novità.")
+    languages[language] = lines
 apk = os.path.join(work, "salotto.apk")
 data = open(apk, "rb").read()
 json.dump({"versionCode": int(code), "versionName": name,
            "url": f"https://github.com/{repo}/releases/download/v{name}/salotto.apk",
-           "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes},
+           "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes,
+           "changes_by_language": languages},
           open(os.path.join(work, "update.json"), "w"), ensure_ascii=False, indent=2)
 PY
 openssl dgst -sha256 -sign "$KEY" -out "$WORK/update.json.sig" "$WORK/update.json"
