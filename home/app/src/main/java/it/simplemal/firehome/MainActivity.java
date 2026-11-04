@@ -211,10 +211,10 @@ public final class MainActivity extends CardActivity {
     private boolean opening;
     private static final long CORNERS_GONE_MS = 110;
     private ImageView blurred;
-    private static final int BLUR_WIDTH = 480;
-    private static final int BLUR_HEIGHT = 270;
-    /** As behind the task manager. */
-    private static final int BLUR_RADIUS = 6;
+    /** A third of the screen: the backdrop only seems a step behind the circles, not lost in a haze. */
+    private static final int BLUR_WIDTH = 640;
+    private static final int BLUR_HEIGHT = 360;
+    private static final int BLUR_RADIUS = 2;
     private static final long BLUR_SCENE_MS = 700;
     private static final long BLUR_SETTLED_MS = 3300;
     private static final long WHEEL_MOVE_MS = 180;
@@ -886,7 +886,7 @@ public final class MainActivity extends CardActivity {
         Bitmap small = Bitmap.createScaledBitmap(whole, BLUR_WIDTH, BLUR_HEIGHT, true);
         whole.recycle();
         Background.draw(() -> {
-            Bitmap soft = Blur.veiled(small, BLUR_RADIUS, Color.TRANSPARENT);
+            Bitmap soft = Blur.light(small, BLUR_WIDTH, BLUR_HEIGHT, BLUR_RADIUS);
             small.recycle();
             runOnUiThread(() -> blurred.setImageBitmap(soft));
         });

@@ -124,7 +124,7 @@ final class WheelHome extends FrameLayout {
     /** An app is being moved: the one it changes place with crosses the top behind it, not over it. */
     private boolean moving;
     /** The halo of the app's colour: off, the circles keep only their dark shadow. */
-    private boolean tinted = true;
+    private boolean tinted;
     private boolean closing;
     private ObjectAnimator sway;
 

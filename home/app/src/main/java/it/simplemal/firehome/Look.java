@@ -160,8 +160,8 @@ final class Look {
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
     static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
-    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. */
-    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
+    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays: off unless chosen, the user's default. */
+    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", false); }
     static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
     /** An app opening from a circle of its colour and closing back into it: off until it is better, the user's choice. */
     static boolean wheelMotion(Context context) { return prefs(context).getBoolean("wheel_motion", false); }
