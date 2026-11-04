@@ -290,6 +290,15 @@
     <string name="grid_delete">Supprimer</string>
     <string name="grid_delete_title">Supprimer %1$s ?</string>
     <string name="grid_delete_text">La photo est retirée de cette TV. Impossible d’annuler.</string>
+    <string name="grid_delete_set">Supprimer toute la collection</string>
+    <string name="grid_delete_set_title">Supprimer toute la collection %1$s ?</string>
+    <string name="grid_delete_set_text">Ses photos n’apparaîtront plus comme fond d’écran, ni au hasard, ni dans l’économiseur d’écran. Vous pouvez les remettre depuis Réglages → Apparence → Fond d’écran.</string>
+    <string name="grid_delete_set_do">Supprimer</string>
+    <string name="grid_hide_text">Elle n’apparaîtra plus comme fond d’écran, ni au hasard, ni dans l’économiseur d’écran. Vous pouvez la remettre depuis Réglages → Apparence → Fond d’écran.</string>
+    <string name="settings_backdrop_give_back">Remettre les fonds supprimés</string>
+    <string name="settings_backdrop_give_back_text">Toutes les photos et collections supprimées reviennent.</string>
+    <string name="settings_backdrop_give_back_question">Remettre les fonds supprimés ?</string>
+    <string name="settings_backdrop_give_back_do">Remettre</string>
     <string name="upload_title">Envoyer depuis le téléphone</string>
     <string name="upload_text">Visez le code avec l’appareil photo du téléphone et choisissez une photo. Le téléphone doit être sur le même réseau que la TV.</string>
     <string name="upload_no_network">La TV n’est connectée à aucun réseau : connectez-la et réessayez.</string>

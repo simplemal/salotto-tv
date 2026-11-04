@@ -290,6 +290,15 @@
     <string name="grid_delete">Eliminar</string>
     <string name="grid_delete_title">¿Eliminar %1$s?</string>
     <string name="grid_delete_text">La foto se quita de esta TV. No se puede deshacer.</string>
+    <string name="grid_delete_set">Eliminar toda la colección</string>
+    <string name="grid_delete_set_title">¿Eliminar toda la colección %1$s?</string>
+    <string name="grid_delete_set_text">Sus fotos ya no aparecerán como fondo, ni al azar, ni en el salvapantallas. Se recuperan en Ajustes → Aspecto → Fondo.</string>
+    <string name="grid_delete_set_do">Eliminar</string>
+    <string name="grid_hide_text">Ya no aparecerá como fondo, ni al azar, ni en el salvapantallas. Se recupera en Ajustes → Aspecto → Fondo.</string>
+    <string name="settings_backdrop_give_back">Recuperar fondos eliminados</string>
+    <string name="settings_backdrop_give_back_text">Vuelven todas las fotos y colecciones eliminadas.</string>
+    <string name="settings_backdrop_give_back_question">¿Recuperar los fondos eliminados?</string>
+    <string name="settings_backdrop_give_back_do">Recuperar</string>
     <string name="upload_title">Subir desde el teléfono</string>
     <string name="upload_text">Apunta la cámara del teléfono al código y elige una foto. El teléfono debe estar en la misma red que la TV.</string>
     <string name="upload_no_network">La TV no está conectada a una red: conéctala y vuelve a intentarlo.</string>

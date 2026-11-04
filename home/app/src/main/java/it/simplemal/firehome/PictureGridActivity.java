@@ -49,6 +49,17 @@ public final class PictureGridActivity extends CardActivity {
     private static final int RADIUS = 10;
     private static final int EDGE = 2;
     private static final int TITLE_SP = 20;
+    /** The set's name in a colour of its own, the picture's a little smaller and paler after it. */
+    private static final int SET_COLOUR = Color.rgb(150, 192, 245);
+    private static final int PICTURE_SP = 16;
+    private static final float PICTURE_ALPHA = 0.8f;
+    private static final int PICTURE_GAP = 14;
+    private static final int QUIET_SP = 13;
+    private static final int QUIET_SIDE = 12;
+    private static final int QUIET_TOP = 5;
+    private static final int QUIET_RADIUS = 14;
+    private static final float QUIET_ALPHA = 0.45f;
+    private static final int QUIET_RIM = Color.argb(60, 255, 255, 255);
     private static final int TITLE_TOP = 22;
     private static final int TITLE_BOTTOM = 14;
     /** The edge of a selected cell stays inside the scrolling area. */
@@ -119,8 +130,12 @@ public final class PictureGridActivity extends CardActivity {
     /** Hidden under a preview, where Down would otherwise find it. */
     private View under;
     private String setName;
+    /** The folder of one of the app's sets, whose pictures can be taken away: null for Personale and the colours. */
+    private String set;
     private TextView title;
+    private TextView pictureName;
     private TextView confirmButton;
+    private TextView deleteSet;
     private String previewed;
     private int previewIndex;
     private TextView before;
@@ -150,15 +165,14 @@ public final class PictureGridActivity extends CardActivity {
         LinearLayout page = new LinearLayout(this);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setGravity(Gravity.CENTER_HORIZONTAL);
-        title = label(setName, TITLE_SP);
-        title.setPadding(0, dp(TITLE_TOP), 0, dp(TITLE_BOTTOM));
-        page.addView(title, new LinearLayout.LayoutParams(-2, -2));
+        set = !personal && folder != null && Arrays.asList(Look.SETS).contains(folder) ? folder : null;
+        page.addView(header(), new LinearLayout.LayoutParams(gridWidth(), -2));
 
         rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
         rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(BOTTOM_ROOM));
         // As wide as four cells even with fewer: one or two photos start on the left, where the rest will follow.
-        rows.setMinimumWidth(COLUMNS * dp(CELL_WIDTH) + (COLUMNS - 1) * dp(GAP) + 2 * dp(SIDE_ROOM));
+        rows.setMinimumWidth(gridWidth());
         LinearLayout row = null;
         for (int index = 0; index < pictures.size(); index++) {
             if (index % COLUMNS == 0) {
@@ -194,6 +208,7 @@ public final class PictureGridActivity extends CardActivity {
 
         int chosen = Math.max(0, pictures.indexOf(Look.backdrop(this)));
         if (!cells.isEmpty()) cells.get(chosen).requestFocus();
+        else if (deleteSet != null) deleteSet.requestFocus();
         if (personal) scroll.post(this::fitWholeRows);
         if (files) {
             asked = new boolean[pictures.size()];
@@ -292,7 +307,9 @@ public final class PictureGridActivity extends CardActivity {
         try {
             String[] names = getAssets().list(folder);
             Arrays.sort(names);
-            for (String name : names) found.add(folder + "/" + name);
+            for (String name : names) {
+                if (!Look.taken(this, folder + "/" + name)) found.add(folder + "/" + name);
+            }
         } catch (IOException e) {
             say(getString(R.string.card_app_unavailable));
         }
@@ -319,7 +336,7 @@ public final class PictureGridActivity extends CardActivity {
             view.setForeground(focused ? edge() : null);
             if (focused && files) sharpenInView();
             if (focused && personal) showRowOf(index, true);
-            if (focused) title.setText(getString(R.string.grid_title, setName, Look.backdropName(this, pictures.get(index)),
+            if (focused) pictureName.setText(getString(R.string.grid_picture, Look.backdropName(this, pictures.get(index)),
                 getString(R.string.grid_position, index + 1, pictures.size())));
         });
         cell.setOnClickListener(view -> showPreview(index));
@@ -497,7 +514,7 @@ public final class PictureGridActivity extends CardActivity {
         buttons.addView(after);
         FrameLayout.LayoutParams bottom = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
         bottom.bottomMargin = dp(BUTTON_BOTTOM);
-        if (personal) {
+        if (personal || set != null) {
             // Under Confirm, as left and right go through the photos: Down reaches it.
             LinearLayout column = new LinearLayout(this);
             column.setOrientation(LinearLayout.VERTICAL);
@@ -590,16 +607,79 @@ public final class PictureGridActivity extends CardActivity {
         return trash;
     }
 
-    /** A photo can be sent by mistake: it goes, after a question, and the grid shows what is left. */
+    /**
+     * A photo can be sent by mistake: it goes, after a question, and the grid shows what is left.
+     * A picture of the app's sets is inside the app: it is taken away, never shown again, and can come back.
+     */
     private void askDelete() {
         String name = previewed;
         if (name == null) return;
-        confirm(getString(R.string.grid_delete_title, Look.backdropName(this, name)), getString(R.string.grid_delete_text),
-            getString(R.string.grid_delete), () -> {
-                Look.deletePersonal(this, name);
+        confirm(getString(R.string.grid_delete_title, Look.backdropName(this, name)),
+            getString(personal ? R.string.grid_delete_text : R.string.grid_hide_text), getString(R.string.grid_delete), () -> {
+                if (personal) Look.deletePersonal(this, name);
+                else Look.take(this, name);
                 setResult(RESULT_OK);
                 recreate();
             });
+    }
+
+    private void askDeleteSet() {
+        confirm(getString(R.string.grid_delete_set_title, setName), getString(R.string.grid_delete_set_text),
+            getString(R.string.grid_delete_set_do), () -> {
+                Look.takeSet(this, set);
+                setResult(RESULT_OK);
+                finish();
+            });
+    }
+
+    private int gridWidth() { return COLUMNS * dp(CELL_WIDTH) + (COLUMNS - 1) * dp(GAP) + 2 * dp(SIDE_ROOM); }
+
+    /**
+     * The set's name on the left in its own colour, the picture's smaller after it, and for the app's
+     * sets a quiet button on the right that Up reaches from the first row.
+     */
+    private View header() {
+        LinearLayout header = new LinearLayout(this);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setPadding(dp(SIDE_ROOM), dp(TITLE_TOP), dp(SIDE_ROOM), dp(TITLE_BOTTOM));
+        title = label(setName, TITLE_SP);
+        title.setTextColor(SET_COLOUR);
+        title.setSingleLine(true);
+        header.addView(title, new LinearLayout.LayoutParams(-2, -2));
+        pictureName = label("", PICTURE_SP);
+        pictureName.setSingleLine(true);
+        pictureName.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        pictureName.setAlpha(PICTURE_ALPHA);
+        pictureName.setPaddingRelative(dp(PICTURE_GAP), 0, dp(PICTURE_GAP), 0);
+        header.addView(pictureName, new LinearLayout.LayoutParams(0, -2, 1));
+        if (set != null) {
+            deleteSet = quietButton(getString(R.string.grid_delete_set), this::askDeleteSet);
+            header.addView(deleteSet, new LinearLayout.LayoutParams(-2, -2));
+        }
+        return header;
+    }
+
+    /** Small and pale until it has the focus: it is there for whoever looks for it. */
+    private TextView quietButton(String text, Runnable action) {
+        TextView button = label(text, QUIET_SP);
+        button.setSingleLine(true);
+        button.setFocusable(true);
+        button.setClickable(true);
+        button.setDefaultFocusHighlightEnabled(false);
+        button.setPadding(dp(QUIET_SIDE), dp(QUIET_TOP), dp(QUIET_SIDE), dp(QUIET_TOP));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setCornerRadius(dp(QUIET_RADIUS));
+        button.setBackground(fill);
+        View.OnFocusChangeListener look = (view, focused) -> {
+            fill.setColor(focused ? Color.WHITE : Color.TRANSPARENT);
+            fill.setStroke(dp(1), focused ? Color.WHITE : QUIET_RIM);
+            button.setTextColor(focused ? Fire.INK : Color.WHITE);
+            button.setAlpha(focused ? 1f : QUIET_ALPHA);
+        };
+        look.onFocusChange(button, false);
+        button.setOnFocusChangeListener(look);
+        button.setOnClickListener(view -> action.run());
+        return button;
     }
 
     private void confirm() {

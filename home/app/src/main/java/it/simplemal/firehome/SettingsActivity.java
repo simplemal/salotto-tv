@@ -1573,19 +1573,19 @@ public final class SettingsActivity extends CardActivity {
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
         drawn.mosaic = Look.ABSTRACT_FOLDER;
         drawn.mark = R.drawable.ic_restart;
-        timed.add(drawn);
+        if (!Look.setTaken(this, Look.ABSTRACT_FOLDER)) timed.add(drawn);
         Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text));
         shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
         shapes.mark = R.drawable.ic_restart;
-        timed.add(shapes);
+        if (!Look.setTaken(this, Look.ABSTRACT_3D_FOLDER)) timed.add(shapes);
         Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text));
         city.mosaic = Look.NOX_FOLDER;
         city.mark = R.drawable.ic_restart;
-        timed.add(city);
+        if (!Look.setTaken(this, Look.NOX_FOLDER)) timed.add(city);
         Entry nature = plainBackdrop(Look.NATURE, getString(R.string.settings_backdrop_nature_text));
         nature.mosaic = Look.NATURE_FOLDER;
         nature.mark = R.drawable.ic_restart;
-        timed.add(nature);
+        if (!Look.setTaken(this, Look.NATURE_FOLDER)) timed.add(nature);
         if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
             Entry mine = plainBackdrop(Look.PERSONAL, getString(R.string.settings_backdrop_personal_timed_text));
             mine.mark = R.drawable.ic_restart;
@@ -1602,11 +1602,20 @@ public final class SettingsActivity extends CardActivity {
         entries.addAll(weatherFirst ? timed : weather);
         entries.add(groupLabel(R.string.first_backdrop_static));
         entries.add(standardSet());
-        entries.add(pictureSet(Look.ABSTRACT, Look.ABSTRACT_FOLDER));
-        entries.add(pictureSet(Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER));
-        entries.add(pictureSet(Look.NOX, Look.NOX_FOLDER));
-        entries.add(pictureSet(Look.NATURE, Look.NATURE_FOLDER));
+        String[][] sets = {{Look.ABSTRACT, Look.ABSTRACT_FOLDER}, {Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER},
+            {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
+        for (String[] set : sets) if (!Look.setTaken(this, set[1])) entries.add(pictureSet(set[0], set[1]));
         entries.add(personalSet());
+        // Only once something was taken away: everything comes back from here.
+        if (Look.anyTaken(this)) {
+            entries.add(new Entry(getString(R.string.settings_backdrop_give_back), null, getDrawable(R.drawable.ic_s_restore),
+                getString(R.string.settings_backdrop_give_back_text), false,
+                () -> confirm(getString(R.string.settings_backdrop_give_back_question), getString(R.string.settings_backdrop_give_back_text),
+                    getString(R.string.settings_backdrop_give_back_do), () -> {
+                        Look.giveBack(this);
+                        refresh();
+                    })));
+        }
         showFromChosen(getString(R.string.settings_backdrop), entries);
     }
 
@@ -1863,7 +1872,7 @@ public final class SettingsActivity extends CardActivity {
         boolean own = ownSaver();
         List<Entry> entries = new ArrayList<>();
         entries.add(groupLabel(Brand.NAME));
-        for (Saver saver : SAVERS) entries.add(saverEntry(saver));
+        for (Saver saver : SAVERS) if (!Look.setTaken(this, saver.folder)) entries.add(saverEntry(saver));
         if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
             Entry mine = saverEntry(personalSaver());
             mine.mosaic = null;

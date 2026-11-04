@@ -5,7 +5,7 @@
 -->
 <resources>
     <!-- Shared by the screens -->
-    <string name="grid_title" translatable="false">%1$s · %2$s · %3$s</string>
+    <string name="grid_picture" translatable="false">%1$s · %2$s</string>
     <string name="card_confirm">Conferma</string>
     <string name="card_cancel">Annulla</string>
     <string name="card_close">Chiudi</string>
@@ -364,6 +364,15 @@
     <string name="grid_delete">Elimina</string>
     <string name="grid_delete_title">Eliminare %1$s?</string>
     <string name="grid_delete_text">La foto viene tolta da questa TV. Non si può annullare.</string>
+    <string name="grid_delete_set">Cancella tutta la collezione</string>
+    <string name="grid_delete_set_title">Cancellare tutta la collezione %1$s?</string>
+    <string name="grid_delete_set_text">Le sue foto non compariranno più come sfondo, nemmeno a caso, né nel salvaschermo. Si rimettono da Impostazioni → Aspetto → Sfondo.</string>
+    <string name="grid_delete_set_do">Cancella</string>
+    <string name="grid_hide_text">Non comparirà più come sfondo, nemmeno a caso, né nel salvaschermo. Si rimette da Impostazioni → Aspetto → Sfondo.</string>
+    <string name="settings_backdrop_give_back">Rimetti gli sfondi cancellati</string>
+    <string name="settings_backdrop_give_back_text">Tornano tutte le foto e le collezioni cancellate.</string>
+    <string name="settings_backdrop_give_back_question">Rimettere gli sfondi cancellati?</string>
+    <string name="settings_backdrop_give_back_do">Rimetti</string>
     <string name="upload_title">Carica dal telefono</string>
     <string name="upload_text">Inquadra il codice con la fotocamera del telefono e scegli una foto. Il telefono deve essere sulla stessa rete della TV.</string>
     <string name="upload_no_network">La TV non è collegata a una rete: collegala e riprova.</string>

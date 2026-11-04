@@ -290,6 +290,15 @@
     <string name="grid_delete">Löschen</string>
     <string name="grid_delete_title">%1$s löschen?</string>
     <string name="grid_delete_text">Das Foto wird von diesem Fernseher entfernt. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="grid_delete_set">Ganze Sammlung löschen</string>
+    <string name="grid_delete_set_title">Die ganze Sammlung %1$s löschen?</string>
+    <string name="grid_delete_set_text">Ihre Fotos erscheinen nicht mehr als Hintergrund, auch nicht zufällig, und nicht im Bildschirmschoner. Zurückholen kannst du sie unter Einstellungen → Aussehen → Hintergrund.</string>
+    <string name="grid_delete_set_do">Löschen</string>
+    <string name="grid_hide_text">Es erscheint nicht mehr als Hintergrund, auch nicht zufällig, und nicht im Bildschirmschoner. Zurückholen kannst du es unter Einstellungen → Aussehen → Hintergrund.</string>
+    <string name="settings_backdrop_give_back">Gelöschte Hintergründe zurückholen</string>
+    <string name="settings_backdrop_give_back_text">Alle gelöschten Fotos und Sammlungen kommen zurück.</string>
+    <string name="settings_backdrop_give_back_question">Gelöschte Hintergründe zurückholen?</string>
+    <string name="settings_backdrop_give_back_do">Zurückholen</string>
     <string name="upload_title">Vom Handy hochladen</string>
     <string name="upload_text">Richte die Kamera des Handys auf den Code und wähle ein Foto. Das Handy muss im selben Netzwerk wie der Fernseher sein.</string>
     <string name="upload_no_network">Der Fernseher ist mit keinem Netzwerk verbunden: verbinde ihn und versuche es erneut.</string>

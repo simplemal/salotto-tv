@@ -290,6 +290,15 @@
     <string name="grid_delete">Eliminar</string>
     <string name="grid_delete_title">Eliminar %1$s?</string>
     <string name="grid_delete_text">A foto é removida desta TV. Não é possível anular.</string>
+    <string name="grid_delete_set">Apagar a coleção inteira</string>
+    <string name="grid_delete_set_title">Apagar a coleção inteira %1$s?</string>
+    <string name="grid_delete_set_text">As fotos dela não vão mais aparecer como fundo, nem ao acaso, nem no protetor de tela. Elas voltam em Configurações → Aparência → Fundo.</string>
+    <string name="grid_delete_set_do">Apagar</string>
+    <string name="grid_hide_text">Ela não vai mais aparecer como fundo, nem ao acaso, nem no protetor de tela. Ela volta em Configurações → Aparência → Fundo.</string>
+    <string name="settings_backdrop_give_back">Recuperar fundos apagados</string>
+    <string name="settings_backdrop_give_back_text">Voltam todas as fotos e coleções apagadas.</string>
+    <string name="settings_backdrop_give_back_question">Recuperar os fundos apagados?</string>
+    <string name="settings_backdrop_give_back_do">Recuperar</string>
     <string name="upload_title">Carregar do telemóvel</string>
     <string name="upload_text">Aponte a câmara do telemóvel para o código e escolha uma foto. O telemóvel tem de estar na mesma rede que a TV.</string>
     <string name="upload_no_network">A TV não está ligada a uma rede: ligue-a e tente novamente.</string>

@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -220,7 +223,7 @@ final class Look {
         boolean same = shown != null && shown.startsWith(folder + "/");
         long now = System.currentTimeMillis();
         long since = now - saved.getLong("abstract_at", 0);
-        if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS && !taken(context, shown)) return shown;
         String picked = anyPicture(context, folder, shown);
         if (picked == null) return shown;
         saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
@@ -252,6 +255,7 @@ final class Look {
     /** Any but the one on show. Null if the set cannot be read. */
     static String anyPicture(Context context, String folder, String shown) {
         List<String> files = new ArrayList<>();
+        List<String> kept = new ArrayList<>();
         if (folder.startsWith("/")) {
             for (File image : images(context)) {
                 if (!image.getPath().equals(shown)) files.add(image.getPath());
@@ -260,19 +264,28 @@ final class Look {
         }
         try {
             for (String name : context.getAssets().list(folder)) {
-                if (!(folder + "/" + name).equals(shown)) files.add(folder + "/" + name);
+                String file = folder + "/" + name;
+                if (file.equals(shown)) continue;
+                files.add(file);
+                if (!taken(context, file)) kept.add(file);
             }
         } catch (IOException e) {
             return null;
         }
-        return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
+        // With everything taken away the set still shows: a screensaver must not go blank.
+        List<String> from = kept.isEmpty() ? files : kept;
+        return from.isEmpty() ? null : from.get(new Random().nextInt(from.size()));
     }
 
     /** Which set Salotto's screensaver shows. */
     static String saverFolder(Context context) {
         String folder = prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER);
         // Personale's photos can be gone, after a backup is restored on another Stick.
-        return folder.startsWith("/") && images(context).isEmpty() ? ABSTRACT_3D_FOLDER : folder;
+        if (folder.startsWith("/") && images(context).isEmpty()) folder = ABSTRACT_3D_FOLDER;
+        if (setTaken(context, folder)) {
+            for (String set : SETS) if (!setTaken(context, set)) return set;
+        }
+        return folder;
     }
     static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
@@ -303,21 +316,76 @@ final class Look {
     static String backdrop(Context context) {
         String chosen = prefs(context).getString("backdrop", null);
         boolean place = Weather.active(context);
-        if (chosen == null) return place ? PICTURES : ABSTRACT_3D;
-        // Its photos can be gone, after a backup is restored on another Stick.
-        if (PERSONAL.equals(chosen) && images(context).isEmpty()) {
-            setBackdrop(context, ABSTRACT_3D);
-            return ABSTRACT_3D;
+        if (chosen == null) return place ? PICTURES : fallback(context);
+        // Its photos can be gone, after a backup is restored on another Stick; or taken away by the user.
+        if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) {
+            String other = fallback(context);
+            setBackdrop(context, other);
+            return other;
         }
         if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
-            setBackdrop(context, ABSTRACT_3D);
-            return ABSTRACT_3D;
+            String other = fallback(context);
+            setBackdrop(context, other);
+            return other;
         }
         return WEATHER.equals(chosen) ? PICTURES : chosen;
     }
 
     static void setBackdrop(Context context, String value) { prefs(context).edit().putString("backdrop", value).apply(); }
+
+    /** The sets whose pictures can be taken away one by one, or all at once. */
+    static final String[] SETS = {ABSTRACT_3D_FOLDER, ABSTRACT_FOLDER, NOX_FOLDER, NATURE_FOLDER};
+    private static final String TAKEN = "taken_pictures";
+    /** Ends the name of a set taken away whole, in the same list as the pictures. */
+    private static final String WHOLE = "/*";
+
+    /**
+     * Taken away by the user: a picture of a set, or a whole set. The files are inside the app and
+     * stay on the TV; they are only never shown again, as a backdrop, by chance or in the screensaver.
+     */
+    static boolean taken(Context context, String name) {
+        Set<String> taken = prefs(context).getStringSet(TAKEN, Collections.emptySet());
+        if (taken.isEmpty()) return false;
+        String folder = folderOf(name);
+        return taken.contains(name) || folder != null && taken.contains(folder + WHOLE);
+    }
+
+    static boolean setTaken(Context context, String folder) {
+        return prefs(context).getStringSet(TAKEN, Collections.emptySet()).contains(folder + WHOLE);
+    }
+
+    static boolean anyTaken(Context context) { return !prefs(context).getStringSet(TAKEN, Collections.emptySet()).isEmpty(); }
+
+    static void take(Context context, String picture) { addTaken(context, picture); }
+
+    static void takeSet(Context context, String folder) { addTaken(context, folder + WHOLE); }
+
+    /** Everything taken away comes back. */
+    static void giveBack(Context context) { prefs(context).edit().remove(TAKEN).apply(); }
+
+    private static void addTaken(Context context, String entry) {
+        Set<String> taken = new HashSet<>(prefs(context).getStringSet(TAKEN, Collections.emptySet()));
+        taken.add(entry);
+        prefs(context).edit().putStringSet(TAKEN, taken).apply();
+    }
+
+    /** The set a backdrop belongs to: a picture's folder, or the folder of a set that changes on its own. */
+    private static String folderOf(String name) {
+        if (ABSTRACT.equals(name)) return ABSTRACT_FOLDER;
+        if (ABSTRACT_3D.equals(name)) return ABSTRACT_3D_FOLDER;
+        if (NOX.equals(name)) return NOX_FOLDER;
+        if (NATURE.equals(name)) return NATURE_FOLDER;
+        int slash = name.indexOf('/');
+        return slash > 0 && !name.startsWith("/") ? name.substring(0, slash) : null;
+    }
+
+    /** Abstract 3D, or the first set still there, or the first plain colour. */
+    private static String fallback(Context context) {
+        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
+        for (String name : names) if (!taken(context, name)) return name;
+        return PRESET_NAMES[0];
+    }
 
     /** Changes when the Home has to be drawn again. */
     static String signature(Context context) {

@@ -298,6 +298,15 @@
     <string name="grid_delete">Удалить</string>
     <string name="grid_delete_title">Удалить «%1$s»?</string>
     <string name="grid_delete_text">Фото будет удалено с этого телевизора. Отменить нельзя.</string>
+    <string name="grid_delete_set">Удалить всю коллекцию</string>
+    <string name="grid_delete_set_title">Удалить всю коллекцию %1$s?</string>
+    <string name="grid_delete_set_text">Её фото больше не будут появляться как фон, даже случайно, и в заставке. Вернуть их можно в Настройки → Внешний вид → Фон.</string>
+    <string name="grid_delete_set_do">Удалить</string>
+    <string name="grid_hide_text">Это фото больше не будет появляться как фон, даже случайно, и в заставке. Вернуть его можно в Настройки → Внешний вид → Фон.</string>
+    <string name="settings_backdrop_give_back">Вернуть удалённые фоны</string>
+    <string name="settings_backdrop_give_back_text">Вернутся все удалённые фото и коллекции.</string>
+    <string name="settings_backdrop_give_back_question">Вернуть удалённые фоны?</string>
+    <string name="settings_backdrop_give_back_do">Вернуть</string>
     <string name="upload_title">Загрузить с телефона</string>
     <string name="upload_text">Наведите камеру телефона на код и выберите фото. Телефон должен быть в той же сети, что и телевизор.</string>
     <string name="upload_no_network">Телевизор не подключён к сети: подключите его и повторите попытку.</string>

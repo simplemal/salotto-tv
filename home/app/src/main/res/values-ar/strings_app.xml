@@ -306,6 +306,15 @@
     <string name="grid_delete">حذف</string>
     <string name="grid_delete_title">حذف «%1$s»؟</string>
     <string name="grid_delete_text">ستُزال الصورة من هذا التلفزيون. لا يمكن التراجع.</string>
+    <string name="grid_delete_set">حذف المجموعة كلها</string>
+    <string name="grid_delete_set_title">هل تريد حذف مجموعة %1$s كلها؟</string>
+    <string name="grid_delete_set_text">لن تظهر صورها بعد الآن كخلفية، ولا عشوائيًا، ولا في شاشة التوقف. يمكن استعادتها من الإعدادات ← المظهر ← الخلفية.</string>
+    <string name="grid_delete_set_do">حذف</string>
+    <string name="grid_hide_text">لن تظهر بعد الآن كخلفية، ولا عشوائيًا، ولا في شاشة التوقف. يمكن استعادتها من الإعدادات ← المظهر ← الخلفية.</string>
+    <string name="settings_backdrop_give_back">استعادة الخلفيات المحذوفة</string>
+    <string name="settings_backdrop_give_back_text">تعود كل الصور والمجموعات المحذوفة.</string>
+    <string name="settings_backdrop_give_back_question">هل تريد استعادة الخلفيات المحذوفة؟</string>
+    <string name="settings_backdrop_give_back_do">استعادة</string>
     <string name="upload_title">التحميل من الهاتف</string>
     <string name="upload_text">وجّه كاميرا الهاتف نحو الرمز واختر صورة. يجب أن يكون الهاتف على شبكة التلفزيون نفسها.</string>
     <string name="upload_no_network">التلفزيون غير متصل بشبكة: اتصل بها ثم حاول مجددًا.</string>

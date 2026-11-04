@@ -290,6 +290,15 @@
     <string name="grid_delete">हटाएँ</string>
     <string name="grid_delete_title">«%1$s» हटाएँ?</string>
     <string name="grid_delete_text">फ़ोटो इस टीवी से हटा दी जाएगी। इसे वापस नहीं किया जा सकता।</string>
+    <string name="grid_delete_set">पूरा संग्रह हटाएँ</string>
+    <string name="grid_delete_set_title">पूरा %1$s संग्रह हटाएँ?</string>
+    <string name="grid_delete_set_text">इसकी तस्वीरें अब बैकग्राउंड के रूप में नहीं दिखेंगी, न ही अपने-आप, न स्क्रीनसेवर में। इन्हें सेटिंग → रूप-रंग → बैकग्राउंड से वापस लाया जा सकता है।</string>
+    <string name="grid_delete_set_do">हटाएँ</string>
+    <string name="grid_hide_text">यह अब बैकग्राउंड के रूप में नहीं दिखेगी, न ही अपने-आप, न स्क्रीनसेवर में। इसे सेटिंग → रूप-रंग → बैकग्राउंड से वापस लाया जा सकता है।</string>
+    <string name="settings_backdrop_give_back">हटाए गए बैकग्राउंड वापस लाएँ</string>
+    <string name="settings_backdrop_give_back_text">हटाई गई सभी तस्वीरें और संग्रह वापस आ जाते हैं।</string>
+    <string name="settings_backdrop_give_back_question">हटाए गए बैकग्राउंड वापस लाएँ?</string>
+    <string name="settings_backdrop_give_back_do">वापस लाएँ</string>
     <string name="upload_title">फ़ोन से अपलोड करें</string>
     <string name="upload_text">फ़ोन के कैमरे से कोड स्कैन करें और एक फ़ोटो चुनें। फ़ोन और टीवी एक ही नेटवर्क पर होने चाहिए।</string>
     <string name="upload_no_network">टीवी किसी नेटवर्क से जुड़ा नहीं है: उसे जोड़ें और फिर से कोशिश करें।</string>
