@@ -85,8 +85,8 @@ final class WheelHome extends FrameLayout {
     private static final float GLOW_IN = 1f;
     private static final float MOVED = 0.0005f;
     private static final long PORTAL_MS = 460;
-    /** While moving, a circle near the top fades: gone at the top, whole again a third of a step away. */
-    private static final float CROSS_FADE = 3f;
+    /** While moving, a circle this close to the top would touch the lit one: it is not drawn, and comes back by the next place. */
+    private static final float CROSS_HIDDEN = 0.6f;
     /** Coming back is a little slower than going: the colour is seen closing into its circle. */
     private static final long CLOSE_MS = 650;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
@@ -269,7 +269,7 @@ final class WheelHome extends FrameLayout {
             // Past the last one in view the circles fade, and where the wheel closes on itself they are gone.
             float alpha = clamp(each + 1 - away) * (circles.size() > shown ? clamp((half - away) * 2) : 1f);
             boolean crossing = moving && index != lit;
-            if (crossing) alpha *= clamp(away * CROSS_FADE);
+            if (crossing) alpha *= clamp((away - CROSS_HIDDEN) / (1 - CROSS_HIDDEN));
             circle.setTranslationX(x - size / 2f);
             circle.setTranslationY(y - size / 2f);
             circle.setScaleX(scale);

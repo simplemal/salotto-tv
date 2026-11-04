@@ -19,6 +19,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -209,6 +210,8 @@ public final class MainActivity extends CardActivity {
     /** One press opens one app: a second one while the first is starting is ignored. */
     private boolean opening;
     private static final long CORNERS_GONE_MS = 110;
+    private static final long WHEEL_MOVE_MS = 180;
+    private long lastMove;
     private static final long CORNERS_BACK_MS = 220;
     private static final long PORTAL_GIVE_UP_MS = 2500;
     /** Should Android not say its animation has ended, the colour closes after this anyway. */
@@ -1334,6 +1337,10 @@ public final class MainActivity extends CardActivity {
     }
 
     private void move(int delta) {
+        // A held key on the wheel moves one place at a steady pace: a swap that overtook the last one would tangle the circles.
+        long now = SystemClock.uptimeMillis();
+        if (circular && now - lastMove < WHEEL_MOVE_MS) return;
+        lastMove = now;
         int from = shownApps.indexOf(moving);
         // The wheel has no ends: past the last app comes the first.
         int to = circular ? Math.floorMod(from + delta, shownApps.size()) : from + delta;
