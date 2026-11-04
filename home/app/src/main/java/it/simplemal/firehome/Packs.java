@@ -53,11 +53,12 @@ final class Packs {
     }
 
     /** On the TV or inside the app: a collection that is neither has no row anywhere. */
-    static boolean present(Context context, String pack) {
-        if (onTv(context, pack)) return true;
+    static boolean present(Context context, String pack) { return onTv(context, pack) || inside(context, pack); }
+
+    private static boolean inside(Context context, String pack) {
         try {
-            String[] inside = context.getAssets().list(pack);
-            return inside != null && inside.length > 0;
+            String[] files = context.getAssets().list(pack);
+            return files != null && files.length > 0;
         } catch (IOException e) {
             return false;
         }
@@ -89,7 +90,8 @@ final class Packs {
         if (!chosen.isFile()) return wanted;
         for (String line : Updater.read(chosen).split("\\s+")) {
             String pack = line.trim();
-            if (Arrays.asList(ALL).contains(pack) && !onTv(context, pack)) wanted.add(pack);
+            // One still inside the app would only be a second copy: it comes once the app no longer carries it.
+            if (Arrays.asList(ALL).contains(pack) && !onTv(context, pack) && !inside(context, pack)) wanted.add(pack);
         }
         return wanted;
     }
