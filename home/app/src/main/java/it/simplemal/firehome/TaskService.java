@@ -483,11 +483,23 @@ public final class TaskService extends AccessibilityService {
         context.getSharedPreferences(KEYS_FILE, MODE_PRIVATE).edit().putBoolean(DOUBLE_HOME, on).apply();
     }
 
-    /** Runs once the Home key's cover has gone; at once without the service. */
-    static void afterHomeCover(Runnable action) {
+    /** The Home key's cover goes now: the Home under it already shows the same thing. */
+    /** The Home key's cover goes once its closing ring has ended, then `then` runs; at once without the service. */
+    static void dropHomeCover(Runnable then) {
         TaskService service = running;
-        if (service == null || service.cover == null) action.run();
-        else service.cover.whenHidden(action);
+        if (service != null && service.cover != null) service.cover.drop(then);
+        else then.run();
+    }
+
+    /** The last picture kept of the app in front, smaller: what the closing ring closes over. */
+    Bitmap frontPicture() {
+        String pkg = front;
+        if (pkg == null) return null;
+        File file = RunningApps.picture(this, pkg);
+        if (!file.isFile()) return null;
+        BitmapFactory.Options half = new BitmapFactory.Options();
+        half.inSampleSize = 2;
+        return BitmapFactory.decodeFile(file.getPath(), half);
     }
 
     static void homeBack() {

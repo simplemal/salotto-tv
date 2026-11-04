@@ -221,8 +221,8 @@ public final class MainActivity extends CardActivity {
     private long lastMove;
     private static final long CORNERS_BACK_MS = 220;
     private static final long PORTAL_GIVE_UP_MS = 2500;
-    /** Should Android not say its animation has ended, the colour closes after this anyway. */
-    private static final long CLOSE_FALLBACK_MS = 700;
+    /** The Home's first frame on screen, under the cover: Amazon's Home must not show through. */
+    private static final long FIRST_FRAME_MS = 120;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
@@ -785,11 +785,10 @@ public final class MainActivity extends CardActivity {
         opening = false;
         // The collections chosen in the installer and not yet on the TV, quietly.
         Packs.fetchChosen(this);
-        // The colour closes once the Home is really seen: after Fire OS's own animation and the Home key's cover.
-        if (wheel.portalOpen()) {
-            root.removeCallbacks(closeWhenSeen);
-            root.postDelayed(closeWhenSeen, CLOSE_FALLBACK_MS);
-        }
+        // The colour closes from the Home's first frame. The Home key's cover shows the same colour, so it
+        // goes at once instead of after its usual wait: waiting for both left the colour still for seconds.
+        if (wheel.portalOpen()) root.postOnAnimation(() -> root.postDelayed(
+            () -> TaskService.dropHomeCover(this::closePortal), FIRST_FRAME_MS));
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -1251,7 +1250,10 @@ public final class MainActivity extends CardActivity {
                 boolean over = TaskService.portal(HomeCover.lastPicture(), tag, colour, spot[0], spot[1], spot[2], () -> {
                     wheel.cover();
                     open(intent);
-                }, () -> HomeCover.fill(colour));
+                }, () -> {
+                    HomeCover.fill(colour);
+                    HomeCover.armClose(colour, spot[0], spot[1], spot[2]);
+                });
                 if (!over) wheel.openPortal(() -> open(intent));
                 // An app that cannot start leaves the Home in front: the colour goes.
                 root.postDelayed(() -> {
@@ -1273,16 +1275,10 @@ public final class MainActivity extends CardActivity {
     }
 
     private void closePortal() {
-        wheel.closePortal(() -> fadeCorners(true, null));
-    }
-
-    private final Runnable closeWhenSeen = () -> TaskService.afterHomeCover(this::closePortal);
-
-    @Override public void onEnterAnimationComplete() {
-        super.onEnterAnimationComplete();
-        if (!wheel.portalOpen()) return;
-        root.removeCallbacks(closeWhenSeen);
-        closeWhenSeen.run();
+        wheel.closePortal(() -> {
+            HomeCover.disarm();
+            fadeCorners(true, null);
+        });
     }
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
