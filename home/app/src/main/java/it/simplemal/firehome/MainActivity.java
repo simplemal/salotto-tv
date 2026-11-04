@@ -590,13 +590,13 @@ public final class MainActivity extends CardActivity {
         // A mouse moves no focus, so here the click is what opens and closes the panel.
         controlButton.setOnClickListener(v -> {
             if (v.isInTouchMode()) showPanel(!panelOpen);
-            else panel.first().requestFocus();
+            else panel.opening().requestFocus();
         });
         controlButton.setOnKeyListener((view, code, event) -> {
             int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
             if (code != toPanel) return false;
             // On the wheel Up goes back to the apps: the panel opens with the button itself.
-            if (event.getAction() == KeyEvent.ACTION_DOWN) (circular ? wheel : panel.first()).requestFocus();
+            if (event.getAction() == KeyEvent.ACTION_DOWN) (circular ? wheel : panel.opening()).requestFocus();
             return true;
         });
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
@@ -1183,7 +1183,7 @@ public final class MainActivity extends CardActivity {
             return made;
         }
         made.recycle();
-        return CircleArt.make(art.image, art.back, art.look == BANNER, size);
+        return CircleArt.make(art.image, art.back, art.look == BANNER, size, tag);
     }
 
     /**

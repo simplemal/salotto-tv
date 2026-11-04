@@ -10,6 +10,9 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An app's own artwork made round for the wheel. The logo is found in the picture, as what differs
@@ -39,9 +42,39 @@ final class CircleArt {
     private static final int BACK_REACH = 16;
     private static final int BACK_PASSES = 3;
 
+    /** Below this distance from the background a pixel of a cut-out logo is clear, above the second it is whole. */
+    private static final int CUT_CLEAR = 25;
+    private static final int CUT_WHOLE = 70;
+
+    /**
+     * A card of our own for an app whose picture does not sit well in a circle: a background we
+     * choose, a gradient from `from` to `to` along `way`, and on it only the logo, cut out of the app's
+     * own picture, so no edge of that picture shows.
+     */
+    private static final class Card {
+        final GradientDrawable.Orientation way;
+        final int from;
+        final int to;
+
+        Card(GradientDrawable.Orientation way, int from, int to) {
+            this.way = way;
+            this.from = from;
+            this.to = to;
+        }
+    }
+
+    private static final Map<String, Card> CARDS = new HashMap<>();
+
+    static {
+        // Prime Video: its banner goes from a deep blue at the bottom left to a light one at the top
+        // right, read from the banner itself (2026-11-04); on the plain fill it showed a box.
+        CARDS.put("com.amazon.firebat", new Card(GradientDrawable.Orientation.BL_TR, Color.rgb(0, 111, 166), Color.rgb(0, 168, 225)));
+    }
+
     private CircleArt() {}
 
-    static Bitmap make(Drawable image, Drawable back, boolean wide, int size) {
+    static Bitmap make(Drawable image, Drawable back, boolean wide, int size, String pkg) {
+        Card card = CARDS.get(pkg);
         int width = SAMPLE;
         int height = wide ? SAMPLE * 9 / 16 : SAMPLE;
         Bitmap sample = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -92,18 +125,25 @@ final class CircleArt {
         // The background is the same picture, as tall as the circle and blurred, the user's idea after
         // Prime Video's diagonal blue showed a box. The logo is taken out first, or its colour would
         // tint the circle around the sharp one: Netflix's red, YouTube's.
-        int coverWidth = Math.max(size, size * width / height);
-        Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);
-        Rect spread = new Rect((size - coverWidth) / 2, 0, (size + coverWidth) / 2, size);
-        canvas.drawBitmap(soft, null, spread, new Paint(Paint.FILTER_BITMAP_FLAG));
-        soft.recycle();
+        if (card != null) {
+            GradientDrawable fill = new GradientDrawable(card.way, new int[]{card.from, card.to});
+            fill.setBounds(0, 0, size, size);
+            fill.draw(canvas);
+        } else {
+            int coverWidth = Math.max(size, size * width / height);
+            Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);
+            Rect spread = new Rect((size - coverWidth) / 2, 0, (size + coverWidth) / 2, size);
+            canvas.drawBitmap(soft, null, spread, new Paint(Paint.FILTER_BITMAP_FLAG));
+            soft.recycle();
+        }
 
         int drawnWidth = Math.max(1, Math.round(pictureWidth));
         int drawnHeight = Math.max(1, Math.round(pictureHeight));
         Bitmap picture = Bitmap.createBitmap(drawnWidth, drawnHeight, Bitmap.Config.ARGB_8888);
         Canvas inside = new Canvas(picture);
         paint(inside, image, back, drawnWidth, drawnHeight);
-        feather(inside, drawnWidth, drawnHeight);
+        if (card != null) cutOut(picture, edge);
+        else feather(inside, drawnWidth, drawnHeight);
         canvas.drawBitmap(picture, size / 2f - centreX * drawnWidth, size / 2f - centreY * drawnHeight,
             new Paint(Paint.FILTER_BITMAP_FLAG));
         picture.recycle();
@@ -159,6 +199,36 @@ final class CircleArt {
                 total += from[row + Math.min(width - 1, x + reach + 1)] - from[row + Math.max(0, x - reach)];
             }
         }
+    }
+
+    /** Only the logo stays: each pixel as clear as it is close to the picture's own background. */
+    private static void cutOut(Bitmap picture, int[] edge) {
+        int width = picture.getWidth();
+        int height = picture.getHeight();
+        int[] pixels = new int[width * height];
+        picture.getPixels(pixels, 0, width, 0, 0, width, height);
+        for (int index = 0; index < pixels.length; index++) {
+            int pixel = pixels[index];
+            float distance = (float) Math.sqrt(nearest(pixel, edge));
+            float kept = Math.max(0f, Math.min(1f, (distance - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR)));
+            pixels[index] = Math.round(kept * 255) << 24 | (pixel & 0xFFFFFF);
+        }
+        picture.setPixels(pixels, 0, width, 0, 0, width, height);
+    }
+
+    /** The squared distance to the closest of the edge colours. */
+    private static int nearest(int pixel, int[] edge) {
+        int red = Color.red(pixel);
+        int green = Color.green(pixel);
+        int blue = Color.blue(pixel);
+        int best = Integer.MAX_VALUE;
+        for (int colour : edge) {
+            int dr = red - Color.red(colour);
+            int dg = green - Color.green(colour);
+            int db = blue - Color.blue(colour);
+            best = Math.min(best, dr * dr + dg * dg + db * db);
+        }
+        return best;
     }
 
     /** A see-through picture is seen on the plain grey, as on the grid. */

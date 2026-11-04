@@ -98,7 +98,10 @@ final class ControlPanel extends LinearLayout {
             view.setClickable(true);
             view.setDefaultFocusHighlightEnabled(false);
             view.setContentDescription(name);
-            view.setOnFocusChangeListener((changed, focused) -> paint());
+            view.setOnFocusChangeListener((changed, focused) -> {
+                if (focused) last = view;
+                paint();
+            });
             tiles.add(this);
             fill.setCornerRadius(host.dp(RADIUS));
             view.setBackground(fill);
@@ -255,6 +258,7 @@ final class ControlPanel extends LinearLayout {
         listed = list;
         removeAllViews();
         tiles.clear();
+        last = null;
         refreshers.clear();
         chosen = null;
         hint.setVisibility(GONE);
@@ -288,6 +292,7 @@ final class ControlPanel extends LinearLayout {
     }
 
     boolean listed() { return listed; }
+    private View last;
 
     /** A plain fill instead of the glass, with the same glass line around it as the grid's panel and the buttons. */
     private Drawable solid() {
@@ -302,6 +307,9 @@ final class ControlPanel extends LinearLayout {
     void leadDownTo(Supplier<View> view) { below = view; }
 
     View first() { return first; }
+
+    /** Where the panel was left: it opens there again, as long as Salotto stays open. */
+    View opening() { return last != null && last.getParent() != null ? last : first; }
 
     void choose(int direction) {
         View next = chosen == null ? first : FocusFinder.getInstance().findNextFocus(this, chosen, direction);
