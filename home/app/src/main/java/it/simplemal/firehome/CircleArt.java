@@ -7,15 +7,15 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 
 /**
  * An app's own artwork made round for the wheel. The logo is found in the picture, as what differs
  * from the colours along its edges, then centred and sized to sit whole inside the circle: a long
  * name like Netflix's no longer touches the rim, a small one like RaiPlay's no longer gets lost.
- * The picture's edges fade into its own background, so no straight line crosses the circle.
+ * The picture's edges fade into a blurred copy of itself, so no straight line crosses the circle.
  */
 final class CircleArt {
     static final int PLAIN = Color.rgb(60, 64, 72);
@@ -35,6 +35,9 @@ final class CircleArt {
     /** The faded border of the picture, as a share of its shorter side. */
     private static final float FEATHER = 0.14f;
     private static final int EDGE_STEP = 2;
+    /** How far the background's blur reaches, in parts of the sample's width: enough to fill a long name. */
+    private static final int BACK_REACH = 16;
+    private static final int BACK_PASSES = 3;
 
     private CircleArt() {}
 
@@ -53,9 +56,11 @@ final class CircleArt {
         int right = -1;
         int bottom = -1;
         int logo = 0;
+        boolean[] mark = new boolean[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 if (!far(pixels[y * width + x], edge)) continue;
+                mark[y * width + x] = true;
                 logo++;
                 left = Math.min(left, x);
                 right = Math.max(right, x + 1);
@@ -69,6 +74,8 @@ final class CircleArt {
         float centreY = 0.5f;
         if (right < 0 || logo > SCENE * width * height) {
             pictureWidth = size * (wide ? SCENE_WIDTH : 1f);
+            // A scene has no logo to take out: its background is the whole picture, blurred.
+            mark = new boolean[width * height];
         } else {
             // Both sides in widths of the picture, which is what the scale multiplies.
             float logoWidth = (right - left) / (float) width;
@@ -82,10 +89,14 @@ final class CircleArt {
 
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
-        GradientDrawable fill = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-            new int[]{rowColour(pixels, width, 0), rowColour(pixels, width, height - 1)});
-        fill.setBounds(0, 0, size, size);
-        fill.draw(canvas);
+        // The background is the same picture, as tall as the circle and blurred, the user's idea after
+        // Prime Video's diagonal blue showed a box. The logo is taken out first, or its colour would
+        // tint the circle around the sharp one: Netflix's red, YouTube's.
+        int coverWidth = Math.max(size, size * width / height);
+        Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);
+        Rect spread = new Rect((size - coverWidth) / 2, 0, (size + coverWidth) / 2, size);
+        canvas.drawBitmap(soft, null, spread, new Paint(Paint.FILTER_BITMAP_FLAG));
+        soft.recycle();
 
         int drawnWidth = Math.max(1, Math.round(pictureWidth));
         int drawnHeight = Math.max(1, Math.round(pictureHeight));
@@ -97,6 +108,57 @@ final class CircleArt {
             new Paint(Paint.FILTER_BITMAP_FLAG));
         picture.recycle();
         return made;
+    }
+
+    /**
+     * The picture with the logo filled from around it and blurred: each pixel is the average of the
+     * background pixels near it, so a gradient stays a gradient and the logo leaves no trace.
+     */
+    private static int[] withoutLogo(int[] pixels, boolean[] mark, int width, int height) {
+        int count = width * height;
+        float[][] sums = new float[4][count];
+        for (int index = 0; index < count; index++) {
+            if (mark[index]) continue;
+            int pixel = pixels[index];
+            sums[0][index] = Color.red(pixel);
+            sums[1][index] = Color.green(pixel);
+            sums[2][index] = Color.blue(pixel);
+            sums[3][index] = 1;
+        }
+        int reach = Math.max(1, width / BACK_REACH);
+        float[] turned = new float[count];
+        for (float[] sum : sums) {
+            for (int pass = 0; pass < BACK_PASSES; pass++) {
+                spread(sum, turned, width, height, reach);
+                spread(turned, sum, height, width, reach);
+            }
+        }
+        int[] smooth = new int[count];
+        for (int index = 0; index < count; index++) {
+            float weight = sums[3][index];
+            // Where no background reached, the logo covered everything: its own pixel will do.
+            if (weight < 1e-4f) {
+                smooth[index] = pixels[index] | 0xFF000000;
+                continue;
+            }
+            smooth[index] = Color.rgb(Math.round(sums[0][index] / weight), Math.round(sums[1][index] / weight),
+                Math.round(sums[2][index] / weight));
+        }
+        return smooth;
+    }
+
+    /** A moving average along each row of `from`, written to `to` turned on its side. */
+    private static void spread(float[] from, float[] to, int width, int height, int reach) {
+        float window = 2 * reach + 1;
+        for (int y = 0; y < height; y++) {
+            int row = y * width;
+            float total = 0;
+            for (int x = -reach; x <= reach; x++) total += from[row + Math.max(0, Math.min(width - 1, x))];
+            for (int x = 0; x < width; x++) {
+                to[x * height + y] = total / window;
+                total += from[row + Math.min(width - 1, x + reach + 1)] - from[row + Math.max(0, x - reach)];
+            }
+        }
     }
 
     /** A see-through picture is seen on the plain grey, as on the grid. */
@@ -140,18 +202,6 @@ final class CircleArt {
         return true;
     }
 
-    private static int rowColour(int[] pixels, int width, int row) {
-        long red = 0;
-        long green = 0;
-        long blue = 0;
-        for (int x = 0; x < width; x++) {
-            int pixel = pixels[row * width + x];
-            red += Color.red(pixel);
-            green += Color.green(pixel);
-            blue += Color.blue(pixel);
-        }
-        return Color.rgb((int) (red / width), (int) (green / width), (int) (blue / width));
-    }
 
     /** Clears the border little by little, so the picture melts into the background under it. */
     private static void feather(Canvas canvas, int width, int height) {
