@@ -21,6 +21,7 @@ Installa Salotto guida ogni passo dal computer, e con Togli Salotto rimette tutt
 |---|---|
 | Mac Apple Silicon | **[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
 | Windows | **[Scarica Installa Salotto per Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
+| Linux | **[Scarica Installa Salotto per Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Linux.AppImage)** (AppImage: rendilo eseguibile, poi aprilo) |
 
 ## Cosa fa
 
