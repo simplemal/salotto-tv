@@ -267,7 +267,7 @@ final class PictureMosaic extends FrameLayout {
 
     /** The illustrations sit in a folder for each moment of the day. */
     private void collect(String path) throws IOException {
-        for (String name : getContext().getAssets().list(path)) {
+        for (String name : Packs.list(getContext(), path)) {
             String file = path + "/" + name;
             if (name.endsWith(Weather.PICTURE_FILE) && !Look.taken(getContext(), file)) files.add(file);
             else if (name.indexOf('.') < 0) collect(file);

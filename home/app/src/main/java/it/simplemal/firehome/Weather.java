@@ -163,7 +163,7 @@ final class Weather {
         Properties known = PICTURE_TABLES.get(folder);
         if (known != null) return known;
         Properties table = new Properties();
-        try (InputStream input = context.getAssets().open(folder + PICTURE_TABLE)) {
+        try (InputStream input = Packs.open(context, folder + PICTURE_TABLE)) {
             table.load(input);
         } catch (IOException e) {
             return table;

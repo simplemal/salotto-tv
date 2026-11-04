@@ -305,7 +305,7 @@ public final class PictureGridActivity extends CardActivity {
     private List<String> pictures(String folder) {
         List<String> found = new ArrayList<>();
         try {
-            String[] names = getAssets().list(folder);
+            String[] names = Packs.list(this, folder);
             Arrays.sort(names);
             for (String name : names) {
                 if (!Look.taken(this, folder + "/" + name)) found.add(folder + "/" + name);
@@ -481,7 +481,7 @@ public final class PictureGridActivity extends CardActivity {
     }
 
     private Bitmap decode(String asset) {
-        try (InputStream input = getAssets().open(asset)) {
+        try (InputStream input = Packs.open(this, asset)) {
             return BitmapFactory.decodeStream(input);
         } catch (IOException e) {
             return null;
@@ -642,16 +642,20 @@ public final class PictureGridActivity extends CardActivity {
         LinearLayout header = new LinearLayout(this);
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(dp(SIDE_ROOM), dp(TITLE_TOP), dp(SIDE_ROOM), dp(TITLE_BOTTOM));
+        // The two names sit on the same line of text: centred, their different sizes would not.
+        LinearLayout names = new LinearLayout(this);
+        names.setBaselineAligned(true);
         title = label(setName, TITLE_SP);
         title.setTextColor(SET_COLOUR);
         title.setSingleLine(true);
-        header.addView(title, new LinearLayout.LayoutParams(-2, -2));
+        names.addView(title, new LinearLayout.LayoutParams(-2, -2));
         pictureName = label("", PICTURE_SP);
         pictureName.setSingleLine(true);
         pictureName.setEllipsize(android.text.TextUtils.TruncateAt.END);
         pictureName.setAlpha(PICTURE_ALPHA);
         pictureName.setPaddingRelative(dp(PICTURE_GAP), 0, dp(PICTURE_GAP), 0);
-        header.addView(pictureName, new LinearLayout.LayoutParams(0, -2, 1));
+        names.addView(pictureName, new LinearLayout.LayoutParams(0, -2, 1));
+        header.addView(names, new LinearLayout.LayoutParams(0, -2, 1));
         if (set != null) {
             deleteSet = quietButton(getString(R.string.grid_delete_set), this::askDeleteSet);
             header.addView(deleteSet, new LinearLayout.LayoutParams(-2, -2));

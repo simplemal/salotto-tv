@@ -263,7 +263,7 @@ final class Look {
             return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
         }
         try {
-            for (String name : context.getAssets().list(folder)) {
+            for (String name : Packs.list(context, folder)) {
                 String file = folder + "/" + name;
                 if (file.equals(shown)) continue;
                 files.add(file);
@@ -498,7 +498,7 @@ final class Look {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = SMALL_SAMPLE;
         if (asset.startsWith("/")) return BitmapFactory.decodeFile(asset, options);
-        try (InputStream input = context.getAssets().open(asset)) {
+        try (InputStream input = Packs.open(context, asset)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             return null;

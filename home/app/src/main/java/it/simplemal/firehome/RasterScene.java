@@ -27,7 +27,7 @@ final class RasterScene implements WeatherView.Scene {
             Bitmap photo = Look.load(new File(asset));
             return photo == null ? null : new RasterScene(photo);
         }
-        try (InputStream input = context.getAssets().open(asset)) {
+        try (InputStream input = Packs.open(context, asset)) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap picture = BitmapFactory.decodeStream(input, null, options);

@@ -78,7 +78,7 @@ final class Thumbnails {
         options.inSampleSize = sample;
         // Sixteen bits turn the dark gradients of the sets into steps: full colour, at twice the memory.
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        try (InputStream input = context.getAssets().open(asset)) {
+        try (InputStream input = Packs.open(context, asset)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             return null;

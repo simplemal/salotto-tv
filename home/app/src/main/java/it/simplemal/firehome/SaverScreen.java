@@ -145,7 +145,7 @@ final class SaverScreen {
             while (size.outWidth / (options.inSampleSize * 2) >= SCREEN_WIDTH) options.inSampleSize *= 2;
             return BitmapFactory.decodeFile(file, options);
         }
-        try (InputStream input = context.getAssets().open(file)) {
+        try (InputStream input = Packs.open(context, file)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             return null;
