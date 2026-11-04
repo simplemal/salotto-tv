@@ -1,0 +1,41 @@
+{
+  "versionName": "1.0.19",
+  "changes": {
+    "en": [
+      "With the Dock at the top, the control center opens without moving the Home",
+      "Update notes appear in the language chosen in Salotto"
+    ],
+    "es": [
+      "Con el Dock arriba, el centro de control se abre sin mover la Home",
+      "Las novedades de las actualizaciones aparecen en el idioma elegido en Salotto"
+    ],
+    "fr": [
+      "Avec le Dock en haut, le centre de contrôle s’ouvre sans déplacer la Home",
+      "Les nouveautés des mises à jour s’affichent dans la langue choisie dans Salotto"
+    ],
+    "de": [
+      "Mit dem Dock oben öffnet sich das Kontrollzentrum, ohne die Home zu verschieben",
+      "Die Neuerungen der Updates erscheinen in der in Salotto gewählten Sprache"
+    ],
+    "pt": [
+      "Com o Dock em cima, o centro de controlo abre sem mover a Home",
+      "As novidades das atualizações aparecem no idioma escolhido no Salotto"
+    ],
+    "ru": [
+      "Когда Dock наверху, центр управления открывается, не сдвигая главный экран",
+      "Описание обновлений показывается на языке, выбранном в Salotto"
+    ],
+    "ar": [
+      "مع وضع Dock في الأعلى، يُفتح مركز التحكم دون تحريك الشاشة الرئيسية",
+      "تظهر مستجدات التحديثات باللغة المختارة في Salotto"
+    ],
+    "hi": [
+      "Dock ऊपर होने पर कंट्रोल सेंटर होम को हिलाए बिना खुलता है",
+      "अपडेट की नई बातें Salotto में चुनी गई भाषा में दिखती हैं"
+    ],
+    "zh": [
+      "Dock 在上方时，控制中心打开时主屏幕不再移动",
+      "更新内容以 Salotto 中选择的语言显示"
+    ]
+  }
+}
