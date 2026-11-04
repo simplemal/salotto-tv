@@ -186,10 +186,10 @@ public final class TaskService extends AccessibilityService {
     static boolean running() { return running != null; }
 
     /** False when the service is off: only it can draw over the app that is starting. */
-    static boolean portal(Bitmap home, String app, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+    static boolean portal(Bitmap home, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
         TaskService service = running;
         if (service == null || home == null) return false;
-        PortalWindow.open(service, home, app, colour, x, y, radius, shown, opened);
+        PortalWindow.open(service, home, colour, x, y, radius, shown, opened);
         return true;
     }
 
@@ -484,10 +484,16 @@ public final class TaskService extends AccessibilityService {
     }
 
     /** The Home key's cover goes now: the Home under it already shows the same thing. */
-    /** The Home key's cover goes once its closing ring has ended, then `then` runs; at once without the service. */
-    static void dropHomeCover(Runnable then) {
+    /** The Home key's closing is running over everything: the Home leaves the colour to it. */
+    static boolean coverCloses() {
         TaskService service = running;
-        if (service != null && service.cover != null) service.cover.drop(then);
+        return service != null && service.cover != null && service.cover.closingHere();
+    }
+
+    /** Runs once the Home key's cover is gone; at once without the service. */
+    static void afterHomeCover(Runnable then) {
+        TaskService service = running;
+        if (service != null && service.cover != null) service.cover.whenGone(then);
         else then.run();
     }
 
@@ -651,7 +657,6 @@ public final class TaskService extends AccessibilityService {
         String page = String.valueOf(event.getClassName());
         // Masks, the veil and messages are windows of Android's own classes, not pages: the app under them stays.
         boolean realPage = !page.startsWith(ANDROID_CLASS);
-        if (realPage) PortalWindow.windowShown(name);
         if (name.equals(getPackageName()) && !realPage) return;
         if (panelWindow != null && realPage && !name.equals(panelApp)
             && (HomeApps.isHome(this, name) || HomeApps.isUserApp(this, name))) panelWindow.close();

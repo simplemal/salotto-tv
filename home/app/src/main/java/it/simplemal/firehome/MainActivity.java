@@ -787,8 +787,16 @@ public final class MainActivity extends CardActivity {
         Packs.fetchChosen(this);
         // The colour closes from the Home's first frame. The Home key's cover shows the same colour, so it
         // goes at once instead of after its usual wait: waiting for both left the colour still for seconds.
-        if (wheel.portalOpen()) root.postOnAnimation(() -> root.postDelayed(
-            () -> TaskService.dropHomeCover(this::closePortal), FIRST_FRAME_MS));
+        if (wheel.portalOpen()) root.postOnAnimation(() -> root.postDelayed(() -> {
+            if (TaskService.coverCloses()) {
+                // The Home key: the cover closes it all, ring and disc, over this Home's picture.
+                wheel.dropPortal();
+                TaskService.afterHomeCover(() -> fadeCorners(true, null));
+            } else {
+                // Back: the app has gone already, only the second half is left, here.
+                closePortal();
+            }
+        }, FIRST_FRAME_MS));
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -1242,18 +1250,16 @@ public final class MainActivity extends CardActivity {
                 open(intent);
                 return;
             }
-            // Fire OS's own opening runs under the colour, unseen; it also puts up the app's first screen at once.
+            // Without Fire OS's own opening: the ring opens straight on, and the app should not slide in under it.
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             opening = true;
             fadeCorners(false, () -> HomeCover.take(getWindow(), () -> {
                 float[] spot = wheel.litSpot();
                 int colour = wheel.litColour();
-                boolean over = TaskService.portal(HomeCover.lastPicture(), tag, colour, spot[0], spot[1], spot[2], () -> {
+                boolean over = TaskService.portal(HomeCover.lastPicture(), colour, spot[0], spot[1], spot[2], () -> {
                     wheel.cover();
                     open(intent);
-                }, () -> {
-                    HomeCover.fill(colour);
-                    HomeCover.armClose(colour, spot[0], spot[1], spot[2]);
-                });
+                }, () -> HomeCover.armClose(colour, spot[0], spot[1], spot[2]));
                 if (!over) wheel.openPortal(() -> open(intent));
                 // An app that cannot start leaves the Home in front: the colour goes.
                 root.postDelayed(() -> {

@@ -406,6 +406,14 @@ final class WheelHome extends FrameLayout {
         portal.setProgress(1f);
     }
 
+    /** Gone at once: the Home key's cover has closed the colour over everything already. */
+    void dropPortal() {
+        if (portal == null) return;
+        removeView(portal);
+        portal = null;
+        closing = false;
+    }
+
     /** Back on the Home: the colour closes back into the app's circle, as the opening went but backwards. */
     void closePortal(Runnable done) {
         if (portal == null || closing) {

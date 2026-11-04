@@ -19,24 +19,22 @@ import android.view.animation.DecelerateInterpolator;
 
 /**
  * Opening an app from the wheel, over every window for a moment: the Home's picture, and a disc of
- * the app's colour that widens from its circle until it covers the screen. The app starts underneath;
- * when Android says its window is up, a hole with nothing drawn in it opens from the middle of the
- * disc, so the app shows through a ring that runs off the screen.
+ * the app's colour that widens from its circle until it covers the screen. The app starts underneath,
+ * and straight away a hole with nothing drawn in it opens from the middle of the disc, so the app
+ * shows through a ring that runs off the screen.
  * Only Salotto's accessibility service can put a window over another app, so it lives there.
  */
 final class PortalWindow extends View {
     private static final long COVER_MS = 380;
     private static final long OPEN_MS = 480;
-    /** Android names the app's page a moment before the page has drawn anything: give it that moment. */
-    private static final long FIRST_FRAME_MS = 350;
-    /** An app slow to show its window, or one that never does, gets the hole anyway after this. */
-    private static final long WAIT_MS = 2500;
+    /** Should a frame never come, the window still goes. */
+    private static final long SPARE_MS = 2000;
     /** The disc ends past the farthest corner, and the hole goes almost as far: its ring is off the screen. */
     private static final float RING_END = 1.25f;
     private static final float HOLE_END = 1.2f;
 
-    /** The one waiting for its app's window, if any: the service tells it. */
-    private static PortalWindow waiting;
+    /** The one on screen: a second opening replaces it. */
+    private static PortalWindow current;
 
     private final WindowManager windows;
     private final Bitmap home;
@@ -50,24 +48,14 @@ final class PortalWindow extends View {
     private final float start;
     private Runnable shown;
     private final Runnable opened;
-    private final String app;
     private float progress;
     private float hole;
     private boolean holeOpening;
-    private boolean appNamed;
     private boolean gone;
-    private final Runnable giveUp = this::openHole;
-    private boolean grown;
-    /** The app has had its moment to draw: the hole opens as soon as the disc covers the screen. */
-    private boolean drawn;
-    private final Runnable ready = () -> {
-        drawn = true;
-        if (grown) openHole();
-    };
 
-    private PortalWindow(Context context, Bitmap home, String app, int colour, float x, float y, float start, Runnable shown, Runnable opened) {
+
+    private PortalWindow(Context context, Bitmap home, int colour, float x, float y, float start, Runnable shown, Runnable opened) {
         super(context);
-        this.app = app;
         windows = context.getSystemService(WindowManager.class);
         this.home = home.copy(Bitmap.Config.ARGB_8888, false);
         this.x = x;
@@ -79,10 +67,10 @@ final class PortalWindow extends View {
     }
 
     /** `shown` runs once the window covers the screen, `opened` when it has gone. */
-    static void open(Context service, Bitmap home, String app, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
-        if (waiting != null) waiting.close();
-        PortalWindow view = new PortalWindow(service, home, app, colour, x, y, radius, shown, opened);
-        waiting = view;
+    static void open(Context service, Bitmap home, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+        if (current != null) current.close();
+        PortalWindow view = new PortalWindow(service, home, colour, x, y, radius, shown, opened);
+        current = view;
         view.windows.addView(view, new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
@@ -90,17 +78,7 @@ final class PortalWindow extends View {
                 | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                 | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
             PixelFormat.TRANSLUCENT));
-        view.postDelayed(view::close, COVER_MS + WAIT_MS + OPEN_MS * 2);
-    }
-
-    /** From the service, for every page that comes up: the app's own opens the hole. */
-    static void windowShown(String pkg) {
-        PortalWindow view = waiting;
-        if (view != null && view.app.equals(pkg) && !view.appNamed) {
-            view.appNamed = true;
-            view.removeCallbacks(view.giveUp);
-            view.postDelayed(view.ready, FIRST_FRAME_MS);
-        }
+        view.postDelayed(view::close, COVER_MS + OPEN_MS + SPARE_MS);
     }
 
     @Override protected void onDraw(Canvas canvas) {
@@ -138,7 +116,7 @@ final class PortalWindow extends View {
         }
     }
 
-    /** The disc widens; the app may already be up when it has covered the screen. */
+    /** The disc widens over the Home while the app starts under it. */
     private void cover() {
         ValueAnimator grow = ValueAnimator.ofFloat(0f, 1f);
         grow.setDuration(COVER_MS);
@@ -148,11 +126,8 @@ final class PortalWindow extends View {
             invalidate();
         });
         grow.addListener(new AnimatorListenerAdapter() {
-            @Override public void onAnimationEnd(Animator animation) {
-                grown = true;
-                if (drawn) openHole();
-                else if (!appNamed) postDelayed(giveUp, WAIT_MS);
-            }
+            // Straight on, whatever is under it yet: waiting for the app made the opening falter.
+            @Override public void onAnimationEnd(Animator animation) { openHole(); }
         });
         grow.start();
     }
@@ -161,8 +136,6 @@ final class PortalWindow extends View {
     private void openHole() {
         if (gone || holeOpening) return;
         holeOpening = true;
-        removeCallbacks(giveUp);
-        if (waiting == this) waiting = null;
         ValueAnimator open = ValueAnimator.ofFloat(0f, 1f);
         open.setDuration(OPEN_MS);
         open.setInterpolator(new DecelerateInterpolator(1.4f));
@@ -179,9 +152,7 @@ final class PortalWindow extends View {
     private void close() {
         if (gone) return;
         gone = true;
-        if (waiting == this) waiting = null;
-        removeCallbacks(giveUp);
-        removeCallbacks(ready);
+        if (current == this) current = null;
         try {
             windows.removeView(this);
         } catch (IllegalArgumentException e) {
