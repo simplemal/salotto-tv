@@ -21,6 +21,7 @@ Installa Salotto guides every step from the computer, and with Remove Salotto it
 |---|---|
 | Mac Apple Silicon | **[Download Installa Salotto for Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
 | Windows | **[Download Installa Salotto for Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
+| Linux | **[Download Installa Salotto for Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Linux.AppImage)** (AppImage: make it executable, then open it) |
 
 ## What it does
 
