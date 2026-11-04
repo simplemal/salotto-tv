@@ -68,9 +68,9 @@ final class WheelHome extends FrameLayout {
     private static final float MOVED = 0.0005f;
     private static final long PORTAL_MS = 460;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
-    private static final float GLOW_REACH = 2.2f;
-    private static final int GLOW_ALPHA = 230;
-    private static final float[] GLOW_STEPS = {1f, 0.95f, 0.75f, 0.32f, 0f};
+    private static final float GLOW_REACH = 1.45f;
+    private static final int GLOW_ALPHA = 105;
+    private static final float[] GLOW_STEPS = {1f, 0.9f, 0.75f, 0.35f, 0f};
     private static final float AWAY_GLOW = 0.5f;
     private static final float AWAY_SCALE = 0.94f;
     private static final float SWAY_DEGREES = 2.5f;
