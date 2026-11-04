@@ -29,6 +29,8 @@ final class HomeApps {
 
     /** Salotto's own settings card, kept in the list so it can be moved like an app. */
     static final String SETTINGS = "salotto:settings";
+    /** Taken off the Home by the user: the gear beside the apps still opens the settings. */
+    private static final String SETTINGS_OFF = "settings_off";
 
     private static final String FILE = "home";
     private static final String KEY = "apps";
@@ -87,8 +89,13 @@ final class HomeApps {
         List<String> apps = new ArrayList<>();
         if (saved == null) apps.addAll(Arrays.asList(DEFAULTS));
         else if (!saved.isEmpty()) apps.addAll(Arrays.asList(saved.split(",")));
-        if (!apps.contains(SETTINGS)) apps.add(SETTINGS);
+        // Lists from before the card existed get it; one the user took off stays off.
+        if (!apps.contains(SETTINGS) && !prefs(context).getBoolean(SETTINGS_OFF, false)) apps.add(SETTINGS);
         return apps;
+    }
+
+    static void setSettingsOff(Context context, boolean off) {
+        prefs(context).edit().putBoolean(SETTINGS_OFF, off).apply();
     }
 
     static void save(Context context, List<String> apps) {

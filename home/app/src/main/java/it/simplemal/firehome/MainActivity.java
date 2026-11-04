@@ -211,6 +211,8 @@ public final class MainActivity extends CardActivity {
     private static final long CORNERS_GONE_MS = 110;
     private static final long CORNERS_BACK_MS = 220;
     private static final long PORTAL_GIVE_UP_MS = 2500;
+    /** Should Android not say its animation has ended, the colour closes after this anyway. */
+    private static final long CLOSE_FALLBACK_MS = 700;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
@@ -766,7 +768,11 @@ public final class MainActivity extends CardActivity {
         inFront = true;
         showing = true;
         opening = false;
-        if (wheel.portalOpen()) closePortal();
+        // The colour closes once the Home is really seen: after Fire OS's own animation and the Home key's cover.
+        if (wheel.portalOpen()) {
+            root.removeCallbacks(closeWhenSeen);
+            root.postDelayed(closeWhenSeen, CLOSE_FALLBACK_MS);
+        }
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
@@ -1214,6 +1220,15 @@ public final class MainActivity extends CardActivity {
         wheel.closePortal(() -> fadeCorners(true, null));
     }
 
+    private final Runnable closeWhenSeen = () -> TaskService.afterHomeCover(this::closePortal);
+
+    @Override public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+        if (!wheel.portalOpen()) return;
+        root.removeCallbacks(closeWhenSeen);
+        closeWhenSeen.run();
+    }
+
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
     private void restRaised() {
         if (page.isLaidOut() && !page.isLayoutRequested() && page.getHeight() > shelf) {
@@ -1291,11 +1306,12 @@ public final class MainActivity extends CardActivity {
     }
 
     private void showMenu(String pkg) {
-        boolean removable = !HomeApps.SETTINGS.equals(pkg);
-        String title = removable ? HomeApps.label(this, pkg) : getString(R.string.first_does_settings);
-        String[] choices = removable ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
+        boolean app = !HomeApps.SETTINGS.equals(pkg);
+        String title = app ? HomeApps.label(this, pkg) : getString(R.string.first_does_settings);
+        // Salotto's settings can leave the Home too: the gear beside the apps opens them, and Tutte le app puts the card back.
+        String[] choices = app ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
                 getString(R.string.card_app_info), getString(R.string.card_uninstall)}
-            : new String[]{getString(R.string.main_move)};
+            : new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home)};
         dialog()
             .setTitle(title)
             .setItems(choices, (dialog, choice) -> {
@@ -1305,6 +1321,7 @@ public final class MainActivity extends CardActivity {
                     render(pkg);
                 } else if (choice == 1) {
                     home.remove(pkg);
+                    if (!app) HomeApps.setSettingsOff(this, true);
                     HomeApps.save(this, home);
                     render(null);
                 } else if (choice == 2) {
@@ -1318,8 +1335,9 @@ public final class MainActivity extends CardActivity {
 
     private void move(int delta) {
         int from = shownApps.indexOf(moving);
-        int to = from + delta;
-        if (from < 0 || to < 0 || to >= shownApps.size()) return;
+        // The wheel has no ends: past the last app comes the first.
+        int to = circular ? Math.floorMod(from + delta, shownApps.size()) : from + delta;
+        if (from < 0 || to < 0 || to >= shownApps.size() || to == from) return;
         String other = shownApps.get(to);
         // The wheel has no cards to glide: it turns to the moved app instead.
         Map<String, int[]> before = new HashMap<>();

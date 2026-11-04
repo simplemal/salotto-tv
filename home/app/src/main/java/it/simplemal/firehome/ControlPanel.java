@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
@@ -70,6 +71,8 @@ final class ControlPanel extends LinearLayout {
     private static final int LIST_VALUE = 110;
     private static final int LIST_LIFT = 12;
     private static final int LIST_FILL = Color.rgb(28, 29, 32);
+    /** As bright as the line of the glass panel. */
+    private static final int RIM_LIGHT = 235;
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
 
     private final class Tile {
@@ -257,7 +260,7 @@ final class ControlPanel extends LinearLayout {
         hint.setVisibility(GONE);
         if (list) buildList();
         else build();
-        // The list is one plain colour: no sheen, nothing to blend with what is behind it.
+        // The list is one plain colour inside the glass line: no sheen, nothing to blend with what is behind it.
         setBackground(list ? solid() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
         addRest();
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
@@ -286,11 +289,13 @@ final class ControlPanel extends LinearLayout {
 
     boolean listed() { return listed; }
 
+    /** A plain fill instead of the glass, with the same glass line around it as the grid's panel and the buttons. */
     private Drawable solid() {
+        int radius = host.dp(PANEL_RADIUS);
         GradientDrawable fill = new GradientDrawable();
         fill.setColor(LIST_FILL);
-        fill.setCornerRadius(host.dp(PANEL_RADIUS));
-        return fill;
+        fill.setCornerRadius(radius);
+        return new LayerDrawable(new Drawable[]{fill, new GlassRim(radius, host.dp(1), RIM_LIGHT)});
     }
 
     /** On the Home, the last row leads down to the apps. */

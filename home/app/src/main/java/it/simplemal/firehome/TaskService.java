@@ -483,6 +483,13 @@ public final class TaskService extends AccessibilityService {
         context.getSharedPreferences(KEYS_FILE, MODE_PRIVATE).edit().putBoolean(DOUBLE_HOME, on).apply();
     }
 
+    /** Runs once the Home key's cover has gone; at once without the service. */
+    static void afterHomeCover(Runnable action) {
+        TaskService service = running;
+        if (service == null || service.cover == null) action.run();
+        else service.cover.whenHidden(action);
+    }
+
     static void homeBack() {
         TaskService service = running;
         if (service != null && service.cover != null) service.cover.homeBack();

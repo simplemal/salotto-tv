@@ -18,6 +18,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Takes the Home key from Fire OS. The key never reaches an app: Fire OS brings up its own Home, and
@@ -59,6 +61,7 @@ final class HomeCover {
     private volatile long startedAt;
     private volatile long lastHeard;
     private boolean holding;
+    private final List<Runnable> afterHide = new ArrayList<>();
     private Bitmap held;
 
     /** A window takes long to add and a frame to show, so it is always there, hidden. */
@@ -217,6 +220,15 @@ final class HomeCover {
         held = null;
         main.removeCallbacks(hide);
         view.setVisibility(View.GONE);
+        List<Runnable> now = new ArrayList<>(afterHide);
+        afterHide.clear();
+        for (Runnable action : now) action.run();
+    }
+
+    /** At once, or as soon as the cover is gone: what the Home plays must not happen under it. */
+    void whenHidden(Runnable action) {
+        if (view.getVisibility() != View.VISIBLE) action.run();
+        else afterHide.add(action);
     }
 
     void close() {

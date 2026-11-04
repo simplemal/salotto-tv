@@ -157,7 +157,8 @@ final class Look {
     static void setCircular(Context context, boolean value) { prefs(context).edit().putBoolean("circular", value).apply(); }
     /** How many circles of the wheel are in view: the lit one and one or two on each side. */
     static final int[] WHEEL_CHOICES = {3, 5};
-    static int wheel(Context context) { return prefs(context).getInt("wheel", 3); }
+    /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
+    static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
 
     /** The clock pattern chosen in Settings. */
