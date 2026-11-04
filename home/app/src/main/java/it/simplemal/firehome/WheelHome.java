@@ -90,7 +90,7 @@ final class WheelHome extends FrameLayout {
     /** Coming back is a little slower than going: the colour is seen closing into its circle. */
     private static final long CLOSE_MS = 650;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
-    private static final float GLOW_REACH = 1.45f;
+    private static final float GLOW_REACH = 1.3f;
     private static final int GLOW_ALPHA = 105;
     private static final float[] GLOW_STEPS = {1f, 0.75f, 0.35f, 0f};
     private static final float AWAY_GLOW = 0.5f;
