@@ -1291,7 +1291,7 @@ public final class MainActivity extends CardActivity {
                 say(getString(R.string.card_app_unavailable));
                 return;
             }
-            // Off by default while it is improved: then the app opens as from the grid.
+            // Turned off in Aspetto: then the app opens as from the grid.
             if (!Look.wheelMotion(this)) {
                 open(intent);
                 return;
