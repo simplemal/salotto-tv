@@ -40,6 +40,7 @@ final class HomeCover {
     /** The Home just started needs this long to take over from Amazon's. */
     private static final long AMAZON_SETTLE_MS = Fire.ANDROID_9 ? 1500 : 600;
     private static final long CLOSING_SETTLE_MS = 2000;
+    private static final long FADE_IN_MS = 220;
     /** The circle waits for the Home; should nothing say it has come, it closes all the same after this. */
     private static final long CLOSE_LIMIT_MS = 2500;
 
@@ -141,7 +142,11 @@ final class HomeCover {
         // being drawn while it closes: started earlier, it stuttered and three dots showed after it.
         layer = new CircleClose(service, where.background, where.art, where.x, where.y, where.radius);
         frame.addView(layer, new FrameLayout.LayoutParams(-1, -1));
+        // It comes in softly, the user's wish: a cut to the colour was abrupt.
+        frame.animate().cancel();
+        frame.setAlpha(0f);
         frame.setVisibility(View.VISIBLE);
+        frame.animate().alpha(1f).setDuration(FADE_IN_MS).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
         shrinking = true;
         main.removeCallbacks(shrink);
         shrunk = false;
@@ -293,6 +298,8 @@ final class HomeCover {
         if (still != null) view.setImageBitmap(still);
         else view.setImageDrawable(new ColorDrawable(Color.BLACK));
         view.invalidate();
+        frame.animate().cancel();
+        frame.setAlpha(1f);
         frame.setVisibility(View.VISIBLE);
         main.removeCallbacks(hide);
         main.postDelayed(hide, HOLD_LIMIT_MS);
@@ -338,6 +345,8 @@ final class HomeCover {
         main.removeCallbacks(hide);
         main.removeCallbacks(shrink);
         main.removeCallbacks(quiet);
+        frame.animate().cancel();
+        frame.setAlpha(1f);
         frame.setVisibility(View.GONE);
         if (layer != null) {
             frame.removeView(layer);

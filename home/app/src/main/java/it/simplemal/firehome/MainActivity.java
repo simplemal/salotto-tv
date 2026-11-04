@@ -232,6 +232,12 @@ public final class MainActivity extends CardActivity {
     private static final Map<String, Integer> CIRCLE_GLOW = new HashMap<>();
     private static final int GLOW_SAMPLE = 24;
     private static final int GLOW_HUES = 12;
+    /**
+     * White, black and grey never count; among the other colours the most present wins, however
+     * small: the user's rule of 2026-11-04, after Plex's orange X (1.3% of its circle) glowed white
+     * under a 2% floor. What is left is only against a stray pixel or two.
+     */
+    private static final float GLOW_LEAST = 0.001f;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -1264,7 +1270,7 @@ public final class MainActivity extends CardActivity {
         if (small != art) small.recycle();
         int best = 0;
         for (int hue = 1; hue < GLOW_HUES; hue++) if (weight[hue] > weight[best]) best = hue;
-        if (weight[best] < inside * 0.02f) return WheelHome.REST_GLOW;
+        if (weight[best] < inside * GLOW_LEAST) return WheelHome.REST_GLOW;
         int colour = Color.rgb(Math.round(sum[best][0] / weight[best]), Math.round(sum[best][1] / weight[best]),
             Math.round(sum[best][2] / weight[best]));
         Color.colorToHSV(colour, hsv);
