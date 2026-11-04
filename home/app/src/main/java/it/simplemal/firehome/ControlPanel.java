@@ -62,6 +62,12 @@ final class ControlPanel extends LinearLayout {
     static final int LINKED = Color.rgb(125, 205, 255);
     private static final int LEVELS = 4;
     private static final int[] TIMER_MINUTES = {30, 60, 90, 120};
+    /** The list of the circular Home: one row per control, icon then name, the state on the right. */
+    private static final int LIST_WIDTH = 270;
+    private static final int LIST_ROW = 34;
+    private static final int LIST_ICON = 22;
+    private static final int LIST_VALUE = 110;
+    private static final int LIST_LIFT = 12;
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
 
     private final class Tile {
@@ -73,6 +79,7 @@ final class ControlPanel extends LinearLayout {
         boolean active;
         boolean small;
         boolean linked;
+        boolean row;
 
         Tile(int picture, String name) {
             icon.setImageResource(picture);
@@ -95,6 +102,14 @@ final class ControlPanel extends LinearLayout {
 
         void paint() {
             boolean selected = view.isFocused() || view == chosen;
+            if (row) {
+                // A row is plain until chosen: what is on shows in its icon and in the words on the right.
+                fill.setColor(selected ? Color.WHITE : Color.TRANSPARENT);
+                icon.setColorFilter(selected ? Color.BLACK : active || linked ? LINKED : Color.WHITE);
+                title.setTextColor(selected ? Color.BLACK : Color.WHITE);
+                value.setTextColor(selected ? Color.argb(170, 0, 0, 0) : Color.argb(170, 255, 255, 255));
+                return;
+            }
             boolean lit = selected || active;
             fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : TILE_OFF);
             int ink = lit ? Color.BLACK : Color.WHITE;
@@ -144,8 +159,8 @@ final class ControlPanel extends LinearLayout {
     /** The selection when the panel's window has no focus to keep it in. See PanelWindow. */
     private View chosen;
     private Supplier<View> below;
-    /** On the circular Home the panel opens in the middle of the screen: the arrows stay inside, Back leaves. */
-    private boolean centred;
+    /** On the circular Home the panel is a list over its button: the arrows stay inside, Back or Down from the bottom leaves. */
+    private boolean listed;
     private View line;
     /** Holds the focus when the panel opens with nothing chosen, so that OK does nothing. */
     private View rest;
@@ -198,6 +213,10 @@ final class ControlPanel extends LinearLayout {
         rest.setOnFocusChangeListener((view, focused) -> {
             if (!focused) view.setFocusable(false);
         });
+        addRest();
+    }
+
+    private void addRest() {
         LayoutParams small = new LayoutParams(1, 1);
         small.topMargin = -1;
         addView(rest, small);
@@ -205,10 +224,10 @@ final class ControlPanel extends LinearLayout {
 
     /** The panel floats above the Home: the arrows must not reach the cards underneath. */
     @Override public View focusSearch(View focused, int direction) {
-        if (focused == rest) return direction == FOCUS_UP && opener != null && !centred ? opener : first;
+        if (focused == rest) return direction == FOCUS_UP && opener != null && !listed ? opener : first;
         View next = FocusFinder.getInstance().findNextFocus(this, focused, direction);
         if (next != null) return next;
-        if (centred) return focused;
+        if (listed) return direction == FOCUS_DOWN && opener != null ? opener : focused;
         View out = direction == FOCUS_UP ? opener : direction == FOCUS_DOWN && below != null ? below.get() : null;
         return out != null ? out : focused;
     }
@@ -225,21 +244,45 @@ final class ControlPanel extends LinearLayout {
         letGoOfFire();
     }
 
-    /** In the middle of the screen, with the hint just under it; or in its usual place under the pill, top right. */
-    void placeCentred(boolean middle) {
-        centred = middle;
+    /** A list over its button on the circular Home, the tiles under the pill on the grid. Built again only on a change. */
+    void setListed(boolean list) {
+        if (list == listed) return;
+        listed = list;
+        removeAllViews();
+        tiles.clear();
+        refreshers.clear();
+        chosen = null;
+        hint.setVisibility(GONE);
+        if (list) buildList();
+        else build();
+        addRest();
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
-        FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
-        spot.gravity = middle ? Gravity.CENTER : Gravity.TOP | Gravity.END;
-        spot.topMargin = middle ? 0 : host.dp(TOP);
-        spot.rightMargin = middle ? 0 : host.dp(EDGE);
-        under.gravity = middle ? Gravity.CENTER : Gravity.TOP | Gravity.END;
-        under.topMargin = middle ? 0 : host.dp(TOP + HEIGHT + 6);
-        under.rightMargin = middle ? 0 : host.dp(EDGE);
-        line.setTranslationY(middle ? host.dp(HEIGHT / 2 + 18) : 0);
+        spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | Gravity.END;
+        spot.topMargin = list ? 0 : host.dp(TOP);
+        spot.rightMargin = list ? 0 : host.dp(EDGE);
+        spot.leftMargin = 0;
+        spot.bottomMargin = 0;
         setLayoutParams(spot);
-        line.setLayoutParams(under);
     }
+
+    /** The list stands on the button, centred on it and a little above it, inside the screen. */
+    void placeOver(View button) {
+        View parent = (View) getParent();
+        int[] at = new int[2];
+        int[] base = new int[2];
+        button.getLocationInWindow(at);
+        parent.getLocationInWindow(base);
+        measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
+        int left = at[0] - base[0] + button.getWidth() / 2 - getMeasuredWidth() / 2;
+        spot.leftMargin = Math.max(host.dp(16), Math.min(left, parent.getWidth() - getMeasuredWidth() - host.dp(16)));
+        spot.bottomMargin = parent.getHeight() - (at[1] - base[1]) + host.dp(LIST_LIFT);
+        setLayoutParams(spot);
+        setPivotX(getMeasuredWidth() / 2f);
+        setPivotY(getMeasuredHeight());
+    }
+
+    boolean listed() { return listed; }
 
     /** On the Home, the last row leads down to the apps. */
     void leadDownTo(Supplier<View> view) { below = view; }
@@ -318,6 +361,73 @@ final class ControlPanel extends LinearLayout {
         refreshers.add(this::showTimer);
         refreshers.add(() -> showDim(dim));
         refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
+    }
+
+    /** The same controls as the tiles, one per row; Standby at the bottom, next to the button. */
+    private void buildList() {
+        Tile power = listRow(R.drawable.ic_power, getContext().getString(R.string.panel_standby), TaskService::standby);
+        Tile wifi = listRow(R.drawable.ic_wifi, "Wi-Fi", () -> settings(SettingsActivity.NETWORK));
+        Tile bluetooth = listRow(R.drawable.ic_bluetooth, "Bluetooth", () -> settings(SettingsActivity.REMOTES));
+        Tile dialogue = listSwitch(R.drawable.ic_dialogue, R.string.settings_dialogue, SettingsActivity.DIALOGUE);
+        Tile leveler = listSwitch(R.drawable.ic_leveler, R.string.settings_leveler, SettingsActivity.LEVELER);
+        Tile dim = listRow(R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness),
+            () -> change(() -> Veil.nextDim(getContext())));
+        Tile warm = listRow(R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter),
+            () -> change(() -> Veil.nextWarm(getContext())));
+        Tile saver = listRow(R.drawable.ic_image, getContext().getString(R.string.panel_screensaver),
+            () -> host.open(Fire.screensaver(getContext())));
+        Tile timer = listRow(R.drawable.ic_timer, getContext().getString(R.string.panel_timer), () -> {
+            nextTimer();
+            refresh();
+        });
+        Tile tasks = listRow(R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks),
+            () -> host.open(new Intent(getContext(), TasksActivity.class)));
+        Tile restart = listRow(R.drawable.ic_restart, getContext().getString(R.string.panel_restart), () -> {
+            host.panelDone();
+            TaskService.restart();
+        });
+        Tile[] all = {power, wifi, bluetooth, dialogue, leveler, dim, warm, saver, timer, tasks, restart};
+        for (int index = all.length - 1; index >= 0; index--) {
+            addView(all[index].view, new LayoutParams(host.dp(LIST_WIDTH), host.dp(LIST_ROW)));
+        }
+        first = power.view;
+        refreshers.add(() -> showNetwork(wifi));
+        refreshers.add(() -> showBluetooth(bluetooth));
+        timerTile = timer;
+        refreshers.add(this::showTimer);
+        refreshers.add(() -> showDim(dim));
+        refreshers.add(() -> showSwitch(warm, Veil.warm(getContext()) > 0));
+    }
+
+    private Tile listRow(int picture, String name, Runnable action) {
+        Tile tile = new Tile(picture, name);
+        tile.row = true;
+        tile.view.setGravity(Gravity.CENTER_VERTICAL);
+        tile.view.setPadding(host.dp(12), 0, host.dp(12), 0);
+        tile.view.addView(tile.icon, new LayoutParams(host.dp(LIST_ICON), host.dp(LIST_ICON)));
+        tile.title.setTextSize(14);
+        tile.title.setSingleLine(true);
+        tile.title.setPadding(host.dp(12), 0, host.dp(8), 0);
+        tile.view.addView(tile.title, new LayoutParams(0, -2, 1));
+        tile.value.setTextSize(12);
+        tile.value.setMaxWidth(host.dp(LIST_VALUE));
+        tile.view.addView(tile.value, new LayoutParams(-2, -2));
+        tile.view.setOnClickListener(view -> action.run());
+        tile.paint();
+        return tile;
+    }
+
+    private Tile listSwitch(int picture, int name, String id) {
+        Tile[] tile = new Tile[1];
+        tile[0] = listRow(picture, getContext().getString(name), () -> flip(tile[0], id));
+        refreshers.add(() -> {
+            FireSettings settings = fire();
+            Background.run(() -> {
+                boolean on = "true".equals(settings.read(FireSettings.AUDIO, id));
+                host.runOnUiThread(() -> showSwitch(tile[0], on));
+            });
+        });
+        return tile[0];
     }
 
     private LinearLayout row() {

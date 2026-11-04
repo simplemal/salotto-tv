@@ -203,6 +203,7 @@ public final class MainActivity extends CardActivity {
     private static final int FREE_ICON = 24;
     private static final int ALL_APPS_CIRCLE = 60;
     private static final int BESIDE_ALL_APPS = 22;
+    private static final float LIST_FOLDED = 0.15f;
     private static final float LIGHT_CORNER = 0.72f;
     private static final int WEATHER_DAY_WIDTH = 50;
     private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
@@ -391,7 +392,7 @@ public final class MainActivity extends CardActivity {
         } else {
             root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
         }
-        panel.placeCentred(circular);
+        panel.setListed(circular);
         panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(circular ? 14 : 40);
@@ -618,14 +619,18 @@ public final class MainActivity extends CardActivity {
         panel.hideHint();
         if (!open) panel.closed();
         panel.animate().cancel();
+        // The list grows up from its button and folds back into it; the tiles drop in from the pill.
+        boolean list = panel.listed();
         if (open) {
             panel.refresh();
+            if (list) panel.placeOver(controlButton);
             panel.setVisibility(View.VISIBLE);
             panel.setAlpha(0f);
-            panel.setTranslationY(-dp(12));
-            panel.animate().alpha(1f).translationY(0).setDuration(PILL_MS).start();
+            panel.setTranslationY(list ? 0 : -dp(12));
+            panel.setScaleY(list ? LIST_FOLDED : 1f);
+            panel.animate().alpha(1f).translationY(0).scaleY(1f).setDuration(PILL_MS).start();
         } else {
-            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(PILL_MS)
+            panel.animate().alpha(0f).translationY(list ? 0 : -dp(12)).scaleY(list ? LIST_FOLDED : 1f).setDuration(PILL_MS)
                 .withEndAction(() -> panel.setVisibility(View.GONE)).start();
         }
     }
