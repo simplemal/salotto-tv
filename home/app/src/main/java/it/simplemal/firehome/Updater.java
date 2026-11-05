@@ -105,6 +105,11 @@ final class Updater {
     /** For what Android adds as it installs: compiled code and its records. */
     private static final int EXTRA_PART = 10;
     private static final int TIMEOUT_MS = 15000;
+    /**
+     * GitHub sometimes answers 504 for a release file, for a moment, and a moment later the same file
+     * comes: seen on 2026-11-05, one try in two for some minutes. Two more tries, a little apart.
+     */
+    private static final long[] RETRY_MS = {1000, 3000};
     private static final int MAX_MANIFEST = 256 * 1024;
     private static final int PERCENT = 100;
 
@@ -195,15 +200,24 @@ final class Updater {
         if (link == null || !link.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             throw new Failure(UpdateError.F101);
         }
-        Release release = newest(LATEST);
+        // Each on its own: a TV with the betas on still finds the beta when the stable version does
+        // not answer, and the other way round.
+        Release release = null;
+        Failure failed = null;
+        try {
+            release = newest(LATEST);
+        } catch (Failure e) {
+            failed = e;
+        }
         if (beta(context)) {
             try {
                 Release trial = newest(BETA);
-                if (trial.versionCode > release.versionCode) release = trial;
+                if (release == null || trial.versionCode > release.versionCode) release = trial;
             } catch (Failure e) {
                 // No beta out yet, or not reachable now: the stable version still counts.
             }
         }
+        if (release == null) throw failed;
         return release.versionCode > installedCode(context) ? release : null;
     }
 
@@ -233,20 +247,46 @@ final class Updater {
 
     /** `length` bytes from `offset`: only a server that answers with that part is used. */
     static HttpURLConnection openPart(String url, long offset, long length) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setConnectTimeout(TIMEOUT_MS);
-        connection.setReadTimeout(TIMEOUT_MS);
-        connection.setRequestProperty("Range", "bytes=" + offset + "-" + (offset + length - 1));
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_PARTIAL) throw new IOException("HTTP");
-        return connection;
+        return connect(url, "bytes=" + offset + "-" + (offset + length - 1), HttpURLConnection.HTTP_PARTIAL);
     }
 
     static HttpURLConnection open(String url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setConnectTimeout(TIMEOUT_MS);
-        connection.setReadTimeout(TIMEOUT_MS);
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) throw new IOException("HTTP");
-        return connection;
+        return connect(url, null, HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * Tried again when the network or GitHub fails for a moment: no answer, an error of the server
+     * (5xx) or too many requests (429). A file that is not there (404, a beta not out yet) is not.
+     */
+    private static HttpURLConnection connect(String url, String range, int wanted) throws IOException {
+        IOException last = null;
+        for (int attempt = 0; attempt <= RETRY_MS.length; attempt++) {
+            if (attempt > 0) {
+                try {
+                    Thread.sleep(RETRY_MS[attempt - 1]);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("interrupted");
+                }
+            }
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(TIMEOUT_MS);
+            connection.setReadTimeout(TIMEOUT_MS);
+            if (range != null) connection.setRequestProperty("Range", range);
+            int code;
+            try {
+                code = connection.getResponseCode();
+            } catch (IOException e) {
+                connection.disconnect();
+                last = e;
+                continue;
+            }
+            if (code == wanted) return connection;
+            connection.disconnect();
+            last = new IOException("HTTP");
+            if (code < HttpURLConnection.HTTP_INTERNAL_ERROR && code != 429) throw last;
+        }
+        throw last;
     }
 
     static void verify(byte[] manifest, byte[] signed) throws Failure {
