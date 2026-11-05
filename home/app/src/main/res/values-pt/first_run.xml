@@ -39,7 +39,10 @@
     <string name="first_packs_now">Baixar agora</string>
     <string name="first_packs_later">Mais tarde</string>
     <string name="first_packs_title">Baixando os fundos</string>
-    <string name="first_packs_stopped">Algumas coleções chegarão mais tarde.</string>
+    <string name="first_packs_room">Não há espaço suficiente na TV para as coleções de imagens restantes: precisam de %1$s e restam %2$s. Elas não chegarão até você liberar espaço.</string>
+    <string name="first_packs_network">A conexão com a internet caiu. As coleções que faltam chegarão sozinhas quando ela voltar.</string>
+    <string name="first_packs_server">O servidor das coleções não responde. O Salotto tentará de novo mais tarde, sozinho.</string>
+    <string name="first_packs_damaged">Uma coleção chegou danificada e foi descartada. O Salotto tentará de novo mais tarde, sozinho.</string>
     <string name="first_preview">Prévia</string>
     <string name="grid_position">%1$d de %2$d</string>
     <string name="first_backdrop_pictures">Clima ilustrado</string>

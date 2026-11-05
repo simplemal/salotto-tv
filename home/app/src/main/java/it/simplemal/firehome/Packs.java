@@ -60,7 +60,14 @@ final class Packs {
     private static volatile long received;
     private static volatile long expected = 1;
     private static volatile List<String> queue = new ArrayList<>();
-    private static volatile boolean stopped;
+    /** Why the last fetch stopped: told to the user, who can do something only about the room. */
+    enum Stop { NONE, ROOM, NETWORK, SERVER, DAMAGED }
+    private static volatile Stop stop = Stop.NONE;
+    /** For Stop.ROOM: what the collections that did not fit weigh, and what was free. */
+    private static volatile long roomNeeded;
+    private static volatile long roomFree;
+    /** The two signed lists are small: anything larger is not theirs. */
+    private static final int MAX_LIST = 1024 * 1024;
     /** The weather is read again before its picture is chosen, but the Home does not wait longer for it. */
     private static final long WEATHER_WAIT_MS = 5000;
 
@@ -175,8 +182,27 @@ final class Packs {
     /** The collections coming in now, in their order, for the page that shows them arriving. */
     static List<String> queue() { return queue; }
 
-    /** The last fetch stopped before its end: the network, the room or GitHub. The Home tries again. */
-    static boolean stopped() { return stopped; }
+    /** Why the last fetch did not bring everything, or NONE. */
+    static Stop stop() { return stop; }
+    static long roomNeeded() { return roomNeeded; }
+    static long roomFree() { return roomFree; }
+
+    /** Not enough room for a collection: the next, smaller or not, is tried all the same. */
+    private static final class NoRoom extends IOException {
+        NoRoom() { super("room"); }
+    }
+
+    /** What the user is told: only the room is theirs to solve; the rest Salotto tries again by itself. */
+    private static Stop why(Exception e) {
+        if (e instanceof NoRoom) return Stop.ROOM;
+        if (e instanceof GeneralSecurityException) return Stop.DAMAGED;
+        if (e instanceof JSONException) return Stop.SERVER;
+        if (e instanceof Updater.Failure) return ((Updater.Failure) e).error == UpdateError.F104 ? Stop.DAMAGED : Stop.SERVER;
+        String what = e.getMessage();
+        if ("fingerprint".equals(what) || "index".equals(what) || "path".equals(what)) return Stop.DAMAGED;
+        if ("HTTP".equals(what) || "large".equals(what)) return Stop.SERVER;
+        return Stop.NETWORK;
+    }
 
     /** Blocking: how much the missing collections weigh, from the signed list. -1 if it cannot be read. */
     static long missingBytes(Context context) {
@@ -188,23 +214,37 @@ final class Packs {
                 if (item != null) total += item.getLong("bytes");
             }
             return total;
-        } catch (Updater.Failure | JSONException e) {
+        } catch (Updater.Failure | JSONException | IOException e) {
             return -1;
         }
     }
 
     /** The list signed with the update key: its collections, each with the place of every file in its archive. */
-    private static JSONArray signedList() throws Updater.Failure, JSONException {
-        byte[] list = Updater.fetch(BASE + "sfondi.json");
-        Updater.verify(list, Updater.fetch(BASE + "sfondi.json.sig"));
+    private static JSONArray signedList() throws Updater.Failure, JSONException, IOException {
+        byte[] list = small(BASE + "sfondi.json");
+        Updater.verify(list, small(BASE + "sfondi.json.sig"));
         return new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
     }
 
     /** Where each file sits in its archive, signed apart from the list: by collection, then by path. */
-    private static JSONObject signedIndex() throws Updater.Failure, JSONException {
-        byte[] index = Updater.fetch(BASE + "sfondi-indice.json");
-        Updater.verify(index, Updater.fetch(BASE + "sfondi-indice.json.sig"));
+    private static JSONObject signedIndex() throws Updater.Failure, JSONException, IOException {
+        byte[] index = small(BASE + "sfondi-indice.json");
+        Updater.verify(index, small(BASE + "sfondi-indice.json.sig"));
         return new JSONObject(new String(index, StandardCharsets.UTF_8)).getJSONObject("index");
+    }
+
+    /** A small file, its failure kept as it is: the network, or GitHub answering wrong ("HTTP"). */
+    private static byte[] small(String url) throws IOException {
+        HttpURLConnection connection = Updater.open(url);
+        java.io.ByteArrayOutputStream body = new java.io.ByteArrayOutputStream();
+        try (InputStream input = connection.getInputStream()) {
+            byte[] chunk = new byte[8192];
+            for (int read; (read = input.read(chunk)) > 0; ) {
+                body.write(chunk, 0, read);
+                if (body.size() > MAX_LIST) throw new IOException("large");
+            }
+        }
+        return body.toByteArray();
     }
 
     private static JSONObject itemOf(JSONArray packs, String pack) throws JSONException {
@@ -227,7 +267,7 @@ final class Packs {
 
     private static void fetchAll(Context context, boolean lightestFirst) {
         if (missing(context).isEmpty() || !fetching.compareAndSet(false, true)) return;
-        stopped = false;
+        stop = Stop.NONE;
         queue = missing(context);
         Background.run(() -> {
             try {
@@ -248,13 +288,25 @@ final class Packs {
                     }
                 }
                 queue = new ArrayList<>(order);
+                long needed = 0;
                 for (String pack : order) {
                     JSONObject item = itemOf(packs, pack);
-                    if (item != null) fetch(context, pack, item);
+                    if (item == null) continue;
+                    try {
+                        fetch(context, pack, item);
+                    } catch (NoRoom e) {
+                        // Too large for what is free: the others may still fit, the user's choice of 2026-11-05.
+                        needed += item.getLong("bytes");
+                    }
+                }
+                if (needed > 0) {
+                    roomNeeded = needed;
+                    roomFree = new StatFs(root(context).getPath()).getAvailableBytes();
+                    stop = Stop.ROOM;
                 }
             } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
-                // Not now: the network, the room or GitHub. The next look tries again.
-                stopped = true;
+                // Not now: the network, GitHub or a damaged archive. The next look tries again.
+                stop = why(e);
             } finally {
                 coming = null;
                 queue = new ArrayList<>();
@@ -359,7 +411,7 @@ final class Packs {
         }
         if (!hex(MessageDigest.getInstance("SHA-256").digest(body)).equals(at.getString(2))) throw new IOException("fingerprint");
         File parent = target.getParentFile();
-        if (!parent.exists() && !parent.mkdirs()) throw new IOException("room");
+        if (!parent.exists() && !parent.mkdirs()) throw new IOException("folder");
         // Checked already, and read only once `.inizio` names it: written in place, never moved.
         Files.write(target.toPath(), body);
     }
@@ -385,8 +437,8 @@ final class Packs {
             throws JSONException, IOException, GeneralSecurityException {
         long size = item.getLong("bytes");
         File root = root(context);
-        if (!root.exists() && !root.mkdirs()) throw new IOException("room");
-        if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new IOException("room");
+        if (!root.exists() && !root.mkdirs()) throw new IOException("folder");
+        if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new NoRoom();
         String url = item.getString("url");
         if (!url.startsWith("https://")) throw new IOException("url");
         File folder = new File(root, pack);
@@ -400,7 +452,14 @@ final class Packs {
         try {
             // Skipping must read too: a skipped byte would be missing from the fingerprint.
             try (InputStream input = new Reading(new DigestInputStream(new Counting(connection.getInputStream()), digest))) {
-                Tar.unpack(input, root, pack, first);
+                try {
+                    Tar.unpack(input, root, pack, first);
+                } catch (IOException e) {
+                    // The room can also end while the files are written, if something else took it meanwhile.
+                    String what = String.valueOf(e.getMessage());
+                    if (what.contains("ENOSPC") || what.contains("No space")) throw new NoRoom();
+                    throw e;
+                }
                 // What is left after the end marker counts for the fingerprint too.
                 byte[] rest = new byte[65536];
                 while (input.read(rest) > 0) { }

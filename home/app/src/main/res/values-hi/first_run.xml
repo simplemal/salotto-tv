@@ -39,7 +39,10 @@
     <string name="first_packs_now">अभी डाउनलोड करें</string>
     <string name="first_packs_later">बाद में</string>
     <string name="first_packs_title">बैकग्राउंड डाउनलोड हो रहे हैं</string>
-    <string name="first_packs_stopped">कुछ संग्रह बाद में आएंगे।</string>
+    <string name="first_packs_room">टीवी पर बाकी इमेज संग्रहों के लिए पर्याप्त जगह नहीं है: %1$s चाहिए, %2$s बची है। जगह खाली करने तक ये नहीं आएंगे।</string>
+    <string name="first_packs_network">इंटरनेट कनेक्शन टूट गया। कनेक्शन लौटने पर बाकी संग्रह अपने आप आ जाएंगे।</string>
+    <string name="first_packs_server">संग्रहों का सर्वर जवाब नहीं दे रहा। Salotto बाद में अपने आप फिर कोशिश करेगा।</string>
+    <string name="first_packs_damaged">एक संग्रह खराब होकर आया और हटा दिया गया। Salotto बाद में अपने आप फिर कोशिश करेगा।</string>
     <string name="first_preview">पूर्वावलोकन</string>
     <string name="grid_position">%2$d में से %1$d</string>
     <string name="first_backdrop_pictures">चित्रित मौसम</string>

@@ -39,7 +39,10 @@
     <string name="first_packs_now">立即下载</string>
     <string name="first_packs_later">稍后</string>
     <string name="first_packs_title">正在下载背景</string>
-    <string name="first_packs_stopped">部分合集将稍后下载。</string>
+    <string name="first_packs_room">电视空间不足，放不下其余的图片合集：需要 %1$s，剩余 %2$s。释放空间之前它们不会下载。</string>
+    <string name="first_packs_network">网络连接已中断。网络恢复后，缺少的合集会自动下载。</string>
+    <string name="first_packs_server">合集服务器没有响应。Salotto 稍后会自动重试。</string>
+    <string name="first_packs_damaged">有一个合集下载后已损坏，已被丢弃。Salotto 稍后会自动重试。</string>
     <string name="first_preview">预览</string>
     <string name="grid_position">%1$d / %2$d</string>
     <string name="first_backdrop_pictures">插画天气</string>

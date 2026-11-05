@@ -442,7 +442,7 @@ public final class FirstRunActivity extends CardActivity {
             long bytes = Packs.missingBytes(this);
             runOnUiThread(() -> {
                 if (asked == visit && bytes > 0) {
-                    note.setText(words.getString(R.string.first_packs_size, Formatter.formatShortFileSize(words, bytes)));
+                    note.setText(words.getString(R.string.first_packs_size, size(bytes)));
                 }
             });
         });
@@ -563,8 +563,9 @@ public final class FirstRunActivity extends CardActivity {
         LinearLayout.LayoutParams textPlace = new LinearLayout.LayoutParams(-1, -2);
         textPlace.topMargin = dp(10);
         side.addView(explained, textPlace);
-        if (Packs.stopped() && !Packs.missing(this).isEmpty()) {
-            TextView later = label(words(R.string.first_packs_stopped), EXPLAINED_SP);
+        String why = stopReason();
+        if (why != null) {
+            TextView later = label(why, EXPLAINED_SP);
             later.setGravity(Gravity.CENTER);
             later.setAlpha(0.6f);
             LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-1, -2);
@@ -581,10 +582,28 @@ public final class FirstRunActivity extends CardActivity {
         if (!bars.isEmpty()) root.postDelayed(() -> follow(shownVisit, whole, bars), PROGRESS_MS);
     }
 
+    /** A weight in the page's language, its number and unit never split over two lines. */
+    private String size(long bytes) {
+        return Formatter.formatShortFileSize(words, bytes).replace(' ', '\u00a0');
+    }
+
+    /** Why the collections stopped coming, said plainly: only the room is the user's to solve. Null if nothing stopped. */
+    private String stopReason() {
+        if (Packs.fetching() || Packs.missing(this).isEmpty()) return null;
+        switch (Packs.stop()) {
+            case ROOM:
+                return words.getString(R.string.first_packs_room, size(Packs.roomNeeded()), size(Packs.roomFree()));
+            case NETWORK: return words(R.string.first_packs_network);
+            case SERVER: return words(R.string.first_packs_server);
+            case DAMAGED: return words(R.string.first_packs_damaged);
+            default: return null;
+        }
+    }
+
     /** Twice a second while collections come: the bars move, and a collection whole becomes a choice. */
     private void follow(int shownVisit, List<String> whole, List<Object[]> bars) {
         if (shownVisit != visit || isFinishing()) return;
-        boolean changed = !Packs.fetching() || Packs.stopped();
+        boolean changed = !Packs.fetching();
         for (Object[] bar : bars) if (Packs.listed(this, (String) bar[1])) changed = true;
         for (String pack : whole) if (!Packs.listed(this, pack)) changed = true;
         if (changed) {
