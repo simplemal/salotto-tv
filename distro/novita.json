@@ -1,77 +1,59 @@
 {
-  "versionName": "1.0.20",
+  "versionName": "1.0.21-beta.1",
   "changes": {
     "en": [
-      "New circular Home: choose it in Appearance › Layout",
-      "Backdrop collections download separately: the app is much lighter",
-      "You can delete single photos or whole collections",
-      "Clock and date: font, size and format for the date too, font and size for the weather",
-      "Settings reopen where you left them",
-      "Beta versions: turn them on in Settings › Update"
+      "After an update the Home opens right away: only the backdrop in use comes first, the rest follows",
+      "On first start Salotto asks whether to download the backdrop collections now, showing each one's progress",
+      "Backdrops list only the collections already on the TV",
+      "If a download stops, Salotto tells you why"
     ],
     "es": [
-      "Nueva Home circular: elígela en Aspecto › Disposición",
-      "Las colecciones de fondos se descargan aparte: la app pesa mucho menos",
-      "Puedes borrar fotos sueltas o colecciones enteras",
-      "Hora y fecha: tipo de letra, tamaño y formato también para la fecha, tipo de letra y tamaño para el tiempo",
-      "Los Ajustes se vuelven a abrir donde los dejaste",
-      "Versiones beta: actívalas en Ajustes › Actualización"
+      "Tras una actualización la Home se abre enseguida: primero llega solo el fondo en uso, el resto después",
+      "Al primer encendido Salotto pregunta si descargar ya las colecciones de fondos, con el progreso de cada una",
+      "En los fondos solo aparecen las colecciones que ya están en la TV",
+      "Si una descarga se detiene, Salotto te dice por qué"
     ],
     "fr": [
-      "Nouvelle Home circulaire : choisis-la dans Apparence › Disposition",
-      "Les collections de fonds se téléchargent à part : l’app est bien plus légère",
-      "Tu peux supprimer des photos une à une ou des collections entières",
-      "Heure et date : police, taille et format aussi pour la date, police et taille pour la météo",
-      "Les Réglages se rouvrent là où tu les as laissés",
-      "Versions bêta : active-les dans Réglages › Mise à jour"
+      "Après une mise à jour, la Home s’ouvre tout de suite : seul le fond utilisé arrive d’abord, le reste ensuite",
+      "Au premier démarrage, Salotto demande s’il faut télécharger tout de suite les collections de fonds, avec la progression de chacune",
+      "Les fonds n’affichent que les collections déjà présentes sur la TV",
+      "Si un téléchargement s’arrête, Salotto t’explique pourquoi"
     ],
     "de": [
-      "Neue runde Home: wähle sie unter Aussehen › Anordnung",
-      "Hintergrund-Sammlungen werden separat geladen: die App ist viel kleiner",
-      "Du kannst einzelne Fotos oder ganze Sammlungen löschen",
-      "Uhrzeit und Datum: Schrift, Größe und Format auch für das Datum, Schrift und Größe für das Wetter",
-      "Die Einstellungen öffnen sich dort, wo du sie verlassen hast",
-      "Beta-Versionen: einschalten unter Einstellungen › Update"
+      "Nach einem Update öffnet sich die Home sofort: zuerst kommt nur der verwendete Hintergrund, der Rest danach",
+      "Beim ersten Start fragt Salotto, ob die Hintergrund-Sammlungen gleich geladen werden sollen, mit dem Fortschritt jeder Sammlung",
+      "Bei den Hintergründen erscheinen nur Sammlungen, die schon auf dem Fernseher sind",
+      "Bleibt ein Download stehen, sagt dir Salotto warum"
     ],
     "pt": [
-      "Nova Home circular: escolhe-a em Aparência › Disposição",
-      "As coleções de fundos descarregam-se à parte: a app fica muito mais leve",
-      "Podes apagar fotos soltas ou coleções inteiras",
-      "Hora e data: letra, tamanho e formato também para a data, letra e tamanho para o tempo",
-      "As Configurações voltam a abrir onde as deixaste",
-      "Versões beta: ativa-as em Configurações › Atualização"
+      "Depois de uma atualização a Home abre na hora: primeiro chega só o fundo em uso, o resto depois",
+      "Na primeira inicialização o Salotto pergunta se você quer baixar já as coleções de fundos, com o progresso de cada uma",
+      "Nos fundos aparecem só as coleções que já estão na TV",
+      "Se um download parar, o Salotto diz o motivo"
     ],
     "ru": [
-      "Новый круглый главный экран: выберите его в Оформление › Расположение",
-      "Коллекции фонов загружаются отдельно: приложение стало намного легче",
-      "Можно удалять отдельные фото или целые коллекции",
-      "Время и дата: шрифт, размер и формат теперь и для даты, шрифт и размер для погоды",
-      "Настройки открываются там, где вы их оставили",
-      "Бета-версии: включите в Настройки › Обновление"
-    ],
-    "ar": [
-      "شاشة رئيسية دائرية جديدة: اخترها من المظهر › الترتيب",
-      "مجموعات الخلفيات تُنزَّل على حدة: أصبح التطبيق أخف بكثير",
-      "يمكنك حذف صور مفردة أو مجموعات كاملة",
-      "الوقت والتاريخ: الخط والحجم والتنسيق للتاريخ أيضًا، والخط والحجم للطقس",
-      "تُفتح الإعدادات حيث تركتها",
-      "النسخ التجريبية: فعّلها من الإعدادات › التحديث"
-    ],
-    "hi": [
-      "नया गोल होम: इसे रूप-रंग › व्यवस्था में चुनें",
-      "बैकग्राउंड संग्रह अलग से डाउनलोड होते हैं: ऐप अब बहुत हल्का है",
-      "आप अलग-अलग फ़ोटो या पूरे संग्रह हटा सकते हैं",
-      "समय और तारीख: तारीख के लिए भी फ़ॉन्ट, आकार और फ़ॉर्मैट, मौसम के लिए फ़ॉन्ट और आकार",
-      "सेटिंग वहीं खुलती हैं जहाँ आपने छोड़ी थीं",
-      "बीटा वर्ज़न: सेटिंग › अपडेट में चालू करें"
+      "После обновления главный экран открывается сразу: сначала загружается только текущий фон, остальное потом",
+      "При первом запуске Salotto спрашивает, скачать ли коллекции фонов сейчас, и показывает прогресс каждой",
+      "В фонах показываются только коллекции, которые уже есть на телевизоре",
+      "Если загрузка остановилась, Salotto объяснит почему"
     ],
     "zh": [
-      "全新圆形主屏幕：在“外观 › 布局”中选择",
-      "背景合集单独下载：应用体积大大减小",
-      "可以删除单张照片或整个合集",
-      "时间和日期：日期也可设置字体、大小和格式，天气可设置字体和大小",
-      "设置会在你离开的位置重新打开",
-      "测试版：在“设置 › 更新”中开启"
+      "更新后主屏幕立即打开：先只下载正在使用的背景，其余稍后下载",
+      "首次启动时，Salotto 会询问是否立即下载背景合集，并显示每个合集的进度",
+      "背景中只列出电视上已有的合集",
+      "下载中断时，Salotto 会告诉你原因"
+    ],
+    "ar": [
+      "بعد التحديث تُفتح الشاشة الرئيسية فورًا: تصل الخلفية المستخدمة أولًا ثم الباقي",
+      "عند التشغيل الأول يسألك Salotto إن كنت تريد تنزيل مجموعات الخلفيات الآن، مع تقدّم كل مجموعة",
+      "تظهر في الخلفيات المجموعات الموجودة على التلفاز فقط",
+      "إذا توقف التنزيل يخبرك Salotto بالسبب"
+    ],
+    "hi": [
+      "अपडेट के बाद होम तुरंत खुलता है: पहले सिर्फ़ इस्तेमाल हो रहा बैकग्राउंड आता है, बाकी बाद में",
+      "पहली बार चालू करने पर Salotto पूछता है कि क्या बैकग्राउंड संग्रह अभी डाउनलोड करें, हर संग्रह की प्रगति के साथ",
+      "बैकग्राउंड में सिर्फ़ वे संग्रह दिखते हैं जो टीवी पर पहले से हैं",
+      "डाउनलोड रुक जाए तो Salotto बताता है क्यों"
     ]
   }
 }
