@@ -24,7 +24,9 @@ final class Cover {
     private static final String ACTIVITY = PACKAGE + ".CoverActivity";
     private static final String APK = "copertura.apk";
     private static final String EXTRA_PAGE = "page";
-    private static final int VERSION = 2;
+    /** 3: it goes only when Salotto, back in front, says so (close), not when anything covers it. */
+    private static final int VERSION = 3;
+    private static final String CLOSE = PACKAGE + ".CLOSE";
     private static final int BEST = 100;
     private static final long INSTALL_LIMIT_MS = 15000;
     private static final long POLL_MS = 200;
@@ -66,6 +68,11 @@ final class Cover {
         } finally {
             apk.delete();
         }
+    }
+
+    /** Salotto is in front again: the cover, wherever it is, can go. Nothing happens if it is not there. */
+    static void close(Context context) {
+        context.sendBroadcast(new Intent(CLOSE).setPackage(PACKAGE));
     }
 
     /** The update page is plain, so even as a whole screen it fits in an Intent. */

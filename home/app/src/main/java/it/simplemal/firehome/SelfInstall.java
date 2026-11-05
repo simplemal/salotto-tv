@@ -57,7 +57,7 @@ public final class SelfInstall extends BroadcastReceiver {
             // No room is something the person can act on, so it is named.
             boolean full = status == PackageInstaller.STATUS_FAILURE_STORAGE;
             Updater.write(Updater.state(context), full ? "failed F106" : "failed C202");
-            // Over the cover, which goes when it is covered, and so the error can be read.
+            // Over the cover, which UpdateActivity then closes, and so the error can be read.
             context.startActivity(new Intent(context, UpdateActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }

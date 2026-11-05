@@ -822,6 +822,8 @@ public final class MainActivity extends CardActivity {
         inFront = true;
         showing = true;
         opening = false;
+        // The update's cover waits underneath until Salotto is back: it can go now.
+        Cover.close(this);
         // The collections chosen in the installer and not yet on the TV, quietly.
         Packs.fetchChosen(this);
         // The colour closes from the Home's first frame. The Home key's cover shows the same colour, so it

@@ -98,6 +98,12 @@ public final class UpdateActivity extends CardActivity {
         else look();
     }
 
+    /** In front again, after the new version came back or Android refused: the cover can go. */
+    @Override protected void onResume() {
+        super.onResume();
+        Cover.close(this);
+    }
+
     private TextView text(String value, int size, boolean strong) {
         TextView view = label(value, size);
         view.setGravity(Gravity.CENTER);
