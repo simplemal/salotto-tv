@@ -23,6 +23,11 @@ final class Tar {
 
     /** The same from a stream, as it arrives: no copy of the archive is kept. It stops at the end marker. */
     static void unpack(InputStream input, File root, String pack) throws IOException {
+        unpack(input, root, pack, java.util.Collections.emptySet());
+    }
+
+    /** The same, leaving as they are the files named in `keep`, already there and checked one by one. */
+    static void unpack(InputStream input, File root, String pack, java.util.Set<String> keep) throws IOException {
         String rootPath = root.getCanonicalPath() + File.separator;
         {
             byte[] header = new byte[BLOCK];
@@ -37,6 +42,8 @@ final class Tar {
                         || !target.getCanonicalPath().startsWith(rootPath)) throw new IOException("path");
                 if (kind == '5') {
                     target.mkdirs();
+                } else if ((kind == '0' || kind == 0) && keep.contains(name)) {
+                    skip(input, length);
                 } else if (kind == '0' || kind == 0) {
                     target.getParentFile().mkdirs();
                     try (OutputStream output = new FileOutputStream(target)) {

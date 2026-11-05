@@ -114,7 +114,11 @@ final class WeatherView extends View {
 
     /** The first scene comes in from outside; a change of weather simply fades over the old one. */
     private void arrive(Scene loaded, String name) {
-        if (loaded == null) return;
+        if (loaded == null) {
+            // Not here yet, while its collection is still coming: the next look tries it again.
+            if (name.equals(wanted)) wanted = null;
+            return;
+        }
         if (!name.equals(wanted)) {
             loaded.release();
             return;

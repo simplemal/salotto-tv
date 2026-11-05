@@ -34,6 +34,12 @@
     <string name="first_does_settings">Réglages</string>
     <string name="first_start">Commencer</string>
     <string name="first_backdrop_title">Choisissez un fond d’écran</string>
+    <string name="first_packs_question">Voulez-vous télécharger maintenant les collections de fonds d’écran choisies ?</string>
+    <string name="first_packs_size">%1$s au total, comptez quelques minutes.</string>
+    <string name="first_packs_now">Télécharger maintenant</string>
+    <string name="first_packs_later">Plus tard</string>
+    <string name="first_packs_title">Téléchargement des fonds d’écran</string>
+    <string name="first_packs_stopped">Certaines collections arriveront plus tard.</string>
     <string name="first_preview">Aperçu</string>
     <string name="grid_position">%1$d sur %2$d</string>
     <string name="first_backdrop_pictures">Météo illustrée</string>

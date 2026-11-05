@@ -34,6 +34,12 @@
     <string name="first_does_settings">Ajustes</string>
     <string name="first_start">Empezar</string>
     <string name="first_backdrop_title">Elige un fondo</string>
+    <string name="first_packs_question">¿Quieres descargar ahora las colecciones de fondos que elegiste?</string>
+    <string name="first_packs_size">Son %1$s, tarda unos minutos.</string>
+    <string name="first_packs_now">Descargar ahora</string>
+    <string name="first_packs_later">Más tarde</string>
+    <string name="first_packs_title">Descargando los fondos</string>
+    <string name="first_packs_stopped">Algunas colecciones llegarán más tarde.</string>
     <string name="first_preview">Vista previa</string>
     <string name="grid_position">%1$d de %2$d</string>
     <string name="first_backdrop_pictures">Tiempo ilustrado</string>

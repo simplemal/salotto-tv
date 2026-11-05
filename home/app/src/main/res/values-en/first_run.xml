@@ -34,6 +34,12 @@
     <string name="first_does_settings">Settings</string>
     <string name="first_start">Get started</string>
     <string name="first_backdrop_title">Choose a backdrop</string>
+    <string name="first_packs_question">Download the backdrop collections you chose now?</string>
+    <string name="first_packs_size">%1$s in all, it takes a few minutes.</string>
+    <string name="first_packs_now">Download now</string>
+    <string name="first_packs_later">Later</string>
+    <string name="first_packs_title">Downloading backdrops</string>
+    <string name="first_packs_stopped">Some collections will arrive later.</string>
     <string name="first_preview">Preview</string>
     <string name="grid_position">%1$d of %2$d</string>
     <string name="first_backdrop_pictures">Illustrated weather</string>

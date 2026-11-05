@@ -34,6 +34,12 @@
     <string name="first_does_settings">设置</string>
     <string name="first_start">开始</string>
     <string name="first_backdrop_title">选择背景</string>
+    <string name="first_packs_question">现在下载你选择的背景合集吗？</string>
+    <string name="first_packs_size">共 %1$s，需要几分钟。</string>
+    <string name="first_packs_now">立即下载</string>
+    <string name="first_packs_later">稍后</string>
+    <string name="first_packs_title">正在下载背景</string>
+    <string name="first_packs_stopped">部分合集将稍后下载。</string>
     <string name="first_preview">预览</string>
     <string name="grid_position">%1$d / %2$d</string>
     <string name="first_backdrop_pictures">插画天气</string>

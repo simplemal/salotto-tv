@@ -420,11 +420,36 @@ final class Look {
         return slash > 0 && !name.startsWith("/") ? name.substring(0, slash) : null;
     }
 
-    /** The collection the chosen backdrop needs, even while it is not here yet. Null for a colour or Personale. */
-    static String chosenPack(Context context) {
+    /**
+     * The collection the Home opens on, as backdrop() will show it once its collection is here, even
+     * while it is not: a weather backdrop without a place gives way to the first set. Null for a
+     * colour or Personale.
+     */
+    static String homePack(Context context) {
         String chosen = prefs(context).getString("backdrop", null);
-        if (chosen == null) return Weather.active(context) ? PICTURES_FOLDER : ABSTRACT_3D_FOLDER;
-        return folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        boolean place = Weather.active(context);
+        if (chosen == null) return place && coming(context, PICTURES_FOLDER) ? PICTURES_FOLDER : fallbackPack(context);
+        if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) return fallbackPack(context);
+        boolean weather = WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen) || AERIAL.equals(chosen);
+        if (weather && !place) return fallbackPack(context);
+        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        // A collection that will never come, not chosen or deleted: the Home shows the first set instead.
+        return folder != null && !coming(context, folder) ? fallbackPack(context) : folder;
+    }
+
+    /** Here, or on its way. */
+    private static boolean coming(Context context, String folder) {
+        return Packs.present(context, folder) || Packs.wanted(context).contains(folder);
+    }
+
+    /** The set fallback() will show: the first one not deleted that is here or on its way. */
+    private static String fallbackPack(Context context) {
+        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
+        for (String name : names) {
+            String folder = folderOf(name);
+            if (!taken(context, name) && coming(context, folder)) return folder;
+        }
+        return null;
     }
 
     /**

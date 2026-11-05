@@ -1324,7 +1324,11 @@ public final class MainActivity extends CardActivity {
     private void backdropArrived() {
         if (!showing) return;
         String look = Look.signature(this);
-        if (look.equals(lookShown)) return;
+        if (look.equals(lookShown)) {
+            // The same backdrop, whose picture for this weather may have just arrived.
+            showBackdrop();
+            return;
+        }
         lookShown = look;
         applyLook();
     }

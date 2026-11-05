@@ -471,8 +471,9 @@ public final class UpdateActivity extends CardActivity {
         body.addView(text(getString(R.string.update_done_text, BuildVersion.name(this)), 19, false));
         forget();
         // The backdrops left the app: before the Home, only the picture it opens on comes, the user's
-        // design of 2026-11-04. The collections follow from the Home, quietly.
-        String pack = Look.chosenPack(this);
+        // design of 2026-11-04; for the weather, the one of the weather read just now. The collections
+        // follow from the Home, quietly.
+        String pack = Look.homePack(this);
         // Only one this TV wants: a collection the user deleted never comes back.
         if (pack != null && Packs.missing(this).contains(pack) && !Packs.partial(this, pack)) {
             body.addView(text(getString(R.string.update_backdrop_first), 16, false));

@@ -42,10 +42,11 @@ final class Packs {
     static final String ROOT = "sfondi";
     /** Written last, after the last file: a folder without it is a download that stopped half way. */
     static final String COMPLETE = ".completo";
-    /** Written after the first picture of a collection whose rest is still to come. */
+    /**
+     * Written after the first picture of a collection whose rest is still to come, with the names of
+     * the files that came, each checked: until the collection is whole, only those are read.
+     */
     static final String PARTIAL = ".inizio";
-    /** A collection being opened, before it takes the place of the one there. */
-    private static final String INCOMING = ".in-arrivo";
     /** One picture cut out of an archive is never larger than this. */
     private static final long MAX_PART = 16L * 1024 * 1024;
     /** Called on the main thread when something arrives that the Home could show. */
@@ -58,6 +59,10 @@ final class Packs {
     private static volatile String coming;
     private static volatile long received;
     private static volatile long expected = 1;
+    private static volatile List<String> queue = new ArrayList<>();
+    private static volatile boolean stopped;
+    /** The weather is read again before its picture is chosen, but the Home does not wait longer for it. */
+    private static final long WEATHER_WAIT_MS = 5000;
 
     static boolean fetching() { return fetching.get(); }
 
@@ -101,16 +106,37 @@ final class Packs {
         return Arrays.asList(ALL).contains(first) ? first : null;
     }
 
-    /** What a folder holds, sorted, without the installer's mark: from the TV when the collection is there. */
+    /**
+     * What a folder holds, sorted, without the marks: from the TV when the collection is there. One
+     * still coming shows only the files that came first, checked one by one, not those arriving.
+     */
     static String[] list(Context context, String path) throws IOException {
         String pack = packOf(path);
-        if (pack != null && (onTv(context, pack) || partial(context, pack))) {
+        if (pack != null && onTv(context, pack)) {
             String[] names = new File(root(context), path).list((folder, name) -> !name.startsWith("."));
             if (names == null) return new String[0];
             Arrays.sort(names);
             return names;
         }
+        if (pack != null && partial(context, pack)) {
+            String inside = path.endsWith("/") ? path : path + "/";
+            List<String> names = new ArrayList<>();
+            for (String name : firstNames(context, pack)) {
+                if (name.startsWith(inside) && name.indexOf('/', inside.length()) < 0) names.add(name.substring(inside.length()));
+            }
+            java.util.Collections.sort(names);
+            return names.toArray(new String[0]);
+        }
         return context.getAssets().list(path);
+    }
+
+    /** The files that came first, as `.inizio` names them. */
+    private static java.util.Set<String> firstNames(Context context, String pack) {
+        java.util.Set<String> names = new java.util.HashSet<>();
+        File marks = new File(new File(root(context), pack), PARTIAL);
+        if (!marks.isFile()) return names;
+        for (String line : Updater.read(marks).split("\n")) if (!line.trim().isEmpty()) names.add(line.trim());
+        return names;
     }
 
     /**
@@ -137,9 +163,34 @@ final class Packs {
         return names;
     }
 
-    /** Offered where a backdrop is chosen before it may have arrived: on the TV, or on its way. */
-    static boolean offered(Context context, String pack) {
-        return present(context, pack) || wanted(context).contains(pack);
+    /**
+     * Has a row where a backdrop is chosen: whole on the TV, or inside the app. One with only its
+     * first picture only if the Home is showing it, so the choice in use is never without its row;
+     * the user's rule of 2026-11-05: a collection that is not here is not listed.
+     */
+    static boolean listed(Context context, String pack) {
+        return onTv(context, pack) || inside(context, pack) || partial(context, pack) && pack.equals(Look.homePack(context));
+    }
+
+    /** The collections coming in now, in their order, for the page that shows them arriving. */
+    static List<String> queue() { return queue; }
+
+    /** The last fetch stopped before its end: the network, the room or GitHub. The Home tries again. */
+    static boolean stopped() { return stopped; }
+
+    /** Blocking: how much the missing collections weigh, from the signed list. -1 if it cannot be read. */
+    static long missingBytes(Context context) {
+        try {
+            JSONArray packs = signedList();
+            long total = 0;
+            for (String pack : missing(context)) {
+                JSONObject item = itemOf(packs, pack);
+                if (item != null) total += item.getLong("bytes");
+            }
+            return total;
+        } catch (Updater.Failure | JSONException e) {
+            return -1;
+        }
     }
 
     /** The list signed with the update key: its collections, each with the place of every file in its archive. */
@@ -165,37 +216,61 @@ final class Packs {
     }
 
     /**
-     * Away from the main thread: fetches the signed list, then the first picture of the chosen
-     * backdrop's collection, then each missing collection whole. A failure leaves nothing half
-     * done, and the next start of the Home tries again.
+     * Away from the main thread: fetches the signed list, then the first picture of the collection
+     * the Home opens on, then each missing collection whole. A failure leaves nothing half done, and
+     * the next start of the Home tries again.
      */
-    static void fetchChosen(Context context) {
+    static void fetchChosen(Context context) { fetchAll(context, false); }
+
+    /** On the first start, asked by the user: every missing collection, the lightest first, so one is ready soon. */
+    static void fetchNow(Context context) { fetchAll(context, true); }
+
+    private static void fetchAll(Context context, boolean lightestFirst) {
         if (missing(context).isEmpty() || !fetching.compareAndSet(false, true)) return;
+        stopped = false;
+        queue = missing(context);
         Background.run(() -> {
             try {
                 JSONArray packs = signedList();
                 List<String> order = missing(context);
-                String first = Look.chosenPack(context);
-                if (first != null && order.remove(first)) {
-                    order.add(0, first);
-                    JSONObject item = itemOf(packs, first);
-                    try {
-                        if (item != null && !partial(context, first)) firstPicture(context, first, item, signedIndex());
-                    } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
-                        // Without its first picture the collection still comes whole, below.
+                if (lightestFirst) {
+                    order.sort((one, other) -> Long.compare(bytesOf(packs, one), bytesOf(packs, other)));
+                } else {
+                    String first = Look.homePack(context);
+                    if (first != null && order.remove(first)) {
+                        order.add(0, first);
+                        JSONObject item = itemOf(packs, first);
+                        try {
+                            if (item != null && !partial(context, first)) firstPicture(context, first, item, signedIndex());
+                        } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
+                            // Without its first picture the collection still comes whole, below.
+                        }
                     }
                 }
+                queue = new ArrayList<>(order);
                 for (String pack : order) {
                     JSONObject item = itemOf(packs, pack);
                     if (item != null) fetch(context, pack, item);
                 }
             } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
                 // Not now: the network, the room or GitHub. The next look tries again.
+                stopped = true;
             } finally {
                 coming = null;
+                queue = new ArrayList<>();
                 fetching.set(false);
+                tell();
             }
         });
+    }
+
+    private static long bytesOf(JSONArray packs, String pack) {
+        try {
+            JSONObject item = itemOf(packs, pack);
+            return item == null ? Long.MAX_VALUE : item.getLong("bytes");
+        } catch (JSONException e) {
+            return Long.MAX_VALUE;
+        }
     }
 
     /**
@@ -207,9 +282,32 @@ final class Packs {
         if (onTv(context, pack) || partial(context, pack) || inside(context, pack)) return true;
         try {
             JSONObject item = itemOf(signedList(), pack);
+            if (Weather.weatherPack(pack)) freshWeather(context);
             return item != null && firstPicture(context, pack, item, signedIndex());
         } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
             return false;
+        }
+    }
+
+    /**
+     * The weather as it is now, so the picture fetched is the one the Home will want: the saved
+     * reading can be from another day, with its sunrise and sunset. Waits a few seconds at most;
+     * then the saved reading, or the hour, decides.
+     */
+    private static void freshWeather(Context context) {
+        if (!Weather.active(context)) return;
+        Thread reading = new Thread(() -> {
+            try {
+                Weather.refresh(context);
+            } catch (IOException | JSONException e) {
+                // The saved reading, or the hour, chooses.
+            }
+        });
+        reading.start();
+        try {
+            reading.join(WEATHER_WAIT_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -222,6 +320,12 @@ final class Packs {
         String picture;
         if (Weather.weatherPack(pack)) {
             part(context, url, index, Weather.tableOf(pack));
+            // Not readable through open() until `.inizio` names it, which comes after the picture.
+            java.util.Properties table = new java.util.Properties();
+            try (InputStream input = new FileInputStream(new File(root(context), Weather.tableOf(pack)))) {
+                table.load(input);
+            }
+            Weather.knowTable(pack + "/", table);
             picture = Weather.pictureIn(context, pack);
         } else {
             List<String> names = new ArrayList<>();
@@ -231,7 +335,8 @@ final class Packs {
         }
         if (picture == null || !index.has(picture)) return false;
         part(context, url, index, picture);
-        Files.write(new File(new File(root(context), pack), PARTIAL).toPath(), new byte[0]);
+        String names = (Weather.weatherPack(pack) ? Weather.tableOf(pack) + "\n" : "") + picture + "\n";
+        Files.write(new File(new File(root(context), pack), PARTIAL).toPath(), names.getBytes(StandardCharsets.UTF_8));
         tell();
         return true;
     }
@@ -255,9 +360,8 @@ final class Packs {
         if (!hex(MessageDigest.getInstance("SHA-256").digest(body)).equals(at.getString(2))) throw new IOException("fingerprint");
         File parent = target.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) throw new IOException("room");
-        File temporary = new File(parent, "." + target.getName() + ".part");
-        Files.write(temporary.toPath(), body);
-        if (!temporary.renameTo(target)) throw new IOException("rename");
+        // Checked already, and read only once `.inizio` names it: written in place, never moved.
+        Files.write(target.toPath(), body);
     }
 
     private static String hex(byte[] bytes) {
@@ -272,9 +376,10 @@ final class Packs {
     }
 
     /**
-     * The whole collection, opened as it arrives into a folder of its own, its fingerprint checked
-     * over every byte; only then does it take the place of what was there. It needs the room of
-     * itself, not of an archive and its contents.
+     * The whole collection, opened as it arrives straight into its own folder, its fingerprint checked
+     * over every byte; only then is it marked whole. Nothing is moved: on the Sticks with Android 11
+     * moving a folder can be refused for good. It needs the room of itself, not of an archive and its
+     * contents. Until it is whole only the files that came first are read, and those stay as they are.
      */
     private static void fetch(Context context, String pack, JSONObject item)
             throws JSONException, IOException, GeneralSecurityException {
@@ -284,37 +389,47 @@ final class Packs {
         if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new IOException("room");
         String url = item.getString("url");
         if (!url.startsWith("https://")) throw new IOException("url");
-        File incoming = new File(root, INCOMING);
-        empty(incoming);
-        if (!incoming.exists() && !incoming.mkdirs()) throw new IOException("room");
+        File folder = new File(root, pack);
+        java.util.Set<String> first = firstNames(context, pack);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         received = 0;
         expected = size;
         coming = pack;
+        boolean whole = false;
         HttpURLConnection connection = Updater.open(url);
         try {
             // Skipping must read too: a skipped byte would be missing from the fingerprint.
             try (InputStream input = new Reading(new DigestInputStream(new Counting(connection.getInputStream()), digest))) {
-                Tar.unpack(input, incoming, pack);
+                Tar.unpack(input, root, pack, first);
                 // What is left after the end marker counts for the fingerprint too.
                 byte[] rest = new byte[65536];
                 while (input.read(rest) > 0) { }
             }
             if (received != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
-            File folder = new File(root, pack);
-            File old = new File(root, INCOMING + "-" + pack);
-            empty(old);
-            old.delete();
-            if (folder.exists() && !folder.renameTo(old)) throw new IOException("rename");
-            if (!new File(incoming, pack).renameTo(folder)) throw new IOException("rename");
             Files.write(new File(folder, COMPLETE).toPath(), new byte[0]);
-            empty(old);
-            old.delete();
+            new File(folder, PARTIAL).delete();
+            whole = true;
             tell();
         } finally {
-            empty(incoming);
-            incoming.delete();
+            // A collection that did not come whole keeps only what came first, checked.
+            if (!whole) clearBut(folder, folder, first);
         }
+    }
+
+    /** Everything in `folder` except the marks and the files named in `keep`, by their path from the collections' root. */
+    private static void clearBut(File top, File folder, java.util.Set<String> keep) {
+        File[] inside = folder.listFiles();
+        if (inside == null) return;
+        String root = top.getParentFile().getPath() + File.separator;
+        for (File file : inside) {
+            if (file.isDirectory()) {
+                clearBut(top, file, keep);
+                if (file.list() != null && file.list().length == 0) file.delete();
+            } else if (!file.getName().equals(PARTIAL) && !keep.contains(file.getPath().substring(root.length()))) {
+                file.delete();
+            }
+        }
+        if (folder == top && folder.list() != null && folder.list().length == 0) folder.delete();
     }
 
     /** Skips by reading. */
@@ -357,19 +472,11 @@ final class Packs {
         }
     }
 
-    private static void empty(File folder) {
-        File[] inside = folder.listFiles();
-        if (inside != null) for (File file : inside) {
-            if (file.isDirectory()) empty(file);
-            file.delete();
-        }
-    }
-
     /** One file of a collection, from the TV when it is there, even before the rest; anything else from inside the app. */
     static InputStream open(Context context, String path) throws IOException {
         String pack = packOf(path);
         File file = new File(root(context), path);
-        if (pack != null && (onTv(context, pack) || file.isFile())) return new FileInputStream(file);
+        if (pack != null && (onTv(context, pack) || firstNames(context, pack).contains(path))) return new FileInputStream(file);
         return context.getAssets().open(path);
     }
 }

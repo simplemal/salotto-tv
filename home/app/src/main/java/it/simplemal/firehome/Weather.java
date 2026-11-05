@@ -63,7 +63,7 @@ final class Weather {
     private static final long RETRY_MS = 5 * Fire.MINUTE_MS;
     private static final int TIMEOUT_MS = 10000;
     private static final AtomicBoolean REFRESHING = new AtomicBoolean();
-    private static final Map<String, Properties> PICTURE_TABLES = new HashMap<>();
+    private static final Map<String, Properties> PICTURE_TABLES = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static volatile long failedAt;
 
@@ -176,6 +176,9 @@ final class Weather {
             : hour < 18 ? "afternoon" : hour < 20 ? "sunset" : "evening";
         return file(context, folder, phase + "/0");
     }
+
+    /** The table of a collection still coming, read by Salotto where it just put it, checked. */
+    static void knowTable(String folder, Properties table) { PICTURE_TABLES.put(folder, table); }
 
     static Properties pictures(Context context, String folder) {
         Properties known = PICTURE_TABLES.get(folder);

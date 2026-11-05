@@ -34,6 +34,12 @@
     <string name="first_does_settings">सेटिंग</string>
     <string name="first_start">शुरू करें</string>
     <string name="first_backdrop_title">बैकग्राउंड चुनें</string>
+    <string name="first_packs_question">क्या आप चुने हुए बैकग्राउंड संग्रह अभी डाउनलोड करना चाहते हैं?</string>
+    <string name="first_packs_size">कुल %1$s, इसमें कुछ मिनट लगेंगे।</string>
+    <string name="first_packs_now">अभी डाउनलोड करें</string>
+    <string name="first_packs_later">बाद में</string>
+    <string name="first_packs_title">बैकग्राउंड डाउनलोड हो रहे हैं</string>
+    <string name="first_packs_stopped">कुछ संग्रह बाद में आएंगे।</string>
     <string name="first_preview">पूर्वावलोकन</string>
     <string name="grid_position">%2$d में से %1$d</string>
     <string name="first_backdrop_pictures">चित्रित मौसम</string>

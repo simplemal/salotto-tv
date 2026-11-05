@@ -1616,17 +1616,17 @@ public final class SettingsActivity extends CardActivity {
             getString(R.string.settings_backdrop_pictures_text));
         pictures.mosaic = Look.PICTURES_FOLDER;
         pictures.mark = R.drawable.ic_cloud;
-        if (Packs.present(this, Look.PICTURES_FOLDER)) weather.add(pictures);
+        if (Packs.listed(this, Look.PICTURES_FOLDER)) weather.add(pictures);
         Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
             getString(R.string.settings_backdrop_photos_text));
         photos.mosaic = Look.PHOTOS_FOLDER;
         photos.mark = R.drawable.ic_cloud;
-        if (Packs.present(this, Look.PHOTOS_FOLDER)) weather.add(photos);
+        if (Packs.listed(this, Look.PHOTOS_FOLDER)) weather.add(photos);
         Entry aerial = weatherBackdrop(Look.AERIAL, R.drawable.ic_photo,
             getString(R.string.settings_backdrop_aerial_text));
         aerial.mosaic = Look.AERIAL_FOLDER;
         aerial.mark = R.drawable.ic_cloud;
-        if (Packs.present(this, Look.AERIAL_FOLDER)) weather.add(aerial);
+        if (Packs.listed(this, Look.AERIAL_FOLDER)) weather.add(aerial);
         List<Entry> timed = new ArrayList<>();
         Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
         drawn.mosaic = Look.ABSTRACT_FOLDER;
@@ -1667,8 +1667,8 @@ public final class SettingsActivity extends CardActivity {
         showFromChosen(getString(R.string.settings_backdrop), entries);
     }
 
-    /** A collection has a row only if it is on the TV, or inside the app, and was not deleted. */
-    private boolean shown(String folder) { return Packs.present(this, folder) && !Look.setTaken(this, folder); }
+    /** A collection has a row only if it is whole on the TV, or inside the app, and was not deleted. */
+    private boolean shown(String folder) { return Packs.listed(this, folder) && !Look.setTaken(this, folder); }
 
     /** Arriving, the selection starts on what is in use. */
     private void showFromChosen(String title, List<Entry> entries) {

@@ -11,7 +11,10 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.text.format.Formatter;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
@@ -86,6 +89,8 @@ public final class FirstRunActivity extends CardActivity {
     private static final int DOT = 7;
     private static final int DOT_GAP = 9;
     private static final int DOTS_BOTTOM = 26;
+    /** How often the bars of the collections coming in move. */
+    private static final long PROGRESS_MS = 500;
     private static final int DOT_OFF = Color.argb(70, 255, 255, 255);
 
     /** A backdrop to choose: with a folder it shows its pictures, without it the page itself turns into it. */
@@ -133,6 +138,10 @@ public final class FirstRunActivity extends CardActivity {
     /** Tells a late answer that its page is gone. */
     private int visit;
     private Runnable back = () -> { };
+    /** The question about the collections is asked once per visit. */
+    private boolean packsAsked;
+    /** The backdrop under the focus, kept when the page is drawn again as collections arrive. */
+    private String focusedChoice;
 
     static boolean due(Context context) {
         return !prefs(context).getBoolean(DONE, false)
@@ -412,7 +421,61 @@ public final class FirstRunActivity extends CardActivity {
         first.requestFocus();
     }
 
+    /**
+     * After the city: with collections chosen and not yet here, and a network, the user is asked
+     * first whether to fetch them now, the user's design of 2026-11-05. Asked once per visit.
+     */
     private void showBackdrop() {
+        if (!packsAsked && !Packs.fetching() && online() && !Packs.missing(this).isEmpty()) askPacks();
+        else showChoices();
+    }
+
+    private boolean online() {
+        return getSystemService(ConnectivityManager.class).getActiveNetwork() != null;
+    }
+
+    /** The question on a line of its own, the weight and the time smaller under it, once they are known. */
+    private void askPacks() {
+        heading(words(R.string.first_packs_question), "");
+        int asked = visit;
+        Background.run(() -> {
+            long bytes = Packs.missingBytes(this);
+            runOnUiThread(() -> {
+                if (asked == visit && bytes > 0) {
+                    note.setText(words.getString(R.string.first_packs_size, Formatter.formatShortFileSize(words, bytes)));
+                }
+            });
+        });
+        View now = button(words(R.string.first_packs_now), BUTTON_SP, () -> answered(true));
+        page.addView(now, place(WIDE, 26));
+        page.addView(button(words(R.string.first_packs_later), BUTTON_SP, () -> answered(false)), place(WIDE, 10));
+        now.requestFocus();
+    }
+
+    /** Back from the choices goes to the question; once collections are coming it is answered, and Back goes to the city. */
+    private void answered(boolean now) {
+        packsAsked = true;
+        if (now) Packs.fetchNow(this);
+        int page = at;
+        back = () -> {
+            if (Packs.fetching()) {
+                go(page - 1);
+                return;
+            }
+            packsAsked = false;
+            go(page);
+        };
+        showChoices();
+    }
+
+    /**
+     * The backdrops to choose: only the collections here, and the plain ones. While collections are
+     * coming, each has a bar instead, and becomes a choice once whole; going on leaves them coming.
+     */
+    private void showChoices() {
+        visit++;
+        int shownVisit = visit;
+        String focusedKey = focusedChoice;
         page.removeAllViews();
         page.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
         float toSide = getResources().getDisplayMetrics().widthPixels * (0.5f - SIDE_CENTER);
@@ -420,6 +483,9 @@ public final class FirstRunActivity extends CardActivity {
         List<Choice> choices = new ArrayList<>();
         if (Weather.place(this) != null) choices.addAll(Arrays.asList(WEATHER_CHOICES));
         choices.addAll(Arrays.asList(OTHER_CHOICES));
+        List<String> coming = Packs.fetching() ? Packs.queue() : new ArrayList<>();
+        List<String> whole = new ArrayList<>();
+        List<Object[]> bars = new ArrayList<>();
         LinearLayout rows = new LinearLayout(this);
         rows.setOrientation(LinearLayout.VERTICAL);
         rows.setPaddingRelative(dp(LIST_ROOM), dp(LIST_TOP), dp(LIST_ROOM), dp(LIST_TOP));
@@ -429,23 +495,42 @@ public final class FirstRunActivity extends CardActivity {
         side.setOrientation(LinearLayout.VERTICAL);
         side.setGravity(Gravity.CENTER);
         side.setPaddingRelative(dp(SIDE_START), 0, dp(SIDE_END), 0);
-        TextView title = label(words(R.string.first_backdrop_title), TITLE_SP);
+        boolean arriving = false;
+        for (Choice choice : choices) {
+            if (choice.folder != null && !Packs.listed(this, choice.folder) && coming.contains(choice.folder)) arriving = true;
+        }
+        TextView title = label(words(arriving ? R.string.first_packs_title : R.string.first_backdrop_title), TITLE_SP);
         title.setGravity(Gravity.CENTER);
         title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         TextView explained = label("", EXPLAINED_SP);
         explained.setGravity(Gravity.CENTER);
         explained.setAlpha(0.85f);
         View first = null;
-        rows.addView(groupLabel(R.string.first_backdrop_dynamic));
+        View kept = null;
+        boolean dynamic = false;
         boolean statics = false;
         for (Choice choice : choices) {
-            // A collection not chosen in the installer, or deleted, is not offered; one on its way is.
-            if (choice.folder != null && !Packs.offered(this, choice.folder)) continue;
+            boolean here = choice.folder == null || Packs.listed(this, choice.folder);
+            // A collection not here is not listed, the user's rule of 2026-11-05; one coming shows its bar.
+            if (!here && !coming.contains(choice.folder)) continue;
+            if (choice.folder != null && !dynamic) {
+                dynamic = true;
+                rows.addView(groupLabel(R.string.first_backdrop_dynamic));
+            }
             if (choice.folder == null && !statics) {
                 statics = true;
                 rows.addView(groupLabel(R.string.first_backdrop_static));
             }
             String name = choice.name == 0 ? choice.key : words(choice.name);
+            LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
+            size.bottomMargin = dp(ROW_GAP);
+            if (!here) {
+                TextView bar = arrivingRow(name, choice.mark);
+                rows.addView(bar, size);
+                bars.add(new Object[]{bar, choice.folder, name});
+                continue;
+            }
+            if (choice.folder != null) whole.add(choice.folder);
             TextView row = button(name, BUTTON_SP, () -> {
                 Look.setBackdrop(this, choice.key);
                 next();
@@ -454,7 +539,10 @@ public final class FirstRunActivity extends CardActivity {
             row.setOnFocusChangeListener((view, focused) -> {
                 style.onFocusChange(view, focused);
                 row.setCompoundDrawableTintList(ColorStateList.valueOf(focused ? Fire.INK : Color.WHITE));
-                if (focused) preview(choice, explained);
+                if (focused) {
+                    focusedChoice = choice.key;
+                    preview(choice, explained);
+                }
             });
             if (choice.mark != 0) {
                 Drawable mark = getDrawable(choice.mark).mutate();
@@ -462,10 +550,9 @@ public final class FirstRunActivity extends CardActivity {
                 row.setCompoundDrawablesRelative(mark, null, null, null);
                 row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
             }
-            LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
-            size.bottomMargin = dp(ROW_GAP);
             rows.addView(row, size);
             if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
+            if (choice.key.equals(focusedKey)) kept = row;
         }
         ScrollView list = new ScrollView(this);
         list.setVerticalScrollBarEnabled(false);
@@ -476,13 +563,66 @@ public final class FirstRunActivity extends CardActivity {
         LinearLayout.LayoutParams textPlace = new LinearLayout.LayoutParams(-1, -2);
         textPlace.topMargin = dp(10);
         side.addView(explained, textPlace);
+        if (Packs.stopped() && !Packs.missing(this).isEmpty()) {
+            TextView later = label(words(R.string.first_packs_stopped), EXPLAINED_SP);
+            later.setGravity(Gravity.CENTER);
+            later.setAlpha(0.6f);
+            LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-1, -2);
+            under.topMargin = dp(16);
+            side.addView(later, under);
+        }
         // Words first and rows after, as in the Settings: the pictures fade out before the rows.
         columns.addView(side, new LinearLayout.LayoutParams(0, -1, SIDE_WEIGHT));
         LinearLayout.LayoutParams listPlace = new LinearLayout.LayoutParams(0, -1, LIST_WEIGHT);
         listPlace.setMarginEnd(dp(LIST_END));
         columns.addView(list, listPlace);
         page.addView(columns, new LinearLayout.LayoutParams(-1, -1));
-        first.requestFocus();
+        (kept != null ? kept : first).requestFocus();
+        if (!bars.isEmpty()) root.postDelayed(() -> follow(shownVisit, whole, bars), PROGRESS_MS);
+    }
+
+    /** Twice a second while collections come: the bars move, and a collection whole becomes a choice. */
+    private void follow(int shownVisit, List<String> whole, List<Object[]> bars) {
+        if (shownVisit != visit || isFinishing()) return;
+        boolean changed = !Packs.fetching() || Packs.stopped();
+        for (Object[] bar : bars) if (Packs.listed(this, (String) bar[1])) changed = true;
+        for (String pack : whole) if (!Packs.listed(this, pack)) changed = true;
+        if (changed) {
+            showChoices();
+            return;
+        }
+        for (Object[] bar : bars) showShare((TextView) bar[0], (String) bar[2], Packs.percent((String) bar[1]));
+        root.postDelayed(() -> follow(shownVisit, whole, bars), PROGRESS_MS);
+    }
+
+    /** A row that cannot be chosen yet: its name, and behind it a bar of how much has come. */
+    private TextView arrivingRow(String name, int markId) {
+        TextView row = label(name, BUTTON_SP);
+        if (markId != 0) {
+            Drawable mark = getDrawable(markId).mutate();
+            mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+            row.setCompoundDrawablesRelative(mark, null, null, null);
+            row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
+        }
+        row.setGravity(Gravity.CENTER);
+        row.setSingleLine(true);
+        row.setFocusable(false);
+        row.setPadding(dp(20), 0, dp(20), 0);
+        GradientDrawable done = new GradientDrawable();
+        done.setColor(Color.argb(90, 255, 255, 255));
+        done.setCornerRadius(dp(12));
+        ClipDrawable share = new ClipDrawable(done, Gravity.START, ClipDrawable.HORIZONTAL);
+        row.setBackground(new LayerDrawable(new Drawable[]{softGlass(dp(12)), share}));
+        showShare(row, name, -1);
+        return row;
+    }
+
+    /** Waiting, it is only dimmed; coming, it shows how much. */
+    private void showShare(TextView row, String name, int percent) {
+        Drawable share = ((LayerDrawable) row.getBackground()).getDrawable(1);
+        share.setLevel(Math.max(0, percent) * 100);
+        row.setAlpha(percent < 0 ? 0.45f : 0.8f);
+        row.setText(percent < 0 ? name : String.format(java.util.Locale.getDefault(), "%s  ·  %d%%", name, percent));
     }
 
     private TextView groupLabel(int name) {
