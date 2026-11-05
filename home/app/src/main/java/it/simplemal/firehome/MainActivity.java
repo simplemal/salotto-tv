@@ -217,6 +217,10 @@ public final class MainActivity extends CardActivity {
     private static final int BLUR_RADIUS = 2;
     private static final long BLUR_SCENE_MS = 700;
     private static final long BLUR_SETTLED_MS = 3300;
+    /** The blur comes in softly when it starts to be shown, the user's request of 2026-11-05. */
+    private static final long BLUR_FADE_MS = 500;
+    /** Shown just now and still empty or old: it fades in with its first picture. */
+    private boolean blurFadeIn;
     private static final long WHEEL_MOVE_MS = 180;
     private long lastMove;
     private static final long CORNERS_BACK_MS = 220;
@@ -946,7 +950,12 @@ public final class MainActivity extends CardActivity {
         Background.draw(() -> {
             Bitmap soft = Blur.light(small, BLUR_WIDTH, BLUR_HEIGHT, BLUR_RADIUS);
             small.recycle();
-            runOnUiThread(() -> blurred.setImageBitmap(soft));
+            runOnUiThread(() -> {
+                blurred.setImageBitmap(soft);
+                if (!blurFadeIn) return;
+                blurFadeIn = false;
+                blurred.animate().alpha(1f).setDuration(BLUR_FADE_MS).start();
+            });
         });
     }
 
@@ -1036,7 +1045,14 @@ public final class MainActivity extends CardActivity {
         boolean wasCircular = circular;
         circular = Look.circular(this);
         wheel.setTinted(Look.tintGlow(this));
-        blurred.setVisibility(circular && Look.wheelBlur(this) ? View.VISIBLE : View.GONE);
+        boolean blur = circular && Look.wheelBlur(this);
+        if (blur && blurred.getVisibility() != View.VISIBLE) {
+            // Switching to the wheel, or turning the blur on: hidden until its picture is ready, then faded in.
+            blurred.animate().cancel();
+            blurred.setAlpha(0f);
+            blurFadeIn = true;
+        }
+        blurred.setVisibility(blur ? View.VISIBLE : View.GONE);
         showBackdrop();
         if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
         columns = Look.columns(this);
