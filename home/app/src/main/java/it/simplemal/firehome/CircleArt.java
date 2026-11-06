@@ -124,6 +124,12 @@ final class CircleArt {
             centreY = (top + bottom) / 2f / height;
         }
         float pictureHeight = pictureWidth * height / width;
+        // Whole numbers, and before the long loops below: on the Max of 2021 (AFTKA, 32 bits) a decimal
+        // held across cutOut came back as 0 (2026-11-06), and NOW's logo sat at the bottom of its circle.
+        int drawnWidth = Math.max(1, Math.round(pictureWidth));
+        int drawnHeight = Math.max(1, Math.round(pictureHeight));
+        int drawnLeft = Math.round(size / 2f - centreX * drawnWidth);
+        int drawnTop = Math.round(size / 2f - centreY * drawnHeight);
 
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
@@ -142,15 +148,12 @@ final class CircleArt {
             soft.recycle();
         }
 
-        int drawnWidth = Math.max(1, Math.round(pictureWidth));
-        int drawnHeight = Math.max(1, Math.round(pictureHeight));
         Bitmap picture = Bitmap.createBitmap(drawnWidth, drawnHeight, Bitmap.Config.ARGB_8888);
         Canvas inside = new Canvas(picture);
         paint(inside, image, back, drawnWidth, drawnHeight);
         if (card != null) cutOut(picture, edge);
         else feather(inside, drawnWidth, drawnHeight);
-        canvas.drawBitmap(picture, size / 2f - centreX * drawnWidth, size / 2f - centreY * drawnHeight,
-            new Paint(Paint.FILTER_BITMAP_FLAG));
+        canvas.drawBitmap(picture, drawnLeft, drawnTop, new Paint(Paint.FILTER_BITMAP_FLAG));
         picture.recycle();
         return made;
     }
@@ -206,6 +209,17 @@ final class CircleArt {
         }
     }
 
+    /** How much of a pixel stays, by its squared distance from the background: no decimals in the long loop. */
+    private static final int[] KEPT = new int[CUT_WHOLE * CUT_WHOLE + 1];
+
+    static {
+        for (int squared = 0; squared < KEPT.length; squared++) {
+            float distance = (float) Math.sqrt(squared);
+            float kept = Math.max(0f, Math.min(1f, (distance - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR)));
+            KEPT[squared] = Math.round(kept * 255);
+        }
+    }
+
     /** Only the logo stays: each pixel as clear as it is close to the picture's own background. */
     private static void cutOut(Bitmap picture, int[] edge) {
         int width = picture.getWidth();
@@ -214,9 +228,8 @@ final class CircleArt {
         picture.getPixels(pixels, 0, width, 0, 0, width, height);
         for (int index = 0; index < pixels.length; index++) {
             int pixel = pixels[index];
-            float distance = (float) Math.sqrt(nearest(pixel, edge));
-            float kept = Math.max(0f, Math.min(1f, (distance - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR)));
-            pixels[index] = Math.round(kept * 255) << 24 | (pixel & 0xFFFFFF);
+            int alpha = KEPT[Math.min(KEPT.length - 1, nearest(pixel, edge))];
+            pixels[index] = alpha << 24 | (pixel & 0xFFFFFF);
         }
         picture.setPixels(pixels, 0, width, 0, 0, width, height);
     }

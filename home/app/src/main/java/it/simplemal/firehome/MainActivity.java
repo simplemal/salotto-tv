@@ -452,7 +452,11 @@ public final class MainActivity extends CardActivity {
             int inset = dp(circular ? 2 : 3);
             button.setPadding(inset, inset, inset, inset);
         }
-        ((LinearLayout.LayoutParams) controlButton.getLayoutParams()).setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
+        // Set again as layout params: a margin end changed in place is not applied once the button is
+        // on screen, and switching to the wheel left Tutte le app 3 dp from it instead of 22 (2026-11-06).
+        LinearLayout.LayoutParams beside = (LinearLayout.LayoutParams) controlButton.getLayoutParams();
+        beside.setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
+        controlButton.setLayoutParams(beside);
         FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
         weatherSpot.rightMargin = dp(32);
         weatherSpot.topMargin = dp(WEATHER_TOP);
