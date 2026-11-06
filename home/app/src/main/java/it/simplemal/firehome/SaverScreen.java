@@ -72,7 +72,7 @@ final class SaverScreen {
         String weather = Look.saverWeather(context) ? Weather.line(context) : null;
         if (weather != null) {
             TextView line = new TextView(context);
-            line.setText(weather);
+            line.setText(WeatherIcon.in(context, weather));
             line.setTextSize(WEATHER_SP);
             line.setTextColor(Color.WHITE);
             line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);

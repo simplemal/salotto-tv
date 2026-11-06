@@ -409,17 +409,6 @@ final class Weather {
         return context.getString(R.string.weather_thunderstorm);
     }
 
-    private static String symbol(int code) {
-        if (code == 0) return "☀️";
-        if (code == 1) return "🌤️";
-        if (code == 2) return "⛅";
-        if (code == 3) return "☁️";
-        if (code <= 48) return "🌫️";
-        if (code <= 57) return "🌦️";
-        if (code <= 67) return "🌧️";
-        if (code <= 77) return "❄️";
-        if (code <= 82) return "🌧️";
-        if (code <= 86) return "🌨️";
-        return "⛈️";
-    }
+    /** A character that WeatherIcon.in draws as the icon: every text holding one goes through it. */
+    private static String symbol(int code) { return WeatherIcon.of(code); }
 }

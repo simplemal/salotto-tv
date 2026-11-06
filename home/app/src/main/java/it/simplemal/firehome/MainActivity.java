@@ -582,13 +582,15 @@ public final class MainActivity extends CardActivity {
     private void showWeatherCorner() {
         String line = Weather.line(this);
         cornerLine.setVisibility(line != null ? View.VISIBLE : View.GONE);
-        if (line != null && !line.contentEquals(cornerLine.getText())) cornerLine.setText(line);
+        if (line != null && !line.contentEquals(cornerLine.getText())) cornerLine.setText(WeatherIcon.in(this, line));
         cornerDays.removeAllViews();
         for (Weather.Day day : Weather.days(this)) {
             LinearLayout column = new LinearLayout(this);
             column.setOrientation(LinearLayout.VERTICAL);
             column.setGravity(Gravity.CENTER_HORIZONTAL);
-            for (TextView part : new TextView[]{label(day.name, 13), label(day.symbol, 20),
+            TextView symbol = label("", 20);
+            symbol.setText(WeatherIcon.in(this, day.symbol));
+            for (TextView part : new TextView[]{label(day.name, 13), symbol,
                     label(day.highest + "°", 15), label(day.lowest + "°", 13)}) {
                 part.setGravity(Gravity.CENTER);
                 part.setShadowLayer(dp(4), 0, dp(1), Color.argb(190, 0, 0, 0));
@@ -774,7 +776,7 @@ public final class MainActivity extends CardActivity {
         pillDate.setVisibility(time);
         pillTime.setVisibility(time);
         pillWeather.setVisibility(symbol != null ? View.VISIBLE : View.GONE);
-        if (symbol != null) pillWeather.setText(symbol);
+        if (symbol != null) pillWeather.setText(WeatherIcon.in(this, symbol));
         pillRow.setPadding(clockInView ? dp(6) : dp(16), dp(6), dp(6), dp(6));
     }
 
@@ -985,10 +987,10 @@ public final class MainActivity extends CardActivity {
     private void showWeather() {
         String line = Weather.line(this);
         weather.setVisibility(line != null ? View.VISIBLE : View.GONE);
-        if (line != null && !line.contentEquals(weather.getText())) weather.setText(line);
+        if (line != null && !line.contentEquals(weather.getText())) weather.setText(WeatherIcon.in(this, line));
         String tomorrow = Weather.tomorrow(this);
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
-        if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(tomorrow);
+        if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
         weatherSymbol = Weather.symbol(this);
         if (circular) showWeatherCorner();
         showPillClock();
