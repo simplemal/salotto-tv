@@ -17,7 +17,7 @@ Tutti i marchi appartengono ai rispettivi proprietari. Fire TV, Alexa, Prime Vid
 | Software | Uso | Licenza |
 |---|---|---|
 | [Material Icons](https://github.com/google/material-design-icons), da [@material-design-icons/svg](https://www.npmjs.com/package/@material-design-icons/svg) | Icone delle Impostazioni | Apache 2.0 |
-| [Lucide](https://lucide.dev/) | Icone del meteo | ISC |
+| [Weather Icons](https://erikflowers.github.io/weather-icons/), di Erik Flowers | Icone del meteo, 15 su 222 | SIL OFL 1.1 |
 | [Open-Meteo](https://open-meteo.com/) | Dati meteo, servizio online | CC BY 4.0 per i dati |
 | [Android Open Source Project](https://source.android.com/) | Piattaforma e strumenti di compilazione | Apache 2.0 |
 | [Gradle](https://gradle.org/) e [Android Gradle Plugin](https://developer.android.com/build) | Compilazione | Apache 2.0 |

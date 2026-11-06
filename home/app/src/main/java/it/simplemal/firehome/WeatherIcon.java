@@ -12,38 +12,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The weather's symbols, Lucide's line icons instead of emoji (the user's choice, 2026-11-06): Fire
- * OS's emoji font drew fog as a grey square. In the text a symbol is a private character, and `in`
- * puts the icon in its place, drawn with the text's own colour and shadow.
+ * The weather's symbols, Erik Flowers's Weather Icons instead of emoji (the user's choice, 2026-11-06):
+ * Fire OS's emoji font drew fog as a grey square. One icon for each of Open-Meteo's conditions, all
+ * different, with no day and night. In the text a symbol is a private character, and `in` puts the
+ * icon in its place, drawn with the text's own colour and shadow.
  */
 final class WeatherIcon {
-    /** As wide as an emoji was beside the same text. */
-    private static final float SCALE = 1.2f;
+    /** The drawings leave a wide margin in their square: at this size a cloud is as tall as a capital. */
+    private static final float SCALE = 1.5f;
     private static final char FIRST = '';
     private static final int[] ICONS = {
-        R.drawable.weather_sun, R.drawable.weather_cloud_sun, R.drawable.weather_cloudy, R.drawable.weather_cloud_fog,
-        R.drawable.weather_cloud_drizzle, R.drawable.weather_cloud_rain, R.drawable.weather_cloud_snow,
-        R.drawable.weather_cloud_sun_rain, R.drawable.weather_cloud_lightning, R.drawable.weather_cloud_hail,
+        R.drawable.weather_day_sunny, R.drawable.weather_day_sunny_overcast, R.drawable.weather_day_cloudy,
+        R.drawable.weather_cloudy, R.drawable.weather_fog, R.drawable.weather_sprinkle, R.drawable.weather_rain_mix,
+        R.drawable.weather_rain, R.drawable.weather_sleet, R.drawable.weather_snow, R.drawable.weather_snowflake_cold,
+        R.drawable.weather_showers, R.drawable.weather_snow_wind, R.drawable.weather_thunderstorm,
+        R.drawable.weather_storm_showers,
     };
     /** Each icon as a mask, at each size it was asked for: the paint gives it colour and shadow. */
     private static final Map<Long, Bitmap> MASKS = new HashMap<>();
 
     private WeatherIcon() {}
 
-    /** Open-Meteo's weather code as its symbol: the same groups the emoji had, hail apart from thunder. */
+    /** Open-Meteo's weather code as its symbol, one per condition whatever its strength. */
     static String of(int code) {
         int icon;
-        if (code == 0) icon = 0;
-        else if (code <= 2) icon = 1;
-        else if (code == 3) icon = 2;
-        else if (code <= 48) icon = 3;
-        else if (code <= 57) icon = 4;
-        else if (code <= 67) icon = 5;
-        else if (code <= 77) icon = 6;
-        else if (code <= 82) icon = 7;
-        else if (code <= 86) icon = 6;
-        else if (code == 96 || code == 99) icon = 9;
-        else icon = 8;
+        if (code <= 2) icon = code;
+        else if (code == 3) icon = 3;
+        else if (code <= 48) icon = 4;
+        else if (code <= 55) icon = 5;
+        else if (code <= 57) icon = 6;
+        else if (code <= 65) icon = 7;
+        else if (code <= 67) icon = 8;
+        else if (code <= 75) icon = 9;
+        else if (code <= 77) icon = 10;
+        else if (code <= 82) icon = 11;
+        else if (code <= 86) icon = 12;
+        else if (code == 96 || code == 99) icon = 14;
+        else icon = 13;
         return String.valueOf((char) (FIRST + icon));
     }
 
@@ -87,9 +92,20 @@ final class WeatherIcon {
 
         private static int size(Paint paint) { return Math.round(paint.getTextSize() * SCALE); }
 
+        /** The line grows if the icon is taller than the text, or a sun's rays would be cut. */
         @Override public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt metrics) {
-            if (metrics != null) paint.getFontMetricsInt(metrics);
-            return size(paint);
+            int size = size(paint);
+            if (metrics != null) {
+                paint.getFontMetricsInt(metrics);
+                float middle = (paint.ascent() + paint.descent()) / 2f;
+                int above = Math.round(middle - size / 2f);
+                int below = Math.round(middle + size / 2f);
+                metrics.ascent = Math.min(metrics.ascent, above);
+                metrics.top = Math.min(metrics.top, above);
+                metrics.descent = Math.max(metrics.descent, below);
+                metrics.bottom = Math.max(metrics.bottom, below);
+            }
+            return size;
         }
 
         /** Centred on the text's own middle, in its colour and with its shadow: a mask takes the paint's colour. */
