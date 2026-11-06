@@ -2,49 +2,40 @@
   "versionName": "1.0.22",
   "changes": {
     "en": [
-      "New weather icons, a different one for each condition",
-      "Circular Home: app logos stay in the middle of their circle on the first-generation Fire TV Stick 4K Max too",
-      "Circular Home: All apps stays centred after changing the layout"
+      "New flat weather icons",
+      "Fixes for positioning issues on the circular Home"
     ],
     "es": [
-      "Nuevos iconos del tiempo, uno distinto para cada condición",
-      "Home circular: los logotipos de las apps quedan en el centro de su círculo también en el Fire TV Stick 4K Max de primera generación",
-      "Home circular: Todas las apps queda centrado después de cambiar la disposición"
+      "Nuevos iconos planos para el tiempo",
+      "Correcciones de errores de posición en la Home circular"
     ],
     "fr": [
-      "Nouvelles icônes météo, une différente pour chaque condition",
-      "Home circulaire : les logos des applis restent au centre de leur cercle aussi sur le Fire TV Stick 4K Max de première génération",
-      "Home circulaire : Toutes les applis reste centré après un changement de disposition"
+      "Nouvelles icônes plates pour la météo",
+      "Corrections de défauts de positionnement dans la Home circulaire"
     ],
     "de": [
-      "Neue Wettersymbole, ein eigenes für jede Wetterlage",
-      "Runde Home: Die App-Logos bleiben auch auf dem Fire TV Stick 4K Max der ersten Generation in der Mitte ihres Kreises",
-      "Runde Home: Alle Apps bleibt nach einem Wechsel der Anordnung mittig"
+      "Neue flache Wettersymbole",
+      "Korrekturen bei der Positionierung auf der runden Home"
     ],
     "pt": [
-      "Novos ícones do tempo, um diferente para cada condição",
-      "Home circular: os logotipos dos apps ficam no centro do círculo também no Fire TV Stick 4K Max de primeira geração",
-      "Home circular: Todos os apps fica centralizado depois de mudar a disposição"
+      "Novos ícones planos para o tempo",
+      "Correções de problemas de posicionamento na Home circular"
     ],
     "ru": [
-      "Новые значки погоды, свой для каждого состояния",
-      "Круглый главный экран: логотипы приложений остаются в центре круга и на Fire TV Stick 4K Max первого поколения",
-      "Круглый главный экран: «Все приложения» остаётся по центру после смены расположения"
+      "Новые плоские значки погоды",
+      "Исправлены ошибки расположения на круглом главном экране"
     ],
     "ar": [
-      "أيقونات طقس جديدة، أيقونة مختلفة لكل حالة",
-      "الشاشة الرئيسية الدائرية: تبقى شعارات التطبيقات في وسط دوائرها أيضًا على Fire TV Stick 4K Max من الجيل الأول",
-      "الشاشة الرئيسية الدائرية: يبقى «كل التطبيقات» في الوسط بعد تغيير التخطيط"
+      "أيقونات طقس مسطحة جديدة",
+      "إصلاح عيوب في المواضع على الشاشة الرئيسية الدائرية"
     ],
     "hi": [
-      "मौसम के नए आइकन, हर स्थिति के लिए अलग",
-      "गोल होम: पहली पीढ़ी की Fire TV Stick 4K Max पर भी ऐप के लोगो अपने गोले के बीच में रहते हैं",
-      "गोल होम: लेआउट बदलने के बाद भी «सभी ऐप» बीच में रहता है"
+      "मौसम के लिए नए फ़्लैट आइकन",
+      "गोल होम पर जगह से जुड़ी गड़बड़ियों में सुधार"
     ],
     "zh": [
-      "全新天气图标，每种天气都有不同的图标",
-      "圆形主屏幕：在第一代 Fire TV Stick 4K Max 上，应用标志也会保持在圆圈中央",
-      "圆形主屏幕：更改布局后，“所有应用”仍保持居中"
+      "全新扁平风格天气图标",
+      "修复圆形主屏幕上的位置问题"
     ]
   }
 }
