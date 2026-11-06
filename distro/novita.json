@@ -1,86 +1,50 @@
 {
-  "versionName": "1.0.21",
+  "versionName": "1.0.22",
   "changes": {
     "en": [
-      "After an update the Home opens right away: only the backdrop in use comes first, the rest follows",
-      "On first start Salotto asks whether to download the backdrop collections now, showing each one's progress",
-      "Backdrops list only the collections already on the TV",
-      "If a download stops, Salotto tells you why",
-      "More reliable updates: if GitHub doesn't answer for a moment, Salotto tries again",
-      "During updates the Fire TV Home stays hidden",
-      "Switching to the circular Home, the blurred backdrop fades in"
+      "New weather icons, a different one for each condition",
+      "Circular Home: app logos stay in the middle of their circle on the first-generation Fire TV Stick 4K Max too",
+      "Circular Home: All apps stays centred after changing the layout"
     ],
     "es": [
-      "Tras una actualización la Home se abre enseguida: primero llega solo el fondo en uso, el resto después",
-      "Al primer encendido Salotto pregunta si descargar ya las colecciones de fondos, con el progreso de cada una",
-      "En los fondos solo aparecen las colecciones que ya están en la TV",
-      "Si una descarga se detiene, Salotto te dice por qué",
-      "Actualizaciones más fiables: si GitHub no responde por un momento, Salotto lo vuelve a intentar",
-      "Durante las actualizaciones la Home de Fire TV queda oculta",
-      "Al pasar a la Home circular, el fondo desenfocado aparece con un fundido"
+      "Nuevos iconos del tiempo, uno distinto para cada condición",
+      "Home circular: los logotipos de las apps quedan en el centro de su círculo también en el Fire TV Stick 4K Max de primera generación",
+      "Home circular: Todas las apps queda centrado después de cambiar la disposición"
     ],
     "fr": [
-      "Après une mise à jour, la Home s’ouvre tout de suite : seul le fond utilisé arrive d’abord, le reste ensuite",
-      "Au premier démarrage, Salotto demande s’il faut télécharger tout de suite les collections de fonds, avec la progression de chacune",
-      "Les fonds n’affichent que les collections déjà présentes sur la TV",
-      "Si un téléchargement s’arrête, Salotto t’explique pourquoi",
-      "Mises à jour plus fiables : si GitHub ne répond pas un instant, Salotto réessaie",
-      "Pendant les mises à jour, la Home de Fire TV reste cachée",
-      "En passant à la Home circulaire, le fond flou apparaît en fondu"
+      "Nouvelles icônes météo, une différente pour chaque condition",
+      "Home circulaire : les logos des applis restent au centre de leur cercle aussi sur le Fire TV Stick 4K Max de première génération",
+      "Home circulaire : Toutes les applis reste centré après un changement de disposition"
     ],
     "de": [
-      "Nach einem Update öffnet sich die Home sofort: zuerst kommt nur der verwendete Hintergrund, der Rest danach",
-      "Beim ersten Start fragt Salotto, ob die Hintergrund-Sammlungen gleich geladen werden sollen, mit dem Fortschritt jeder Sammlung",
-      "Bei den Hintergründen erscheinen nur Sammlungen, die schon auf dem Fernseher sind",
-      "Bleibt ein Download stehen, sagt dir Salotto warum",
-      "Zuverlässigere Updates: Antwortet GitHub kurz nicht, versucht es Salotto erneut",
-      "Während der Updates bleibt die Fire-TV-Home verborgen",
-      "Beim Wechsel zur runden Home wird der unscharfe Hintergrund sanft eingeblendet"
+      "Neue Wettersymbole, ein eigenes für jede Wetterlage",
+      "Runde Home: Die App-Logos bleiben auch auf dem Fire TV Stick 4K Max der ersten Generation in der Mitte ihres Kreises",
+      "Runde Home: Alle Apps bleibt nach einem Wechsel der Anordnung mittig"
     ],
     "pt": [
-      "Depois de uma atualização a Home abre na hora: primeiro chega só o fundo em uso, o resto depois",
-      "Na primeira inicialização o Salotto pergunta se você quer baixar já as coleções de fundos, com o progresso de cada uma",
-      "Nos fundos aparecem só as coleções que já estão na TV",
-      "Se um download parar, o Salotto diz o motivo",
-      "Atualizações mais confiáveis: se o GitHub não responder por um momento, o Salotto tenta de novo",
-      "Durante as atualizações a Home do Fire TV fica escondida",
-      "Ao passar para a Home circular, o fundo desfocado aparece aos poucos"
+      "Novos ícones do tempo, um diferente para cada condição",
+      "Home circular: os logotipos dos apps ficam no centro do círculo também no Fire TV Stick 4K Max de primeira geração",
+      "Home circular: Todos os apps fica centralizado depois de mudar a disposição"
     ],
     "ru": [
-      "После обновления главный экран открывается сразу: сначала загружается только текущий фон, остальное потом",
-      "При первом запуске Salotto спрашивает, скачать ли коллекции фонов сейчас, и показывает прогресс каждой",
-      "В фонах показываются только коллекции, которые уже есть на телевизоре",
-      "Если загрузка остановилась, Salotto объяснит почему",
-      "Более надёжные обновления: если GitHub на мгновение не отвечает, Salotto пробует снова",
-      "Во время обновлений главный экран Fire TV остаётся скрытым",
-      "При переходе на круглый главный экран размытый фон появляется плавно"
-    ],
-    "zh": [
-      "更新后主屏幕立即打开：先只下载正在使用的背景，其余稍后下载",
-      "首次启动时，Salotto 会询问是否立即下载背景合集，并显示每个合集的进度",
-      "背景中只列出电视上已有的合集",
-      "下载中断时，Salotto 会告诉你原因",
-      "更新更可靠：GitHub 暂时没有响应时，Salotto 会重试",
-      "更新期间不再显示 Fire TV 主屏幕",
-      "切换到圆形主屏幕时，模糊背景会淡入出现"
+      "Новые значки погоды, свой для каждого состояния",
+      "Круглый главный экран: логотипы приложений остаются в центре круга и на Fire TV Stick 4K Max первого поколения",
+      "Круглый главный экран: «Все приложения» остаётся по центру после смены расположения"
     ],
     "ar": [
-      "بعد التحديث تُفتح الشاشة الرئيسية فورًا: تصل الخلفية المستخدمة أولًا ثم الباقي",
-      "عند التشغيل الأول يسألك Salotto إن كنت تريد تنزيل مجموعات الخلفيات الآن، مع تقدّم كل مجموعة",
-      "تظهر في الخلفيات المجموعات الموجودة على التلفاز فقط",
-      "إذا توقف التنزيل يخبرك Salotto بالسبب",
-      "تحديثات أكثر موثوقية: إذا لم يستجب GitHub للحظة، يعيد Salotto المحاولة",
-      "أثناء التحديثات تبقى الشاشة الرئيسية لـ Fire TV مخفية",
-      "عند الانتقال إلى الشاشة الرئيسية الدائرية تظهر الخلفية الضبابية تدريجيًا"
+      "أيقونات طقس جديدة، أيقونة مختلفة لكل حالة",
+      "الشاشة الرئيسية الدائرية: تبقى شعارات التطبيقات في وسط دوائرها أيضًا على Fire TV Stick 4K Max من الجيل الأول",
+      "الشاشة الرئيسية الدائرية: يبقى «كل التطبيقات» في الوسط بعد تغيير التخطيط"
     ],
     "hi": [
-      "अपडेट के बाद होम तुरंत खुलता है: पहले सिर्फ़ इस्तेमाल हो रहा बैकग्राउंड आता है, बाकी बाद में",
-      "पहली बार चालू करने पर Salotto पूछता है कि क्या बैकग्राउंड संग्रह अभी डाउनलोड करें, हर संग्रह की प्रगति के साथ",
-      "बैकग्राउंड में सिर्फ़ वे संग्रह दिखते हैं जो टीवी पर पहले से हैं",
-      "डाउनलोड रुक जाए तो Salotto बताता है क्यों",
-      "ज़्यादा भरोसेमंद अपडेट: GitHub एक पल जवाब न दे तो Salotto फिर कोशिश करता है",
-      "अपडेट के दौरान Fire TV का होम छिपा रहता है",
-      "गोल होम पर जाने पर धुंधला बैकग्राउंड धीरे-धीरे दिखता है"
+      "मौसम के नए आइकन, हर स्थिति के लिए अलग",
+      "गोल होम: पहली पीढ़ी की Fire TV Stick 4K Max पर भी ऐप के लोगो अपने गोले के बीच में रहते हैं",
+      "गोल होम: लेआउट बदलने के बाद भी «सभी ऐप» बीच में रहता है"
+    ],
+    "zh": [
+      "全新天气图标，每种天气都有不同的图标",
+      "圆形主屏幕：在第一代 Fire TV Stick 4K Max 上，应用标志也会保持在圆圈中央",
+      "圆形主屏幕：更改布局后，“所有应用”仍保持居中"
     ]
   }
 }
