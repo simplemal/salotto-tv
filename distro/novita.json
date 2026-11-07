@@ -1,41 +1,59 @@
 {
-  "versionName": "1.0.22",
+  "versionName": "1.0.23",
   "changes": {
     "en": [
-      "New flat weather icons",
-      "Fixes for positioning issues on the circular Home"
+      "Support for the Fire TV Stick Lite",
+      "While the Home loads, a spinner covers it until it is all ready",
+      "Screensaver and task manager opened from the control center close it",
+      "Fixed a crash at first start on Fire TVs with Fire OS 7"
     ],
     "es": [
-      "Nuevos iconos planos para el tiempo",
-      "Correcciones de errores de posición en la Home circular"
+      "Compatibilidad con el Fire TV Stick Lite",
+      "Mientras el Home se carga, una rueda lo cubre hasta que está listo",
+      "El salvapantallas y el administrador de tareas abiertos desde el centro de control lo cierran",
+      "Corregido un cierre en el primer inicio en los Fire TV con Fire OS 7"
     ],
     "fr": [
-      "Nouvelles icônes plates pour la météo",
-      "Corrections de défauts de positionnement dans la Home circulaire"
+      "Prise en charge du Fire TV Stick Lite",
+      "Pendant le chargement de la Home, une roue la couvre jusqu’à ce qu’elle soit prête",
+      "L’économiseur d’écran et le gestionnaire de tâches ouverts depuis le centre de contrôle le ferment",
+      "Correction d’une fermeture au premier démarrage sur les Fire TV sous Fire OS 7"
     ],
     "de": [
-      "Neue flache Wettersymbole",
-      "Korrekturen bei der Positionierung auf der runden Home"
+      "Unterstützung für den Fire TV Stick Lite",
+      "Während Home lädt, verdeckt ein Ladekreis sie, bis alles bereit ist",
+      "Bildschirmschoner und Task-Manager, aus dem Kontrollzentrum geöffnet, schließen es",
+      "Absturz beim ersten Start auf Fire TVs mit Fire OS 7 behoben"
     ],
     "pt": [
-      "Novos ícones planos para o tempo",
-      "Correções de problemas de posicionamento na Home circular"
+      "Suporte ao Fire TV Stick Lite",
+      "Enquanto o Home carrega, um indicador o cobre até estar tudo pronto",
+      "Protetor de tela e gerenciador de tarefas abertos pela central de controle a fecham",
+      "Corrigido um fechamento na primeira inicialização em Fire TVs com Fire OS 7"
     ],
     "ru": [
-      "Новые плоские значки погоды",
-      "Исправлены ошибки расположения на круглом главном экране"
+      "Поддержка Fire TV Stick Lite",
+      "Пока главный экран загружается, его закрывает индикатор, пока всё не будет готово",
+      "Заставка и диспетчер задач, открытые из центра управления, закрывают его",
+      "Исправлено закрытие при первом запуске на Fire TV с Fire OS 7"
     ],
     "ar": [
-      "أيقونات طقس مسطحة جديدة",
-      "إصلاح عيوب في المواضع على الشاشة الرئيسية الدائرية"
+      "دعم Fire TV Stick Lite",
+      "أثناء تحميل الشاشة الرئيسية يغطيها مؤشر دوّار حتى تجهز بالكامل",
+      "شاشة التوقف ومدير المهام عند فتحهما من مركز التحكم يغلقانه",
+      "إصلاح إغلاق عند التشغيل الأول على أجهزة Fire TV بنظام Fire OS 7"
     ],
     "hi": [
-      "मौसम के लिए नए फ़्लैट आइकन",
-      "गोल होम पर जगह से जुड़ी गड़बड़ियों में सुधार"
+      "Fire TV Stick Lite के लिए सपोर्ट",
+      "होम लोड होते समय, पूरी तरह तैयार होने तक एक स्पिनर उसे ढके रहता है",
+      "कंट्रोल सेंटर से खोले गए स्क्रीनसेवर और टास्क मैनेजर उसे बंद कर देते हैं",
+      "Fire OS 7 वाले Fire TV पर पहली बार शुरू करते समय बंद होने की समस्या ठीक की गई"
     ],
     "zh": [
-      "全新扁平风格天气图标",
-      "修复圆形主屏幕上的位置问题"
+      "支持 Fire TV Stick Lite",
+      "主屏幕加载时，加载图标会遮住它，直到全部就绪",
+      "从控制中心打开屏保和任务管理器时会关闭控制中心",
+      "修复 Fire OS 7 的 Fire TV 首次启动时闪退的问题"
     ]
   }
 }
