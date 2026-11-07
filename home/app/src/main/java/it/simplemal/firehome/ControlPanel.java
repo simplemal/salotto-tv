@@ -151,6 +151,16 @@ final class ControlPanel extends LinearLayout {
         void runOnUiThread(Runnable run);
         /** On the Home nothing happens: the panel stays until the focus leaves it. */
         void panelDone();
+        /** A page that takes the screen is opening: coming back, the user finds the Home without the panel. */
+        default void leave() { }
+    }
+
+    private void saver() { away(Fire.screensaver(getContext())); }
+
+    /** The screensaver and the task manager: coming back from them, the panel would only be in the way. */
+    private void away(Intent page) {
+        host.leave();
+        host.open(page);
     }
 
     private final Host host;
@@ -365,13 +375,13 @@ final class ControlPanel extends LinearLayout {
             () -> change(() -> Veil.nextWarm(getContext())));
 
         LinearLayout tools = row();
-        small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> host.open(Fire.screensaver(getContext())));
+        small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> saver());
         Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), GAP, () -> {
             nextTimer();
             refresh();
         });
         small(tools, R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks), GAP,
-            () -> host.open(new Intent(getContext(), TasksActivity.class)));
+            () -> away(new Intent(getContext(), TasksActivity.class)));
         small(tools, R.drawable.ic_restart, getContext().getString(R.string.panel_restart), GAP, () -> {
             host.panelDone();
             TaskService.restart();
@@ -397,13 +407,13 @@ final class ControlPanel extends LinearLayout {
         Tile warm = listRow(R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter),
             () -> change(() -> Veil.nextWarm(getContext())));
         Tile saver = listRow(R.drawable.ic_image, getContext().getString(R.string.panel_screensaver),
-            () -> host.open(Fire.screensaver(getContext())));
+            () -> saver());
         Tile timer = listRow(R.drawable.ic_timer, getContext().getString(R.string.panel_timer), () -> {
             nextTimer();
             refresh();
         });
         Tile tasks = listRow(R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks),
-            () -> host.open(new Intent(getContext(), TasksActivity.class)));
+            () -> away(new Intent(getContext(), TasksActivity.class)));
         Tile restart = listRow(R.drawable.ic_restart, getContext().getString(R.string.panel_restart), () -> {
             host.panelDone();
             TaskService.restart();

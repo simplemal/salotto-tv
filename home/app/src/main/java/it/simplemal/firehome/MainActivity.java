@@ -700,6 +700,14 @@ public final class MainActivity extends CardActivity {
         return false;
     }
 
+    /** The panel follows the focus: it goes to where the Home rests, the wheel or the first card. */
+    @Override public void leave() {
+        if (!panelOpen) return;
+        View rest = circular ? wheel : dock != null && dock.getChildCount() > 0 ? dock.getChildAt(0) : null;
+        if (rest != null) rest.requestFocus();
+        showPanel(false);
+    }
+
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
