@@ -17,6 +17,7 @@
     <string name="main_move_hint">Перемещайте стрелками, затем нажмите OK</string>
     <string name="main_footer">Salotto, вер. %1$s - авторы</string>
     <string name="main_all_apps">Все приложения</string>
+    <string name="main_loading_home">Загрузка главного экрана</string>
     <string name="main_move">Переместить</string>
 
     <string name="apps_add_hint">Удерживайте OK, чтобы добавить на главный экран</string>

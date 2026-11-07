@@ -195,7 +195,7 @@ final class Look {
     static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
     static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
     /** An app opening from a circle of its colour and closing back into it: on unless chosen, the user's choice of 2026-11-04. */
-    static boolean wheelMotion(Context context) { return prefs(context).getBoolean("wheel_motion", true); }
+    static boolean wheelMotion(Context context) { return !Fire.STICK_2020 && prefs(context).getBoolean("wheel_motion", true); }
     static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
     /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
     static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }

@@ -17,6 +17,7 @@
     <string name="main_move_hint">Mit den Pfeilen verschieben, dann OK drücken</string>
     <string name="main_footer">Salotto, Version %1$s - Credits</string>
     <string name="main_all_apps">Alle Apps</string>
+    <string name="main_loading_home">Home wird geladen</string>
     <string name="main_move">Verschieben</string>
 
     <string name="apps_add_hint">OK gedrückt halten, um sie zu Home hinzuzufügen</string>

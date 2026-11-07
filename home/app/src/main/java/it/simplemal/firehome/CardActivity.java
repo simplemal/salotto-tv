@@ -74,6 +74,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     };
 
     private int cardNames;
+    /** Artwork being drawn away from the main thread, for a page that waits until it has all arrived. */
+    protected int artComing;
     private Drawable focusRing;
 
     @Override protected void attachBaseContext(Context base) {
@@ -173,16 +175,22 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             ImageView image = imageOf(tile);
             // Opaque meanwhile: the focus shadow would show through an empty card.
             image.setBackground(cardFill(ICON));
+            artComing++;
             Background.draw(() -> {
                 Bitmap made = cardArt(key, pkg, width);
                 runOnUiThread(() -> {
                     image.setBackground(null);
                     image.setImageBitmap(made);
+                    artComing--;
+                    artShown();
                 });
             });
         }
         return tile;
     }
+
+    /** One more card's artwork is on screen. */
+    protected void artShown() { }
 
     /** An update can change the artwork, so its date is part of the name. */
     private String artKey(String pkg, int width) {

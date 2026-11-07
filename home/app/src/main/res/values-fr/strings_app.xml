@@ -17,6 +17,7 @@
     <string name="main_move_hint">Déplacez avec les flèches, puis appuyez sur OK</string>
     <string name="main_footer">Salotto, v. %1$s - crédits</string>
     <string name="main_all_apps">Toutes les applis</string>
+    <string name="main_loading_home">Chargement de l’accueil</string>
     <string name="main_move">Déplacer</string>
 
     <string name="apps_add_hint">Maintenez OK pour l’ajouter à l’Accueil</string>

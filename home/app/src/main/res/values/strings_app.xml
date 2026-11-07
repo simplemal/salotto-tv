@@ -26,6 +26,7 @@
     <!-- At the foot of the Home, shown in capitals. %1$s is the version -->
     <string name="main_footer">Salotto, ver %1$s - credits</string>
     <string name="main_all_apps">Tutte le app</string>
+    <string name="main_loading_home">Caricamento della Home</string>
     <string name="main_move">Sposta</string>
 
     <!-- All apps -->

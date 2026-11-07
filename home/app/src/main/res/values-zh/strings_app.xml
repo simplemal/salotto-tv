@@ -17,6 +17,7 @@
     <string name="main_move_hint">用方向键移动，然后按 OK 键</string>
     <string name="main_footer">Salotto，版本 %1$s - 致谢</string>
     <string name="main_all_apps">所有应用</string>
+    <string name="main_loading_home">正在加载主屏幕</string>
     <string name="main_move">移动</string>
 
     <string name="apps_add_hint">长按 OK 键，加入主页</string>

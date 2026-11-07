@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
@@ -44,6 +45,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -54,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.Objects;
 import org.json.JSONException;
 
@@ -215,12 +218,27 @@ public final class MainActivity extends CardActivity {
     private static final int BLUR_WIDTH = 640;
     private static final int BLUR_HEIGHT = 360;
     private static final int BLUR_RADIUS = 2;
-    private static final long BLUR_SCENE_MS = 700;
-    private static final long BLUR_SETTLED_MS = 3300;
     /** The blur comes in softly when it starts to be shown, the user's request of 2026-11-05. */
     private static final long BLUR_FADE_MS = 500;
     /** Shown just now and still empty or old: it fades in with its first picture. */
     private boolean blurFadeIn;
+    /** Each blur asked for: a plain one shows only if no other was asked after it. */
+    private int blurAsked;
+    private int blursComing;
+    /** A new backdrop waiting for its blur, to come in with it in one step: no other blur is taken meanwhile, it would show the old one. */
+    private int swapsComing;
+    private int backdropsComing;
+    /**
+     * Over the Home switched between grid and wheel, until its circles or cards, backdrop and blur are
+     * all there: the user's request of 2026-11-07, instead of watching it being built.
+     */
+    private FrameLayout loadingMask;
+    private boolean loading;
+    private boolean looked;
+    private static final long LOADING_LIMIT_MS = 10000;
+    private static final long LOADING_OUT_MS = 200;
+    private static final int LOADING_WHEEL = 40;
+    private final Runnable endLoading = this::hideLoading;
     private static final long WHEEL_MOVE_MS = 180;
     private long lastMove;
     private static final long CORNERS_BACK_MS = 220;
@@ -266,6 +284,10 @@ public final class MainActivity extends CardActivity {
         blurred.setScaleType(ImageView.ScaleType.FIT_XY);
         blurred.setVisibility(View.GONE);
         root.addView(blurred, new FrameLayout.LayoutParams(-1, -1));
+        // A blur asked for before the first layout had no screen to draw: it is taken now.
+        root.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (oldRight - oldLeft == 0 && right - left > 0 && blurred.getVisibility() == View.VISIBLE) blurBackdrop();
+        });
         clockShade = cornerShade(0);
         pillShade = cornerShade(1);
         pillShade.setAlpha(0);
@@ -874,6 +896,7 @@ public final class MainActivity extends CardActivity {
         ticker.post(weatherCheck);
         weatherView.resume();
         root.postDelayed(offerStart, OFFER_START_MS);
+        homeMaybeReady();
     }
 
     /** After the backdrop has come in, or the question would open over an empty Home. */
@@ -913,71 +936,195 @@ public final class MainActivity extends CardActivity {
         else Updater.askAgain();
     }
 
-    /** Runs every minute: the same backdrop is not fetched and drawn again. */
-    private void showBackdrop() {
+    /**
+     * Runs every minute: the same backdrop is not fetched and drawn again. `chosen`: the look has just
+     * changed in Settings. Then, and always under the wheel's blur or on the Sticks of 2020, a new
+     * backdrop is made ready away from the screen, blurred too when the blur is on, and replaces the
+     * old one in one step: the user's request of 2026-11-07, a fade over the blur used to stall.
+     */
+    private void showBackdrop(boolean chosen) {
         if (circular) readCorner();
         String scene = Look.weatherPictures(this) ? Weather.picture(this)
             : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
         String plain = scene == null ? Look.backdrop(this) : null;
         String before = plainBackdrop;
         plainBackdrop = plain;
+        boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || Fire.STICK_2020;
         if (plain != null && !plain.equals(before)) {
+            backdropsComing++;
             Look.show(this, picture -> {
-                if (plain.equals(plainBackdrop)) root.setBackground(picture);
-                blurLater(0);
+                Runnable place = () -> {
+                    if (!plain.equals(plainBackdrop)) return;
+                    root.setBackground(picture);
+                    weatherView.show(null);
+                };
+                if (plain.equals(plainBackdrop) && blurred.getVisibility() == View.VISIBLE) {
+                    blurAndPlace(canvas -> {
+                        picture.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                        picture.draw(canvas);
+                    }, place);
+                    return;
+                }
+                place.run();
+                backdropsComing--;
+                homeMaybeReady();
             });
+        } else if (scene == null) {
+            weatherView.show(null);
         }
-        weatherView.show(scene);
-        // A scene loads away from the main thread and comes in with a short entry: blurred once it has settled.
-        blurLater(BLUR_SCENE_MS);
-        blurLater(BLUR_SETTLED_MS);
+        if (scene == null) return;
+        if (!oneStep) {
+            weatherView.show(scene);
+            return;
+        }
+        backdropsComing++;
+        if (!weatherView.show(scene, this::swapReady)) backdropsComing--;
     }
 
-    private void blurLater(long delay) {
-        if (blurred.getVisibility() != View.VISIBLE) return;
-        root.postDelayed(this::blurBackdrop, delay);
+    /** A scene loaded for a change in one step: blurred first when the blur is on. */
+    private void swapReady(Runnable place, Consumer<Canvas> paint) {
+        if (paint != null && blurred.getVisibility() == View.VISIBLE) {
+            blurAndPlace(paint, place);
+            return;
+        }
+        place.run();
+        backdropsComing--;
+        homeMaybeReady();
+    }
+
+    private void blurAndPlace(Consumer<Canvas> paint, Runnable place) {
+        swapsComing++;
+        blurOf(paint, true, soft -> {
+            swapsComing--;
+            backdropsComing--;
+            place.run();
+            if (soft != null) showBlur(soft);
+            else blurBackdrop();
+            homeMaybeReady();
+        });
+    }
+
+    /** What is behind the wheel now, blurred: after the blur is turned on, or the screen got its size. */
+    private void blurBackdrop() {
+        if (blurred.getVisibility() != View.VISIBLE || swapsComing > 0) return;
+        blurOf(canvas -> {
+            Drawable behind = root.getBackground();
+            if (behind != null) behind.draw(canvas);
+            weatherView.paintSettled(canvas);
+        }, false, soft -> {
+            if (soft != null) showBlur(soft);
+            homeMaybeReady();
+        });
     }
 
     /**
-     * What is behind the wheel, drawn small and blurred by Blur, the same as behind the task
-     * manager: Android 11 cannot blur a view. A moving weather scene is seen still, as last drawn.
+     * Drawn small and blurred by Blur, the same as behind the task manager: Android 11 cannot blur a
+     * view. A moving weather scene is drawn as it rests. `done` gets null with no screen size yet, or
+     * for a plain blur that a later one has overtaken.
      */
-    private void blurBackdrop() {
-        if (blurred.getVisibility() != View.VISIBLE || root.getWidth() == 0) return;
+    private void blurOf(Consumer<Canvas> paint, boolean always, Consumer<Bitmap> done) {
+        if (root.getWidth() == 0) {
+            done.accept(null);
+            return;
+        }
+        int asked = ++blurAsked;
         // At the screen's own size: a picture scene fills whatever canvas it is given, scaled or not.
         Bitmap whole = Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(whole);
         canvas.drawColor(Color.BLACK);
-        Drawable behind = root.getBackground();
-        if (behind != null) behind.draw(canvas);
-        weatherView.draw(canvas);
+        paint.accept(canvas);
         Bitmap small = Bitmap.createScaledBitmap(whole, BLUR_WIDTH, BLUR_HEIGHT, true);
         whole.recycle();
+        blursComing++;
         Background.draw(() -> {
             Bitmap soft = Blur.light(small, BLUR_WIDTH, BLUR_HEIGHT, BLUR_RADIUS);
             small.recycle();
             runOnUiThread(() -> {
-                blurred.setImageBitmap(soft);
-                if (!blurFadeIn) return;
-                blurFadeIn = false;
-                blurred.animate().alpha(1f).setDuration(BLUR_FADE_MS).start();
+                blursComing--;
+                if (always || asked == blurAsked) {
+                    done.accept(soft);
+                } else {
+                    soft.recycle();
+                    done.accept(null);
+                }
             });
         });
     }
+
+    private void showBlur(Bitmap soft) {
+        blurred.setImageBitmap(soft);
+        if (!blurFadeIn) {
+            coverScene();
+            return;
+        }
+        blurFadeIn = false;
+        blurred.animate().alpha(1f).setDuration(BLUR_FADE_MS).withEndAction(this::coverScene).start();
+    }
+
+    /** Wholly behind the blur, the scene stops drawing: on the wheel it would move unseen. */
+    private void coverScene() {
+        weatherView.setCovered(blurred.getVisibility() == View.VISIBLE && blurred.getAlpha() == 1f && blurred.getDrawable() != null);
+    }
+
+    private void showLoading() {
+        if (loadingMask == null) {
+            loadingMask = new FrameLayout(this);
+            loadingMask.setBackground(Look.plainBackdrop());
+            LinearLayout middle = new LinearLayout(this);
+            middle.setOrientation(LinearLayout.VERTICAL);
+            middle.setGravity(Gravity.CENTER_HORIZONTAL);
+            ProgressBar spinner = new ProgressBar(this);
+            spinner.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+            middle.addView(spinner, new LinearLayout.LayoutParams(dp(LOADING_WHEEL), dp(LOADING_WHEEL)));
+            TextView words = new TextView(this);
+            words.setText(R.string.main_loading_home);
+            words.setTextColor(Color.argb(200, 255, 255, 255));
+            words.setTextSize(16);
+            LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+            under.topMargin = dp(16);
+            middle.addView(words, under);
+            loadingMask.addView(middle, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
+            root.addView(loadingMask, new FrameLayout.LayoutParams(-1, -1));
+        }
+        loadingMask.animate().cancel();
+        loadingMask.setAlpha(1f);
+        loadingMask.setVisibility(View.VISIBLE);
+        loadingMask.bringToFront();
+        loading = true;
+        root.removeCallbacks(endLoading);
+        root.postDelayed(endLoading, LOADING_LIMIT_MS);
+    }
+
+    /** Everything asked for has arrived: one frame later, so that it is drawn, the mask goes. */
+    private void homeMaybeReady() {
+        if (!loading || artComing > 0 || backdropsComing > 0 || blursComing > 0 || swapsComing > 0) return;
+        root.postOnAnimation(() -> {
+            if (artComing == 0 && backdropsComing == 0 && blursComing == 0 && swapsComing == 0) hideLoading();
+        });
+    }
+
+    private void hideLoading() {
+        if (!loading) return;
+        loading = false;
+        root.removeCallbacks(endLoading);
+        loadingMask.animate().alpha(0f).setDuration(LOADING_OUT_MS).withEndAction(() -> loadingMask.setVisibility(View.GONE)).start();
+    }
+
+    @Override protected void artShown() { homeMaybeReady(); }
 
     /** Runs while the Home is in front: a TV can stay on it for hours. */
     private void checkWeather() {
         noteTime();
         root.postDelayed(freshPicture, FRESH_PICTURE_MS);
         showWeather();
-        showBackdrop();
+        showBackdrop(false);
         if (Weather.due(this)) {
             Background.run(() -> {
                 try {
                     Weather.refresh(getApplicationContext());
                     runOnUiThread(() -> {
                         showWeather();
-                        showBackdrop();
+                        showBackdrop(false);
                     });
                 } catch (IOException | JSONException e) {
                     // The last reading stays on screen; the next check tries again.
@@ -1051,15 +1198,21 @@ public final class MainActivity extends CardActivity {
         boolean wasCircular = circular;
         circular = Look.circular(this);
         wheel.setTinted(Look.tintGlow(this));
+        if (looked && circular != wasCircular) showLoading();
+        looked = true;
         boolean blur = circular && Look.wheelBlur(this);
-        if (blur && blurred.getVisibility() != View.VISIBLE) {
-            // Switching to the wheel, or turning the blur on: hidden until its picture is ready, then faded in.
+        boolean blurOn = blur && blurred.getVisibility() != View.VISIBLE;
+        if (blurOn) {
+            // Turning the blur on: hidden until its picture is ready, then faded in. Under the mask of
+            // a switch to the wheel it is simply there when the mask goes.
             blurred.animate().cancel();
-            blurred.setAlpha(0f);
-            blurFadeIn = true;
+            blurred.setAlpha(loading ? 1f : 0f);
+            blurFadeIn = !loading;
         }
         blurred.setVisibility(blur ? View.VISIBLE : View.GONE);
-        showBackdrop();
+        coverScene();
+        showBackdrop(true);
+        if (blurOn) blurBackdrop();
         if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
         columns = Look.columns(this);
         clock.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
@@ -1197,6 +1350,7 @@ public final class MainActivity extends CardActivity {
                 circle.setImageBitmap(known);
             } else {
                 circle.setBackgroundColor(Color.rgb(60, 64, 72));
+                artComing++;
                 Background.draw(() -> {
                     Bitmap made = circleArt(tag, size);
                     int glow = glowOf(made);
@@ -1206,6 +1360,8 @@ public final class MainActivity extends CardActivity {
                         circle.setBackground(null);
                         circle.setImageBitmap(made);
                         wheel.setGlow(tag, glow);
+                        artComing--;
+                        artShown();
                     });
                 });
             }
@@ -1350,7 +1506,7 @@ public final class MainActivity extends CardActivity {
         String look = Look.signature(this);
         if (look.equals(lookShown)) {
             // The same backdrop, whose picture for this weather may have just arrived.
-            showBackdrop();
+            showBackdrop(false);
             return;
         }
         lookShown = look;

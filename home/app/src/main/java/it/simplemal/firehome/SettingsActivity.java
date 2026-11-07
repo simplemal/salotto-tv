@@ -730,11 +730,14 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }));
             boolean motion = Look.wheelMotion(this);
-            entries.add(new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, getDrawable(R.drawable.ic_s_open),
+            Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, getDrawable(R.drawable.ic_s_open),
                 getString(R.string.settings_wheel_motion_text), false, () -> {
                     Look.setWheelMotion(this, !motion);
                     refresh();
-                }));
+                });
+            // The Sticks of 2020 cannot draw it smoothly: shown, always off, not to be chosen.
+            opening.off = Fire.STICK_2020;
+            entries.add(opening);
             boolean blur = Look.wheelBlur(this);
             entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, getDrawable(R.drawable.ic_s_wallpaper),
                 getString(R.string.settings_wheel_blur_text), false, () -> {
