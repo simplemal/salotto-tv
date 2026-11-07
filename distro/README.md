@@ -22,6 +22,8 @@ I programmi di terzi non sono inclusi: l'installatore li scarica dai progetti or
 | Fire TV Stick 4K 2ª gen (`AFTKM`) | 8.1.6.6 e 8.1.8.5 | Supportato |
 | Fire TV Stick 4K Max 2ª gen (`AFTKRT`) | 8.1.8.5 | Supportato |
 | Fire TV Stick 4K Max 1ª gen (`AFTKA`) | 7.7.1.3 | Supportato, con limitazioni: niente filtro caldo, chiusura delle app e Wi-Fi passano da Fire OS |
+| Fire TV Stick 3ª gen (`AFTSSS`) | 7 | Supportato, provato da un utente: come la 4K Max 1ª gen, con meno memoria e senza apertura animata |
+| Fire TV Stick Lite 1ª gen (`AFTSS`) | 7.7.1.4 | In prova: come la Stick 3ª gen |
 
 Altri modelli: l'installatore si ferma e non cambia nulla.
 
