@@ -18,6 +18,12 @@ final class Fire {
      * after Home it holds every start for 5 s, except one made by an alarm.
      */
     static final boolean ANDROID_9 = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
+    /**
+     * The Sticks of 2020, the 3rd generation (AFTSSS) and the Lite (AFTSS): Android 9 like the 4K Max
+     * of 2021, but 1 GB of memory, a weaker graphics chip and 1080p at most. Effects that cost two
+     * whole screens at once are left out there.
+     */
+    static final boolean STICK_2020 = "AFTSSS".equals(Build.MODEL) || "AFTSS".equals(Build.MODEL);
     /** The tools read this line too: pubblica-aggiornamento.sh and genera-errori.py. */
     static final String UPDATES_REPO = "simplemal/salotto-tv";
     /** Took the Home key to Salotto on Sticks set up before Salotto did that itself. */

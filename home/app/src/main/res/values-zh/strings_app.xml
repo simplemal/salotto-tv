@@ -17,6 +17,7 @@
     <string name="main_move_hint">用方向键移动，然后按 OK 键</string>
     <string name="main_footer">Salotto，版本 %1$s - 致谢</string>
     <string name="main_all_apps">所有应用</string>
+    <string name="main_loading_home">正在加载主屏幕</string>
     <string name="main_move">移动</string>
 
     <string name="apps_add_hint">长按 OK 键，加入主页</string>
@@ -87,6 +88,8 @@
     <string name="about_others_text">AirPlay Server 接收来自 iPhone、iPad 和 Mac 的内容。Aurora Store 可以安装 Android 应用，无需账户。</string>
     <string name="about_only">Salotto 独有。</string>
     <string name="about_only_text">插画或照片背景，跟随你所在城市的天气和时间。在任何应用中长按菜单键，都能打开控制中心：Wi-Fi、Bluetooth、定时、亮度和蓝光过滤。长按返回键打开任务管理器。一个展示 Stick 和电视音频、视频规格的页面。更清晰的对白和统一音量触手可及：它们是 Fire OS 的滤镜，这里集中在一处。更新经过签名，安装前会先检查。</string>
+    <string name="about_thanks">致谢</string>
+    <string name="about_thanks_text">感谢我的朋友 Lorenzo Salomone 提出圆形主屏幕的创意。</string>
     <string name="about_license">许可</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0。Salotto 可以免费用于非商业目的的使用、研究、修改和衍生。若要销售，需要获得作者的许可。</string>
     <string name="about_marks">商标</string>
@@ -102,7 +105,6 @@
     <string name="about_not_included">未包含的程序</string>
     <string name="about_not_included_text">安装时会从原项目下载，不做任何修改。</string>
     <string name="about_use_airplay">接收来自 iPhone、iPad 和 Mac 的内容</string>
-    <string name="about_use_aurora">安装 Android 应用，无需账户</string>
 
     <string name="device_name">名称</string>
     <string name="device_model">型号</string>
@@ -235,6 +237,8 @@
     <string name="update_detail_back">出了点问题：正在退回之前的版本。</string>
     <string name="update_done">更新完成</string>
     <string name="update_done_text">现在你用的是 Salotto %1$s。</string>
+    <string name="update_backdrops">正在从 GitHub 下载背景：%1$d%%</string>
+    <string name="update_backdrop_first">正在准备背景…</string>
     <string name="update_problem_line">%1$s（%2$s）</string>
     <string name="update_scan_help">用手机扫描，了解更多</string>
     <string name="update_outcome_untouched">Salotto 没有被改动</string>
@@ -274,5 +278,31 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">要再次关闭，需要一台电脑：\n1. 打开 Install Salotto。\n2. 选择这台电视。\n3. 按提示的步骤操作。</string>
     <string name="update_error_r304">需要在电脑上使用 Install Salotto</string>
+    <string name="update_room_title">Fire TV 空间不足，无法更新</string>
+    <string name="update_room_numbers">需要 %1$s，现有 %2$s。Salotto 未被改动。</string>
+    <string name="update_room_choices">你可以删除不用的应用来释放空间后重试，或在电脑上用 Installa Salotto 更新 Salotto：%1$s</string>
+    <string name="update_from_computer">如果问题仍然存在，请在电脑上用 Installa Salotto 更新 Salotto：%1$s</string>
     <string name="update_back_computer">要回到上一版本，请在电脑上打开 Install Salotto，然后选择“回到上一版本”。</string>
+    <string name="grid_upload">上传</string>
+    <string name="grid_personal_empty">还没有图片。按“上传”从手机发送。</string>
+    <string name="personal_photo">照片 %1$d</string>
+    <string name="grid_delete">删除</string>
+    <string name="grid_delete_title">删除“%1$s”？</string>
+    <string name="grid_delete_text">照片将从这台电视上移除，无法撤销。</string>
+    <string name="grid_delete_set">删除整个合集</string>
+    <string name="grid_delete_set_title">删除整个“%1$s”合集？</string>
+    <string name="grid_delete_set_text">其中所有照片将从这台电视上移除，无法撤销。</string>
+    <string name="grid_delete_set_do">删除</string>
+    <string name="upload_title">从手机上传</string>
+    <string name="upload_text">用手机相机扫描二维码并选择一张照片。手机必须与电视在同一网络中。</string>
+    <string name="upload_no_network">电视未连接网络：请连接后重试。</string>
+    <plurals name="upload_received">
+        <item quantity="other">已收到 %1$d 张图片</item>
+    </plurals>
+    <string name="upload_web_title">选择一张照片：它会出现在 Salotto 背景中的“个人”里。</string>
+    <string name="upload_web_pick">上传图片</string>
+    <string name="upload_web_sending">正在发送…</string>
+    <string name="upload_web_sent">已发送。可以再发送一张。</string>
+    <string name="upload_web_failed">无法发送，请重试。</string>
+    <string name="weather_today">今天</string>
 </resources>

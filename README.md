@@ -12,6 +12,7 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 - Fire TV Stick 4K Max 2nd generation (2023)
 - Fire TV Stick 4K Max 1st generation (2021), with some features limited
 - Fire TV Stick 3rd generation (2020), with some features limited
+- Fire TV Stick Lite 1st generation (2020), with some features limited
 
 ## Installation
 

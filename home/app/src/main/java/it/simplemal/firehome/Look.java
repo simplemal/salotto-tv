@@ -16,9 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.function.Consumer;
 
 /** The saved appearance of the Home: grid, clock and backdrop. Only the weather backdrop changes on its own. */
@@ -73,6 +78,9 @@ final class Look {
     static final String ABSTRACT_3D = "Abstract 3D";
     static final String NOX = "Nox City";
     static final String NATURE = "Aerial Nature";
+    /** The photos of Personale, changing on the timer like the sets: offered from two photos on. */
+    static final String PERSONAL = "Personal";
+    static final int PERSONAL_TIMED_FROM = 2;
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
     static final String AERIAL_FOLDER = "meteo-aereo";
@@ -85,6 +93,8 @@ final class Look {
     private static final long MINUTE_MS = 60 * 1000L;
     private static final String FILE = "look";
     private static final String FOLDER = "sfondi";
+    /** foto-7.jpg is Foto 7: a phone's own names are long strings of numbers. */
+    private static final Pattern PHOTO = Pattern.compile("foto-(\\d+)\\.(jpg|jpeg|png)");
     private static final int WIDE = 1920;
 
     private static String cachedName;
@@ -112,6 +122,9 @@ final class Look {
         if (PICTURES.equals(key)) return context.getString(R.string.first_backdrop_pictures);
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
         if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
+        if (PERSONAL.equals(key)) return context.getString(R.string.settings_backdrop_personal);
+        Matcher photo = PHOTO.matcher(key);
+        if (photo.matches()) return context.getString(R.string.personal_photo, Integer.parseInt(photo.group(1)));
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
         return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
@@ -125,6 +138,34 @@ final class Look {
 
     static int columns(Context context) { return prefs(context).getInt("columns", 6); }
     static void setColumns(Context context, int value) { prefs(context).edit().putInt("columns", value).apply(); }
+    /** The date's sizes, small to large; the middle one is what it always had. */
+    static final int[] DATE_SIZES = {16, 20, 26};
+    /** The date's letters: the medium sans it always had. */
+    private static final int DATE_FONT = 3;
+    /** The weather's first line: like the date unless chosen apart, the first choice offered. */
+    static final int LIKE_DATE = -1;
+
+    static int dateFont(Context context) { return prefs(context).getInt("date_font", DATE_FONT); }
+    static void setDateFont(Context context, int value) { prefs(context).edit().putInt("date_font", value).apply(); }
+    static int dateSize(Context context) { return prefs(context).getInt("date_size", 1); }
+    static void setDateSize(Context context, int value) { prefs(context).edit().putInt("date_size", value).apply(); }
+    static boolean dateNumeric(Context context) { return prefs(context).getBoolean("date_numeric", false); }
+    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean("date_numeric", value).apply(); }
+    static int weatherFont(Context context) { return prefs(context).getInt("weather_font", LIKE_DATE); }
+    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt("weather_font", value).apply(); }
+    static int weatherSize(Context context) { return prefs(context).getInt("weather_size", LIKE_DATE); }
+    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt("weather_size", value).apply(); }
+
+    /** The weather's first line, resolved: its own choice, or the date's. */
+    static int weatherFontShown(Context context) { int own = weatherFont(context); return own == LIKE_DATE ? dateFont(context) : own; }
+    static int weatherSizeShown(Context context) { int own = weatherSize(context); return own == LIKE_DATE ? dateSize(context) : own; }
+
+    /** In the way of the language: the day and month spelt out, or numbers only. */
+    static String datePattern(Context context) {
+        return android.text.format.DateFormat.getBestDateTimePattern(Locale.getDefault(),
+            dateNumeric(context) ? "ddMMyyyy" : "EEEEdMMMM");
+    }
+
     static int font(Context context) { return prefs(context).getInt("font", 2); }
     static void setFont(Context context, int value) { prefs(context).edit().putInt("font", value).apply(); }
     static int size(Context context) { return prefs(context).getInt("size", 1); }
@@ -138,7 +179,27 @@ final class Look {
     static boolean seconds(Context context) { return prefs(context).getBoolean("seconds", false); }
     static void setSeconds(Context context, boolean value) { prefs(context).edit().putBoolean("seconds", value).apply(); }
     static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
+    /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
+    static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
+    static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
     static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
+    /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
+    static boolean circular(Context context) { return prefs(context).getBoolean("circular", false); }
+    static void setCircular(Context context, boolean value) { prefs(context).edit().putBoolean("circular", value).apply(); }
+    /** How many circles of the wheel are in view: the lit one and one or two on each side. */
+    static final int[] WHEEL_CHOICES = {3, 5};
+    /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
+    static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
+    static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
+    /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. On unless chosen: the user's default again, 2026-11-04. */
+    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
+    static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
+    /** An app opening from a circle of its colour and closing back into it: on unless chosen, the user's choice of 2026-11-04. */
+    static boolean wheelMotion(Context context) { return !Fire.STICK_2020 && prefs(context).getBoolean("wheel_motion", true); }
+    static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
+    /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
+    static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }
+    static void setWheelBlur(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_blur", on).apply(); }
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
@@ -160,12 +221,20 @@ final class Look {
     /** One picture of a set, chosen and kept: the backdrop is then that file. */
     static boolean fixedPicture(Context context) { return backdrop(context).endsWith(Weather.PICTURE_FILE); }
 
+    /** One of the sets that change on a timer. */
+
     private static String timedFolder(Context context) {
         String chosen = backdrop(context);
         if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;
         if (ABSTRACT_3D.equals(chosen)) return ABSTRACT_3D_FOLDER;
         if (NOX.equals(chosen)) return NOX_FOLDER;
+        if (PERSONAL.equals(chosen)) return personalFolder(context).getPath();
         return NATURE.equals(chosen) ? NATURE_FOLDER : null;
+    }
+
+    /** A picture to draw whole: one of the app's sets, or a photo of Personale by its full path. */
+    static boolean picture(String name) {
+        return name.endsWith(Weather.PICTURE_FILE) || name.startsWith("/");
     }
 
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
@@ -182,7 +251,7 @@ final class Look {
         boolean same = shown != null && shown.startsWith(folder + "/");
         long now = System.currentTimeMillis();
         long since = now - saved.getLong("abstract_at", 0);
-        if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        if (same && since >= 0 && since < abstractMinutes(context) * MINUTE_MS && !taken(context, shown)) return shown;
         String picked = anyPicture(context, folder, shown);
         if (picked == null) return shown;
         saved.edit().putString("abstract", picked).putLong("abstract_at", now).apply();
@@ -214,18 +283,38 @@ final class Look {
     /** Any but the one on show. Null if the set cannot be read. */
     static String anyPicture(Context context, String folder, String shown) {
         List<String> files = new ArrayList<>();
+        List<String> kept = new ArrayList<>();
+        if (folder.startsWith("/")) {
+            for (File image : images(context)) {
+                if (!image.getPath().equals(shown)) files.add(image.getPath());
+            }
+            return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
+        }
         try {
-            for (String name : context.getAssets().list(folder)) {
-                if (!(folder + "/" + name).equals(shown)) files.add(folder + "/" + name);
+            for (String name : Packs.list(context, folder)) {
+                String file = folder + "/" + name;
+                if (file.equals(shown)) continue;
+                files.add(file);
+                if (!taken(context, file)) kept.add(file);
             }
         } catch (IOException e) {
             return null;
         }
-        return files.isEmpty() ? null : files.get(new Random().nextInt(files.size()));
+        // With everything taken away the set still shows: a screensaver must not go blank.
+        List<String> from = kept.isEmpty() ? files : kept;
+        return from.isEmpty() ? null : from.get(new Random().nextInt(from.size()));
     }
 
     /** Which set Salotto's screensaver shows. */
-    static String saverFolder(Context context) { return prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER); }
+    static String saverFolder(Context context) {
+        String folder = prefs(context).getString("saver_folder", ABSTRACT_3D_FOLDER);
+        // Personale's photos can be gone, after a backup is restored on another Stick.
+        if (folder.startsWith("/") && images(context).isEmpty()) folder = ABSTRACT_3D_FOLDER;
+        if (setTaken(context, folder) || !folder.startsWith("/") && !Packs.present(context, folder)) {
+            for (String set : SETS) if (!setTaken(context, set) && Packs.present(context, set)) return set;
+        }
+        return folder;
+    }
     static void setSaverFolder(Context context, String value) { prefs(context).edit().putString("saver_folder", value).apply(); }
 
     /** Salotto's screensaver is the one chosen. */
@@ -255,39 +344,210 @@ final class Look {
     static String backdrop(Context context) {
         String chosen = prefs(context).getString("backdrop", null);
         boolean place = Weather.active(context);
-        if (chosen == null) return place ? PICTURES : ABSTRACT_3D;
+        if (chosen == null) return place && Packs.present(context, PICTURES_FOLDER) ? PICTURES : fallback(context);
+        // Its photos can be gone, after a backup is restored on another Stick; or taken away by the user.
+        if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) {
+            String other = fallback(context);
+            setBackdrop(context, other);
+            return other;
+        }
+        // A collection still on its way, after the installer or the update that took it out of the app:
+        // something else for now, without forgetting the choice.
+        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        if (folder != null && !Packs.present(context, folder)) return fallback(context);
         if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
-            setBackdrop(context, ABSTRACT_3D);
-            return ABSTRACT_3D;
+            String other = fallback(context);
+            setBackdrop(context, other);
+            return other;
         }
         return WEATHER.equals(chosen) ? PICTURES : chosen;
     }
 
     static void setBackdrop(Context context, String value) { prefs(context).edit().putString("backdrop", value).apply(); }
 
+    /** The sets whose pictures can be taken away one by one, or all at once. */
+    static final String[] SETS = {ABSTRACT_3D_FOLDER, ABSTRACT_FOLDER, NOX_FOLDER, NATURE_FOLDER};
+    private static final String TAKEN = "taken_pictures";
+    /** Ends the name of a set taken away whole, in the same list as the pictures. */
+    private static final String WHOLE = "/*";
+
+    /**
+     * Deleted by the user: a picture of a set, or a whole set. What is inside the app cannot leave it,
+     * so it is never shown again, as a backdrop, by chance or in the screensaver; installing Salotto
+     * again is the only way back, the user's choice of 2026-11-04.
+     */
+    static boolean taken(Context context, String name) {
+        Set<String> taken = prefs(context).getStringSet(TAKEN, Collections.emptySet());
+        if (taken.isEmpty()) return false;
+        String folder = folderOf(name);
+        return taken.contains(name) || folder != null && taken.contains(folder + WHOLE);
+    }
+
+    static boolean setTaken(Context context, String folder) {
+        return prefs(context).getStringSet(TAKEN, Collections.emptySet()).contains(folder + WHOLE);
+    }
+
+    /** For good: the file goes from the TV when the installer put it there, and it is never shown again. */
+    static void take(Context context, String picture) {
+        addTaken(context, picture);
+        new File(Packs.root(context), picture).delete();
+    }
+
+    static void takeSet(Context context, String folder) {
+        addTaken(context, folder + WHOLE);
+        File[] files = new File(Packs.root(context), folder).listFiles();
+        if (files != null) for (File file : files) file.delete();
+        new File(Packs.root(context), folder).delete();
+    }
+
+    private static void addTaken(Context context, String entry) {
+        Set<String> taken = new HashSet<>(prefs(context).getStringSet(TAKEN, Collections.emptySet()));
+        taken.add(entry);
+        prefs(context).edit().putStringSet(TAKEN, taken).apply();
+    }
+
+    /** The set a backdrop belongs to: a picture's folder, or the folder of a set that changes on its own. */
+    private static String folderOf(String name) {
+        if (PICTURES.equals(name)) return PICTURES_FOLDER;
+        if (PHOTOS.equals(name)) return PHOTOS_FOLDER;
+        if (AERIAL.equals(name)) return AERIAL_FOLDER;
+        if (ABSTRACT.equals(name)) return ABSTRACT_FOLDER;
+        if (ABSTRACT_3D.equals(name)) return ABSTRACT_3D_FOLDER;
+        if (NOX.equals(name)) return NOX_FOLDER;
+        if (NATURE.equals(name)) return NATURE_FOLDER;
+        int slash = name.indexOf('/');
+        return slash > 0 && !name.startsWith("/") ? name.substring(0, slash) : null;
+    }
+
+    /**
+     * The collection the Home opens on, as backdrop() will show it once its collection is here, even
+     * while it is not: a weather backdrop without a place gives way to the first set. Null for a
+     * colour or Personale.
+     */
+    static String homePack(Context context) {
+        String chosen = prefs(context).getString("backdrop", null);
+        boolean place = Weather.active(context);
+        if (chosen == null) return place && coming(context, PICTURES_FOLDER) ? PICTURES_FOLDER : fallbackPack(context);
+        if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) return fallbackPack(context);
+        boolean weather = WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen) || AERIAL.equals(chosen);
+        if (weather && !place) return fallbackPack(context);
+        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        // A collection that will never come, not chosen or deleted: the Home shows the first set instead.
+        return folder != null && !coming(context, folder) ? fallbackPack(context) : folder;
+    }
+
+    /** Here, or on its way. */
+    private static boolean coming(Context context, String folder) {
+        return Packs.present(context, folder) || Packs.wanted(context).contains(folder);
+    }
+
+    /** The set fallback() will show: the first one not deleted that is here or on its way. */
+    private static String fallbackPack(Context context) {
+        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
+        for (String name : names) {
+            String folder = folderOf(name);
+            if (!taken(context, name) && coming(context, folder)) return folder;
+        }
+        return null;
+    }
+
+    /**
+     * The picture of `pack` the chosen backdrop opens on, among `names`: a picture chosen on its own,
+     * the one last shown, or the first one not deleted. What Salotto downloads before the rest.
+     */
+    static String firstPicture(Context context, String pack, List<String> names) {
+        String chosen = prefs(context).getString("backdrop", null);
+        if (chosen != null && chosen.startsWith(pack + "/") && names.contains(chosen)) return chosen;
+        String shown = prefs(context).getString("abstract", null);
+        if (shown != null && shown.startsWith(pack + "/") && names.contains(shown) && !taken(context, shown)) return shown;
+        for (String name : names) {
+            String lower = name.toLowerCase(Locale.ROOT);
+            if (!taken(context, name) && (lower.endsWith(".webp") || lower.endsWith(".jpg") || lower.endsWith(".png"))) return name;
+        }
+        return null;
+    }
+
+    /** Abstract 3D, or the first set still there, or the first plain colour. */
+    private static String fallback(Context context) {
+        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
+        for (String name : names) if (!taken(context, name) && Packs.present(context, folderOf(name))) return name;
+        return PRESET_NAMES[0];
+    }
+
     /** Changes when the Home has to be drawn again. */
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
-            + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context);
+            + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
+            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
+            + "/" + tintGlow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
     static String cardsSignature(Context context) {
-        return columns(context) + "/" + names(context);
+        return columns(context) + "/" + names(context) + "/" + circular(context) + "/" + wheel(context);
     }
 
-    /** Images copied into the app's own folder: the Stick has no system image picker. */
+    /** Where the images of Personale are, sent from a phone or copied before that. */
+    static File personalFolder(Context context) { return new File(context.getFilesDir(), FOLDER); }
+
+    /** The backdrop is one of them. */
+    static boolean personal(Context context, String name) { return new File(personalFolder(context), name).isFile(); }
+
+    /** Images copied into the app's own folder: the Stick has no system image picker. In the order they came. */
     static List<File> images(Context context) {
         List<File> images = new ArrayList<>();
-        File[] files = new File(context.getFilesDir(), FOLDER).listFiles();
+        File[] files = personalFolder(context).listFiles();
         if (files == null) return images;
-        Arrays.sort(files);
+        Arrays.sort(files, (one, other) -> Long.compare(number(one), number(other)) != 0
+            ? Long.compare(number(one), number(other)) : one.getName().compareTo(other.getName()));
         for (File file : files) {
             String name = file.getName().toLowerCase();
             if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")) images.add(file);
         }
         return images;
+    }
+
+    /** Its number as Foto N, or past every number for a file named some other way. */
+    private static long number(File file) {
+        Matcher photo = PHOTO.matcher(file.getName());
+        return photo.matches() ? Long.parseLong(photo.group(1)) : Long.MAX_VALUE;
+    }
+
+    /** The name for the next photo: one past the highest, so a name never moves to another picture. */
+    static synchronized File nextPhoto(Context context, String extension) {
+        long highest = 0;
+        for (File image : images(context)) {
+            long taken = number(image);
+            if (taken != Long.MAX_VALUE) highest = Math.max(highest, taken);
+        }
+        return new File(personalFolder(context), "foto-" + (highest + 1) + "." + extension);
+    }
+
+    /** Older images, or ones copied by hand, take a Foto N name too; a backdrop chosen among them follows. */
+    static synchronized void tidyPersonal(Context context) {
+        for (File image : images(context)) {
+            if (number(image) != Long.MAX_VALUE) continue;
+            String extension = image.getName().substring(image.getName().lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
+            File named = nextPhoto(context, extension);
+            if (!image.renameTo(named)) continue;
+            SharedPreferences saved = prefs(context);
+            if (image.getName().equals(saved.getString("backdrop", null))) setBackdrop(context, named.getName());
+            if (image.getPath().equals(saved.getString("abstract", null))) saved.edit().putString("abstract", named.getPath()).apply();
+        }
+    }
+
+    /** Gone from the TV. A backdrop that was this photo goes back to the default. */
+    static void deletePersonal(Context context, String name) {
+        File image = new File(personalFolder(context), name);
+        if (!image.delete()) return;
+        SharedPreferences saved = prefs(context);
+        SharedPreferences.Editor change = saved.edit();
+        if (name.equals(saved.getString("backdrop", null))) change.remove("backdrop");
+        if (image.getPath().equals(saved.getString("abstract", null))) change.remove("abstract");
+        change.apply();
+        trim();
     }
 
     /** The backdrop by that name, when it is one of the plain ones. */
@@ -308,7 +568,7 @@ final class Look {
     static void current(Context context, Consumer<Bitmap> done) {
         String name = currentName(context);
         Runnable plain = () -> show(context, drawable -> done.accept(painted(drawable)));
-        if (!weatherPictures(context) || !name.endsWith(Weather.PICTURE_FILE)) {
+        if (!weatherPictures(context) || name == null || !picture(name)) {
             plain.run();
             return;
         }
@@ -326,7 +586,8 @@ final class Look {
     private static Bitmap small(Context context, String asset) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = SMALL_SAMPLE;
-        try (InputStream input = context.getAssets().open(asset)) {
+        if (asset.startsWith("/")) return BitmapFactory.decodeFile(asset, options);
+        try (InputStream input = Packs.open(context, asset)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             return null;
@@ -343,7 +604,7 @@ final class Look {
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
         String chosen = backdrop(context);
-        File file = new File(new File(context.getFilesDir(), FOLDER), chosen);
+        File file = new File(personalFolder(context), chosen);
         if (!file.isFile()) {
             trim();
             done.accept(preset(chosen));
@@ -373,7 +634,7 @@ final class Look {
     }
 
     /** Decoded close to screen size and cropped to 16:9, so nothing is stretched. */
-    private static Bitmap load(File file) {
+    static Bitmap load(File file) {
         BitmapFactory.Options size = new BitmapFactory.Options();
         size.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getPath(), size);

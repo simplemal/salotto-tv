@@ -17,6 +17,7 @@
     <string name="main_move_hint">Move with the arrows, then press OK</string>
     <string name="main_footer">Salotto, v%1$s - credits</string>
     <string name="main_all_apps">All apps</string>
+    <string name="main_loading_home">Loading the Home</string>
     <string name="main_move">Move</string>
 
     <string name="apps_add_hint">Hold down OK to add it to the Home</string>
@@ -90,6 +91,8 @@
     <string name="about_others_text">AirPlay Server receives from iPhone, iPad and Mac. Aurora Store installs Android apps, even without an account.</string>
     <string name="about_only">Only in Salotto.</string>
     <string name="about_only_text">Illustrated or photographic backdrops that follow your city’s weather and time. A control center over any app, by holding down Menu: Wi-Fi, Bluetooth, timer, brightness and blue light filter. A task manager by holding down Back. A page with the audio and video standards of the Stick and the TV. Clearer dialogue and even volume at your fingertips: they are Fire OS filters, gathered in one place. Signed updates, checked before they are installed.</string>
+    <string name="about_thanks">Thanks</string>
+    <string name="about_thanks_text">To my friend Lorenzo Salomone, for the idea of the circular Home.</string>
     <string name="about_license">License</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto can be used, studied, modified and built upon for free for non-commercial purposes. To sell it you need the author’s permission.</string>
     <string name="about_marks">Trademarks</string>
@@ -105,7 +108,6 @@
     <string name="about_not_included">Programs not included</string>
     <string name="about_not_included_text">Installing downloads them from the original projects, without changing them.</string>
     <string name="about_use_airplay">Receives from iPhone, iPad and Mac</string>
-    <string name="about_use_aurora">Installs Android apps, even without an account</string>
 
     <string name="device_name">Name</string>
     <string name="device_model">Model</string>
@@ -239,6 +241,8 @@
     <string name="update_detail_back">Something’s wrong: going back to the previous version.</string>
     <string name="update_done">Update complete</string>
     <string name="update_done_text">You now have Salotto %1$s.</string>
+    <string name="update_backdrops">Downloading the backdrops from GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">Getting the backdrop ready…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Scan it with your phone to learn more</string>
     <string name="update_outcome_untouched">Salotto was not changed</string>
@@ -278,5 +282,32 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">To turn them off again you need a computer:\n1. Open Install Salotto.\n2. Choose this TV.\n3. Follow the steps it offers.</string>
     <string name="update_error_r304">Install Salotto is needed on a computer</string>
+    <string name="update_room_title">The Fire TV does not have enough space for the update</string>
+    <string name="update_room_numbers">%1$s is needed and you have %2$s. Salotto has not been touched.</string>
+    <string name="update_room_choices">You can free up space by removing apps you do not use, then try again, or update Salotto from a computer with Installa Salotto: %1$s</string>
+    <string name="update_from_computer">If the problem persists, update Salotto from a computer with Installa Salotto: %1$s</string>
     <string name="update_back_computer">To go back to the previous version, open Install Salotto on a computer and choose “Go back to the previous version”.</string>
+    <string name="grid_upload">Upload</string>
+    <string name="grid_personal_empty">No images yet. Press Upload to send them from your phone.</string>
+    <string name="personal_photo">Photo %1$d</string>
+    <string name="grid_delete">Delete</string>
+    <string name="grid_delete_title">Delete %1$s?</string>
+    <string name="grid_delete_text">The photo is removed from this TV. This cannot be undone.</string>
+    <string name="grid_delete_set">Delete the whole collection</string>
+    <string name="grid_delete_set_title">Delete the whole %1$s collection?</string>
+    <string name="grid_delete_set_text">All its photos are removed from this TV. This cannot be undone.</string>
+    <string name="grid_delete_set_do">Delete</string>
+    <string name="upload_title">Upload from your phone</string>
+    <string name="upload_text">Point your phone’s camera at the code and choose a photo. The phone must be on the same network as the TV.</string>
+    <string name="upload_no_network">The TV is not connected to a network: connect it and try again.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d image received</item>
+        <item quantity="other">%1$d images received</item>
+    </plurals>
+    <string name="upload_web_title">Choose a photo: it will appear in Personal, among Salotto’s backdrops.</string>
+    <string name="upload_web_pick">Upload image</string>
+    <string name="upload_web_sending">Sending…</string>
+    <string name="upload_web_sent">Sent. You can send another one.</string>
+    <string name="upload_web_failed">It could not be sent. Try again.</string>
+    <string name="weather_today">Today</string>
 </resources>

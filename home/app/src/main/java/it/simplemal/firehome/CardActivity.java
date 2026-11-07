@@ -64,7 +64,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     private static final int MIN_CAPTION = 130;
     private static final int EDGE_SAMPLE = 32;
     private static final long FOCUS_MS = 140;
-    private static final int CARD_ART_BYTES = 16 * 1024 * 1024;
+    /** Half on the Stick of 2020, which has half the memory. */
+    private static final int CARD_ART_BYTES = (Fire.STICK_2020 ? 8 : 16) * 1024 * 1024;
     /** Apps whose TV banner is a small logo: their layered icon fills the card far better. */
     private static final List<String> LAYERED_ICON = Arrays.asList("com.aurora.store");
     /** Each app's artwork at the size of its card: a banner alone can be many times larger. */
@@ -73,6 +74,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     };
 
     private int cardNames;
+    /** Artwork being drawn away from the main thread, for a page that waits until it has all arrived. */
+    protected int artComing;
     private Drawable focusRing;
 
     @Override protected void attachBaseContext(Context base) {
@@ -172,16 +175,22 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             ImageView image = imageOf(tile);
             // Opaque meanwhile: the focus shadow would show through an empty card.
             image.setBackground(cardFill(ICON));
+            artComing++;
             Background.draw(() -> {
                 Bitmap made = cardArt(key, pkg, width);
                 runOnUiThread(() -> {
                     image.setBackground(null);
                     image.setImageBitmap(made);
+                    artComing--;
+                    artShown();
                 });
             });
         }
         return tile;
     }
+
+    /** One more card's artwork is on screen. */
+    protected void artShown() { }
 
     /** An update can change the artwork, so its date is part of the name. */
     private String artKey(String pkg, int width) {

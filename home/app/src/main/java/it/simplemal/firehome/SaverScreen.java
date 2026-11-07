@@ -26,6 +26,7 @@ import java.util.Random;
  * in one place on the screen for hours.
  */
 final class SaverScreen {
+    private static final int SCREEN_WIDTH = 1920;
     private static final long FADE_MS = 1500;
     private static final long MINUTE_MS = 60 * 1000L;
     private static final int TIME_SP = 72;
@@ -71,7 +72,7 @@ final class SaverScreen {
         String weather = Look.saverWeather(context) ? Weather.line(context) : null;
         if (weather != null) {
             TextView line = new TextView(context);
-            line.setText(weather);
+            line.setText(WeatherIcon.in(context, weather));
             line.setTextSize(WEATHER_SP);
             line.setTextColor(Color.WHITE);
             line.setShadowLayer(SHADOW, 0, 0, SHADOW_COLOR);
@@ -135,7 +136,16 @@ final class SaverScreen {
     private static Bitmap decode(Context context, String file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
-        try (InputStream input = context.getAssets().open(file)) {
+        // A photo of Personale, by its full path: read near screen size, the view crops it.
+        if (file.startsWith("/")) {
+            BitmapFactory.Options size = new BitmapFactory.Options();
+            size.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(file, size);
+            options.inSampleSize = 1;
+            while (size.outWidth / (options.inSampleSize * 2) >= SCREEN_WIDTH) options.inSampleSize *= 2;
+            return BitmapFactory.decodeFile(file, options);
+        }
+        try (InputStream input = Packs.open(context, file)) {
             return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             return null;

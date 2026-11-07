@@ -34,6 +34,15 @@
     <string name="first_does_settings">Настройки</string>
     <string name="first_start">Начать</string>
     <string name="first_backdrop_title">Выберите фон</string>
+    <string name="first_packs_question">Скачать выбранные коллекции фонов сейчас?</string>
+    <string name="first_packs_size">Это %1$s, займёт несколько минут.</string>
+    <string name="first_packs_now">Скачать сейчас</string>
+    <string name="first_packs_later">Позже</string>
+    <string name="first_packs_title">Загрузка фонов</string>
+    <string name="first_packs_room">На телевизоре не хватает места для остальных коллекций изображений: нужно %1$s, свободно %2$s. Они не загрузятся, пока вы не освободите место.</string>
+    <string name="first_packs_network">Подключение к интернету прервалось. Недостающие коллекции загрузятся сами, когда оно восстановится.</string>
+    <string name="first_packs_server">Сервер коллекций не отвечает. Salotto сам попробует позже.</string>
+    <string name="first_packs_damaged">Коллекция пришла повреждённой и была удалена. Salotto сам попробует позже.</string>
     <string name="first_preview">Предпросмотр</string>
     <string name="grid_position">%1$d из %2$d</string>
     <string name="first_backdrop_pictures">Иллюстрированная погода</string>

@@ -17,6 +17,7 @@
     <string name="main_move_hint">तीर वाले बटन से सरकाएं, फिर OK दबाएं</string>
     <string name="main_footer">Salotto, वर्ज़न %1$s - क्रेडिट</string>
     <string name="main_all_apps">सभी ऐप</string>
+    <string name="main_loading_home">होम लोड हो रहा है</string>
     <string name="main_move">सरकाएं</string>
 
     <string name="apps_add_hint">होम में जोड़ने के लिए OK दबाए रखें</string>
@@ -90,6 +91,8 @@
     <string name="about_others_text">AirPlay Server iPhone, iPad और Mac से वीडियो पाता है। Aurora Store बिना खाते के भी Android ऐप इंस्टॉल करता है।</string>
     <string name="about_only">सिर्फ़ Salotto में।</string>
     <string name="about_only_text">चित्रित या फ़ोटो वाले बैकग्राउंड, जो आपके शहर के मौसम और समय के साथ बदलते हैं। किसी भी ऐप पर मेनू दबाए रखने से कंट्रोल सेंटर: Wi-Fi, Bluetooth, टाइमर, ब्राइटनेस और ब्लू लाइट फ़िल्टर। वापस दबाए रखने से टास्क मैनेजर। Stick और टीवी के ऑडियो और वीडियो स्टैंडर्ड का एक पेज। साफ़ डायलॉग और एक जैसा वॉल्यूम बस एक क्लिक पर: ये Fire OS के फ़िल्टर हैं, जो एक ही जगह इकट्ठा किए गए हैं। साइन किए हुए अपडेट, जो इंस्टॉल से पहले जाँचे जाते हैं।</string>
+    <string name="about_thanks">धन्यवाद</string>
+    <string name="about_thanks_text">मेरे मित्र लोरेंज़ो सालोमोने को, गोल होम के विचार के लिए।</string>
     <string name="about_license">लाइसेंस</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto को गैर-व्यावसायिक उद्देश्यों के लिए मुफ़्त में इस्तेमाल किया, पढ़ा-समझा, बदला और उससे नया बनाया जा सकता है। बेचने के लिए लेखक की अनुमति चाहिए।</string>
     <string name="about_marks">ट्रेडमार्क</string>
@@ -105,7 +108,6 @@
     <string name="about_not_included">शामिल नहीं किए गए प्रोग्राम</string>
     <string name="about_not_included_text">इंस्टॉल के समय इन्हें मूल प्रोजेक्ट से डाउनलोड किया जाता है, बिना बदले।</string>
     <string name="about_use_airplay">iPhone, iPad और Mac से वीडियो पाता है</string>
-    <string name="about_use_aurora">बिना खाते के भी Android ऐप इंस्टॉल करता है</string>
 
     <string name="device_name">नाम</string>
     <string name="device_model">मॉडल</string>
@@ -239,6 +241,8 @@
     <string name="update_detail_back">कुछ गड़बड़ है: पिछले वर्ज़न पर लौट रहे हैं।</string>
     <string name="update_done">अपडेट पूरा हुआ</string>
     <string name="update_done_text">अब आपके पास Salotto %1$s है।</string>
+    <string name="update_backdrops">GitHub से बैकग्राउंड डाउनलोड हो रहे हैं: %1$d%%</string>
+    <string name="update_backdrop_first">बैकग्राउंड तैयार हो रहा है…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">फ़ोन से स्कैन करके और जानें</string>
     <string name="update_outcome_untouched">Salotto में कोई बदलाव नहीं हुआ</string>
@@ -278,5 +282,32 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">इन्हें फिर से बंद करने के लिए कंप्यूटर चाहिए:\n1. Install Salotto खोलें।\n2. यह टीवी चुनें।\n3. बताए गए चरणों का पालन करें।</string>
     <string name="update_error_r304">कंप्यूटर पर Install Salotto चाहिए</string>
+    <string name="update_room_title">Fire TV में अपडेट के लिए पर्याप्त जगह नहीं है</string>
+    <string name="update_room_numbers">%1$s चाहिए और आपके पास %2$s है। Salotto को छुआ नहीं गया।</string>
+    <string name="update_room_choices">जिन ऐप्स का उपयोग नहीं करते उन्हें हटाकर जगह खाली करें और फिर से कोशिश करें, या कंप्यूटर से Installa Salotto के ज़रिए Salotto अपडेट करें: %1$s</string>
+    <string name="update_from_computer">अगर समस्या बनी रहे, तो कंप्यूटर से Installa Salotto के ज़रिए Salotto अपडेट करें: %1$s</string>
     <string name="update_back_computer">पिछले संस्करण पर लौटने के लिए कंप्यूटर पर Install Salotto खोलें और «पिछले संस्करण पर लौटें» चुनें।</string>
+    <string name="grid_upload">अपलोड</string>
+    <string name="grid_personal_empty">अभी कोई चित्र नहीं। फ़ोन से भेजने के लिए «अपलोड» दबाएँ।</string>
+    <string name="personal_photo">फ़ोटो %1$d</string>
+    <string name="grid_delete">हटाएँ</string>
+    <string name="grid_delete_title">«%1$s» हटाएँ?</string>
+    <string name="grid_delete_text">फ़ोटो इस टीवी से हटा दी जाएगी। इसे वापस नहीं किया जा सकता।</string>
+    <string name="grid_delete_set">पूरा संग्रह हटाएँ</string>
+    <string name="grid_delete_set_title">पूरा %1$s संग्रह हटाएँ?</string>
+    <string name="grid_delete_set_text">इसकी सभी फ़ोटो इस टीवी से हटा दी जाएँगी। इसे वापस नहीं किया जा सकता।</string>
+    <string name="grid_delete_set_do">हटाएँ</string>
+    <string name="upload_title">फ़ोन से अपलोड करें</string>
+    <string name="upload_text">फ़ोन के कैमरे से कोड स्कैन करें और एक फ़ोटो चुनें। फ़ोन और टीवी एक ही नेटवर्क पर होने चाहिए।</string>
+    <string name="upload_no_network">टीवी किसी नेटवर्क से जुड़ा नहीं है: उसे जोड़ें और फिर से कोशिश करें।</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d चित्र मिला</item>
+        <item quantity="other">%1$d चित्र मिले</item>
+    </plurals>
+    <string name="upload_web_title">एक फ़ोटो चुनें: यह Salotto के बैकग्राउंड में «निजी» में दिखेगी।</string>
+    <string name="upload_web_pick">चित्र अपलोड करें</string>
+    <string name="upload_web_sending">भेजा जा रहा है…</string>
+    <string name="upload_web_sent">भेज दी गई। आप एक और भेज सकते हैं।</string>
+    <string name="upload_web_failed">भेजा नहीं जा सका। फिर से कोशिश करें।</string>
+    <string name="weather_today">आज</string>
 </resources>

@@ -34,6 +34,15 @@
     <string name="first_does_settings">Impostazioni</string>
     <string name="first_start">Inizia</string>
     <string name="first_backdrop_title">Scegli lo sfondo</string>
+    <string name="first_packs_question">Vuoi scaricare adesso le collezioni di sfondi che hai scelto?</string>
+    <string name="first_packs_size">Sono %1$s, ci vuole qualche minuto.</string>
+    <string name="first_packs_now">Scarica adesso</string>
+    <string name="first_packs_later">Più tardi</string>
+    <string name="first_packs_title">Scaricamento degli sfondi</string>
+    <string name="first_packs_room">Sulla TV non c\'è abbastanza spazio per le restanti collezioni di immagini: servono %1$s, ne restano %2$s. Non arriveranno finché non liberi spazio.</string>
+    <string name="first_packs_network">La connessione a Internet si è interrotta. Le collezioni mancanti arriveranno da sole quando torna.</string>
+    <string name="first_packs_server">Il server delle collezioni non risponde. Salotto riproverà da solo più tardi.</string>
+    <string name="first_packs_damaged">Una collezione è arrivata danneggiata ed è stata scartata. Salotto riproverà da solo più tardi.</string>
     <string name="first_preview">Anteprima</string>
     <string name="grid_position">%1$d di %2$d</string>
     <string name="first_backdrop_pictures">Meteo illustrato</string>

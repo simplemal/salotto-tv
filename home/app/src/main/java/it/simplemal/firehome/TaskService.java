@@ -185,6 +185,14 @@ public final class TaskService extends AccessibilityService {
 
     static boolean running() { return running != null; }
 
+    /** False when the service is off: only it can draw over the app that is starting. */
+    static boolean portal(Bitmap home, Bitmap art, int colour, float x, float y, float radius, Runnable shown, Runnable opened) {
+        TaskService service = running;
+        if (service == null || home == null) return false;
+        PortalWindow.open(service, home, art, colour, x, y, radius, shown, opened);
+        return true;
+    }
+
     /** Fire OS's Settings stay open until Salotto is in front again. */
     static void wantFireSettings() { fireSettingsWanted = true; }
 
@@ -475,6 +483,32 @@ public final class TaskService extends AccessibilityService {
         context.getSharedPreferences(KEYS_FILE, MODE_PRIVATE).edit().putBoolean(DOUBLE_HOME, on).apply();
     }
 
+    /** The Home key's cover goes now: the Home under it already shows the same thing. */
+    /** The Home key's cover goes now: the Home under it shows the same colour, and closes it. */
+    static void dropHomeCover() {
+        TaskService service = running;
+        if (service != null && service.cover != null) service.cover.drop();
+    }
+
+    /** The Home key's closing is being drawn by the cover: the Home leaves it to it. */
+    static boolean coverCloses() {
+        TaskService service = running;
+        return service != null && service.cover != null && service.cover.closingHere();
+    }
+
+    /** Back from an app opened from the wheel: its circle closes over everything. False if it cannot. */
+    static boolean closeOverAll() {
+        TaskService service = running;
+        return service != null && service.cover != null && service.cover.closeOverAll();
+    }
+
+    /** Runs once the Home key's cover is gone; at once without the service. */
+    static void afterHomeCover(Runnable then) {
+        TaskService service = running;
+        if (service != null && service.cover != null) service.cover.whenGone(then);
+        else then.run();
+    }
+
     static void homeBack() {
         TaskService service = running;
         if (service != null && service.cover != null) service.cover.homeBack();
@@ -587,8 +621,6 @@ public final class TaskService extends AccessibilityService {
         registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         cover = new HomeCover(this);
         showVeil();
-        // A restart forgets the screen's colour matrix.
-        if (Veil.warm(this) > 0) adb.post(this::connected);
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
         startHomeLog();
         endFixer();
@@ -929,7 +961,6 @@ public final class TaskService extends AccessibilityService {
             if (!"ready".equals(opened.readLine())) throw new IOException("Helper did not start");
             client = opened;
             startHomeLog();
-            if (Veil.warm(this) > 0) run(Veil.WARM_ON);
             return true;
         } catch (IOException | GeneralSecurityException | SecurityException e) {
             Log.w(TAG, "No adb connection", e);

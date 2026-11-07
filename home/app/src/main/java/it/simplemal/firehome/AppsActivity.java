@@ -1,5 +1,6 @@
 package it.simplemal.firehome;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -57,10 +58,12 @@ public final class AppsActivity extends CardActivity {
         View target = null;
         LinearLayout row = null;
         List<HomeApps.App> apps = HomeApps.installed(this);
+        // Salotto's settings first, so a card taken off the Home can be put back from here.
+        apps.add(0, new HomeApps.App(HomeApps.SETTINGS, getString(R.string.first_does_settings)));
         for (int index = 0; index < apps.size(); index++) {
             if (index % columns == 0) row = row(page);
             HomeApps.App app = apps.get(index);
-            View tile = appCard(row, app.label, app.pkg, width, () -> showMenu(app));
+            View tile = tileOf(row, app);
             if (first == null) first = tile;
             if (app.pkg.equals(focus)) target = tile;
         }
@@ -72,12 +75,18 @@ public final class AppsActivity extends CardActivity {
     private void redrawCard(HomeApps.App app) {
         View old = page.findViewWithTag(app.pkg);
         LinearLayout row = (LinearLayout) old.getParent();
-        View tile = appCard(row, app.label, app.pkg, width, () -> showMenu(app));
+        View tile = tileOf(row, app);
         row.removeView(tile);
         row.addView(tile, row.indexOfChild(old));
         tile.requestFocus();
         row.removeView(old);
         shown = state();
+    }
+
+    private View tileOf(LinearLayout row, HomeApps.App app) {
+        if (!HomeApps.SETTINGS.equals(app.pkg)) return appCard(row, app.label, app.pkg, width, () -> showMenu(app));
+        return card(row, app.pkg, app.label, getDrawable(R.drawable.ic_settings), null, SHADED, width,
+            () -> open(new Intent(this, SettingsActivity.class)), () -> showMenu(app));
     }
 
     @Override protected boolean isMarked(String tag) { return home.contains(tag); }
@@ -90,10 +99,12 @@ public final class AppsActivity extends CardActivity {
 
     private void showMenu(HomeApps.App app) {
         boolean listed = home.contains(app.pkg);
+        boolean settings = HomeApps.SETTINGS.equals(app.pkg);
+        String onHome = getString(listed ? R.string.card_remove_from_home : R.string.card_add_to_home);
         dialog()
             .setTitle(app.label)
-            .setItems(new String[]{getString(listed ? R.string.card_remove_from_home : R.string.card_add_to_home),
-                    getString(R.string.card_app_info), getString(R.string.card_uninstall)},
+            .setItems(settings ? new String[]{onHome}
+                    : new String[]{onHome, getString(R.string.card_app_info), getString(R.string.card_uninstall)},
                 (dialog, choice) -> {
                     if (choice == 1) {
                         appInfo(app.pkg);
@@ -102,6 +113,7 @@ public final class AppsActivity extends CardActivity {
                     } else {
                         if (listed) home.remove(app.pkg);
                         else home.add(app.pkg);
+                        if (settings) HomeApps.setSettingsOff(this, listed);
                         HomeApps.save(this, home);
                         redrawCard(app);
                     }

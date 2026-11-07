@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
 import android.os.StatFs;
+import android.os.storage.StorageManager;
 import android.provider.Settings;
 import android.util.Base64;
 import java.io.ByteArrayOutputStream;
@@ -31,17 +32,32 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /** Finds and checks a new version. Nothing here changes the installed app. */
 final class Updater {
-    static final class Failure extends Exception {
+    static class Failure extends Exception {
         final UpdateError error;
         Failure(UpdateError error) { this.error = error; }
+    }
+
+    /** Not enough room: the page says how much is needed and how much there is. */
+    static final class NoRoom extends Failure {
+        final long needed;
+        final long free;
+
+        NoRoom(long needed, long free) {
+            super(UpdateError.F106);
+            this.needed = needed;
+            this.free = free;
+        }
     }
 
     static final class Release {
@@ -50,12 +66,25 @@ final class Updater {
         String url;
         String sha256;
         long size;
+        /** In Italian, the only list before 1.0.19: older versions still read it. */
         final List<String> changes = new ArrayList<>();
+        final Map<String, List<String>> changesByLanguage = new HashMap<>();
+
+        /** In Salotto's language when the release has it, otherwise in Italian. */
+        List<String> changes(Context context) {
+            List<String> own = changesByLanguage.get(Language.code(context));
+            return own != null && !own.isEmpty() ? own : changes;
+        }
     }
 
     interface Progress { void percent(int done); }
 
-    private static final String BASE = "https://github.com/" + Fire.UPDATES_REPO + "/releases/latest/download/";
+    private static final String LATEST = "https://github.com/" + Fire.UPDATES_REPO + "/releases/latest/download/";
+    /**
+     * A fixed pre-release, which GitHub's "latest" never points to: only a TV with the betas on looks
+     * here. Its update.json is replaced at every beta and names the APK of that beta's own pre-release.
+     */
+    private static final String BETA = "https://github.com/" + Fire.UPDATES_REPO + "/releases/download/beta/";
     /** Only updates signed by the private half of this key are ever considered. */
     private static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+Xr4FLe8cXoDAqAen4eIgxam1dviQ81GfwoMv51vrd0sajsazDnwlEzdFR3+VfTHJDTFK7qeOebtfvoWzgePQ==";
     private static final String FILE = "update";
@@ -63,10 +92,24 @@ final class Updater {
     private static final String PREVIOUS = "update-previous.apk";
     /** A failed look is usually a network still waking up. */
     private static final long RETRY = 10 * Fire.MINUTE_MS;
+    /** A release may come out any time: a day's wait left the TVs a version behind. */
+    private static final long NOTHING_NEW = 60 * Fire.MINUTE_MS;
     /** The script reports well within this; a state left older than this has no one behind it. */
     private static final long STALE = 5 * Fire.MINUTE_MS;
-    private static final long ROOM_FACTOR = 3;
+    /**
+     * Copies of the new version on the Stick at the worst moment: the download and Android's own, and
+     * the old version kept for the way back except on Android 9, where the way back is the computer.
+     * Android also checks, as it installs, that one more fits.
+     */
+    private static final int COPIES = Fire.ANDROID_9 ? 2 : 3;
+    /** For what Android adds as it installs: compiled code and its records. */
+    private static final int EXTRA_PART = 10;
     private static final int TIMEOUT_MS = 15000;
+    /**
+     * GitHub sometimes answers 504 for a release file, for a moment, and a moment later the same file
+     * comes: seen on 2026-11-05, one try in two for some minutes. Two more tries, a little apart.
+     */
+    private static final long[] RETRY_MS = {1000, 3000};
     private static final int MAX_MANIFEST = 256 * 1024;
     private static final int PERCENT = 100;
 
@@ -89,10 +132,18 @@ final class Updater {
     static File health(Context context) { return shared(context, "update-health"); }
     static File previous(Context context) { return shared(context, PREVIOUS); }
 
+    static boolean beta(Context context) { return prefs(context).getBoolean("beta", false); }
+
+    /** Turned on, the next look happens at once. Turned off, nothing goes back: a newer stable version follows. */
+    static void setBeta(Context context, boolean on) {
+        prefs(context).edit().putBoolean("beta", on).apply();
+        askAgain();
+    }
+
     static int target(Context context) { return prefs(context).getInt("target", 0); }
     static void setTarget(Context context, int code) { prefs(context).edit().putInt("target", code).commit(); }
 
-    /** True at every start of Salotto and once a day after that: "later" lasts until then. */
+    /** True at every start of Salotto, then every hour, or a day after an offer: "later" lasts until then. */
     static boolean due() {
         long now = System.currentTimeMillis();
         if (now < nextCheck) return false;
@@ -104,7 +155,7 @@ final class Updater {
     static Release offer(Context context) {
         try {
             Release found = check(context);
-            nextCheck = System.currentTimeMillis() + Fire.DAY_MS;
+            nextCheck = System.currentTimeMillis() + (found == null ? NOTHING_NEW : Fire.DAY_MS);
             return found;
         } catch (Failure e) {
             return null;
@@ -149,15 +200,37 @@ final class Updater {
         if (link == null || !link.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
             throw new Failure(UpdateError.F101);
         }
-        byte[] manifest = fetch("update.json");
-        verify(manifest, fetch("update.json.sig"));
-        Release release = parse(manifest);
+        // Each on its own: a TV with the betas on still finds the beta when the stable version does
+        // not answer, and the other way round.
+        Release release = null;
+        Failure failed = null;
+        try {
+            release = newest(LATEST);
+        } catch (Failure e) {
+            failed = e;
+        }
+        if (beta(context)) {
+            try {
+                Release trial = newest(BETA);
+                if (release == null || trial.versionCode > release.versionCode) release = trial;
+            } catch (Failure e) {
+                // No beta out yet, or not reachable now: the stable version still counts.
+            }
+        }
+        if (release == null) throw failed;
         return release.versionCode > installedCode(context) ? release : null;
     }
 
-    private static byte[] fetch(String name) throws Failure {
+    /** Betas and stable versions share one row of version codes, so the higher one is the newer. */
+    private static Release newest(String base) throws Failure {
+        byte[] manifest = fetch(base + "update.json");
+        verify(manifest, fetch(base + "update.json.sig"));
+        return parse(manifest);
+    }
+
+    static byte[] fetch(String url) throws Failure {
         try {
-            HttpURLConnection connection = open(BASE + name);
+            HttpURLConnection connection = open(url);
             ByteArrayOutputStream body = new ByteArrayOutputStream();
             try (InputStream input = connection.getInputStream()) {
                 byte[] chunk = new byte[8192];
@@ -172,15 +245,51 @@ final class Updater {
         }
     }
 
-    private static HttpURLConnection open(String url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-        connection.setConnectTimeout(TIMEOUT_MS);
-        connection.setReadTimeout(TIMEOUT_MS);
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) throw new IOException("HTTP");
-        return connection;
+    /** `length` bytes from `offset`: only a server that answers with that part is used. */
+    static HttpURLConnection openPart(String url, long offset, long length) throws IOException {
+        return connect(url, "bytes=" + offset + "-" + (offset + length - 1), HttpURLConnection.HTTP_PARTIAL);
     }
 
-    private static void verify(byte[] manifest, byte[] signed) throws Failure {
+    static HttpURLConnection open(String url) throws IOException {
+        return connect(url, null, HttpURLConnection.HTTP_OK);
+    }
+
+    /**
+     * Tried again when the network or GitHub fails for a moment: no answer, an error of the server
+     * (5xx) or too many requests (429). A file that is not there (404, a beta not out yet) is not.
+     */
+    private static HttpURLConnection connect(String url, String range, int wanted) throws IOException {
+        IOException last = null;
+        for (int attempt = 0; attempt <= RETRY_MS.length; attempt++) {
+            if (attempt > 0) {
+                try {
+                    Thread.sleep(RETRY_MS[attempt - 1]);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("interrupted");
+                }
+            }
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(TIMEOUT_MS);
+            connection.setReadTimeout(TIMEOUT_MS);
+            if (range != null) connection.setRequestProperty("Range", range);
+            int code;
+            try {
+                code = connection.getResponseCode();
+            } catch (IOException e) {
+                connection.disconnect();
+                last = e;
+                continue;
+            }
+            if (code == wanted) return connection;
+            connection.disconnect();
+            last = new IOException("HTTP");
+            if (code < HttpURLConnection.HTTP_INTERNAL_ERROR && code != 429) throw last;
+        }
+        throw last;
+    }
+
+    static void verify(byte[] manifest, byte[] signed) throws Failure {
         try {
             PublicKey key = KeyFactory.getInstance("EC")
                 .generatePublic(new X509EncodedKeySpec(Base64.decode(PUBLIC_KEY, Base64.DEFAULT)));
@@ -204,6 +313,16 @@ final class Updater {
             release.size = json.getLong("size");
             JSONArray changes = json.getJSONArray("changes");
             for (int index = 0; index < changes.length(); index++) release.changes.add(changes.getString(index));
+            JSONObject languages = json.optJSONObject("changes_by_language");
+            if (languages != null) {
+                for (Iterator<String> codes = languages.keys(); codes.hasNext(); ) {
+                    String code = codes.next();
+                    JSONArray lines = languages.getJSONArray(code);
+                    List<String> list = new ArrayList<>();
+                    for (int index = 0; index < lines.length(); index++) list.add(lines.getString(index));
+                    release.changesByLanguage.put(code, list);
+                }
+            }
             if (!release.url.startsWith("https://") || release.size <= 0) throw new Failure(UpdateError.F103);
             return release;
         } catch (JSONException e) {
@@ -220,12 +339,24 @@ final class Updater {
         }
     }
 
-    /** Refuses before the download, so a full Stick costs nothing. */
+    /**
+     * Refuses before the download, so a full Stick costs nothing. What counts is what Android lets an
+     * app take: it keeps a reserve of its own, and an install that would reach it fails at the very end,
+     * as on a 4K Max of 2021 with 1.1 GB free (code -4 in its log, 2026-11-03).
+     */
     static void checkRoom(Context context, Release release) throws Failure {
         File folder = mediaFolder(context);
         if (!folder.exists() && !folder.mkdirs()) throw new Failure(UpdateError.F114);
-        long free = new StatFs(folder.getPath()).getAvailableBytes();
-        if (free < release.size * ROOM_FACTOR) throw new Failure(UpdateError.F106);
+        long free;
+        try {
+            free = context.getSystemService(StorageManager.class).getAllocatableBytes(StorageManager.UUID_DEFAULT);
+        } catch (IOException e) {
+            free = new StatFs(folder.getPath()).getAvailableBytes();
+        }
+        // What an earlier try left behind is replaced, so it counts as free.
+        free += shared(context, APK).length() + previous(context).length();
+        long needed = release.size * COPIES + release.size / EXTRA_PART;
+        if (free < needed) throw new NoRoom(needed, free);
     }
 
     static void checkIdle(Context context) throws Failure {

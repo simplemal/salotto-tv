@@ -17,6 +17,7 @@
     <string name="main_move_hint">Déplacez avec les flèches, puis appuyez sur OK</string>
     <string name="main_footer">Salotto, v. %1$s - crédits</string>
     <string name="main_all_apps">Toutes les applis</string>
+    <string name="main_loading_home">Chargement de l’accueil</string>
     <string name="main_move">Déplacer</string>
 
     <string name="apps_add_hint">Maintenez OK pour l’ajouter à l’Accueil</string>
@@ -90,6 +91,8 @@
     <string name="about_others_text">AirPlay Server reçoit depuis iPhone, iPad et Mac. Aurora Store installe des applis Android, même sans compte.</string>
     <string name="about_only">Uniquement dans Salotto.</string>
     <string name="about_only_text">Fonds d’écran illustrés ou photographiques qui suivent la météo et l’heure de votre ville. Centre de contrôle sur n’importe quelle appli, en maintenant Menu : Wi-Fi, Bluetooth, minuteur, luminosité et filtre lumière bleue. Gestionnaire de tâches en maintenant Retour. Une page avec les normes audio et vidéo du Stick et de la TV. Dialogues plus clairs et volume uniforme à portée de main : ce sont des filtres de Fire OS, réunis en un seul endroit. Mises à jour signées et vérifiées avant l’installation.</string>
+    <string name="about_thanks">Remerciements</string>
+    <string name="about_thanks_text">À mon ami Lorenzo Salomone, pour l’idée de l’Accueil circulaire.</string>
     <string name="about_license">Licence</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto peut être utilisé, étudié, modifié et dérivé gratuitement à des fins non commerciales. Pour le vendre, il faut l’accord de l’auteur.</string>
     <string name="about_marks">Marques</string>
@@ -105,7 +108,6 @@
     <string name="about_not_included">Programmes non inclus</string>
     <string name="about_not_included_text">L’installation les télécharge depuis les projets d’origine, sans les modifier.</string>
     <string name="about_use_airplay">Reçoit depuis iPhone, iPad et Mac</string>
-    <string name="about_use_aurora">Installe des applis Android, même sans compte</string>
 
     <string name="device_name">Nom</string>
     <string name="device_model">Modèle</string>
@@ -239,6 +241,8 @@
     <string name="update_detail_back">Un problème est survenu : retour à la version précédente.</string>
     <string name="update_done">Mise à jour terminée</string>
     <string name="update_done_text">Vous avez maintenant Salotto %1$s.</string>
+    <string name="update_backdrops">Téléchargement des fonds depuis GitHub : %1$d %%</string>
+    <string name="update_backdrop_first">Préparation du fond…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Scannez-le avec votre téléphone pour en savoir plus</string>
     <string name="update_outcome_untouched">Salotto n’a pas été modifié</string>
@@ -278,5 +282,32 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Pour les désactiver à nouveau, il faut un ordinateur :\n1. Ouvrez Install Salotto.\n2. Choisissez ce téléviseur.\n3. Suivez les étapes proposées.</string>
     <string name="update_error_r304">Install Salotto est nécessaire sur un ordinateur</string>
+    <string name="update_room_title">Le Fire TV n’a pas assez d’espace pour la mise à jour</string>
+    <string name="update_room_numbers">Il faut %1$s et vous avez %2$s. Salotto n’a pas été modifié.</string>
+    <string name="update_room_choices">Vous pouvez libérer de l’espace en supprimant les apps que vous n’utilisez pas, puis réessayer, ou mettre Salotto à jour depuis l’ordinateur avec Installa Salotto : %1$s</string>
+    <string name="update_from_computer">Si le problème persiste, mettez Salotto à jour depuis l’ordinateur avec Installa Salotto : %1$s</string>
     <string name="update_back_computer">Pour revenir à la version précédente, ouvrez Install Salotto sur un ordinateur et choisissez « Revenir à la version précédente ».</string>
+    <string name="grid_upload">Envoyer</string>
+    <string name="grid_personal_empty">Aucune image pour l’instant. Appuyez sur Envoyer pour les envoyer depuis le téléphone.</string>
+    <string name="personal_photo">Photo %1$d</string>
+    <string name="grid_delete">Supprimer</string>
+    <string name="grid_delete_title">Supprimer %1$s ?</string>
+    <string name="grid_delete_text">La photo est retirée de cette TV. Impossible d’annuler.</string>
+    <string name="grid_delete_set">Supprimer toute la collection</string>
+    <string name="grid_delete_set_title">Supprimer toute la collection %1$s ?</string>
+    <string name="grid_delete_set_text">Toutes ses photos sont retirées de cette TV. Impossible d’annuler.</string>
+    <string name="grid_delete_set_do">Supprimer</string>
+    <string name="upload_title">Envoyer depuis le téléphone</string>
+    <string name="upload_text">Visez le code avec l’appareil photo du téléphone et choisissez une photo. Le téléphone doit être sur le même réseau que la TV.</string>
+    <string name="upload_no_network">La TV n’est connectée à aucun réseau : connectez-la et réessayez.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d image reçue</item>
+        <item quantity="other">%1$d images reçues</item>
+    </plurals>
+    <string name="upload_web_title">Choisissez une photo : elle apparaîtra dans Personnel, parmi les fonds de Salotto.</string>
+    <string name="upload_web_pick">Envoyer une image</string>
+    <string name="upload_web_sending">Envoi en cours…</string>
+    <string name="upload_web_sent">Envoyée. Vous pouvez en envoyer une autre.</string>
+    <string name="upload_web_failed">L’envoi a échoué. Réessayez.</string>
+    <string name="weather_today">Auj.</string>
 </resources>

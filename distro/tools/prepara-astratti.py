@@ -14,7 +14,8 @@ import numpy
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-ASSETS = ROOT / "home/app/src/main/assets"
+# The collections are published apart, on the release "sfondi": not inside the app.
+ASSETS = ROOT / "home/sfondi"
 SETS = {ROOT / "assets/background-abstract-illustrated": ASSETS / "astratti",
         ROOT / "assets/background-abstract-3d": ASSETS / "astratti-3d",
         ROOT / "assets/background-nox-city": ASSETS / "nox-city",

@@ -13,7 +13,7 @@ from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "assets/background-meteo-photos"
-TARGET = ROOT / "home/app/src/main/assets/meteo-foto"
+TARGET = ROOT / "home/sfondi/meteo-foto"
 SIZE = (1920, 1080)
 QUALITY = 78
 EXPECTED = 120

@@ -5,7 +5,7 @@
 -->
 <resources>
     <!-- Shared by the screens -->
-    <string name="grid_title" translatable="false">%1$s · %2$s · %3$s</string>
+    <string name="grid_picture" translatable="false">%1$s · %2$s</string>
     <string name="card_confirm">Conferma</string>
     <string name="card_cancel">Annulla</string>
     <string name="card_close">Chiudi</string>
@@ -26,6 +26,7 @@
     <!-- At the foot of the Home, shown in capitals. %1$s is the version -->
     <string name="main_footer">Salotto, ver %1$s - credits</string>
     <string name="main_all_apps">Tutte le app</string>
+    <string name="main_loading_home">Caricamento della Home</string>
     <string name="main_move">Sposta</string>
 
     <!-- All apps -->
@@ -125,6 +126,8 @@
     <!-- Salotto is the app here, not a room -->
     <string name="about_only">Solo in Salotto.</string>
     <string name="about_only_text">Sfondi illustrati o fotografici che seguono il meteo e l’ora della tua città. Centro di controllo su qualsiasi app, tenendo premuto Menu: Wi-Fi, Bluetooth, timer, luminosità e filtro luce blu. Task manager tenendo premuto Indietro. Una pagina con gli standard audio e video di Stick e TV. Dialoghi più chiari e volume uniforme a portata di mano: sono filtri di Fire OS, raccolti in un posto solo. Aggiornamenti firmati e controllati prima di installarli.</string>
+    <string name="about_thanks">Ringraziamenti</string>
+    <string name="about_thanks_text">All’amico Lorenzo Salomone, per l’idea della Home circolare.</string>
     <string name="about_license">Licenza</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto si può usare, studiare, modificare e derivare gratis per scopi non commerciali. Per venderlo serve il permesso dell’autore.</string>
     <string name="about_marks">Marchi</string>
@@ -141,7 +144,6 @@
     <string name="about_not_included">Programmi non inclusi</string>
     <string name="about_not_included_text">L’installazione li scarica dai progetti originali, senza modificarli.</string>
     <string name="about_use_airplay">Riceve da iPhone, iPad e Mac</string>
-    <string name="about_use_aurora">Installa app Android, anche senza account</string>
 
     <!-- What the device says about itself -->
     <string name="device_name">Nome</string>
@@ -309,6 +311,8 @@
     <string name="update_done">Aggiornamento completato</string>
     <!-- %1$s is a version -->
     <string name="update_done_text">Ora hai Salotto %1$s.</string>
+    <string name="update_backdrops">Scarico gli sfondi da GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">Preparo lo sfondo…</string>
     <!-- %1$s is the problem, %2$s its code, such as SAL-F101 -->
     <string name="update_problem_line">%1$s (%2$s)</string>
     <!-- Under a QR code: "it" is the code -->
@@ -352,5 +356,32 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Per rispegnerle serve un computer:\n1. Apri Installa Salotto.\n2. Scegli questa TV.\n3. Segui i passi che propone.</string>
     <string name="update_error_r304">Serve Installa Salotto sul computer</string>
+    <string name="update_room_title">La Fire TV non ha spazio sufficiente per l’aggiornamento</string>
+    <string name="update_room_numbers">Servono %1$s e ne hai %2$s. Salotto non è stata toccata.</string>
+    <string name="update_room_choices">Puoi liberare spazio togliendo le app che non usi, poi riprovare, oppure aggiornare Salotto dal computer con Installa Salotto: %1$s</string>
+    <string name="update_from_computer">Se il problema resta, aggiorna Salotto dal computer con Installa Salotto: %1$s</string>
     <string name="update_back_computer">Per tornare alla versione precedente apri Installa Salotto sul computer e scegli «Torna alla versione precedente».</string>
+    <string name="grid_upload">Carica</string>
+    <string name="grid_personal_empty">Ancora nessuna immagine. Premi Carica per inviarle dal telefono.</string>
+    <string name="personal_photo">Foto %1$d</string>
+    <string name="grid_delete">Elimina</string>
+    <string name="grid_delete_title">Eliminare %1$s?</string>
+    <string name="grid_delete_text">La foto viene tolta da questa TV. Non si può annullare.</string>
+    <string name="grid_delete_set">Cancella tutta la collezione</string>
+    <string name="grid_delete_set_title">Cancellare tutta la collezione %1$s?</string>
+    <string name="grid_delete_set_text">Tutte le sue foto vengono tolte da questa TV. Non si può annullare.</string>
+    <string name="grid_delete_set_do">Cancella</string>
+    <string name="upload_title">Carica dal telefono</string>
+    <string name="upload_text">Inquadra il codice con la fotocamera del telefono e scegli una foto. Il telefono deve essere sulla stessa rete della TV.</string>
+    <string name="upload_no_network">La TV non è collegata a una rete: collegala e riprova.</string>
+    <plurals name="upload_received">
+        <item quantity="one">%1$d immagine ricevuta</item>
+        <item quantity="other">%1$d immagini ricevute</item>
+    </plurals>
+    <string name="upload_web_title">Scegli una foto: apparirà in Personale, tra gli sfondi di Salotto.</string>
+    <string name="upload_web_pick">Carica immagine</string>
+    <string name="upload_web_sending">Invio in corso…</string>
+    <string name="upload_web_sent">Inviata. Puoi mandarne un’altra.</string>
+    <string name="upload_web_failed">Non è stato possibile inviarla. Riprova.</string>
+    <string name="weather_today">Oggi</string>
 </resources>

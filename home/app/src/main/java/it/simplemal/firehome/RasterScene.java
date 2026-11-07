@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,7 +22,12 @@ final class RasterScene implements WeatherView.Scene {
 
     /** Null if the file cannot be read: the scene on screen stays. */
     static RasterScene load(Context context, String asset) {
-        try (InputStream input = context.getAssets().open(asset)) {
+        // A photo of Personale: any shape, so cropped to the screen like a chosen one.
+        if (asset.startsWith("/")) {
+            Bitmap photo = Look.load(new File(asset));
+            return photo == null ? null : new RasterScene(photo);
+        }
+        try (InputStream input = Packs.open(context, asset)) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inMutable = true;
             Bitmap picture = BitmapFactory.decodeStream(input, null, options);

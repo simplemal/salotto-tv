@@ -5,21 +5,20 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 
 /**
- * The picture made dimmer, and its white warmer. Dimming is a tinted window over everything, drawn
- * once: TaskService owns it. A window can only add colour, which turns blacks amber, so warmth is
- * the screen's own colour matrix: Fire OS has no night display on this Stick, only the shell may
- * set the matrix, and it lasts until the Stick restarts. This class says how much.
+ * The picture made dimmer, and its white warmer: one tinted window over everything, drawn once, that
+ * TaskService owns. A window can only add colour, so the warmth is a faint brown that the blacks get
+ * too, kept faint for that: Fire OS 8 refuses the screen's colour matrix even to the shell, and has
+ * no night display. This class says how much.
  */
 final class Veil {
     private static final String FILE = "veil";
     private static final String DIM = "dim";
     private static final String WARM = "warm";
     private static final float[] DIM_ALPHA = {0, 0.25f, 0.45f};
-    private static final int WARM_LEVELS = 2;
-    private static final String COLOR_MATRIX = "service call SurfaceFlinger 1015 i32 ";
-    /** Red, green and blue scaled by what takes a D65 white to D55: black stays black. */
-    static final String WARM_ON = COLOR_MATRIX + "1 f 1 f 0 f 0 f 0 f 0 f 0.952 f 0 f 0 f 0 f 0 f 0.879 f 0 f 0 f 0 f 0 f 1";
-    static final String WARM_OFF = COLOR_MATRIX + "0";
+    /** Chosen by eye on the TV: at 5% the blacks hardly move. */
+    private static final float[] WARM_ALPHA = {0, 0.05f};
+    private static final int AMBER_RED = 80;
+    private static final int AMBER_GREEN = 40;
     private static final int OPAQUE = 255;
 
     private Veil() {}
@@ -38,14 +37,17 @@ final class Veil {
     }
 
     static void nextDim(Context context) { next(context, DIM, DIM_ALPHA.length); }
-    static void nextWarm(Context context) { next(context, WARM, WARM_LEVELS); }
+    static void nextWarm(Context context) { next(context, WARM, WARM_ALPHA.length); }
     static int dim(Context context) { return level(context, DIM, DIM_ALPHA.length); }
-    static int warm(Context context) { return level(context, WARM, WARM_LEVELS); }
+    static int warm(Context context) { return level(context, WARM, WARM_ALPHA.length); }
 
-    /** What `service call` prints when the matrix was taken. */
-    static boolean accepted(String reply) { return reply != null && reply.contains("Parcel") && !reply.contains("Error"); }
-
+    /** The brown under the black, as one colour: what the two windows would make one over the other. */
     static int color(Context context) {
-        return Color.argb(Math.round(DIM_ALPHA[dim(context)] * OPAQUE), 0, 0, 0);
+        float dim = DIM_ALPHA[dim(context)];
+        float warm = WARM_ALPHA[warm(context)];
+        float alpha = 1 - (1 - dim) * (1 - warm);
+        if (alpha == 0) return Color.TRANSPARENT;
+        float amber = (1 - dim) * warm / alpha;
+        return Color.argb(Math.round(alpha * OPAQUE), Math.round(amber * AMBER_RED), Math.round(amber * AMBER_GREEN), 0);
     }
 }

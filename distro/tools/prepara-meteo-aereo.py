@@ -13,7 +13,7 @@ import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "assets/background-meteo-aereal"
-TARGET = ROOT / "home/app/src/main/assets/meteo-aereo"
+TARGET = ROOT / "home/sfondi/meteo-aereo"
 WIDTH, HEIGHT = 1920, 1080
 QUALITY = 74
 EXPECTED = 120

@@ -3,7 +3,6 @@ package it.simplemal.firehome;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.drawable.Drawable;
@@ -21,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +41,15 @@ public final class TasksActivity extends CardActivity {
     /** The backdrop as this page shows it, kept until it changes: working it out takes a moment. */
     private static String veiledName;
     private static Bitmap veiled;
-    private static final int BUTTON_SIZE = 32;
+    /** The round button, shared with the trash of Personale. */
+    static final int BUTTON_SIZE = 32;
     static final String CLOSE = "✕";
     static final int CLOSE_SP = 13;
     private static final int BUTTON_GAP = 56;
-    private static final int BUTTON_RING = 2;
+    static final int BUTTON_RING = 2;
     /** The grey the thin cross looks: over a dark picture the darker fill alone cannot be seen. */
-    private static final int BUTTON_EDGE = Color.rgb(190, 194, 200);
+    static final int BUTTON_EDGE = Color.rgb(190, 194, 200);
+    static final int BUTTON_REST = Color.rgb(84, 88, 96);
     private static final int ROW_DROP = 48;
     private static final float OTHER_SCALE = 0.86f;
     private static final float OTHER_ALPHA = 0.5f;
@@ -59,7 +59,6 @@ public final class TasksActivity extends CardActivity {
     /** What one card shows, read away from the main thread. */
     private static final class Slide {
         HomeApps.App app;
-        Bitmap frame;
         Art art;
     }
 
@@ -219,8 +218,9 @@ public final class TasksActivity extends CardActivity {
                 for (HomeApps.App app : RunningApps.list(this)) {
                     Slide slide = new Slide();
                     slide.app = app;
-                    slide.frame = picture(app.pkg);
-                    if (slide.frame == null) slide.art = art(app.pkg);
+                    // Only the app's own artwork, as on the Home: the user's decision of 2026-11-02. A picture of
+                    // the screen could even be another app's, or the Home's, kept under this name.
+                    slide.art = art(app.pkg);
                     slides.add(slide);
                 }
             }
@@ -277,20 +277,15 @@ public final class TasksActivity extends CardActivity {
     private View card(Slide slide, int position) {
         ImageView image = new ImageView(this);
         image.setBackgroundColor(Color.rgb(28, 30, 36));
-        if (slide.frame != null) {
+        Art art = slide.art;
+        image.setImageDrawable(art.image);
+        if (art.back != null) image.setBackground(art.back);
+        if (art.look == BANNER) {
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            image.setImageBitmap(slide.frame);
         } else {
-            Art art = slide.art;
-            image.setImageDrawable(art.image);
-            if (art.back != null) image.setBackground(art.back);
-            if (art.look == BANNER) {
-                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            } else {
-                int inset = art.back != null ? 0 : dp(ART_INSET);
-                image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                image.setPadding(inset, inset, inset, inset);
-            }
+            int inset = art.back != null ? 0 : dp(ART_INSET);
+            image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            image.setPadding(inset, inset, inset, inset);
         }
         image.setClipToOutline(true);
         image.setOutlineProvider(new ViewOutlineProvider() {
@@ -308,11 +303,6 @@ public final class TasksActivity extends CardActivity {
         return image;
     }
 
-    private Bitmap picture(String pkg) {
-        File file = RunningApps.picture(this, pkg);
-        Bitmap frame = file.isFile() ? BitmapFactory.decodeFile(file.getPath()) : null;
-        return frame == null || RunningApps.blank(frame) ? null : frame;
-    }
 
     private void select(int position) {
         index = position;
@@ -352,7 +342,7 @@ public final class TasksActivity extends CardActivity {
             View card = cards.get(index);
             card.setForeground(new LayerDrawable(new Drawable[]{(Drawable) card.getTag(), edge()}));
         }
-        buttonFill.setColor(onButton ? Color.WHITE : Color.rgb(84, 88, 96));
+        buttonFill.setColor(onButton ? Color.WHITE : BUTTON_REST);
         buttonFill.setStroke(dp(BUTTON_RING), onButton ? Color.WHITE : BUTTON_EDGE);
         button.setTextColor(onButton ? Fire.INK : Color.WHITE);
         // While Fire OS's page gets ready a wheel takes this place: no X to press too soon.

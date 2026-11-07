@@ -23,6 +23,15 @@ final class WeatherView extends View {
         void release();
     }
 
+    /**
+     * A change made in one step: the old scene stays until the new one is ready elsewhere too, for
+     * example blurred, and then `place` swaps it at once. `paint` draws the new one settled, on any
+     * canvas; it is null when the scene could not be loaded, and `place` then does nothing.
+     */
+    interface Swap {
+        void ready(Runnable place, Consumer<Canvas> paint);
+    }
+
     private static final double FADE_S = 2.5;
     private static final float SHADE_FROM = 0.30f;
     private static final float SHADE_FULL = 0.72f;
@@ -32,6 +41,8 @@ final class WeatherView extends View {
 
     /** A bright sky would swallow the white text and the dock at the bottom of the Home. */
     private final Paint shade = new Paint();
+    /** The height the shade's gradient was made for: a scene can be painted before this view has any size. */
+    private int shadeHeight;
     /** Still, the scene is one texture: every frame of a scroll would otherwise draw all its layers. */
     private final Runnable flatten = () -> setLayerType(LAYER_TYPE_HARDWARE, null);
     private Scene scene;
@@ -42,6 +53,8 @@ final class WeatherView extends View {
     private double enteredAt = -WeatherScene.ENTRY_S;
     private double fadeStart;
     private float scroll;
+    /** Hidden behind something opaque, the blur of the wheel: nothing to draw or move. */
+    private boolean covered;
     private Runnable onShown;
     private Consumer<Boolean> onFade;
 
@@ -89,8 +102,18 @@ final class WeatherView extends View {
         if (gone != null) gone.release();
     }
 
-    /** A file of the illustrations, or the name of a scene to draw. */
-    void show(String name) {
+    void setCovered(boolean value) {
+        if (covered == value) return;
+        covered = value;
+        unflatten();
+        invalidate();
+    }
+
+    /** A file of the illustrations, or the name of a scene to draw, fading over the one before. */
+    void show(String name) { show(name, null); }
+
+    /** With a swap, the new scene replaces the old one in one step, when the swap says. True when a scene is on its way. */
+    boolean show(String name, Swap swap) {
         if (name == null) {
             wanted = null;
             release(scene);
@@ -99,22 +122,79 @@ final class WeatherView extends View {
             previous = null;
             unflatten();
             setVisibility(GONE);
-            return;
+            return false;
         }
-        if (name.equals(wanted)) return;
+        if (name.equals(wanted)) return false;
         wanted = name;
         Context context = getContext().getApplicationContext();
         DisplayMetrics screen = getResources().getDisplayMetrics();
         Background.draw(() -> {
-            Scene loaded = name.endsWith(Weather.PICTURE_FILE) ? RasterScene.load(context, name)
+            Scene loaded = Look.picture(name) ? RasterScene.load(context, name)
                 : WeatherScene.load(context, name, screen.widthPixels, screen.heightPixels);
-            post(() -> arrive(loaded, name));
+            post(() -> {
+                if (swap != null) swapIn(loaded, name, swap);
+                else arrive(loaded, name);
+            });
         });
+        return true;
+    }
+
+    private void swapIn(Scene loaded, String name, Swap swap) {
+        if (loaded == null) {
+            if (name.equals(wanted)) wanted = null;
+            swap.ready(() -> { }, null);
+            return;
+        }
+        boolean[] placed = {false};
+        swap.ready(() -> {
+            if (placed[0]) return;
+            placed[0] = true;
+            if (!name.equals(wanted) || scene == loaded) {
+                if (scene != loaded) loaded.release();
+                return;
+            }
+            release(previous);
+            release(scene);
+            previous = null;
+            scene = loaded;
+            double time = now();
+            fadeStart = time - FADE_S;
+            enteredAt = time;
+            unflatten();
+            setVisibility(VISIBLE);
+            invalidate();
+            if (onShown != null) onShown.run();
+        }, canvas -> paint(canvas, loaded));
+    }
+
+    /** The scene as it rests after its entrance, with the shade: for a blurred copy of what is behind the Home. */
+    void paintSettled(Canvas canvas) {
+        if (scene != null && getVisibility() == VISIBLE) paint(canvas, scene);
+    }
+
+    private void paint(Canvas canvas, Scene which) {
+        which.draw(canvas, WeatherScene.ENTRY_S, scroll, 1);
+        drawShade(canvas);
+    }
+
+    /** Without its gradient the shade would be plain black over the lower two thirds. */
+    private void drawShade(Canvas canvas) {
+        int height = canvas.getHeight();
+        if (height != shadeHeight) {
+            shadeHeight = height;
+            shade.setShader(new LinearGradient(0, height * SHADE_FROM, 0, height * SHADE_FULL, Color.TRANSPARENT,
+                Color.argb(SHADE_ALPHA, 0, 0, 0), Shader.TileMode.CLAMP));
+        }
+        canvas.drawRect(0, height * SHADE_FROM, canvas.getWidth(), height, shade);
     }
 
     /** The first scene comes in from outside; a change of weather simply fades over the old one. */
     private void arrive(Scene loaded, String name) {
-        if (loaded == null) return;
+        if (loaded == null) {
+            // Not here yet, while its collection is still coming: the next look tries it again.
+            if (name.equals(wanted)) wanted = null;
+            return;
+        }
         if (!name.equals(wanted)) {
             loaded.release();
             return;
@@ -134,14 +214,9 @@ final class WeatherView extends View {
         if (onShown != null) onShown.run();
     }
 
-    @Override protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
-        shade.setShader(new LinearGradient(0, height * SHADE_FROM, 0, height * SHADE_FULL, Color.TRANSPARENT,
-            Color.argb(SHADE_ALPHA, 0, 0, 0), Shader.TileMode.CLAMP));
-    }
-
     @Override protected void onDraw(Canvas canvas) {
         Scene current = scene;
-        if (current == null) return;
+        if (current == null || covered) return;
         double time = now();
         double entered = time - enteredAt;
         float alpha = 1;
@@ -160,7 +235,7 @@ final class WeatherView extends View {
         }
         if (fading) alpha = (float) fade;
         current.draw(canvas, entered, scroll, alpha);
-        canvas.drawRect(0, getHeight() * SHADE_FROM, getWidth(), getHeight(), shade);
+        drawShade(canvas);
         // Every frame the screen can show, for a short while: smooth, and then nothing at all.
         boolean moving = fading || previous != null || current.moves() && entered < WeatherScene.ENTRY_S;
         if (running && moving) {

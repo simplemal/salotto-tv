@@ -92,6 +92,8 @@
             android:screenOrientation="landscape" />
         <activity android:name=".PictureGridActivity" android:exported="false"
             android:screenOrientation="landscape" />
+        <activity android:name=".UploadActivity" android:exported="false"
+            android:screenOrientation="landscape" />
         <activity android:name=".TasksActivity" android:exported="true"
             android:screenOrientation="landscape" android:launchMode="singleInstance"
             android:excludeFromRecents="true" android:taskAffinity=""

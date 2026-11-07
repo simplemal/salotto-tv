@@ -85,14 +85,26 @@ final class Blur {
     }
 
     private static int[] blurred(Bitmap picture, int radius) {
-        int[] pixels = new int[WIDTH * HEIGHT];
-        int[] turned = new int[WIDTH * HEIGHT];
-        Bitmap.createScaledBitmap(picture, WIDTH, HEIGHT, true).getPixels(pixels, 0, WIDTH, 0, 0, WIDTH, HEIGHT);
+        return blurred(picture, WIDTH, HEIGHT, radius);
+    }
+
+    private static int[] blurred(Bitmap picture, int width, int height, int radius) {
+        int[] pixels = new int[width * height];
+        int[] turned = new int[width * height];
+        Bitmap.createScaledBitmap(picture, width, height, true).getPixels(pixels, 0, width, 0, 0, width, height);
         for (int pass = 0; pass < PASSES; pass++) {
-            average(pixels, turned, WIDTH, HEIGHT, radius);
-            average(turned, pixels, HEIGHT, WIDTH, radius);
+            average(pixels, turned, width, height, radius);
+            average(turned, pixels, height, width, radius);
         }
         return pixels;
+    }
+
+    /**
+     * A light blur, at `width` by `height`: behind the wheel the picture only has to seem a step
+     * back from the circles. At a third of the screen a radius of 2 is a few pixels of the TV.
+     */
+    static Bitmap light(Bitmap picture, int width, int height, int radius) {
+        return Bitmap.createBitmap(blurred(picture, width, height, radius), width, height, Bitmap.Config.ARGB_8888);
     }
 
     /** Along each row of `from`, written to `to` turned on its side: the next call does the columns. */

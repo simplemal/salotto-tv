@@ -34,6 +34,15 @@
     <string name="first_does_settings">Réglages</string>
     <string name="first_start">Commencer</string>
     <string name="first_backdrop_title">Choisissez un fond d’écran</string>
+    <string name="first_packs_question">Voulez-vous télécharger maintenant les collections de fonds d’écran choisies ?</string>
+    <string name="first_packs_size">%1$s au total, comptez quelques minutes.</string>
+    <string name="first_packs_now">Télécharger maintenant</string>
+    <string name="first_packs_later">Plus tard</string>
+    <string name="first_packs_title">Téléchargement des fonds d’écran</string>
+    <string name="first_packs_room">Il n’y a pas assez d’espace sur la TV pour les collections d’images restantes : il faut %1$s, il reste %2$s. Elles n’arriveront pas tant que vous ne libérez pas d’espace.</string>
+    <string name="first_packs_network">La connexion Internet a été interrompue. Les collections manquantes arriveront d’elles-mêmes à son retour.</string>
+    <string name="first_packs_server">Le serveur des collections ne répond pas. Salotto réessaiera plus tard de lui-même.</string>
+    <string name="first_packs_damaged">Une collection est arrivée endommagée et a été écartée. Salotto réessaiera plus tard de lui-même.</string>
     <string name="first_preview">Aperçu</string>
     <string name="grid_position">%1$d sur %2$d</string>
     <string name="first_backdrop_pictures">Météo illustrée</string>

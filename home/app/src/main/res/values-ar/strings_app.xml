@@ -17,6 +17,7 @@
     <string name="main_move_hint">حرّك بالأسهم ثم اضغط OK</string>
     <string name="main_footer">Salotto، الإصدار %1$s - الاعتمادات</string>
     <string name="main_all_apps">كل التطبيقات</string>
+    <string name="main_loading_home">جارٍ تحميل الشاشة الرئيسية</string>
     <string name="main_move">نقل</string>
 
     <string name="apps_add_hint">اضغط مطولًا على OK لإضافته إلى الرئيسية</string>
@@ -102,6 +103,8 @@
     <string name="about_others_text">AirPlay Server يستقبل من iPhone وiPad وMac. Aurora Store يثبّت تطبيقات Android، حتى بلا حساب.</string>
     <string name="about_only">في Salotto فقط.</string>
     <string name="about_only_text">خلفيات مرسومة أو فوتوغرافية تتبع طقس مدينتك ووقتها. مركز التحكم فوق أي تطبيق، بالضغط مطولًا على القائمة: Wi-Fi وBluetooth والمؤقت والسطوع وفلتر الضوء الأزرق. مدير المهام بالضغط مطولًا على رجوع. صفحة بمعايير الصوت والفيديو في Stick والتلفزيون. حوارات أوضح ومستوى صوت موحّد في متناول يدك: هي مرشّحات Fire OS مجمّعة في مكان واحد. تحديثات موقّعة ومفحوصة قبل تثبيتها.</string>
+    <string name="about_thanks">شكر</string>
+    <string name="about_thanks_text">إلى صديقي لورينزو سالومونه، على فكرة الشاشة الرئيسية الدائرية.</string>
     <string name="about_license">الترخيص</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. يمكن استخدام Salotto ودراسته وتعديله والاشتقاق منه مجانًا لأغراض غير تجارية. أما بيعه فيحتاج إلى إذن المؤلف.</string>
     <string name="about_marks">العلامات التجارية</string>
@@ -117,7 +120,6 @@
     <string name="about_not_included">برامج غير مضمّنة</string>
     <string name="about_not_included_text">يحمّلها التثبيت من مشاريعها الأصلية، دون تعديل.</string>
     <string name="about_use_airplay">يستقبل من iPhone وiPad وMac</string>
-    <string name="about_use_aurora">يثبّت تطبيقات Android، حتى بلا حساب</string>
 
     <string name="device_name">الاسم</string>
     <string name="device_model">الطراز</string>
@@ -255,6 +257,8 @@
     <string name="update_detail_back">حدث خطأ ما: جارٍ العودة إلى الإصدار السابق.</string>
     <string name="update_done">اكتمل التحديث</string>
     <string name="update_done_text">لديك الآن Salotto %1$s.</string>
+    <string name="update_backdrops">جارٍ تنزيل الخلفيات من GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">جارٍ تجهيز الخلفية…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">امسحه بالهاتف لمعرفة المزيد</string>
     <string name="update_outcome_untouched">لم يتغير Salotto</string>
@@ -294,5 +298,36 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">لإيقافها مجددًا يلزم حاسوب:\n1. افتح Install Salotto.\n2. اختر هذا التلفاز.\n3. اتبع الخطوات المعروضة.</string>
     <string name="update_error_r304">يلزم Install Salotto على حاسوب</string>
+    <string name="update_room_title">لا توجد مساحة كافية على Fire TV للتحديث</string>
+    <string name="update_room_numbers">المطلوب %1$s والمتاح %2$s. لم يتم تغيير Salotto.</string>
+    <string name="update_room_choices">يمكنك تحرير مساحة بإزالة التطبيقات التي لا تستخدمها ثم المحاولة مجددًا، أو تحديث Salotto من الكمبيوتر باستخدام Installa Salotto: %1$s</string>
+    <string name="update_from_computer">إذا استمرت المشكلة، حدّث Salotto من الكمبيوتر باستخدام Installa Salotto: %1$s</string>
     <string name="update_back_computer">للرجوع إلى الإصدار السابق، افتح Install Salotto على حاسوب واختر «الرجوع إلى الإصدار السابق».</string>
+    <string name="grid_upload">تحميل</string>
+    <string name="grid_personal_empty">لا توجد صور بعد. اضغط «تحميل» لإرسالها من الهاتف.</string>
+    <string name="personal_photo">صورة %1$d</string>
+    <string name="grid_delete">حذف</string>
+    <string name="grid_delete_title">حذف «%1$s»؟</string>
+    <string name="grid_delete_text">ستُزال الصورة من هذا التلفزيون. لا يمكن التراجع.</string>
+    <string name="grid_delete_set">حذف المجموعة كلها</string>
+    <string name="grid_delete_set_title">هل تريد حذف مجموعة %1$s كلها؟</string>
+    <string name="grid_delete_set_text">ستُزال كل صورها من هذا التلفزيون. لا يمكن التراجع.</string>
+    <string name="grid_delete_set_do">حذف</string>
+    <string name="upload_title">التحميل من الهاتف</string>
+    <string name="upload_text">وجّه كاميرا الهاتف نحو الرمز واختر صورة. يجب أن يكون الهاتف على شبكة التلفزيون نفسها.</string>
+    <string name="upload_no_network">التلفزيون غير متصل بشبكة: اتصل بها ثم حاول مجددًا.</string>
+    <plurals name="upload_received">
+        <item quantity="zero">الصور المستلمة: %1$d</item>
+        <item quantity="one">الصور المستلمة: %1$d</item>
+        <item quantity="two">الصور المستلمة: %1$d</item>
+        <item quantity="few">الصور المستلمة: %1$d</item>
+        <item quantity="many">الصور المستلمة: %1$d</item>
+        <item quantity="other">الصور المستلمة: %1$d</item>
+    </plurals>
+    <string name="upload_web_title">اختر صورة: ستظهر في «شخصي» ضمن خلفيات Salotto.</string>
+    <string name="upload_web_pick">تحميل صورة</string>
+    <string name="upload_web_sending">جارٍ الإرسال…</string>
+    <string name="upload_web_sent">تم الإرسال. يمكنك إرسال صورة أخرى.</string>
+    <string name="upload_web_failed">تعذّر الإرسال. حاول مجددًا.</string>
+    <string name="weather_today">اليوم</string>
 </resources>

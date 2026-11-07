@@ -17,6 +17,7 @@
     <string name="main_move_hint">Перемещайте стрелками, затем нажмите OK</string>
     <string name="main_footer">Salotto, вер. %1$s - авторы</string>
     <string name="main_all_apps">Все приложения</string>
+    <string name="main_loading_home">Загрузка главного экрана</string>
     <string name="main_move">Переместить</string>
 
     <string name="apps_add_hint">Удерживайте OK, чтобы добавить на главный экран</string>
@@ -96,6 +97,8 @@
     <string name="about_others_text">AirPlay Server принимает видео с iPhone, iPad и Mac. Aurora Store устанавливает приложения Android, даже без аккаунта.</string>
     <string name="about_only">Только в Salotto.</string>
     <string name="about_only_text">Иллюстрированные или фотографические фоны, которые следуют за погодой и временем вашего города. Центр управления поверх любого приложения при удержании «Меню»: Wi-Fi, Bluetooth, таймер, яркость и фильтр синего света. Диспетчер задач при удержании «Назад». Страница со стандартами звука и видео Stick и телевизора. Чёткая речь и ровная громкость под рукой: это фильтры Fire OS, собранные в одном месте. Подписанные обновления, которые проверяются перед установкой.</string>
+    <string name="about_thanks">Благодарности</string>
+    <string name="about_thanks_text">Моему другу Лоренцо Саломоне — за идею круглого главного экрана.</string>
     <string name="about_license">Лицензия</string>
     <string name="about_license_text">PolyForm Noncommercial 1.0.0. Salotto можно бесплатно использовать, изучать, изменять и делать на его основе производные работы в некоммерческих целях. Для продажи нужно разрешение автора.</string>
     <string name="about_marks">Товарные знаки</string>
@@ -111,7 +114,6 @@
     <string name="about_not_included">Программы не входят в комплект</string>
     <string name="about_not_included_text">При установке они загружаются из оригинальных проектов без изменений.</string>
     <string name="about_use_airplay">Принимает видео с iPhone, iPad и Mac</string>
-    <string name="about_use_aurora">Устанавливает приложения Android, даже без аккаунта</string>
 
     <string name="device_name">Название</string>
     <string name="device_model">Модель</string>
@@ -247,6 +249,8 @@
     <string name="update_detail_back">Что-то пошло не так: возвращаюсь к предыдущей версии.</string>
     <string name="update_done">Обновление завершено</string>
     <string name="update_done_text">Теперь у вас Salotto %1$s.</string>
+    <string name="update_backdrops">Загрузка фонов с GitHub: %1$d%%</string>
+    <string name="update_backdrop_first">Готовлю фон…</string>
     <string name="update_problem_line">%1$s (%2$s)</string>
     <string name="update_scan_help">Наведите на него камеру телефона, чтобы узнать больше</string>
     <string name="update_outcome_untouched">Salotto не изменялось</string>
@@ -286,5 +290,34 @@
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Чтобы снова их отключить, нужен компьютер:\n1. Откройте Install Salotto.\n2. Выберите этот телевизор.\n3. Следуйте предложенным шагам.</string>
     <string name="update_error_r304">Нужен Install Salotto на компьютере</string>
+    <string name="update_room_title">На Fire TV недостаточно места для обновления</string>
+    <string name="update_room_numbers">Нужно %1$s, свободно %2$s. Salotto не изменён.</string>
+    <string name="update_room_choices">Освободите место, удалив ненужные приложения, и повторите попытку или обновите Salotto с компьютера через Installa Salotto: %1$s</string>
+    <string name="update_from_computer">Если проблема не исчезнет, обновите Salotto с компьютера через Installa Salotto: %1$s</string>
     <string name="update_back_computer">Чтобы вернуться к предыдущей версии, откройте Install Salotto на компьютере и выберите «Вернуться к предыдущей версии».</string>
+    <string name="grid_upload">Загрузить</string>
+    <string name="grid_personal_empty">Пока нет изображений. Нажмите «Загрузить», чтобы отправить их с телефона.</string>
+    <string name="personal_photo">Фото %1$d</string>
+    <string name="grid_delete">Удалить</string>
+    <string name="grid_delete_title">Удалить «%1$s»?</string>
+    <string name="grid_delete_text">Фото будет удалено с этого телевизора. Отменить нельзя.</string>
+    <string name="grid_delete_set">Удалить всю коллекцию</string>
+    <string name="grid_delete_set_title">Удалить всю коллекцию %1$s?</string>
+    <string name="grid_delete_set_text">Все её фото будут удалены с этого телевизора. Отменить нельзя.</string>
+    <string name="grid_delete_set_do">Удалить</string>
+    <string name="upload_title">Загрузить с телефона</string>
+    <string name="upload_text">Наведите камеру телефона на код и выберите фото. Телефон должен быть в той же сети, что и телевизор.</string>
+    <string name="upload_no_network">Телевизор не подключён к сети: подключите его и повторите попытку.</string>
+    <plurals name="upload_received">
+        <item quantity="one">Получено изображений: %1$d</item>
+        <item quantity="few">Получено изображений: %1$d</item>
+        <item quantity="many">Получено изображений: %1$d</item>
+        <item quantity="other">Получено изображений: %1$d</item>
+    </plurals>
+    <string name="upload_web_title">Выберите фото: оно появится в разделе «Личные» среди фонов Salotto.</string>
+    <string name="upload_web_pick">Загрузить изображение</string>
+    <string name="upload_web_sending">Отправка…</string>
+    <string name="upload_web_sent">Отправлено. Можно отправить ещё одно.</string>
+    <string name="upload_web_failed">Не удалось отправить. Повторите попытку.</string>
+    <string name="weather_today">Сегодня</string>
 </resources>

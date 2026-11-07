@@ -8,9 +8,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -43,6 +45,9 @@ public final class UpdateActivity extends CardActivity {
     /** Versions up to 0.12.20 install the next one from a script, which waits for its word. */
     private static final String OLD_SCRIPT = "starting";
     private static final long HOME_AFTER_MS = 2500;
+    /** A download that has not started by then will not: the network, or GitHub. */
+    /** The first picture is small: should it not come, the Home goes on with something else. */
+    private static final long FIRST_LONGEST_MS = 30000;
     /** Fixed, so these pages stay readable whatever the Home wallpaper is. */
     static final int BACKGROUND = Color.rgb(24, 26, 32);
     private static final int BOX = Color.rgb(14, 15, 19);
@@ -52,6 +57,7 @@ public final class UpdateActivity extends CardActivity {
     private static final int CHANGE_SP = 12;
     private static final int ACTION_SP = 15;
     private static final int ERROR_SP = 15;
+    private static final int ROOM_WIDTH = 640;
     private static final int BAR_HEIGHT = 5;
     private static final long PAGE_DRAWN_MS = 100;
 
@@ -90,6 +96,12 @@ public final class UpdateActivity extends CardActivity {
         setContentView(page);
         if (getIntent().getBooleanExtra(EXTRA_AFTER, false)) resume();
         else look();
+    }
+
+    /** In front again, after the new version came back or Android refused: the cover can go. */
+    @Override protected void onResume() {
+        super.onResume();
+        Cover.close(this);
     }
 
     private TextView text(String value, int size, boolean strong) {
@@ -157,7 +169,7 @@ public final class UpdateActivity extends CardActivity {
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
         list.setPadding(dp(20), dp(2), dp(15), dp(2));
-        for (String change : found.changes) {
+        for (String change : found.changes(this)) {
             TextView item = label("•  " + change, CHANGE_SP);
             item.setPadding(0, dp(3), 0, dp(3));
             list.addView(item);
@@ -249,6 +261,8 @@ public final class UpdateActivity extends CardActivity {
         Background.run(() -> {
             try {
                 job.run();
+            } catch (Updater.NoRoom room) {
+                main.post(() -> showNoRoom(room));
             } catch (Updater.Failure failure) {
                 main.post(() -> showError(failure.error));
             }
@@ -277,7 +291,8 @@ public final class UpdateActivity extends CardActivity {
             step(CHOICES, getString(R.string.update_detail_choices));
             saveChoices();
             step(COPY, getString(R.string.update_detail_copy));
-            Updater.keepCurrent(this);
+            // Android 9 goes back only from the computer: a copy there would only take room the install needs.
+            if (!Fire.ANDROID_9) Updater.keepCurrent(this);
             allowInstalling();
             Updater.recheck(apk, release);
             install(apk);
@@ -461,14 +476,50 @@ public final class UpdateActivity extends CardActivity {
         title.setText(getString(R.string.update_done));
         body.addView(text(getString(R.string.update_done_text, BuildVersion.name(this)), 19, false));
         forget();
-        main.postDelayed(this::home, HOME_AFTER_MS);
+        // The backdrops left the app: before the Home, only the picture it opens on comes, the user's
+        // design of 2026-11-04; for the weather, the one of the weather read just now. The collections
+        // follow from the Home, quietly.
+        String pack = Look.homePack(this);
+        // Only one this TV wants: a collection the user deleted never comes back.
+        if (pack != null && Packs.missing(this).contains(pack) && !Packs.partial(this, pack)) {
+            body.addView(text(getString(R.string.update_backdrop_first), 16, false));
+            main.postDelayed(this::home, FIRST_LONGEST_MS);
+            Background.run(() -> {
+                Packs.fetchFirst(this, pack);
+                main.post(this::home);
+            });
+        } else {
+            main.postDelayed(this::home, HOME_AFTER_MS);
+        }
     }
 
     private void forget() { Updater.clean(this); }
 
+    private boolean leaving;
+
     private void home() {
+        if (leaving) return;
+        leaving = true;
+        main.removeCallbacksAndMessages(null);
         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
+    }
+
+    /** Checked before anything is downloaded or changed: Salotto stays exactly as it is. */
+    private void showNoRoom(Updater.NoRoom room) {
+        TaskService.installEnded();
+        busy = false;
+        forget();
+        clear();
+        title.setText(getString(R.string.update_room_title));
+        TextView numbers = text(getString(R.string.update_room_numbers, Formatter.formatShortFileSize(this, room.needed),
+            Formatter.formatShortFileSize(this, Math.max(0, room.free))), ERROR_SP, false);
+        numbers.setPadding(0, 0, 0, dp(16));
+        body.addView(numbers);
+        body.addView(text(getString(R.string.update_room_choices, "github.com/" + Fire.UPDATES_REPO), ERROR_SP, false),
+            new LinearLayout.LayoutParams(dp(ROOM_WIDTH), -2));
+        boolean alone = getIntent().getBooleanExtra(EXTRA_AFTER, false);
+        actions(action(getString(R.string.card_close), alone ? this::home : this::finish));
     }
 
     private void showError(UpdateError error) {
@@ -491,6 +542,12 @@ public final class UpdateActivity extends CardActivity {
         TextView help = text(getString(R.string.update_scan_help), CHANGE_SP, false);
         help.setPadding(0, dp(12), 0, 0);
         body.addView(help);
+        // From the computer Salotto is installed another way, which gets past an update that keeps failing here.
+        if (error != UpdateError.R304) {
+            TextView computer = text(getString(R.string.update_from_computer, "github.com/" + Fire.UPDATES_REPO), CHANGE_SP, false);
+            computer.setPadding(0, dp(12), 0, 0);
+            body.addView(computer);
+        }
         // Reopened by the install script, this page has nothing of Salotto beneath it.
         boolean alone = getIntent().getBooleanExtra(EXTRA_AFTER, false);
         actions(action(getString(R.string.card_close), alone ? this::home : this::finish));

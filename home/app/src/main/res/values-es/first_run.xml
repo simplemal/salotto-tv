@@ -34,6 +34,15 @@
     <string name="first_does_settings">Ajustes</string>
     <string name="first_start">Empezar</string>
     <string name="first_backdrop_title">Elige un fondo</string>
+    <string name="first_packs_question">¿Quieres descargar ahora las colecciones de fondos que elegiste?</string>
+    <string name="first_packs_size">Son %1$s, tarda unos minutos.</string>
+    <string name="first_packs_now">Descargar ahora</string>
+    <string name="first_packs_later">Más tarde</string>
+    <string name="first_packs_title">Descargando los fondos</string>
+    <string name="first_packs_room">No hay espacio suficiente en la TV para las colecciones de imágenes restantes: necesitan %1$s y quedan %2$s. No llegarán hasta que liberes espacio.</string>
+    <string name="first_packs_network">Se cortó la conexión a Internet. Las colecciones que faltan llegarán solas cuando vuelva.</string>
+    <string name="first_packs_server">El servidor de las colecciones no responde. Salotto volverá a intentarlo solo más tarde.</string>
+    <string name="first_packs_damaged">Una colección llegó dañada y se descartó. Salotto volverá a intentarlo solo más tarde.</string>
     <string name="first_preview">Vista previa</string>
     <string name="grid_position">%1$d de %2$d</string>
     <string name="first_backdrop_pictures">Tiempo ilustrado</string>

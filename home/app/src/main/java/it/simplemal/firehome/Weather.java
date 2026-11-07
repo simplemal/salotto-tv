@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ final class Weather {
     private static final long RETRY_MS = 5 * Fire.MINUTE_MS;
     private static final int TIMEOUT_MS = 10000;
     private static final AtomicBoolean REFRESHING = new AtomicBoolean();
-    private static final Map<String, Properties> PICTURE_TABLES = new HashMap<>();
+    private static final Map<String, Properties> PICTURE_TABLES = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static volatile long failedAt;
 
@@ -122,6 +123,24 @@ final class Weather {
         return path;
     }
 
+    static boolean weatherPack(String pack) {
+        return (pack + "/").equals(PICTURES) || (pack + "/").equals(PHOTOS) || (pack + "/").equals(AERIAL);
+    }
+
+    static String tableOf(String pack) { return pack + "/" + PICTURE_TABLE; }
+
+    /**
+     * The picture of `pack` for this hour and this weather, read from its table alone: the one
+     * Salotto downloads before the rest of the collection, so the Home opens on it.
+     */
+    static String pictureIn(Context context, String pack) {
+        String folder = pack + "/";
+        SharedPreferences saved = prefs(context);
+        String key = active(context) && saved.contains("code") ? phase(saved) + "/" + saved.getInt("code", 0) : null;
+        String path = key == null ? null : file(context, folder, key);
+        return path != null ? path : byClock(context, folder);
+    }
+
     /** A weather with two pictures takes them in turn by the day, so it does not change at every look. */
     private static String file(Context context, String folder, String key) {
         String files = pictures(context, folder).getProperty(key);
@@ -158,11 +177,14 @@ final class Weather {
         return file(context, folder, phase + "/0");
     }
 
+    /** The table of a collection still coming, read by Salotto where it just put it, checked. */
+    static void knowTable(String folder, Properties table) { PICTURE_TABLES.put(folder, table); }
+
     static Properties pictures(Context context, String folder) {
         Properties known = PICTURE_TABLES.get(folder);
         if (known != null) return known;
         Properties table = new Properties();
-        try (InputStream input = context.getAssets().open(folder + PICTURE_TABLE)) {
+        try (InputStream input = Packs.open(context, folder + PICTURE_TABLE)) {
             table.load(input);
         } catch (IOException e) {
             return table;
@@ -251,6 +273,53 @@ final class Weather {
             description(context, code));
     }
 
+    /** One day of the forecast on the circular Home. */
+    static final class Day {
+        final String name;
+        final String symbol;
+        final int highest;
+        final int lowest;
+
+        Day(String name, String symbol, int highest, int lowest) {
+            this.name = name;
+            this.symbol = symbol;
+            this.highest = highest;
+            this.lowest = lowest;
+        }
+    }
+
+    /** Code, highest and lowest of each day, today first. */
+    private static String days(JSONObject daily) throws JSONException {
+        StringBuilder days = new StringBuilder();
+        JSONArray codes = daily.getJSONArray("weather_code");
+        for (int index = 0; index < codes.length(); index++) {
+            if (index > 0) days.append(';');
+            days.append(codes.getInt(index)).append(',')
+                .append(Math.round(daily.getJSONArray("temperature_2m_max").getDouble(index))).append(',')
+                .append(Math.round(daily.getJSONArray("temperature_2m_min").getDouble(index)));
+        }
+        return days.toString();
+    }
+
+    /** Today and the next days, or an empty list when there is nothing recent to show. */
+    static List<Day> days(Context context) {
+        List<Day> days = new ArrayList<>();
+        String saved = prefs(context).getString("days", null);
+        if (!recent(context) || saved == null) return days;
+        Calendar day = Calendar.getInstance();
+        SimpleDateFormat weekday = new SimpleDateFormat("EEE", Locale.getDefault());
+        for (String one : saved.split(";")) {
+            String[] parts = one.split(",");
+            if (parts.length != 3) return new ArrayList<>();
+            String name = days.isEmpty() ? context.getString(R.string.weather_today) : weekday.format(day.getTime());
+            name = name.replace(".", "");
+            name = name.substring(0, 1).toUpperCase(Locale.getDefault()) + name.substring(1);
+            days.add(new Day(name, symbol(Integer.parseInt(parts[0])), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])));
+            day.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return days;
+    }
+
     /** Blocking: call it away from the main thread. A failure keeps the last reading. */
     static void refresh(Context context) throws IOException, JSONException {
         if (!REFRESHING.compareAndSet(false, true)) return;
@@ -260,7 +329,7 @@ final class Weather {
             SharedPreferences saved = prefs(context);
             String url = "https://api.open-meteo.com/v1/forecast?latitude=" + saved.getString("latitude", "")
                 + "&longitude=" + saved.getString("longitude", "") + "&current=temperature_2m,weather_code,is_day"
-                + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=2"
+                + "&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=4"
                 + "&timezone=auto&timeformat=unixtime"
                 + (saved.getBoolean("fahrenheit", false) ? "&temperature_unit=fahrenheit" : "");
             JSONObject forecast = new JSONObject(get(url));
@@ -275,6 +344,7 @@ final class Weather {
                 .putInt("tomorrow_code", daily.getJSONArray("weather_code").getInt(1))
                 .putFloat("tomorrow_max", (float) daily.getJSONArray("temperature_2m_max").getDouble(1))
                 .putFloat("tomorrow_min", (float) daily.getJSONArray("temperature_2m_min").getDouble(1))
+                .putString("days", days(daily))
                 .putLong("updated", System.currentTimeMillis()).apply();
             failedAt = 0;
         } finally {
@@ -339,17 +409,6 @@ final class Weather {
         return context.getString(R.string.weather_thunderstorm);
     }
 
-    private static String symbol(int code) {
-        if (code == 0) return "☀️";
-        if (code == 1) return "🌤️";
-        if (code == 2) return "⛅";
-        if (code == 3) return "☁️";
-        if (code <= 48) return "🌫️";
-        if (code <= 57) return "🌦️";
-        if (code <= 67) return "🌧️";
-        if (code <= 77) return "❄️";
-        if (code <= 82) return "🌧️";
-        if (code <= 86) return "🌨️";
-        return "⛈️";
-    }
+    /** A character that WeatherIcon.in draws as the icon: every text holding one goes through it. */
+    private static String symbol(int code) { return WeatherIcon.of(code); }
 }

@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+
 
 /**
  * Takes the Home key from Fire OS. The key never reaches an app: Fire OS brings up its own Home, and
@@ -37,6 +39,12 @@ final class HomeCover {
     private static final long AMAZON_TRY_MS = 50;
     /** The Home just started needs this long to take over from Amazon's. */
     private static final long AMAZON_SETTLE_MS = Fire.ANDROID_9 ? 1500 : 600;
+    private static final long CLOSING_SETTLE_MS = 2000;
+    private static final long FADE_IN_MS = 220;
+    /** A frame or two after the fade, before the circle starts to close. */
+    private static final long FADE_SETTLE_MS = 50;
+    /** The circle waits for the Home; should nothing say it has come, it closes all the same after this. */
+    private static final long CLOSE_LIMIT_MS = 2500;
 
     /** The setting: a double press leaves Amazon's Home on screen. */
     static volatile boolean doubleHome;
@@ -49,10 +57,14 @@ final class HomeCover {
     private final AccessibilityService service;
     private final WindowManager windows;
     private final ImageView view;
+    /** The window: the picture, and over it, after an app from the wheel, its closing circle. */
+    private final FrameLayout frame;
     /** Asked for with a double press: it stays until a press or another app says otherwise. */
     private boolean leftOnAmazon;
     private final Runnable lookForAmazon = this::lookForAmazon;
     private int amazonTries;
+    /** Only the answer to the latest question counts. */
+    private int lastLook;
     private volatile long startedAt;
     private volatile long lastHeard;
     private boolean holding;
@@ -64,25 +76,143 @@ final class HomeCover {
         windows = service.getSystemService(WindowManager.class);
         view = new ImageView(service);
         view.setScaleType(ImageView.ScaleType.FIT_XY);
-        view.setVisibility(View.GONE);
-        windows.addView(view, new WindowManager.LayoutParams(
+        frame = new FrameLayout(service);
+        frame.addView(view, new FrameLayout.LayoutParams(-1, -1));
+        frame.setVisibility(View.GONE);
+        windows.addView(frame, new WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.OPAQUE));
+                | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+            PixelFormat.TRANSLUCENT));
     }
 
     static boolean ready() { return picture != null; }
 
     static Bitmap lastPicture() { return picture; }
 
+
     static void homeShown(Window window) { home = window; }
+
+    /** The app opened from the wheel: its circle, the colour of its background, and where it sits. */
+    private static final class Closing {
+        final Bitmap art;
+        final int background;
+        final float x;
+        final float y;
+        final float radius;
+
+        Closing(Bitmap art, int background, float x, float y, float radius) {
+            this.art = art;
+            this.background = background;
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
+        }
+    }
+
+    private static volatile Closing closing;
+
+    static void armClose(Bitmap art, int background, float x, float y, float radius) {
+        closing = new Closing(art, background, x, y, radius);
+    }
+
+    static void disarm() { closing = null; }
+
+    private CircleClose layer;
+    private boolean shrinking;
+    /** When the Home drew itself under the cover; zero while it has not. */
+    private volatile long homeBackAt;
+    private Runnable whenGone;
+    private final Runnable shrink = this::shrink;
+    private final Runnable quiet = this::whenQuiet;
+    private boolean shrunk;
+    /** When the fade in ends. */
+    private long fadedAt;
+    /** While the circle is closing the remote's arrows would move the wheel under it: the Home ignores them. */
+    static volatile boolean busy;
+
+    /**
+     * The Home key after an app from the wheel, at once over everything: the circle's own background,
+     * as wide as the screen, closes onto the app's circle, small in its place over the Home's picture.
+     */
+    private void startClose(Closing where) {
+        busy = true;
+        view.setImageBitmap(picture);
+        if (picture == null) view.setImageDrawable(new ColorDrawable(Color.BLACK));
+        // The whole screen in the circle's own colour at once, the app's circle small in its place.
+        // It stays still until the Home is there and past Fire OS's animation, so nothing else is
+        // being drawn while it closes: started earlier, it stuttered and three dots showed after it.
+        layer = new CircleClose(service, where.background, where.art, where.x, where.y, where.radius);
+        frame.addView(layer, new FrameLayout.LayoutParams(-1, -1));
+        // It comes in softly, the user's wish: a cut to the colour was abrupt.
+        frame.animate().cancel();
+        frame.setAlpha(0f);
+        frame.setVisibility(View.VISIBLE);
+        frame.animate().alpha(1f).setDuration(FADE_IN_MS).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
+        fadedAt = SystemClock.uptimeMillis() + FADE_IN_MS;
+        shrinking = true;
+        main.removeCallbacks(shrink);
+        shrunk = false;
+        if (homeBackAt > 0) main.postDelayed(quiet, AFTER_HOME_MS);
+        main.postDelayed(shrink, CLOSE_LIMIT_MS);
+    }
+
+    /** Once the Home's thread has nothing left to do: then nothing else is drawn while the circle closes. */
+    private void whenQuiet() {
+        Looper.myQueue().addIdleHandler(() -> {
+            main.post(shrink);
+            return false;
+        });
+    }
+
+    private void shrink() {
+        // Once only: a second start, from the limit and from the Home both, made it bounce.
+        if (layer == null || shrunk) return;
+        // Never while it is still fading in: the two together stuttered, as the user saw.
+        long fading = fadedAt + FADE_SETTLE_MS - SystemClock.uptimeMillis();
+        if (fading > 0) {
+            main.removeCallbacks(shrink);
+            main.postDelayed(shrink, fading);
+            return;
+        }
+        shrunk = true;
+        main.removeCallbacks(shrink);
+        main.removeCallbacks(hide);
+        main.removeCallbacks(quiet);
+        // Around the closing circle, the Home's last picture: the Home under it looks the same.
+        layer.close(this::hide);
+        // Should the circle never get to its end, the cover goes all the same.
+        main.postDelayed(hide, CircleClose.MS + AFTER_HOME_MS);
+    }
+
+    /**
+     * Back from an app opened from the wheel: the same closing as the Home key's, over everything,
+     * so Fire OS's fade from the app never shows. False without an app to close onto.
+     */
+    boolean closeOverAll() {
+        if (layer != null) return true;
+        Closing where = closing;
+        if (where == null || holding) return false;
+        homeBackAt = 0;
+        startClose(where);
+        return true;
+    }
+
+    /** The Home key's closing is being drawn here: the Home leaves it to the cover. */
+    boolean closingHere() { return layer != null; }
+
+    /** `then` runs once the cover is gone, at once if it is not up. */
+    void whenGone(Runnable then) {
+        if (frame.getVisibility() != View.VISIBLE) then.run();
+        else whenGone = then;
+    }
 
     /** From the Home, as it leaves the screen: half size, the cover is up for a moment only. */
     static void take(Window window) { take(window, () -> { }); }
 
-    private static void take(Window window, Runnable taken) {
+    static void take(Window window, Runnable taken) {
         if (picture == null) picture = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
         try {
             PixelCopy.request(window, picture, result -> taken.run(), new Handler(Looper.getMainLooper()));
@@ -100,7 +230,10 @@ final class HomeCover {
         long now = SystemClock.elapsedRealtime();
         boolean stay = now - lastHeard < DOUBLE_PRESS_MS && doubleHome;
         lastHeard = now;
-        if (!stay) startHome();
+        if (!stay) {
+            homeBackAt = 0;
+            startHome();
+        }
         main.post(() -> pressed(stay));
     }
 
@@ -141,9 +274,27 @@ final class HomeCover {
 
     private void lookForAmazon() {
         if (leftOnAmazon || holding) return;
+        if (!Fire.STICK_2020) {
+            answered(amazonActive());
+            return;
+        }
+        // The Stick of 2020 can take seconds to answer, and Salotto's Home has to start on the main thread.
+        int look = ++lastLook;
+        Background.run(() -> {
+            boolean there = amazonActive();
+            main.post(() -> { if (look == lastLook) answered(there); });
+        });
+    }
+
+    private boolean amazonActive() {
         AccessibilityNodeInfo active = service.getRootInActiveWindow();
-        boolean there = active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
-        boolean settling = SystemClock.elapsedRealtime() - startedAt < AMAZON_SETTLE_MS;
+        return active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+    }
+
+    private void answered(boolean there) {
+        if (leftOnAmazon || holding) return;
+        // While the circle closes the Home takes longer to come: starting it again resumed it twice under the circle.
+        boolean settling = SystemClock.elapsedRealtime() - startedAt < (layer != null ? CLOSING_SETTLE_MS : AMAZON_SETTLE_MS);
         if (there && !settling) {
             show();
             startHome();
@@ -159,7 +310,9 @@ final class HomeCover {
         if (still != null) view.setImageBitmap(still);
         else view.setImageDrawable(new ColorDrawable(Color.BLACK));
         view.invalidate();
-        view.setVisibility(View.VISIBLE);
+        frame.animate().cancel();
+        frame.setAlpha(1f);
+        frame.setVisibility(View.VISIBLE);
         main.removeCallbacks(hide);
         main.postDelayed(hide, HOLD_LIMIT_MS);
     }
@@ -169,17 +322,31 @@ final class HomeCover {
     }
 
     private void show() {
+        Closing where = closing;
+        // After an app opened from the wheel its circle closes; a second look at Amazon's Home lets it run.
+        if (where != null && !holding) {
+            if (layer == null) startClose(where);
+            return;
+        }
         if (picture != null) view.setImageBitmap(picture);
         else view.setImageDrawable(new ColorDrawable(Color.BLACK));
         view.invalidate();
-        view.setVisibility(View.VISIBLE);
+        frame.setVisibility(View.VISIBLE);
         main.removeCallbacks(hide);
         main.postDelayed(hide, SHOW_LIMIT_MS);
     }
 
     /** The Home has drawn itself. */
     void homeBack() {
-        if (view.getVisibility() != View.VISIBLE) return;
+        homeBackAt = SystemClock.uptimeMillis();
+        // The closing circle starts once the Home is there, and takes the cover away itself.
+        if (shrinking) {
+            if (shrunk) return;
+            main.removeCallbacks(quiet);
+            main.postDelayed(quiet, AFTER_HOME_MS);
+            return;
+        }
+        if (frame.getVisibility() != View.VISIBLE) return;
         main.removeCallbacks(hide);
         main.postDelayed(hide, AFTER_HOME_MS);
     }
@@ -188,12 +355,34 @@ final class HomeCover {
         holding = false;
         held = null;
         main.removeCallbacks(hide);
-        view.setVisibility(View.GONE);
+        main.removeCallbacks(shrink);
+        main.removeCallbacks(quiet);
+        frame.animate().cancel();
+        frame.setAlpha(1f);
+        frame.setVisibility(View.GONE);
+        if (layer != null) {
+            frame.removeView(layer);
+            layer = null;
+            shrinking = false;
+            closing = null;
+        }
+        busy = false;
+        Runnable then = whenGone;
+        whenGone = null;
+        if (then != null) then.run();
+    }
+
+    /** Gone now: the Home under it shows the same colour. A hold over a Fire OS page is not this cover's to drop. */
+    void drop() {
+        if (!holding && frame.getVisibility() == View.VISIBLE) hide();
     }
 
     void close() {
         main.removeCallbacks(hide);
+        main.removeCallbacks(shrink);
+        busy = false;
         main.removeCallbacks(lookForAmazon);
-        windows.removeView(view);
+        lastLook++;
+        windows.removeView(frame);
     }
 }

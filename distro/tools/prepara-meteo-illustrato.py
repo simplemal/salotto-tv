@@ -14,7 +14,7 @@ from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "assets/background-meteo-anime-raster"
-TARGET = ROOT / "home/app/src/main/assets/meteo-illustrato"
+TARGET = ROOT / "home/sfondi/meteo-illustrato"
 SIZE = (1920, 1080)
 QUALITY = 70
 EXPECTED = 120

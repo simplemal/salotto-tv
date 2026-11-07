@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 # Publishes the built Salotto as a release of this repository: APK, signed update.json, error page,
 # and next to them the latest installer, which is what people download.
-# Usage: distro/tools/pubblica-aggiornamento.sh "first change" "second change" ...
+# Usage: distro/tools/pubblica-aggiornamento.sh [--beta] "first change" "second change" ...
+# With --beta the version, named like 1.0.20-beta.1, becomes a pre-release, which GitHub's "latest"
+# never points to: only the TVs with the betas on find it, through the fixed pre-release "beta". The
+# installer, README and error page stay on the stable version. Betas and stable versions share one row
+# of version codes: the next stable one only needs a higher code to reach the TVs on the beta too.
+# The changes are in Italian; distro/novita.json holds them in every other language of the app, for
+# this same version, and each TV shows its own. Older versions read only the Italian list.
 set -euo pipefail
+
+BETA=false
+if [ "${1:-}" = "--beta" ]; then BETA=true; shift; fi
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APK="$ROOT/home/.toolchain/app-build/outputs/apk/debug/app-debug.apk"
@@ -15,6 +24,10 @@ NAME="$(sed -n "s/.*versionName '\(.*\)'.*/\1/p" "$ROOT/home/app/build.gradle")"
 REPO="$(sed -n 's/.*UPDATES_REPO = "\(.*\)".*/\1/p' "$ROOT/home/app/src/main/java/it/simplemal/firehome/Fire.java")"
 [ -n "$REPO" ] || { echo "Fermo: repository non trovato in Fire.java."; exit 1; }
 [ $# -gt 0 ] || { echo "Elenca le novità tra virgolette."; exit 2; }
+case "$NAME" in
+  *-beta*) $BETA || { echo "Fermo: la $NAME è una beta, si pubblica con --beta."; exit 1; } ;;
+  *) ! $BETA || { echo "Fermo: per una beta il nome della versione finisce con -beta.N, ora è $NAME."; exit 1; } ;;
+esac
 if grep -rnE -f "$ROOT/distro/dati-personali.local" "$ROOT/home/app/src" > /dev/null; then
   echo "Fermo: dati personali nei sorgenti."; exit 1
 fi
@@ -32,19 +45,48 @@ SIGNER="$(JAVA_HOME="$(echo "$TOOLS"/jdk-*/Contents/Home)" "$TOOLS/android-sdk/b
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
 cp "$APK" "$WORK/salotto.apk"
-"$ROOT/distro/tools/prepara-installatore.sh" "$WORK/installatore"
-python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$@" <<'PY'
-import hashlib, json, os, sys
-work, code, name, repo, *changes = sys.argv[1:]
+$BETA || "$ROOT/distro/tools/prepara-installatore.sh" "$WORK/installatore"
+python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$ROOT" "$@" <<'PY'
+import hashlib, json, os, re, sys
+work, code, name, repo, root, *changes = sys.argv[1:]
+java = open(os.path.join(root, "home/app/src/main/java/it/simplemal/firehome/Language.java"), encoding="utf-8").read()
+codes = re.findall(r'"([a-z]{2})"', re.search(r"CODES = \{([^}]*)\}", java).group(1))
+try:
+    notes = json.load(open(os.path.join(root, "distro/novita.json"), encoding="utf-8"))
+except FileNotFoundError:
+    sys.exit("Fermo: mancano le novità nelle altre lingue, in distro/novita.json.")
+if notes.get("versionName") != name:
+    sys.exit(f"Fermo: distro/novita.json è per la {notes.get('versionName')}, non per la {name}.")
+languages = {"it": changes}
+for language in codes:
+    if language == "it":
+        continue
+    lines = notes.get("changes", {}).get(language)
+    if not lines or len(lines) != len(changes):
+        sys.exit(f"Fermo: in distro/novita.json la lingua {language} non ha {len(changes)} novità.")
+    languages[language] = lines
 apk = os.path.join(work, "salotto.apk")
 data = open(apk, "rb").read()
 json.dump({"versionCode": int(code), "versionName": name,
            "url": f"https://github.com/{repo}/releases/download/v{name}/salotto.apk",
-           "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes},
+           "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes,
+           "changes_by_language": languages},
           open(os.path.join(work, "update.json"), "w"), ensure_ascii=False, indent=2)
 PY
 openssl dgst -sha256 -sign "$KEY" -out "$WORK/update.json.sig" "$WORK/update.json"
 openssl dgst -sha256 -verify <(openssl pkey -in "$KEY" -pubout 2>/dev/null) -signature "$WORK/update.json.sig" "$WORK/update.json"
+
+NOTES="$(printf -- '- %s\n' "$@")"
+if $BETA; then
+  gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" \
+    --repo "$REPO" --title "Salotto $NAME" --notes "$NOTES" --prerelease --latest=false
+  gh release view beta --repo "$REPO" > /dev/null 2>&1 ||
+    gh release create beta --repo "$REPO" --title "Salotto beta" --prerelease --latest=false \
+      --notes "Il canale beta: Salotto lo legge solo con Impostazioni → Aggiornamento → Versioni beta. Le versioni sono nelle pre-release."
+  gh release upload beta "$WORK/update.json" "$WORK/update.json.sig" --repo "$REPO" --clobber
+  echo "Pubblicata la beta $NAME ($CODE)"
+  exit 0
+fi
 
 # The page people reach from the QR is the one on main: it changes there when this branch arrives.
 python3 "$ROOT/distro/tools/genera-errori.py" "$ROOT/ERRORI.md"
@@ -52,5 +94,5 @@ git -C "$ROOT" add ERRORI.md
 git -C "$ROOT" diff --cached --quiet || git -C "$ROOT" commit -q -m "Errori per la versione $NAME"
 git -C "$ROOT" push -q origin HEAD
 gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" "$WORK"/installatore/* \
-  --repo "$REPO" --title "Salotto $NAME" --notes "$(printf -- '- %s\n' "$@")" --latest
+  --repo "$REPO" --title "Salotto $NAME" --notes "$NOTES" --latest
 echo "Pubblicata la versione $NAME ($CODE)"

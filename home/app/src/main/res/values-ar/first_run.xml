@@ -34,6 +34,15 @@
     <string name="first_does_settings">الإعدادات</string>
     <string name="first_start">ابدأ</string>
     <string name="first_backdrop_title">اختر خلفية</string>
+    <string name="first_packs_question">هل تريد تنزيل مجموعات الخلفيات التي اخترتها الآن؟</string>
+    <string name="first_packs_size">الحجم %1$s، ويستغرق ذلك بضع دقائق.</string>
+    <string name="first_packs_now">نزّل الآن</string>
+    <string name="first_packs_later">لاحقًا</string>
+    <string name="first_packs_title">جارٍ تنزيل الخلفيات</string>
+    <string name="first_packs_room">لا توجد مساحة كافية على التلفاز لمجموعات الصور المتبقية: تحتاج إلى %1$s، والمتبقي %2$s. لن تصل حتى تحرر مساحة.</string>
+    <string name="first_packs_network">انقطع الاتصال بالإنترنت. ستصل المجموعات الناقصة تلقائيًا عند عودته.</string>
+    <string name="first_packs_server">خادم المجموعات لا يستجيب. سيعيد Salotto المحاولة لاحقًا تلقائيًا.</string>
+    <string name="first_packs_damaged">وصلت إحدى المجموعات تالفة وتم تجاهلها. سيعيد Salotto المحاولة لاحقًا تلقائيًا.</string>
     <string name="first_preview">معاينة</string>
     <string name="grid_position">%1$d من %2$d</string>
     <string name="first_backdrop_pictures">طقس مرسوم</string>

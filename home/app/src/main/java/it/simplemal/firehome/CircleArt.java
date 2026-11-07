@@ -1,0 +1,333 @@
+package it.simplemal.firehome;
+
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.Shader;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * An app's own artwork made round for the wheel. The logo is found in the picture, as what differs
+ * from the colours along its edges, then centred and sized to sit whole inside the circle: a long
+ * name like Netflix's no longer touches the rim, a small one like RaiPlay's no longer gets lost.
+ * The picture's edges fade into a blurred copy of itself, so no straight line crosses the circle.
+ */
+final class CircleArt {
+    static final int PLAIN = Color.rgb(60, 64, 72);
+    private static final int SAMPLE = 160;
+    /** How far a colour must be from every edge colour to count as logo: a gradient stays background. */
+    private static final int NEAR = 60;
+    /** Past this share of logo the picture is a scene, not a logo on a background: it is kept as it was. */
+    private static final float SCENE = 0.6f;
+    /** The logo's corners stay inside this share of the diameter. */
+    private static final float DIAGONAL = 0.76f;
+    private static final float WIDEST = 0.74f;
+    private static final float TALLEST = 0.48f;
+    /** A tiny logo is not blown up past this, in diameters of picture width. */
+    private static final float MOST = 3f;
+    /** A scene is drawn this much wider than the circle, as before. */
+    private static final float SCENE_WIDTH = 1.25f;
+    /** The faded border of the picture, as a share of its shorter side. */
+    private static final float FEATHER = 0.14f;
+    private static final int EDGE_STEP = 2;
+    /** How far the background's blur reaches, in parts of the sample's width: enough to fill a long name. */
+    private static final int BACK_REACH = 16;
+    private static final int BACK_PASSES = 3;
+    private static final int RIM_SAMPLES = 48;
+    private static final float[] RIM_AT = {0.86f, 0.93f};
+
+    /** Below this distance from the background a pixel of a cut-out logo is clear, above the second it is whole. */
+    private static final int CUT_CLEAR = 25;
+    private static final int CUT_WHOLE = 70;
+
+    /**
+     * A card of our own for an app whose picture does not sit well in a circle: a background we
+     * choose, a gradient from `from` to `to` along `way`, and on it only the logo, cut out of the app's
+     * own picture, so no edge of that picture shows.
+     */
+    private static final class Card {
+        final GradientDrawable.Orientation way;
+        final int from;
+        final int to;
+
+        Card(GradientDrawable.Orientation way, int from, int to) {
+            this.way = way;
+            this.from = from;
+            this.to = to;
+        }
+    }
+
+    private static final Map<String, Card> CARDS = new HashMap<>();
+
+    static {
+        // Prime Video: its banner goes from a deep blue at the bottom left to a light one at the top
+        // right, read from the banner itself (2026-11-04); on the plain fill it showed a box.
+        CARDS.put("com.amazon.firebat", new Card(GradientDrawable.Orientation.BL_TR, Color.rgb(0, 111, 166), Color.rgb(0, 168, 225)));
+        // NOW: its banner's teal, from near black at the bottom left (lifted a little) to the top
+        // right; the rays of light around the O go, only a glow next to it stays with the logo.
+        CARDS.put("com.nowtv.it", new Card(GradientDrawable.Orientation.BL_TR, Color.rgb(10, 51, 55), Color.rgb(4, 122, 130)));
+    }
+
+    private CircleArt() {}
+
+    static Bitmap make(Drawable image, Drawable back, boolean wide, int size, String pkg) {
+        Card card = CARDS.get(pkg);
+        int width = SAMPLE;
+        int height = wide ? SAMPLE * 9 / 16 : SAMPLE;
+        Bitmap sample = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        paint(new Canvas(sample), image, back, width, height);
+        int[] pixels = new int[width * height];
+        sample.getPixels(pixels, 0, width, 0, 0, width, height);
+        sample.recycle();
+
+        int[] edge = edgeColours(pixels, width, height);
+        int left = width;
+        int top = height;
+        int right = -1;
+        int bottom = -1;
+        int logo = 0;
+        boolean[] mark = new boolean[width * height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (!far(pixels[y * width + x], edge)) continue;
+                mark[y * width + x] = true;
+                logo++;
+                left = Math.min(left, x);
+                right = Math.max(right, x + 1);
+                top = Math.min(top, y);
+                bottom = Math.max(bottom, y + 1);
+            }
+        }
+
+        float pictureWidth;
+        float centreX = 0.5f;
+        float centreY = 0.5f;
+        if (right < 0 || logo > SCENE * width * height) {
+            pictureWidth = size * (wide ? SCENE_WIDTH : 1f);
+            // A scene has no logo to take out: its background is the whole picture, blurred.
+            mark = new boolean[width * height];
+        } else {
+            // Both sides in widths of the picture, which is what the scale multiplies.
+            float logoWidth = (right - left) / (float) width;
+            float logoHeight = (bottom - top) / (float) width;
+            pictureWidth = Math.min(Math.min(DIAGONAL * size / (float) Math.hypot(logoWidth, logoHeight),
+                WIDEST * size / logoWidth), Math.min(TALLEST * size / logoHeight, MOST * size));
+            centreX = (left + right) / 2f / width;
+            centreY = (top + bottom) / 2f / height;
+        }
+        float pictureHeight = pictureWidth * height / width;
+        // Whole numbers, and before the long loops below: on the Max of 2021 (AFTKA, 32 bits) a decimal
+        // held across cutOut came back as 0 (2026-11-06), and NOW's logo sat at the bottom of its circle.
+        int drawnWidth = Math.max(1, Math.round(pictureWidth));
+        int drawnHeight = Math.max(1, Math.round(pictureHeight));
+        int drawnLeft = Math.round(size / 2f - centreX * drawnWidth);
+        int drawnTop = Math.round(size / 2f - centreY * drawnHeight);
+
+        Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        // The background is the same picture, as tall as the circle and blurred, the user's idea after
+        // Prime Video's diagonal blue showed a box. The logo is taken out first, or its colour would
+        // tint the circle around the sharp one: Netflix's red, YouTube's.
+        if (card != null) {
+            GradientDrawable fill = new GradientDrawable(card.way, new int[]{card.from, card.to});
+            fill.setBounds(0, 0, size, size);
+            fill.draw(canvas);
+        } else {
+            int coverWidth = Math.max(size, size * width / height);
+            Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);
+            Rect spread = new Rect((size - coverWidth) / 2, 0, (size + coverWidth) / 2, size);
+            canvas.drawBitmap(soft, null, spread, new Paint(Paint.FILTER_BITMAP_FLAG));
+            soft.recycle();
+        }
+
+        Bitmap picture = Bitmap.createBitmap(drawnWidth, drawnHeight, Bitmap.Config.ARGB_8888);
+        Canvas inside = new Canvas(picture);
+        paint(inside, image, back, drawnWidth, drawnHeight);
+        if (card != null) cutOut(picture, edge);
+        else feather(inside, drawnWidth, drawnHeight);
+        canvas.drawBitmap(picture, drawnLeft, drawnTop, new Paint(Paint.FILTER_BITMAP_FLAG));
+        picture.recycle();
+        return made;
+    }
+
+    /**
+     * The picture with the logo filled from around it and blurred: each pixel is the average of the
+     * background pixels near it, so a gradient stays a gradient and the logo leaves no trace.
+     */
+    private static int[] withoutLogo(int[] pixels, boolean[] mark, int width, int height) {
+        int count = width * height;
+        float[][] sums = new float[4][count];
+        for (int index = 0; index < count; index++) {
+            if (mark[index]) continue;
+            int pixel = pixels[index];
+            sums[0][index] = Color.red(pixel);
+            sums[1][index] = Color.green(pixel);
+            sums[2][index] = Color.blue(pixel);
+            sums[3][index] = 1;
+        }
+        int reach = Math.max(1, width / BACK_REACH);
+        float[] turned = new float[count];
+        for (float[] sum : sums) {
+            for (int pass = 0; pass < BACK_PASSES; pass++) {
+                spread(sum, turned, width, height, reach);
+                spread(turned, sum, height, width, reach);
+            }
+        }
+        int[] smooth = new int[count];
+        for (int index = 0; index < count; index++) {
+            float weight = sums[3][index];
+            // Where no background reached, the logo covered everything: its own pixel will do.
+            if (weight < 1e-4f) {
+                smooth[index] = pixels[index] | 0xFF000000;
+                continue;
+            }
+            smooth[index] = Color.rgb(Math.round(sums[0][index] / weight), Math.round(sums[1][index] / weight),
+                Math.round(sums[2][index] / weight));
+        }
+        return smooth;
+    }
+
+    /** A moving average along each row of `from`, written to `to` turned on its side. */
+    private static void spread(float[] from, float[] to, int width, int height, int reach) {
+        float window = 2 * reach + 1;
+        for (int y = 0; y < height; y++) {
+            int row = y * width;
+            float total = 0;
+            for (int x = -reach; x <= reach; x++) total += from[row + Math.max(0, Math.min(width - 1, x))];
+            for (int x = 0; x < width; x++) {
+                to[x * height + y] = total / window;
+                total += from[row + Math.min(width - 1, x + reach + 1)] - from[row + Math.max(0, x - reach)];
+            }
+        }
+    }
+
+    /** How much of a pixel stays, by its squared distance from the background: no decimals in the long loop. */
+    private static final int[] KEPT = new int[CUT_WHOLE * CUT_WHOLE + 1];
+
+    static {
+        for (int squared = 0; squared < KEPT.length; squared++) {
+            float distance = (float) Math.sqrt(squared);
+            float kept = Math.max(0f, Math.min(1f, (distance - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR)));
+            KEPT[squared] = Math.round(kept * 255);
+        }
+    }
+
+    /** Only the logo stays: each pixel as clear as it is close to the picture's own background. */
+    private static void cutOut(Bitmap picture, int[] edge) {
+        int width = picture.getWidth();
+        int height = picture.getHeight();
+        int[] pixels = new int[width * height];
+        picture.getPixels(pixels, 0, width, 0, 0, width, height);
+        for (int index = 0; index < pixels.length; index++) {
+            int pixel = pixels[index];
+            int alpha = KEPT[Math.min(KEPT.length - 1, nearest(pixel, edge))];
+            pixels[index] = alpha << 24 | (pixel & 0xFFFFFF);
+        }
+        picture.setPixels(pixels, 0, width, 0, 0, width, height);
+    }
+
+    /** The squared distance to the closest of the edge colours. */
+    private static int nearest(int pixel, int[] edge) {
+        int red = Color.red(pixel);
+        int green = Color.green(pixel);
+        int blue = Color.blue(pixel);
+        int best = Integer.MAX_VALUE;
+        for (int colour : edge) {
+            int dr = red - Color.red(colour);
+            int dg = green - Color.green(colour);
+            int db = blue - Color.blue(colour);
+            best = Math.min(best, dr * dr + dg * dg + db * db);
+        }
+        return best;
+    }
+
+    /** The colour along the inside of a circle's edge: its background, where the logo never reaches. */
+    static int rim(Bitmap art) {
+        int size = Math.min(art.getWidth(), art.getHeight());
+        float centre = size / 2f;
+        long red = 0;
+        long green = 0;
+        long blue = 0;
+        int count = 0;
+        for (int step = 0; step < RIM_SAMPLES; step++) {
+            double angle = 2 * Math.PI * step / RIM_SAMPLES;
+            for (float share : RIM_AT) {
+                int x = Math.round(centre + (float) Math.cos(angle) * centre * share);
+                int y = Math.round(centre + (float) Math.sin(angle) * centre * share);
+                int pixel = art.getPixel(Math.max(0, Math.min(size - 1, x)), Math.max(0, Math.min(size - 1, y)));
+                red += Color.red(pixel);
+                green += Color.green(pixel);
+                blue += Color.blue(pixel);
+                count++;
+            }
+        }
+        return Color.rgb((int) (red / count), (int) (green / count), (int) (blue / count));
+    }
+
+    /** A see-through picture is seen on the plain grey, as on the grid. */
+    private static void paint(Canvas canvas, Drawable image, Drawable back, int width, int height) {
+        canvas.drawColor(PLAIN);
+        if (back != null) {
+            back.setBounds(0, 0, width, height);
+            back.draw(canvas);
+        }
+        image.setBounds(0, 0, width, height);
+        image.draw(canvas);
+    }
+
+    private static int[] edgeColours(int[] pixels, int width, int height) {
+        int count = 0;
+        int[] edge = new int[(width + height) * 2 / EDGE_STEP + 4];
+        for (int x = 0; x < width; x += EDGE_STEP) {
+            edge[count++] = pixels[x];
+            edge[count++] = pixels[(height - 1) * width + x];
+        }
+        for (int y = 0; y < height; y += EDGE_STEP) {
+            edge[count++] = pixels[y * width];
+            edge[count++] = pixels[y * width + width - 1];
+        }
+        int[] used = new int[count];
+        System.arraycopy(edge, 0, used, 0, count);
+        return used;
+    }
+
+    private static boolean far(int pixel, int[] edge) {
+        int red = Color.red(pixel);
+        int green = Color.green(pixel);
+        int blue = Color.blue(pixel);
+        int limit = NEAR * NEAR;
+        for (int colour : edge) {
+            int dr = red - Color.red(colour);
+            int dg = green - Color.green(colour);
+            int db = blue - Color.blue(colour);
+            if (dr * dr + dg * dg + db * db <= limit) return false;
+        }
+        return true;
+    }
+
+
+    /** Clears the border little by little, so the picture melts into the background under it. */
+    private static void feather(Canvas canvas, int width, int height) {
+        float band = FEATHER * Math.min(width, height);
+        Paint paint = new Paint();
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+        int gone = Color.BLACK;
+        int kept = Color.TRANSPARENT;
+        paint.setShader(new LinearGradient(0, 0, band, 0, gone, kept, Shader.TileMode.CLAMP));
+        canvas.drawRect(0, 0, band, height, paint);
+        paint.setShader(new LinearGradient(width, 0, width - band, 0, gone, kept, Shader.TileMode.CLAMP));
+        canvas.drawRect(width - band, 0, width, height, paint);
+        paint.setShader(new LinearGradient(0, 0, 0, band, gone, kept, Shader.TileMode.CLAMP));
+        canvas.drawRect(0, 0, width, band, paint);
+        paint.setShader(new LinearGradient(0, height, 0, height - band, gone, kept, Shader.TileMode.CLAMP));
+        canvas.drawRect(0, height - band, width, height, paint);
+    }
+}
