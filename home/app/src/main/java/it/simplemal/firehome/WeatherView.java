@@ -41,6 +41,8 @@ final class WeatherView extends View {
 
     /** A bright sky would swallow the white text and the dock at the bottom of the Home. */
     private final Paint shade = new Paint();
+    /** The height the shade's gradient was made for: a scene can be painted before this view has any size. */
+    private int shadeHeight;
     /** Still, the scene is one texture: every frame of a scroll would otherwise draw all its layers. */
     private final Runnable flatten = () -> setLayerType(LAYER_TYPE_HARDWARE, null);
     private Scene scene;
@@ -172,7 +174,18 @@ final class WeatherView extends View {
 
     private void paint(Canvas canvas, Scene which) {
         which.draw(canvas, WeatherScene.ENTRY_S, scroll, 1);
-        canvas.drawRect(0, canvas.getHeight() * SHADE_FROM, canvas.getWidth(), canvas.getHeight(), shade);
+        drawShade(canvas);
+    }
+
+    /** Without its gradient the shade would be plain black over the lower two thirds. */
+    private void drawShade(Canvas canvas) {
+        int height = canvas.getHeight();
+        if (height != shadeHeight) {
+            shadeHeight = height;
+            shade.setShader(new LinearGradient(0, height * SHADE_FROM, 0, height * SHADE_FULL, Color.TRANSPARENT,
+                Color.argb(SHADE_ALPHA, 0, 0, 0), Shader.TileMode.CLAMP));
+        }
+        canvas.drawRect(0, height * SHADE_FROM, canvas.getWidth(), height, shade);
     }
 
     /** The first scene comes in from outside; a change of weather simply fades over the old one. */
@@ -201,11 +214,6 @@ final class WeatherView extends View {
         if (onShown != null) onShown.run();
     }
 
-    @Override protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
-        shade.setShader(new LinearGradient(0, height * SHADE_FROM, 0, height * SHADE_FULL, Color.TRANSPARENT,
-            Color.argb(SHADE_ALPHA, 0, 0, 0), Shader.TileMode.CLAMP));
-    }
-
     @Override protected void onDraw(Canvas canvas) {
         Scene current = scene;
         if (current == null || covered) return;
@@ -227,7 +235,7 @@ final class WeatherView extends View {
         }
         if (fading) alpha = (float) fade;
         current.draw(canvas, entered, scroll, alpha);
-        canvas.drawRect(0, getHeight() * SHADE_FROM, getWidth(), getHeight(), shade);
+        drawShade(canvas);
         // Every frame the screen can show, for a short while: smooth, and then nothing at all.
         boolean moving = fading || previous != null || current.moves() && entered < WeatherScene.ENTRY_S;
         if (running && moving) {

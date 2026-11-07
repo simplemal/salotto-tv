@@ -228,6 +228,8 @@ public final class MainActivity extends CardActivity {
     /** A new backdrop waiting for its blur, to come in with it in one step: no other blur is taken meanwhile, it would show the old one. */
     private int swapsComing;
     private int backdropsComing;
+    /** The blur on screen is the one for this backdrop: false from the moment one is wanted until it comes. */
+    private boolean blurReady;
     /**
      * Over the Home switched between grid and wheel, until its circles or cards, backdrop and blur are
      * all there: the user's request of 2026-11-07, instead of watching it being built.
@@ -994,6 +996,7 @@ public final class MainActivity extends CardActivity {
 
     private void blurAndPlace(Consumer<Canvas> paint, Runnable place) {
         swapsComing++;
+        blurReady = false;
         blurOf(paint, true, soft -> {
             swapsComing--;
             backdropsComing--;
@@ -1053,6 +1056,7 @@ public final class MainActivity extends CardActivity {
 
     private void showBlur(Bitmap soft) {
         blurred.setImageBitmap(soft);
+        blurReady = true;
         if (!blurFadeIn) {
             coverScene();
             return;
@@ -1097,10 +1101,16 @@ public final class MainActivity extends CardActivity {
 
     /** Everything asked for has arrived: one frame later, so that it is drawn, the mask goes. */
     private void homeMaybeReady() {
-        if (!loading || artComing > 0 || backdropsComing > 0 || blursComing > 0 || swapsComing > 0) return;
+        if (!loading || !homeReady()) return;
         root.postOnAnimation(() -> {
-            if (artComing == 0 && backdropsComing == 0 && blursComing == 0 && swapsComing == 0) hideLoading();
+            if (homeReady()) hideLoading();
         });
+    }
+
+    /** A blur still missing counts too: before the first layout there is no screen to take it from. */
+    private boolean homeReady() {
+        return artComing == 0 && backdropsComing == 0 && blursComing == 0 && swapsComing == 0
+            && (blurred.getVisibility() != View.VISIBLE || blurReady);
     }
 
     private void hideLoading() {
@@ -1198,10 +1208,12 @@ public final class MainActivity extends CardActivity {
         boolean wasCircular = circular;
         circular = Look.circular(this);
         wheel.setTinted(Look.tintGlow(this));
-        if (looked && circular != wasCircular) showLoading();
+        // Also when the Home starts: until then only the window's grey would show, the user's report of 2026-11-07.
+        if (!looked || circular != wasCircular) showLoading();
         looked = true;
         boolean blur = circular && Look.wheelBlur(this);
         boolean blurOn = blur && blurred.getVisibility() != View.VISIBLE;
+        if (blurOn) blurReady = false;
         if (blurOn) {
             // Turning the blur on: hidden until its picture is ready, then faded in. Under the mask of
             // a switch to the wheel it is simply there when the mask goes.
