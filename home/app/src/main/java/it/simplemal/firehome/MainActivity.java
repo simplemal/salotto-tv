@@ -1531,7 +1531,8 @@ public final class MainActivity extends CardActivity {
 
     @Override public void onEnterAnimationComplete() {
         super.onEnterAnimationComplete();
-        if (!wheel.portalOpen()) return;
+        // Android 9 calls it even when onCreate has handed over to the welcome and built nothing.
+        if (wheel == null || !wheel.portalOpen()) return;
         root.removeCallbacks(closeNow);
         closeNow.run();
     }
