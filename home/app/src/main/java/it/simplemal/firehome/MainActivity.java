@@ -891,7 +891,11 @@ public final class MainActivity extends CardActivity {
             lookShown = look;
             applyLook();
         }
-        if (!state(apps).equals(shown)) render(focusedTag(), apps);
+        // A Home loaded again, under its mask, starts from the first app, in the grid and on the wheel:
+        // the user's request of 2026-11-07.
+        if (!state(apps).equals(shown)) render(loading && !apps.isEmpty() ? apps.get(0) : focusedTag(), apps);
+        // The wheel keeps a button's focus otherwise, the control centre's one after a switch from the grid.
+        if (loading && circular) wheel.requestFocus();
         if (appsOnly) restRaised();
         Look.backHome(this);
         waitForSaver();
