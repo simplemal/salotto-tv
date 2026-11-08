@@ -1,0 +1,42 @@
+name: Problema · Problem
+description: Qualcosa non funziona come dovrebbe · Something does not work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prima guarda tra le [segnalazioni già aperte](https://github.com/simplemal/salotto-tv/issues): se c'è già, aggiungi un commento o un 👍. Se sulla TV compare un codice, cercalo anche in [ERRORI.md](https://github.com/simplemal/salotto-tv/blob/main/ERRORI.md).
+        First look through the [open issues](https://github.com/simplemal/salotto-tv/issues): if yours is already there, add a comment or a 👍. If a code appears on the TV, also look for it in [ERRORI.md](https://github.com/simplemal/salotto-tv/blob/main/ERRORI.md).
+  - type: dropdown
+    id: model
+    attributes:
+      label: Modello della Fire TV · Fire TV model
+      options:
+        - Fire TV Stick 4K, 2ª gen · 2nd gen (AFTKM)
+        - Fire TV Stick 4K Max, 2ª gen · 2nd gen (AFTKRT)
+        - Fire TV Stick 4K Max, 1ª gen · 1st gen (AFTKA)
+        - Fire TV Stick, 3ª gen · 3rd gen (AFTSSS)
+        - Fire TV Stick Lite, 1ª gen · 1st gen (AFTSS)
+        - Altro · Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versione di Salotto · Salotto version
+      description: Impostazioni → Informazioni su Salotto · Settings → About Salotto
+      placeholder: "1.0.23"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Cosa hai fatto e cosa è successo · What you did and what happened
+      description: Se c'è un codice di errore, scrivilo o allega una foto dello schermo · If there is an error code, write it down or attach a photo of the screen
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: File di «Segnala un problema» · “Report a problem” file
+      description: "Solo per i problemi d'installazione. In Installa Salotto premi «Segnala un problema»: salva sulla Scrivania un file da trascinare qui · Only for installation problems. In Installa Salotto press “Report a problem”: it saves a file on the Desktop to drag here"

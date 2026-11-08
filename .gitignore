@@ -2,6 +2,7 @@
 # may reach the public repository.
 /*
 !/.gitignore
+!/.github/
 !/LICENSE
 !/NOTICE.md
 !/README.md

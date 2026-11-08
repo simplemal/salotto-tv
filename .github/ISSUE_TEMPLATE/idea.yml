@@ -1,0 +1,21 @@
+name: Nuova funzione · New feature
+description: Una funzione che vorresti in Salotto · A feature you would like in Salotto
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prima guarda tra le [segnalazioni già aperte](https://github.com/simplemal/salotto-tv/issues): se c'è già, aggiungi un commento o un 👍.
+        First look through the [open issues](https://github.com/simplemal/salotto-tv/issues): if yours is already there, add a comment or a 👍.
+  - type: textarea
+    id: what
+    attributes:
+      label: Cosa ti servirebbe · What you would need
+    validations:
+      required: true
+  - type: textarea
+    id: when
+    attributes:
+      label: Quando lo useresti · When you would use it
+    validations:
+      required: true
