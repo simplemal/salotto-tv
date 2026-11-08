@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.Rect;
@@ -35,6 +36,7 @@ import android.text.format.Formatter;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -82,7 +84,11 @@ public final class SettingsActivity extends CardActivity {
     private static final int MENU_ROW = 40;
     private static final int ROWS_TOP = 14;
     private static final int ROW_HEIGHT = 48;
-    private static final int CHOICE_INDENT = 28;
+    private static final int POPUP_WIDTH = 620;
+    private static final int POPUP_HEIGHT = 430;
+    private static final int BLUR_RADIUS = 6;
+    /** Lighter than behind the task manager: here the backdrop is meant to be seen. */
+    private static final int SCRIM = Color.argb(150, 8, 10, 14);
     private static final long SECTION_PAUSE_MS = 140;
     private static final int APPS_SECTION = 3;
     private static final int SCREEN_SECTION = 4;
@@ -183,8 +189,8 @@ public final class SettingsActivity extends CardActivity {
         boolean label;
         /** Beside the title: what kind of backdrop it is. Zero keeps the room empty, to stay lined up. */
         int mark = NO_MARK;
-        /** Its choices open under the row, in the same page, instead of on a page of their own. */
-        boolean inline;
+        /** One of a list of choices: pressing it also closes the window of choices. */
+        boolean picks;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -205,15 +211,16 @@ public final class SettingsActivity extends CardActivity {
         String opened;
         /** The real page is on screen: reading it again must not replace it with the waiting one. */
         boolean drawn;
-        /** Choices shown under the row that opened them, inside the page below. */
-        boolean inline;
         /** Under the title: what the whole section is for. Only the first page of a section has it. */
         String about;
-        /** What was last shown, so that a level of choices can draw this page around them. */
-        String title;
-        List<Entry> entries;
-        String note;
         Level(Runnable show) { this.show = show; }
+    }
+
+    private static final class Pane {
+        TextView heading;
+        LinearLayout tableHead;
+        ScrollView scroll;
+        LinearLayout rows;
     }
 
     /** One line of the column on the left: a section with its first page. */
@@ -272,10 +279,13 @@ public final class SettingsActivity extends CardActivity {
     private boolean inMenu = true;
     /** Moving quickly down the column draws only the page where it stops. */
     private final Runnable showSection = this::openSection;
-    /** Where the rows of the level on top begin: after the page around them, for a level of choices. */
-    private int rowOffset;
-    /** Set by the row being pressed: the level it opens is a level of choices. */
-    private boolean pendingInline;
+    /** The section's page, and the window over it for everything a row opens: the same size for all. */
+    private Pane page;
+    private Pane popup;
+    private FrameLayout shade;
+    private ImageView backdropView;
+    private static String veiledName;
+    private static Bitmap veiled;
     /** A key pressed in the column: its release must not reach the page it opened. */
     private int heldInMenu;
     /** Fire OS answers slowly: the page shows what was read last and reads again when it is stale. */
@@ -303,7 +313,6 @@ public final class SettingsActivity extends CardActivity {
         DeviceInfo.prepare();
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackground(Look.plainBackdrop());
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
         previewNote = label(getString(R.string.first_preview), PREVIEW_SP);
         previewNote.setAlpha(0.7f);
@@ -347,49 +356,53 @@ public final class SettingsActivity extends CardActivity {
         panes.addView(left, new LinearLayout.LayoutParams(dp(MENU_WIDTH + MENU_GAP), -1));
         mosaic = new PictureMosaic(this);
 
-        heading = label("", 26);
-        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        heading.setSingleLine(true);
-        heading.setEllipsize(TextUtils.TruncateAt.END);
-        heading.setPadding(dp(14), dp(COLUMN_TOP - 8), dp(14), 0);
         about = label("", 15);
         about.setAlpha(0.7f);
         about.setMaxLines(2);
         about.setEllipsize(TextUtils.TruncateAt.END);
         about.setPadding(dp(14), dp(4), dp(14), 0);
-
-        scroll = new ScrollView(this) {
-            /** Keeps the focused row's rounded ends inside the list. */
-            @Override protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
-                Rect room = new Rect(rect);
-                room.inset(0, -dp(ROW_ROOM));
-                return super.computeScrollDeltaToGetChildRectOnScreen(room);
-            }
-        };
-        scroll.setVerticalScrollBarEnabled(false);
-        scroll.setClipChildren(false);
-        scroll.setFillViewport(true);
-        rows = new LinearLayout(this);
-        rows.setOrientation(LinearLayout.VERTICAL);
-        rows.setClipChildren(false);
-        rows.setClipToPadding(false);
-        rows.setPadding(dp(8), dp(ROWS_TOP), dp(8), dp(16));
-        scroll.addView(rows);
+        page = pane(COLUMN_TOP - 8);
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
-        list.addView(heading, new LinearLayout.LayoutParams(-1, -2));
+        list.addView(page.heading, new LinearLayout.LayoutParams(-1, -2));
         list.addView(about, new LinearLayout.LayoutParams(-1, -2));
-        tableHead = new LinearLayout(this);
-        tableHead.setPadding(dp(8 + TABLE_PADDING), dp(12), dp(8 + TABLE_PADDING), 0);
-        tableHead.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
-        for (TextView name : addColumns(tableHead, strings(TABLE_COLUMNS), 12)) name.setAlpha(0.6f);
-        list.addView(tableHead, new LinearLayout.LayoutParams(-1, -2));
-        list.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        list.addView(page.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        list.addView(page.scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 1));
+
+        // Everything a row opens comes up in the middle, over the page, always the same size.
+        popup = pane(22);
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setClickable(true);
+        card.setPadding(dp(12), 0, dp(12), dp(10));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.rgb(30, 33, 40));
+        fill.setCornerRadius(dp(22));
+        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
+        card.setBackground(fill);
+        card.setElevation(dp(24));
+        card.addView(popup.heading, new LinearLayout.LayoutParams(-1, -2));
+        card.addView(popup.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        shade = new FrameLayout(this);
+        shade.setBackgroundColor(Color.argb(150, 0, 0, 0));
+        shade.setClickable(true);
+        shade.setOnClickListener(view -> onBackPressed());
+        shade.setVisibility(View.GONE);
+        shade.addView(card, new FrameLayout.LayoutParams(dp(POPUP_WIDTH), dp(POPUP_HEIGHT), Gravity.CENTER));
+
+        backdropView = new ImageView(this);
+        backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        backdropView.setBackground(Look.plainBackdrop());
         FrameLayout stage = new FrameLayout(this);
+        stage.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
+        stage.addView(shade, new FrameLayout.LayoutParams(-1, -1));
         setContentView(stage);
+        usePane(false);
+        dressBackdrop();
         FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
         corner.bottomMargin = dp(PREVIEW_MARGIN);
         corner.setMarginStart(dp(PREVIEW_MARGIN));
@@ -419,6 +432,55 @@ public final class SettingsActivity extends CardActivity {
         }
         paintMenu();
         if (inMenu) menu.post(this::selectCurrent);
+    }
+
+    /** A title, the head of a table and the rows under them, scrolling. */
+    private Pane pane(int top) {
+        Pane pane = new Pane();
+        pane.heading = label("", 26);
+        pane.heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        pane.heading.setSingleLine(true);
+        pane.heading.setEllipsize(TextUtils.TruncateAt.END);
+        pane.heading.setPadding(dp(14), dp(top), dp(14), 0);
+        pane.scroll = new ScrollView(this) {
+            /** Keeps the focused row's rounded ends inside the list. */
+            @Override protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
+                Rect room = new Rect(rect);
+                room.inset(0, -dp(ROW_ROOM));
+                return super.computeScrollDeltaToGetChildRectOnScreen(room);
+            }
+        };
+        pane.scroll.setVerticalScrollBarEnabled(false);
+        pane.scroll.setClipChildren(false);
+        pane.scroll.setFillViewport(true);
+        pane.rows = new LinearLayout(this);
+        pane.rows.setOrientation(LinearLayout.VERTICAL);
+        pane.rows.setClipChildren(false);
+        pane.rows.setClipToPadding(false);
+        pane.scroll.addView(pane.rows);
+        pane.tableHead = new LinearLayout(this);
+        pane.tableHead.setPadding(dp(8 + TABLE_PADDING), dp(12), dp(8 + TABLE_PADDING), 0);
+        pane.tableHead.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
+        for (TextView name : addColumns(pane.tableHead, strings(TABLE_COLUMNS), 12)) name.setAlpha(0.6f);
+        pane.tableHead.setVisibility(View.GONE);
+        return pane;
+    }
+
+    /** The Home's own backdrop, blurred and darkened as behind the task manager. Until it is ready, the plain one. */
+    private void dressBackdrop() {
+        String name = Look.currentName(this);
+        if (name.equals(veiledName)) {
+            backdropView.setImageBitmap(veiled);
+            return;
+        }
+        Look.current(this, picture -> Background.draw(() -> {
+            Bitmap shown = Blur.veiled(picture, BLUR_RADIUS, SCRIM);
+            runOnUiThread(() -> {
+                veiledName = name;
+                veiled = shown;
+                if (!isDestroyed()) backdropView.setImageBitmap(shown);
+            });
+        }));
     }
 
     private String sectionName(Section part) {
@@ -493,6 +555,7 @@ public final class SettingsActivity extends CardActivity {
         heading.setText(Brand.mark(this, sectionName(part)));
         about.setText(part.about == 0 ? "" : getString(part.about));
         about.setVisibility(part.about == 0 ? View.GONE : View.VISIBLE);
+        usePane(false);
         rows.removeAllViews();
         tableHead.setVisibility(View.GONE);
         showPreview(null);
@@ -584,8 +647,6 @@ public final class SettingsActivity extends CardActivity {
         java.util.Iterator<Level> down = levels.descendingIterator();
         while (down.hasNext()) {
             Level level = down.next();
-            // Choices left open under a row are not a place to come back to.
-            if (level.inline) break;
             way.add(new Spot(level.focus, level.opened));
         }
         leftAt = way;
@@ -597,7 +658,10 @@ public final class SettingsActivity extends CardActivity {
     @Override protected void onResume() {
         super.onResume();
         avStale = true;
-        if (resumedOnce) refresh();
+        if (resumedOnce) {
+            dressBackdrop();
+            refresh();
+        }
         resumedOnce = true;
     }
 
@@ -617,14 +681,11 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void enter(Runnable show) {
-        Level level = new Level(show);
-        level.inline = pendingInline && !levels.isEmpty();
-        pendingInline = false;
-        levels.push(level);
+        levels.push(new Level(show));
         show.run();
     }
 
-    /** After a choice the row closes and shows it. */
+    /** After a choice its window closes, and the page shows it. */
     private void closeChoices(Level level) {
         if (levels.peek() != level || levels.size() < 2) return;
         levels.pop();
@@ -678,51 +739,38 @@ public final class SettingsActivity extends CardActivity {
     /** The note stays under the rows, for what is true of all of them. */
     private void show(String title, List<Entry> entries, String note) {
         Level level = levels.peek();
-        Level page = level;
-        if (level.inline) {
-            java.util.Iterator<Level> up = levels.iterator();
-            up.next();
-            page = up.next();
-        } else {
-            level.title = title;
-            level.entries = entries;
-            level.note = note;
+        usePane(levels.size() > 1);
+        heading.setText(Brand.mark(this, title));
+        if (levels.size() == 1) {
+            about.setText(level.about != null ? level.about : "");
+            about.setVisibility(level.about != null ? View.VISIBLE : View.GONE);
         }
-        heading.setText(Brand.mark(this, page.title));
-        about.setText(page.about != null ? page.about : "");
-        about.setVisibility(page.about != null ? View.VISIBLE : View.GONE);
-        boolean table = !level.inline && entries.get(0).columns != null;
+        boolean table = entries.get(0).columns != null;
         tableHead.setVisibility(table ? View.VISIBLE : View.GONE);
         rows.setPadding(dp(8), dp(table ? 8 : ROWS_TOP), dp(8), dp(16));
         // The rows of the table must not run under its head.
         scroll.setClipChildren(table);
         rows.removeAllViews();
-        rowOffset = 0;
-        for (int index = 0; index < page.entries.size(); index++) {
-            Entry entry = page.entries.get(index);
-            View view = entry.label ? label(entry) : table ? tableRow(entry) : row(entry);
-            rows.addView(view, entry.label ? new LinearLayout.LayoutParams(-1, -2) : table ? tableRowSize(entry) : rowSize());
-            if (!level.inline || entry.label) continue;
-            // The page stays around its choices, quiet: only the row that opened them stands out.
-            view.setFocusable(false);
-            view.setClickable(false);
-            if (index != page.focus) {
-                view.setAlpha(0.4f);
-                continue;
-            }
-            view.setBackground(openFill());
-            rowOffset = rows.getChildCount();
-            for (Entry choice : entries) {
-                View option = choice.label ? label(choice) : row(choice);
-                rows.addView(option, choice.label ? new LinearLayout.LayoutParams(-1, -2) : choiceSize());
-            }
-            if (note != null) rows.addView(note(note), choiceSize());
+        for (Entry entry : entries) {
+            if (entry.label) rows.addView(label(entry), new LinearLayout.LayoutParams(-1, -2));
+            else rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
         }
-        if (!level.inline && note != null) rows.addView(note(note), new LinearLayout.LayoutParams(-1, -2));
+        if (note != null) rows.addView(note(note), new LinearLayout.LayoutParams(-1, -2));
         shownEntries = entries;
         level.drawn = true;
-        if (level.focus == 0 && !level.inline || inMenu) scroll.scrollTo(0, 0);
+        if (level.focus == 0 || inMenu) scroll.scrollTo(0, 0);
         if (!inMenu) selectRow(level.focus);
+    }
+
+    /** The page for the first level of a section; the window over it for the levels below. */
+    private void usePane(boolean up) {
+        Pane target = up ? popup : page;
+        heading = target.heading;
+        tableHead = target.tableHead;
+        scroll = target.scroll;
+        rows = target.rows;
+        shade.setVisibility(up ? View.VISIBLE : View.GONE);
+        page.rows.setDescendantFocusability(up ? ViewGroup.FOCUS_BLOCK_DESCENDANTS : ViewGroup.FOCUS_AFTER_DESCENDANTS);
     }
 
     private TextView note(String text) {
@@ -732,19 +780,11 @@ public final class SettingsActivity extends CardActivity {
         return line;
     }
 
-    /** The row whose choices are open under it. */
-    private Drawable openFill() {
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.argb(70, 255, 255, 255));
-        fill.setCornerRadius(dp(12));
-        return fill;
-    }
-
     /** A plain requestFocus fails after a touch, leaving no row selected. */
     private void selectRow(int index) {
         int count = rows.getChildCount();
         if (count == 0) return;
-        int row = Math.min(Math.max(0, index + rowOffset), count - 1);
+        int row = Math.min(Math.max(0, index), count - 1);
         while (row < count - 1 && !rows.getChildAt(row).isFocusable()) row++;
         rows.getChildAt(row).requestFocusFromTouch();
     }
@@ -763,13 +803,6 @@ public final class SettingsActivity extends CardActivity {
     private LinearLayout.LayoutParams rowSize() {
         LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
         size.bottomMargin = dp(8);
-        return size;
-    }
-
-    /** The choices sit a little in, under the row that opened them. */
-    private LinearLayout.LayoutParams choiceSize() {
-        LinearLayout.LayoutParams size = rowSize();
-        size.setMarginStart(dp(CHOICE_INDENT));
         return size;
     }
 
@@ -819,13 +852,10 @@ public final class SettingsActivity extends CardActivity {
         row.setBackground(rest);
         row.setOnClickListener(v -> {
             Level level = levels.peek();
-            level.focus = rows.indexOfChild(v) - rowOffset;
+            level.focus = rows.indexOfChild(v);
             level.opened = entry.title;
-            pendingInline = entry.inline;
             entry.action.run();
-            pendingInline = false;
-            // A choice made under its row closes them, and the row shows it.
-            if (level.inline && !isFinishing()) closeChoices(level);
+            if (entry.picks && !isFinishing()) closeChoices(level);
         });
         row.setOnFocusChangeListener((view, focused) -> {
             paint.accept(focused);
@@ -833,7 +863,7 @@ public final class SettingsActivity extends CardActivity {
             float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
             if (focused) {
-                levels.peek().focus = rows.indexOfChild(view) - rowOffset;
+                levels.peek().focus = rows.indexOfChild(view);
                 showPreview(entry);
             }
         });
@@ -845,7 +875,7 @@ public final class SettingsActivity extends CardActivity {
         mosaic.show(pictures ? entry.mosaic : null);
         if (plain) root.setBackground(entry.preview);
         else if (pictures) root.setBackground(null);
-        else if (previewing) root.setBackground(Look.plainBackdrop());
+        else if (previewing) root.setBackground(null);
         previewing = plain || pictures;
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
     }
@@ -932,11 +962,6 @@ public final class SettingsActivity extends CardActivity {
             })));
     }
 
-    private Entry inline(Entry entry) {
-        entry.inline = true;
-        return entry;
-    }
-
     private Entry info(String title, String value, String text) {
         return new Entry(title, value, null, text, false, () -> { });
     }
@@ -965,17 +990,17 @@ public final class SettingsActivity extends CardActivity {
     private void showHome() {
         boolean circular = Look.circular(this);
         List<Entry> entries = new ArrayList<>();
-        entries.add(inline(new Entry(getString(R.string.settings_home),
+        entries.add(new Entry(getString(R.string.settings_home),
             getString(circular ? R.string.settings_home_circle : R.string.settings_home_grid), null,
             getString(circular ? R.string.settings_home_circle_text : R.string.settings_home_grid_text),
-            true, () -> enter(this::showHomes))));
+            true, () -> enter(this::showHomes)));
         entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null,
             getString(R.string.settings_backdrop_text), true, () -> enter(this::showBackdrops)));
         entries.add(groupLabel(circular ? R.string.settings_section_circle : R.string.settings_section_grid));
         if (circular) {
             // The wheel has no rows, no dock and no names under the circles.
-            entries.add(inline(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
-                getString(R.string.settings_wheel_text), true, () -> enter(this::showWheel))));
+            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
+                getString(R.string.settings_wheel_text), true, () -> enter(this::showWheel)));
             boolean glow = Look.tintGlow(this);
             entries.add(new Entry(getString(R.string.settings_glow), glow ? YES : NO, null,
                 getString(R.string.settings_glow_text), false, () -> {
@@ -998,13 +1023,13 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }));
         } else {
-            entries.add(inline(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
-                getString(R.string.settings_grid_text), true, () -> enter(this::showColumns))));
-            entries.add(inline(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
-                getString(R.string.settings_app_names_text), true, () -> enter(this::showNames))));
-            entries.add(inline(new Entry(getString(R.string.settings_dock),
+            entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
+                getString(R.string.settings_grid_text), true, () -> enter(this::showColumns)));
+            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
+                getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
+            entries.add(new Entry(getString(R.string.settings_dock),
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom), null,
-                getString(R.string.settings_dock_text), true, () -> enter(this::showDock))));
+                getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
         }
         entries.add(groupLabel(R.string.settings_section_home_apps));
         entries.add(new Entry(getString(R.string.settings_sort_home), null, null,
@@ -1044,8 +1069,10 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         for (int index = 0; index < names.length; index++) {
             int choice = index;
-            entries.add(new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture),
-                text.apply(index), false, () -> choose.accept(choice)));
+            Entry entry = new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture),
+                text.apply(index), false, () -> choose.accept(choice));
+            entry.picks = true;
+            entries.add(entry);
         }
         return entries;
     }
@@ -1197,8 +1224,8 @@ public final class SettingsActivity extends CardActivity {
         entries.add(new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, null,
             getString(R.string.settings_tv_off_text), false,
             () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))));
-        entries.add(inline(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null,
-            getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes))));
+        entries.add(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null,
+            getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)));
         entries.add(new Entry(getString(R.string.settings_standards), null, null, getString(R.string.settings_standards_text),
             true, () -> enter(this::showStandards)));
         show(getString(R.string.settings_screen), entries);
@@ -1281,19 +1308,19 @@ public final class SettingsActivity extends CardActivity {
         // A page of its own: a wrong one can leave the screen black, and the page counts down the way back.
         entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), null,
             resolutionText(), true, () -> enter(() -> showResolutions(resolution))));
-        entries.add(inline(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), null,
+        entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), null,
             getString(R.string.settings_hdr_text), true,
-            () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range)))));
-        entries.add(inline(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), null,
+            () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range))));
+        entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), null,
             getString(R.string.settings_color_format_text), true,
-            () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format)))));
+            () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format))));
         if (depth != null && !depth.isEmpty()) {
-            entries.add(inline(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), null,
+            entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), null,
                 getString(R.string.settings_color_depth_text), true,
-                () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth)))));
+                () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth))));
         }
-        entries.add(inline(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), null,
-            getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality))));
+        entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), null,
+            getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality)));
         return entries;
     }
 
@@ -1302,9 +1329,9 @@ public final class SettingsActivity extends CardActivity {
         boolean clear = "true".equals(sound[1]);
         String surround = surroundNow();
         return Arrays.asList(
-            inline(new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
+            new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
                 getString(R.string.settings_surround_text), true,
-                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround)))),
+                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
             new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null,
                 getString(R.string.settings_dialogue_text), false,
                 () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
@@ -1358,10 +1385,13 @@ public final class SettingsActivity extends CardActivity {
             values.subList(1, 3).clear();
             names.subList(1, 3).clear();
         }
-        show(getString(R.string.settings_resolution), choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
+        List<Entry> entries = choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
             resolutionText(), index -> {
                 if (!values.get(index).equals(current)) changeResolution(current, values.get(index));
-            }));
+            });
+        // The window stays while the question counts down: it closes when the answer comes.
+        for (Entry entry : entries) entry.picks = false;
+        show(getString(R.string.settings_resolution), entries);
     }
 
     /** Fire OS does not go back by itself, and with no picture nobody could reach the setting. */
@@ -1564,8 +1594,8 @@ public final class SettingsActivity extends CardActivity {
         boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
         boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
         List<Entry> entries = new ArrayList<>(Arrays.asList(
-            inline(new Entry(getString(R.string.settings_language), Language.name(this), null,
-                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages))),
+            new Entry(getString(R.string.settings_language), Language.name(this), null,
+                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
             new Entry(getString(R.string.panel_notifications), notificationValue(), null,
                 getString(R.string.settings_notifications_text), false, () -> {
                     NotificationCounter.seen(this);
@@ -1821,7 +1851,7 @@ public final class SettingsActivity extends CardActivity {
                 try {
                     Backup.restore(this);
                     say(getString(R.string.settings_choices_restored));
-                    root.setBackground(Look.plainBackdrop());
+                    dressBackdrop();
                     refresh();
                 } catch (IOException | JSONException e) {
                     sayLong(getString(R.string.settings_nothing_to_restore));
@@ -1879,6 +1909,7 @@ public final class SettingsActivity extends CardActivity {
                     return;
                 }
                 Look.setBackdrop(this, name);
+                dressBackdrop();
                 refresh();
             });
     }
@@ -1887,7 +1918,7 @@ public final class SettingsActivity extends CardActivity {
         Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
             getDrawable(R.drawable.ic_image), text, false, () -> {
                 Look.setBackdrop(this, name);
-                root.setBackground(Look.plainBackdrop());
+                dressBackdrop();
                 refresh();
             });
         entry.mark = 0;
@@ -2036,10 +2067,10 @@ public final class SettingsActivity extends CardActivity {
                     Look.setClock(this, !visible);
                     refresh();
                 }),
-            inline(new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], null,
-                getString(R.string.settings_font_text), true, () -> enter(this::showFonts))),
-            inline(new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], null,
-                getString(R.string.settings_size_text), true, () -> enter(this::showSizes))),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], null,
+                getString(R.string.settings_font_text), true, () -> enter(this::showFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], null,
+                getString(R.string.settings_size_text), true, () -> enter(this::showSizes)),
             new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), null,
                 getString(R.string.settings_hours_text), false, () -> {
                     Look.setHours24(this, !Look.hours24(this));
@@ -2056,12 +2087,12 @@ public final class SettingsActivity extends CardActivity {
                     Look.setDate(this, !Look.date(this));
                     refresh();
                 }),
-            inline(new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], null,
-                getString(R.string.settings_date_font_text), true, () -> enter(this::showDateFonts))),
-            inline(new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], null,
-                getString(R.string.settings_date_size_text), true, () -> enter(this::showDateSizes))),
-            inline(new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
-                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats))),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], null,
+                getString(R.string.settings_date_font_text), true, () -> enter(this::showDateFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], null,
+                getString(R.string.settings_date_size_text), true, () -> enter(this::showDateSizes)),
+            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
+                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats)),
             groupLabel(R.string.settings_weather),
             new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null,
                 getString(R.string.settings_weather_show_text), false, () -> {
@@ -2075,10 +2106,10 @@ public final class SettingsActivity extends CardActivity {
                     Weather.setFahrenheit(this, !Weather.fahrenheit(this));
                     refresh();
                 }),
-            inline(new Entry(getString(R.string.settings_font), weatherFontName(), null,
-                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts))),
-            inline(new Entry(getString(R.string.settings_size), weatherSizeName(), null,
-                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes)))));
+            new Entry(getString(R.string.settings_font), weatherFontName(), null,
+                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts)),
+            new Entry(getString(R.string.settings_size), weatherSizeName(), null,
+                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes))));
     }
 
     private String dateFormatName(boolean numeric) {
@@ -2244,8 +2275,8 @@ public final class SettingsActivity extends CardActivity {
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
             new Entry(getString(R.string.settings_saver_kind), own ? ownSaverName() : "Fire OS", null,
                 getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
-            inline(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
-                () -> enter(this::showSaverTimes)))));
+            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
+                () -> enter(this::showSaverTimes))));
         if (own || !Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         if (own) {
@@ -2253,8 +2284,8 @@ public final class SettingsActivity extends CardActivity {
             entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
             entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
             entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
-            entries.add(inline(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], null,
-                getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces))));
+            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], null,
+                getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
         }
         show(getString(R.string.settings_saver), entries);
     }
