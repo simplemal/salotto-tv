@@ -427,6 +427,8 @@ public final class SettingsActivity extends CardActivity {
         shade = new FrameLayout(this);
         shade.setClickable(true);
         shade.setOnClickListener(view -> onBackPressed());
+        // Clickable makes it focusable on its own: with the focus on it, the window's rows had none.
+        shade.setFocusable(false);
         shade.setVisibility(View.GONE);
         shade.addView(card, new FrameLayout.LayoutParams(dp(POPUP_WIDTH), -2, Gravity.CENTER));
 
@@ -547,7 +549,8 @@ public final class SettingsActivity extends CardActivity {
         row.addView(name, new LinearLayout.LayoutParams(0, -2, 1));
         row.setTag(new Drawable[]{selectedFill(dp(10)), softGlass(dp(10))});
         row.setOnClickListener(view -> {
-            if (index != section) chooseSection(index);
+            // A window still open goes too: the click is a choice of the column.
+            if (index != section || levels.size() > 1) chooseSection(index);
             if (!inMenu) goMenu();
         });
         return row;
@@ -933,6 +936,12 @@ public final class SettingsActivity extends CardActivity {
         Drawable rest = softGlass(dp(12));
         row.setBackground(rest);
         row.setOnClickListener(v -> {
+            // A click, with a mouse or on a preview of the screen, reaches the page without the
+            // keys that would have left the column: Back would then still close everything.
+            if (inMenu) {
+                inMenu = false;
+                paintMenu();
+            }
             Level level = levels.peek();
             level.focus = rows.indexOfChild(v);
             level.opened = entry.title;
