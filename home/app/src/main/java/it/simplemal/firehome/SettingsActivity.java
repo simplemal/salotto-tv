@@ -84,8 +84,14 @@ public final class SettingsActivity extends CardActivity {
     private static final int MENU_ROW = 40;
     private static final int ROWS_TOP = 14;
     private static final int ROW_HEIGHT = 48;
-    private static final int POPUP_WIDTH = 620;
-    private static final int POPUP_HEIGHT = 430;
+    /** In the window everything is a size smaller. */
+    private static final int SMALL_ROW_HEIGHT = 40;
+    /** The outer columns of pictures stay whole beside it, see PictureMosaic. */
+    private static final int POPUP_WIDTH = 440;
+    private static final int POPUP_HEIGHT = 390;
+    private static final int SHADE = Color.argb(150, 0, 0, 0);
+    /** Over the pictures only a little: they are what the window is about. */
+    private static final int LIGHT_SHADE = Color.argb(60, 0, 0, 0);
     private static final int BLUR_RADIUS = 6;
     /** Lighter than behind the task manager: here the backdrop is meant to be seen. */
     private static final int SCRIM = Color.argb(150, 8, 10, 14);
@@ -145,7 +151,7 @@ public final class SettingsActivity extends CardActivity {
     private static final int ROW_ROOM = 14;
     private static final int[] TABLE_COLUMNS = {R.string.settings_table_stick, R.string.settings_table_tv,
         R.string.settings_table_in_use};
-    private static final int[] TABLE_WIDTHS = {96, 96, 112};
+    private static final int[] TABLE_WIDTHS = {78, 78, 92};
     private static final int TABLE_ROW = 34;
     private static final int TABLE_PADDING = 14;
 
@@ -271,7 +277,6 @@ public final class SettingsActivity extends CardActivity {
     private TextView about;
     private PictureMosaic mosaic;
     private TextView previewNote;
-    private boolean previewing;
     private LinearLayout menu;
     private Section[] sections;
     private int section;
@@ -283,6 +288,12 @@ public final class SettingsActivity extends CardActivity {
     private Pane page;
     private Pane popup;
     private FrameLayout shade;
+    /** The rows being built belong to the window: a size smaller. */
+    private boolean small;
+    /** A plain backdrop shown whole while its row has the focus. */
+    private View previewLayer;
+    /** A window of backdrops or screensavers is open: their pictures stay around it. */
+    private boolean pictureWindow;
     private ImageView backdropView;
     private static String veiledName;
     private static Bitmap veiled;
@@ -354,7 +365,7 @@ public final class SettingsActivity extends CardActivity {
         }
         left.addView(menu, new LinearLayout.LayoutParams(-1, -2));
         panes.addView(left, new LinearLayout.LayoutParams(dp(MENU_WIDTH + MENU_GAP), -1));
-        mosaic = new PictureMosaic(this);
+        mosaic = new PictureMosaic(this, dp(POPUP_WIDTH), dp(POPUP_HEIGHT));
 
         about = label("", 15);
         about.setAlpha(0.7f);
@@ -371,22 +382,29 @@ public final class SettingsActivity extends CardActivity {
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 1));
 
         // Everything a row opens comes up in the middle, over the page, always the same size.
-        popup = pane(22);
+        popup = pane(18);
+        popup.heading.setTextSize(20);
+        popup.heading.setPadding(dp(16), dp(18), dp(16), dp(4));
+        // The title scrolls with the rows, so that a long list never cuts it.
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(LinearLayout.VERTICAL);
+        popup.scroll.removeView(popup.rows);
+        column.addView(popup.heading, new LinearLayout.LayoutParams(-1, -2));
+        column.addView(popup.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        column.addView(popup.rows, new LinearLayout.LayoutParams(-1, -2));
+        popup.scroll.addView(column);
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setClickable(true);
-        card.setPadding(dp(12), 0, dp(12), dp(10));
+        card.setPadding(dp(8), 0, dp(8), dp(6));
         GradientDrawable fill = new GradientDrawable();
         fill.setColor(Color.rgb(30, 33, 40));
         fill.setCornerRadius(dp(22));
         fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
         card.setBackground(fill);
         card.setElevation(dp(24));
-        card.addView(popup.heading, new LinearLayout.LayoutParams(-1, -2));
-        card.addView(popup.tableHead, new LinearLayout.LayoutParams(-1, -2));
-        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, -1));
         shade = new FrameLayout(this);
-        shade.setBackgroundColor(Color.argb(150, 0, 0, 0));
         shade.setClickable(true);
         shade.setOnClickListener(view -> onBackPressed());
         shade.setVisibility(View.GONE);
@@ -395,13 +413,16 @@ public final class SettingsActivity extends CardActivity {
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         backdropView.setBackground(Look.plainBackdrop());
+        previewLayer = new View(this);
+        previewLayer.setVisibility(View.GONE);
         FrameLayout stage = new FrameLayout(this);
         stage.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
+        stage.addView(previewLayer, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(shade, new FrameLayout.LayoutParams(-1, -1));
         setContentView(stage);
-        usePane(false);
+        usePane(false, false);
         dressBackdrop();
         FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
         corner.bottomMargin = dp(PREVIEW_MARGIN);
@@ -555,7 +576,7 @@ public final class SettingsActivity extends CardActivity {
         heading.setText(Brand.mark(this, sectionName(part)));
         about.setText(part.about == 0 ? "" : getString(part.about));
         about.setVisibility(part.about == 0 ? View.GONE : View.VISIBLE);
-        usePane(false);
+        usePane(false, false);
         rows.removeAllViews();
         tableHead.setVisibility(View.GONE);
         showPreview(null);
@@ -739,7 +760,10 @@ public final class SettingsActivity extends CardActivity {
     /** The note stays under the rows, for what is true of all of them. */
     private void show(String title, List<Entry> entries, String note) {
         Level level = levels.peek();
-        usePane(levels.size() > 1);
+        boolean pictures = false;
+        for (Entry entry : entries) pictures |= entry.mosaic != null || entry.preview != null;
+        usePane(levels.size() > 1, pictures);
+        small = levels.size() > 1;
         heading.setText(Brand.mark(this, title));
         if (levels.size() == 1) {
             about.setText(level.about != null ? level.about : "");
@@ -758,18 +782,44 @@ public final class SettingsActivity extends CardActivity {
         if (note != null) rows.addView(note(note), new LinearLayout.LayoutParams(-1, -2));
         shownEntries = entries;
         level.drawn = true;
-        if (level.focus == 0 || inMenu) scroll.scrollTo(0, 0);
+        if (level.focus == 0 || inMenu || firstRow(level.focus)) scroll.scrollTo(0, 0);
+        // The pictures of what is in use, until the focus reaches a row with its own.
+        if (pictureWindow) mosaic.show(chosenPictures(entries));
         if (!inMenu) selectRow(level.focus);
     }
 
-    /** The page for the first level of a section; the window over it for the levels below. */
-    private void usePane(boolean up) {
+    private String chosenPictures(List<Entry> entries) {
+        String first = null;
+        for (Entry entry : entries) {
+            if (entry.mosaic == null) continue;
+            if (CHECK.equals(entry.value)) return entry.mosaic;
+            if (first == null) first = entry.mosaic;
+        }
+        return first;
+    }
+
+    /** No row can have the focus above this one: up there are only the title and the headings. */
+    private boolean firstRow(int index) {
+        for (int row = 0; row < Math.min(index, rows.getChildCount()); row++) {
+            if (rows.getChildAt(row).isFocusable()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * The page for the first level of a section; the window over it for the levels below. Over
+     * backdrops and screensavers the page goes, and their pictures fill the screen around the window.
+     */
+    private void usePane(boolean up, boolean pictures) {
         Pane target = up ? popup : page;
         heading = target.heading;
         tableHead = target.tableHead;
         scroll = target.scroll;
         rows = target.rows;
         shade.setVisibility(up ? View.VISIBLE : View.GONE);
+        shade.setBackgroundColor(pictures ? LIGHT_SHADE : SHADE);
+        pictureWindow = up && pictures;
+        root.setVisibility(up && pictures ? View.INVISIBLE : View.VISIBLE);
         page.rows.setDescendantFocusability(up ? ViewGroup.FOCUS_BLOCK_DESCENDANTS : ViewGroup.FOCUS_AFTER_DESCENDANTS);
     }
 
@@ -801,8 +851,8 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private LinearLayout.LayoutParams rowSize() {
-        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
-        size.bottomMargin = dp(8);
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(small ? SMALL_ROW_HEIGHT : ROW_HEIGHT));
+        size.bottomMargin = dp(small ? 6 : 8);
         return size;
     }
 
@@ -863,8 +913,11 @@ public final class SettingsActivity extends CardActivity {
             float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
             if (focused) {
-                levels.peek().focus = rows.indexOfChild(view);
+                int index = rows.indexOfChild(view);
+                levels.peek().focus = index;
                 showPreview(entry);
+                // The title scrolls with the rows: back on the first row it comes back into view.
+                if (firstRow(index)) scroll.smoothScrollTo(0, 0);
             }
         });
     }
@@ -872,27 +925,26 @@ public final class SettingsActivity extends CardActivity {
     private void showPreview(Entry entry) {
         boolean plain = entry != null && entry.preview != null;
         boolean pictures = entry != null && entry.mosaic != null;
-        mosaic.show(pictures ? entry.mosaic : null);
-        if (plain) root.setBackground(entry.preview);
-        else if (pictures) root.setBackground(null);
-        else if (previewing) root.setBackground(null);
-        previewing = plain || pictures;
+        // Among backdrops a row without pictures leaves the last ones around the window.
+        if (pictures || plain || !pictureWindow) mosaic.show(pictures ? entry.mosaic : null);
+        previewLayer.setBackground(plain ? entry.preview : null);
+        previewLayer.setVisibility(plain ? View.VISIBLE : View.GONE);
         previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
     }
 
     private View label(Entry entry) {
-        TextView label = label(entry.title, LABEL_SP);
+        TextView label = label(entry.title, small ? 13 : LABEL_SP);
         label.setText(Brand.mark(this, entry.title));
         label.setAlpha(0.7f);
-        label.setPadding(dp(20), dp(LABEL_ROOM), dp(16), dp(8));
+        label.setPadding(dp(small ? 16 : 20), dp(LABEL_ROOM), dp(16), dp(small ? 6 : 8));
         return label;
     }
 
     private View row(Entry entry) {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(20), 0, dp(16), 0);
-        TextView title = label(entry.title, 20);
+        row.setPadding(dp(small ? 16 : 20), 0, dp(small ? 12 : 16), 0);
+        TextView title = label(entry.title, small ? 17 : 20);
         if (entry.family != null) title.setTypeface(Typeface.create(entry.family, Typeface.NORMAL));
         title.setSingleLine(true);
         if (entry.mark != NO_MARK) {
@@ -905,10 +957,10 @@ public final class SettingsActivity extends CardActivity {
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         boolean onOff = YES.equals(entry.value) || NO.equals(entry.value);
         ToggleView toggle = onOff ? new ToggleView(this, YES.equals(entry.value)) : null;
-        TextView value = label(onOff || entry.value == null ? "" : entry.value, 18);
+        TextView value = label(onOff || entry.value == null ? "" : entry.value, small ? 15 : 18);
         value.setSingleLine(true);
         value.setEllipsize(TextUtils.TruncateAt.END);
-        value.setMaxWidth(dp(230));
+        value.setMaxWidth(dp(small ? 170 : 230));
         value.setAlpha(0.75f);
         row.addView(value);
         ImageView lock = new ImageView(this);
@@ -917,8 +969,8 @@ public final class SettingsActivity extends CardActivity {
         LinearLayout.LayoutParams lockPlace = new LinearLayout.LayoutParams(dp(LOCK_SIZE), dp(LOCK_SIZE));
         lockPlace.setMarginStart(dp(8));
         if (entry.locked) row.addView(lock, lockPlace);
-        if (onOff) row.addView(toggle, new LinearLayout.LayoutParams(dp(38), dp(21)));
-        TextView chevron = label(entry.branch ? "›" : "", 24);
+        if (onOff) row.addView(toggle, new LinearLayout.LayoutParams(dp(small ? 34 : 38), dp(small ? 19 : 21)));
+        TextView chevron = label(entry.branch ? "›" : "", small ? 20 : 24);
         chevron.setPadding(dp(12), 0, 0, dp(3));
         chevron.setAlpha(0.75f);
         if (!onOff) row.addView(chevron);
