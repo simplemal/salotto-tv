@@ -63,6 +63,13 @@ Ogni versione è una [release](https://github.com/simplemal/salotto-tv/releases)
 
 Se sulla TV compare un codice, cercalo in [ERRORI.md](ERRORI.md). Per tutto il resto [apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new).
 
+## Problemi e nuove idee
+
+Per segnalare un problema o proporre una funzione nuova, apri una [segnalazione su GitHub](https://github.com/simplemal/salotto-tv/issues/new): serve solo un account GitHub gratuito. Prima guarda tra le [segnalazioni già aperte](https://github.com/simplemal/salotto-tv/issues): se c'è già, aggiungi un commento o un 👍.
+
+- **Problema:** indica il modello della Fire TV e la versione di Salotto (in Impostazioni → Informazioni su Salotto), cosa hai fatto e cosa è successo. Se c'è un codice di errore, scrivilo o allega una foto dello schermo. Per i problemi d'installazione, in Installa Salotto premi «Segnala un problema»: salva sulla Scrivania un file da allegare.
+- **Nuova funzione:** descrivi cosa ti servirebbe e quando lo useresti.
+
 ## Sostieni Salotto
 
 Salotto è gratuito e open-source. Se ti è stato utile e vuoi sostenerne lo sviluppo, anche per nuove piattaforme, puoi offrirmi un caffè ☕
