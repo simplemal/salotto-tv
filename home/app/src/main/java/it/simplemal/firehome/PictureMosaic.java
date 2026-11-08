@@ -46,6 +46,8 @@ final class PictureMosaic extends FrameLayout {
     private static final float TILE_SHARE = 0.25f;
     private static final float GAP_SHARE = 0.024f;
     private static final int AROUND_COLUMNS = 4;
+    /** Around a window many tiles are in view: one changes at a time, and seldom. */
+    private static final long AROUND_EVERY_MS = 6000;
     private static final float AROUND_GAP_SHARE = 0.016f;
     private static final float RADIUS_SHARE = 0.008f;
     /** The middle column stands under the title of the page, with half a column on either side. */
@@ -165,6 +167,9 @@ final class PictureMosaic extends FrameLayout {
     private final Drawable base = Look.plainBackdrop();
     private final FrameLayout grid;
     private List<String> files = new ArrayList<>();
+    private long every = EVERY_MS;
+    private boolean oneAtATime;
+    private boolean turnNext;
     private String folder;
     private int next;
     private long started;
@@ -185,6 +190,8 @@ final class PictureMosaic extends FrameLayout {
             grid = new FrameLayout(context);
             addView(grid, new LayoutParams(-1, -1));
             placeAround(screen, clearWidth, clearHeight);
+            every = AROUND_EVERY_MS;
+            oneAtATime = true;
             return;
         }
         setBackground(Look.plainBackdrop());
@@ -288,7 +295,7 @@ final class PictureMosaic extends FrameLayout {
         }
         started = SystemClock.uptimeMillis();
         for (Tile tile : tiles) load(tile, false);
-        postDelayed(change, EVERY_MS);
+        postDelayed(change, every);
     }
 
     private void sortMoments(Properties table, String wanted) {
@@ -337,9 +344,14 @@ final class PictureMosaic extends FrameLayout {
             if (tile.seen && tile.filled && !tile.busy) free.add(tile);
         }
         Collections.shuffle(free);
-        if (free.size() > 0) load(free.get(0), true);
-        if (free.size() > 1) load(free.get(1), false);
-        postDelayed(change, EVERY_MS);
+        if (oneAtATime) {
+            turnNext = !turnNext;
+            if (free.size() > 0) load(free.get(0), turnNext);
+        } else {
+            if (free.size() > 0) load(free.get(0), true);
+            if (free.size() > 1) load(free.get(1), false);
+        }
+        postDelayed(change, every);
     }
 
     private void load(Tile tile, boolean turns) {

@@ -238,6 +238,10 @@ public final class MainActivity extends CardActivity {
     private boolean loading;
     private boolean looked;
     private static final long LOADING_LIMIT_MS = 10000;
+    private static final long MENU_BACKDROP_DELAY_MS = 4000;
+    private final Runnable menuBackdrop = () -> {
+        if (!isDestroyed()) MenuBackdrop.prepare(this);
+    };
     private static final long LOADING_OUT_MS = 200;
     private static final int LOADING_WHEEL = 40;
     private final Runnable endLoading = this::hideLoading;
@@ -1113,6 +1117,11 @@ public final class MainActivity extends CardActivity {
 
     /** Everything asked for has arrived: one frame later, so that it is drawn, the mask goes. */
     private void homeMaybeReady() {
+        if (homeReady()) {
+            // The settings' backdrop is made now, while nothing else is going on, and not when they open.
+            root.removeCallbacks(menuBackdrop);
+            root.postDelayed(menuBackdrop, MENU_BACKDROP_DELAY_MS);
+        }
         if (!loading || !homeReady()) return;
         root.postOnAnimation(() -> {
             if (homeReady()) hideLoading();

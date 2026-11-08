@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.usage.StorageStats;
 import android.app.usage.StorageStatsManager;
 import android.bluetooth.BluetoothAdapter;
@@ -37,6 +38,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -92,9 +94,6 @@ public final class SettingsActivity extends CardActivity {
     private static final int SHADE = Color.argb(150, 0, 0, 0);
     /** Over the pictures only a little: they are what the window is about. */
     private static final int LIGHT_SHADE = Color.argb(60, 0, 0, 0);
-    private static final int BLUR_RADIUS = 6;
-    /** Lighter than behind the task manager: here the backdrop is meant to be seen. */
-    private static final int SCRIM = Color.argb(150, 8, 10, 14);
     private static final long SECTION_PAUSE_MS = 140;
     private static final int APPS_SECTION = 3;
     private static final int SCREEN_SECTION = 4;
@@ -219,6 +218,9 @@ public final class SettingsActivity extends CardActivity {
         boolean drawn;
         /** Under the title: what the whole section is for. Only the first page of a section has it. */
         String about;
+        String title;
+        /** Above the title of a window: where it was opened from, the heading over its row or the page. */
+        String context;
         Level(Runnable show) { this.show = show; }
     }
 
@@ -288,6 +290,7 @@ public final class SettingsActivity extends CardActivity {
     private Pane page;
     private Pane popup;
     private FrameLayout shade;
+    private TextView eyebrow;
     /** The rows being built belong to the window: a size smaller. */
     private boolean small;
     /** A plain backdrop shown whole while its row has the focus. */
@@ -295,8 +298,6 @@ public final class SettingsActivity extends CardActivity {
     /** A window of backdrops or screensavers is open: their pictures stay around it. */
     private boolean pictureWindow;
     private ImageView backdropView;
-    private static String veiledName;
-    private static Bitmap veiled;
     /** A key pressed in the column: its release must not reach the page it opened. */
     private int heldInMenu;
     /** Fire OS answers slowly: the page shows what was read last and reads again when it is stale. */
@@ -375,40 +376,59 @@ public final class SettingsActivity extends CardActivity {
         page = pane(COLUMN_TOP - 8);
         LinearLayout list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
-        list.addView(page.heading, new LinearLayout.LayoutParams(-1, -2));
-        list.addView(about, new LinearLayout.LayoutParams(-1, -2));
-        list.addView(page.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        // Title and description scroll with the rows: no row ever slides under a fixed header.
+        LinearLayout pageColumn = new LinearLayout(this);
+        pageColumn.setOrientation(LinearLayout.VERTICAL);
+        page.scroll.removeView(page.rows);
+        pageColumn.addView(page.heading, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(about, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(page.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(page.rows, new LinearLayout.LayoutParams(-1, -2));
+        page.scroll.addView(pageColumn);
         list.addView(page.scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         panes.addView(list, new LinearLayout.LayoutParams(0, -1, 1));
 
         // Everything a row opens comes up in the middle, over the page, always the same size.
         popup = pane(18);
         popup.heading.setTextSize(20);
-        popup.heading.setPadding(dp(16), dp(18), dp(16), dp(4));
+        popup.heading.setPadding(dp(16), 0, dp(16), dp(4));
+        eyebrow = label("", 13);
+        eyebrow.setAlpha(0.6f);
+        eyebrow.setSingleLine(true);
+        eyebrow.setEllipsize(TextUtils.TruncateAt.END);
+        eyebrow.setPadding(dp(16), dp(16), dp(16), dp(2));
         // The title scrolls with the rows, so that a long list never cuts it.
         LinearLayout column = new LinearLayout(this);
         column.setOrientation(LinearLayout.VERTICAL);
         popup.scroll.removeView(popup.rows);
+        column.addView(eyebrow, new LinearLayout.LayoutParams(-1, -2));
         column.addView(popup.heading, new LinearLayout.LayoutParams(-1, -2));
         column.addView(popup.tableHead, new LinearLayout.LayoutParams(-1, -2));
         column.addView(popup.rows, new LinearLayout.LayoutParams(-1, -2));
         popup.scroll.addView(column);
-        LinearLayout card = new LinearLayout(this);
+        // As tall as what it holds, up to POPUP_HEIGHT, and always in the middle.
+        LinearLayout card = new LinearLayout(this) {
+            @Override protected void onMeasure(int widthSpec, int heightSpec) {
+                super.onMeasure(widthSpec, MeasureSpec.makeMeasureSpec(dp(POPUP_HEIGHT), MeasureSpec.AT_MOST));
+            }
+        };
         card.setOrientation(LinearLayout.VERTICAL);
         card.setClickable(true);
-        card.setPadding(dp(8), 0, dp(8), dp(6));
+        // The rows run to the rounded edge and go under it, not under a band above it.
+        card.setPadding(dp(8), 0, dp(8), 0);
+        card.setClipToOutline(true);
         GradientDrawable fill = new GradientDrawable();
         fill.setColor(Color.rgb(30, 33, 40));
         fill.setCornerRadius(dp(22));
         fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
         card.setBackground(fill);
         card.setElevation(dp(24));
-        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, -1));
+        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, -2));
         shade = new FrameLayout(this);
         shade.setClickable(true);
         shade.setOnClickListener(view -> onBackPressed());
         shade.setVisibility(View.GONE);
-        shade.addView(card, new FrameLayout.LayoutParams(dp(POPUP_WIDTH), dp(POPUP_HEIGHT), Gravity.CENTER));
+        shade.addView(card, new FrameLayout.LayoutParams(dp(POPUP_WIDTH), -2, Gravity.CENTER));
 
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -487,21 +507,16 @@ public final class SettingsActivity extends CardActivity {
         return pane;
     }
 
-    /** The Home's own backdrop, blurred and darkened as behind the task manager. Until it is ready, the plain one. */
+    /** The Home's own backdrop, blurred and darkened, usually made beforehand by the Home. Until it is ready, the plain one. */
     private void dressBackdrop() {
-        String name = Look.currentName(this);
-        if (name.equals(veiledName)) {
-            backdropView.setImageBitmap(veiled);
+        Bitmap ready = MenuBackdrop.ready(this);
+        if (ready != null) {
+            backdropView.setImageBitmap(ready);
             return;
         }
-        Look.current(this, picture -> Background.draw(() -> {
-            Bitmap shown = Blur.veiled(picture, BLUR_RADIUS, SCRIM);
-            runOnUiThread(() -> {
-                veiledName = name;
-                veiled = shown;
-                if (!isDestroyed()) backdropView.setImageBitmap(shown);
-            });
-        }));
+        MenuBackdrop.make(this, made -> {
+            if (!isDestroyed()) backdropView.setImageBitmap(made);
+        });
     }
 
     private String sectionName(Section part) {
@@ -702,8 +717,20 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void enter(Runnable show) {
-        levels.push(new Level(show));
+        Level level = new Level(show);
+        if (!levels.isEmpty()) level.context = contextOf(levels.peek());
+        levels.push(level);
         show.run();
+    }
+
+    /** «Tipo» alone says little: the heading over its row, or the page it is on, says of what. */
+    private String contextOf(Level parent) {
+        if (shownEntries != null) {
+            for (int index = Math.min(parent.focus, shownEntries.size()) - 1; index >= 0; index--) {
+                if (shownEntries.get(index).label) return shownEntries.get(index).title;
+            }
+        }
+        return parent.title;
     }
 
     /** After a choice its window closes, and the page shows it. */
@@ -764,7 +791,12 @@ public final class SettingsActivity extends CardActivity {
         for (Entry entry : entries) pictures |= entry.mosaic != null || entry.preview != null;
         usePane(levels.size() > 1, pictures);
         small = levels.size() > 1;
+        level.title = title;
         heading.setText(Brand.mark(this, title));
+        if (small) {
+            eyebrow.setText(level.context != null ? Brand.mark(this, level.context) : "");
+            eyebrow.setVisibility(level.context != null ? View.VISIBLE : View.GONE);
+        }
         if (levels.size() == 1) {
             about.setText(level.about != null ? level.about : "");
             about.setVisibility(level.about != null ? View.VISIBLE : View.GONE);
@@ -1827,17 +1859,8 @@ public final class SettingsActivity extends CardActivity {
             connectWifi(name, security, "");
             return;
         }
-        EditText password = new EditText(this);
-        password.setSingleLine(true);
-        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        AlertDialog dialog = dialog()
-            .setTitle(getString(R.string.settings_wifi_password, name)).setView(password)
-            .setNegativeButton(getString(R.string.settings_cancel), null)
-            .setPositiveButton(getString(R.string.settings_wifi_join), (d, button) -> connectWifi(name, security, password.getText().toString()))
-            .create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-        centerButton(dialog);
+        askText(getString(R.string.settings_wifi_password, name), true, getString(R.string.settings_wifi_join),
+            password -> connectWifi(name, security, password));
     }
 
     private void connectWifi(String name, String security, String password) {
@@ -1877,7 +1900,7 @@ public final class SettingsActivity extends CardActivity {
         boolean beta = Updater.beta(this);
         boolean doubleHome = HomeCover.doubleHome;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_about), BuildVersion.name(this), null,
+        entries.add(new Entry(getString(R.string.settings_about), null, null,
             getString(R.string.settings_about_text), true, () -> open(new Intent(this, AboutActivity.class))));
         entries.add(groupLabel(R.string.settings_update));
         entries.add(new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), null,
@@ -2239,32 +2262,72 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void askPlace() {
-        EditText name = new EditText(this);
-        name.setSingleLine(true);
-        name.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        AlertDialog dialog = dialog()
-            .setTitle(getString(R.string.first_city_hint)).setView(name)
-            .setPositiveButton(getString(R.string.first_search), (d, button) -> searchPlace(name.getText().toString().trim()))
-            .create();
-        name.setOnEditorActionListener((view, action, event) -> {
-            dialog.dismiss();
-            searchPlace(name.getText().toString().trim());
-            return true;
-        });
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-        centerButton(dialog);
+        askText(getString(R.string.first_city_hint), false, getString(R.string.first_search), name -> searchPlace(name.trim()));
     }
 
-    /** The dialog's own bar leaves its only button off centre, under a line that is centred. */
-    private void centerButton(AlertDialog dialog) {
-        View button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        LinearLayout bar = (LinearLayout) button.getParent();
-        for (int index = 0; index < bar.getChildCount(); index++) {
-            if (bar.getChildAt(index) != button) bar.getChildAt(index).setVisibility(View.GONE);
-        }
-        bar.setGravity(Gravity.CENTER_HORIZONTAL);
-        bar.setPadding(0, bar.getPaddingTop(), 0, bar.getPaddingBottom());
+    /** A title, one field and one button, all centred, in the same window as the rest of the settings. */
+    private void askText(String title, boolean secret, String action, Consumer<String> done) {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(24), dp(20), dp(24), dp(20));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.rgb(30, 33, 40));
+        fill.setCornerRadius(dp(22));
+        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
+        box.setBackground(fill);
+        TextView heading = label(title, 20);
+        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        heading.setGravity(Gravity.CENTER);
+        box.addView(heading, new LinearLayout.LayoutParams(-2, -2));
+        EditText field = new EditText(this);
+        field.setSingleLine(true);
+        field.setTextSize(18);
+        field.setTextColor(Color.WHITE);
+        field.setGravity(Gravity.CENTER);
+        // A rounded field instead of Android's line under the words.
+        GradientDrawable well = new GradientDrawable();
+        well.setColor(Color.argb(40, 255, 255, 255));
+        well.setCornerRadius(dp(12));
+        field.setBackground(well);
+        field.setPadding(dp(16), dp(10), dp(16), dp(10));
+        field.setInputType(secret ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD : InputType.TYPE_CLASS_TEXT);
+        field.setImeOptions(secret ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_SEARCH);
+        LinearLayout.LayoutParams wide = new LinearLayout.LayoutParams(dp(360), -2);
+        wide.topMargin = dp(16);
+        box.addView(field, wide);
+        TextView button = label(action, 18);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(28), dp(10), dp(28), dp(10));
+        button.setFocusable(true);
+        button.setClickable(true);
+        button.setDefaultFocusHighlightEnabled(false);
+        Drawable rest = softGlass(dp(20));
+        Drawable lit = selectedFill(dp(20));
+        button.setBackground(rest);
+        button.setOnFocusChangeListener((view, focused) -> {
+            view.setBackground(focused ? lit : rest);
+            button.setTextColor(focused ? Fire.INK : Color.WHITE);
+        });
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(16);
+        box.addView(button, under);
+        Runnable send = () -> {
+            dialog.dismiss();
+            done.accept(field.getText().toString());
+        };
+        button.setOnClickListener(view -> send.run());
+        field.setOnEditorActionListener((view, code, event) -> {
+            send.run();
+            return true;
+        });
+        dialog.setContentView(box);
+        Window window = dialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        dialog.show();
     }
 
     private void searchPlace(String name) {

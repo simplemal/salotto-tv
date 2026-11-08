@@ -341,7 +341,7 @@
     <string name="settings_date_long">Esteso</string>
     <string name="settings_date_numeric">Numerico</string>
     <string name="settings_date_format_text">Come la scrive la lingua del Fire TV.</string>
-    <string name="settings_like_date">Come Data</string>
+    <string name="settings_like_date">Come la Data</string>
     <string name="settings_weather_font_text">Lo stile della prima riga del meteo.</string>
     <string name="settings_weather_size_text">Quanto è grande la prima riga del meteo.</string>
     <string name="settings_cat_home">Home</string>
