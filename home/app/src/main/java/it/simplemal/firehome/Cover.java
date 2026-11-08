@@ -24,8 +24,11 @@ final class Cover {
     private static final String ACTIVITY = PACKAGE + ".CoverActivity";
     private static final String APK = "copertura.apk";
     private static final String EXTRA_PAGE = "page";
-    /** 3: it goes only when Salotto, back in front, says so (close), not when anything covers it. */
-    private static final int VERSION = 3;
+    /**
+     * 3: it goes only when Salotto, back in front, says so (close), not when anything covers it.
+     * 4: with no picture it shows the sofa on black, for adb, which starts it before replacing Salotto.
+     */
+    private static final int VERSION = 4;
     private static final String CLOSE = PACKAGE + ".CLOSE";
     private static final int BEST = 100;
     private static final long INSTALL_LIMIT_MS = 15000;
