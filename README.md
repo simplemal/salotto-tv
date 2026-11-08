@@ -63,6 +63,12 @@ Every version is a [release](https://github.com/simplemal/salotto-tv/releases) w
 
 If a code appears on the TV, look for it in [ERRORI.md](ERRORI.md). For anything else [open an issue](https://github.com/simplemal/salotto-tv/issues/new).
 
+## Support Salotto
+
+Salotto is free and open source. If it has been useful to you and you want to support its development, including for new platforms, you can buy me a coffee ☕
+
+<p><a href="https://buymeacoffee.com/saggiamente"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="50"></a></p>
+
 ## License
 
 [PolyForm Noncommercial 1.0.0](LICENSE): it can be used, studied, modified and built upon for free for non-commercial purposes. Selling it requires the author's permission. Credits and third-party software are in [NOTICE.md](NOTICE.md).
