@@ -964,7 +964,8 @@ public final class MainActivity extends CardActivity {
         if (circular) readCorner();
         String scene = Look.weatherPictures(this) ? Weather.picture(this)
             : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
-        String plain = scene == null ? Look.backdrop(this) : null;
+        // Salotto's colours changing by themselves: the one due now, so that a new one is a change.
+        String plain = scene == null ? Look.shownBackdrop(this) : null;
         String before = plainBackdrop;
         plainBackdrop = plain;
         boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || Fire.STICK_2020;

@@ -76,8 +76,6 @@ public final class SettingsActivity extends CardActivity {
     private static final int LABEL_ROOM = 6;
     private static final int MARK_SIZE = 20;
     private static final int MARK_GAP = 12;
-    private static final int PREVIEW_SP = 12;
-    private static final int PREVIEW_MARGIN = 24;
     private static final int LOCK_SIZE = 16;
     private static final int WIFI_5GHZ = 5000;
     /** The column of sections, and the room between it and the page. */
@@ -92,8 +90,6 @@ public final class SettingsActivity extends CardActivity {
     private static final int POPUP_WIDTH = 440;
     private static final int POPUP_HEIGHT = 390;
     private static final int SHADE = Color.argb(150, 0, 0, 0);
-    /** Over the pictures only a little: they are what the window is about. */
-    private static final int LIGHT_SHADE = Color.argb(60, 0, 0, 0);
     private static final long SECTION_PAUSE_MS = 140;
     private static final int APPS_SECTION = 3;
     private static final int SCREEN_SECTION = 4;
@@ -186,10 +182,6 @@ public final class SettingsActivity extends CardActivity {
         boolean locked;
         /** Shown but not to be chosen: the focus skips it. */
         boolean off;
-        /** The backdrop this row would give: the page turns into it while the row has the focus. */
-        Drawable preview;
-        /** The pictures of this row: they become the page's background while it has the focus. */
-        String mosaic;
         /** A heading for the rows below it: not a row. */
         boolean label;
         /** Beside the title: what kind of backdrop it is. Zero keeps the room empty, to stay lined up. */
@@ -277,8 +269,6 @@ public final class SettingsActivity extends CardActivity {
     private LinearLayout root;
     private TextView heading;
     private TextView about;
-    private PictureMosaic mosaic;
-    private TextView previewNote;
     private LinearLayout menu;
     private Section[] sections;
     private int section;
@@ -293,10 +283,6 @@ public final class SettingsActivity extends CardActivity {
     private TextView eyebrow;
     /** The rows being built belong to the window: a size smaller. */
     private boolean small;
-    /** A plain backdrop shown whole while its row has the focus. */
-    private View previewLayer;
-    /** A window of backdrops or screensavers is open: their pictures stay around it. */
-    private boolean pictureWindow;
     private ImageView backdropView;
     /** A key pressed in the column: its release must not reach the page it opened. */
     private int heldInMenu;
@@ -326,9 +312,6 @@ public final class SettingsActivity extends CardActivity {
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
-        previewNote = label(getString(R.string.first_preview), PREVIEW_SP);
-        previewNote.setAlpha(0.7f);
-        previewNote.setVisibility(View.GONE);
 
         LinearLayout panes = new LinearLayout(this);
         root.addView(panes, new LinearLayout.LayoutParams(-1, 0, 1));
@@ -366,7 +349,6 @@ public final class SettingsActivity extends CardActivity {
         }
         left.addView(menu, new LinearLayout.LayoutParams(-1, -2));
         panes.addView(left, new LinearLayout.LayoutParams(dp(MENU_WIDTH + MENU_GAP), -1));
-        mosaic = new PictureMosaic(this, dp(POPUP_WIDTH), dp(POPUP_HEIGHT));
 
         about = label("", 15);
         about.setAlpha(0.7f);
@@ -435,21 +417,13 @@ public final class SettingsActivity extends CardActivity {
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         backdropView.setBackground(Look.plainBackdrop());
-        previewLayer = new View(this);
-        previewLayer.setVisibility(View.GONE);
         FrameLayout stage = new FrameLayout(this);
         stage.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
-        stage.addView(previewLayer, new FrameLayout.LayoutParams(-1, -1));
-        stage.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(shade, new FrameLayout.LayoutParams(-1, -1));
         setContentView(stage);
-        usePane(false, false);
+        usePane(false);
         dressBackdrop();
-        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
-        corner.bottomMargin = dp(PREVIEW_MARGIN);
-        corner.setMarginStart(dp(PREVIEW_MARGIN));
-        addContentView(previewNote, corner);
         // A mouse click puts the window in touch mode, which drops the selection: take it back.
         root.getViewTreeObserver().addOnTouchModeChangeListener(touching -> {
             if (touching) rows.post(this::selectCurrent);
@@ -594,10 +568,9 @@ public final class SettingsActivity extends CardActivity {
         heading.setText(Brand.mark(this, sectionName(part)));
         about.setText(part.about == 0 ? "" : getString(part.about));
         about.setVisibility(part.about == 0 ? View.GONE : View.VISIBLE);
-        usePane(false, false);
+        usePane(false);
         rows.removeAllViews();
         tableHead.setVisibility(View.GONE);
-        showPreview(null);
         rows.removeCallbacks(showSection);
         rows.postDelayed(showSection, SECTION_PAUSE_MS);
     }
@@ -790,9 +763,7 @@ public final class SettingsActivity extends CardActivity {
     /** The note stays under the rows, for what is true of all of them. */
     private void show(String title, List<Entry> entries, String note) {
         Level level = levels.peek();
-        boolean pictures = false;
-        for (Entry entry : entries) pictures |= entry.mosaic != null || entry.preview != null;
-        usePane(levels.size() > 1, pictures);
+        usePane(levels.size() > 1);
         small = levels.size() > 1;
         level.title = title;
         heading.setText(Brand.mark(this, title));
@@ -818,19 +789,7 @@ public final class SettingsActivity extends CardActivity {
         shownEntries = entries;
         level.drawn = true;
         if (level.focus == 0 || inMenu || firstRow(level.focus)) scroll.scrollTo(0, 0);
-        // The pictures of what is in use, until the focus reaches a row with its own.
-        if (pictureWindow) mosaic.show(chosenPictures(entries));
         if (!inMenu) selectRow(level.focus);
-    }
-
-    private String chosenPictures(List<Entry> entries) {
-        String first = null;
-        for (Entry entry : entries) {
-            if (entry.mosaic == null) continue;
-            if (CHECK.equals(entry.value)) return entry.mosaic;
-            if (first == null) first = entry.mosaic;
-        }
-        return first;
     }
 
     /** No row can have the focus above this one: up there are only the title and the headings. */
@@ -841,20 +800,15 @@ public final class SettingsActivity extends CardActivity {
         return true;
     }
 
-    /**
-     * The page for the first level of a section; the window over it for the levels below. Over
-     * backdrops and screensavers the page goes, and their pictures fill the screen around the window.
-     */
-    private void usePane(boolean up, boolean pictures) {
+    /** The page for the first level of a section; the window over it for the levels below. */
+    private void usePane(boolean up) {
         Pane target = up ? popup : page;
         heading = target.heading;
         tableHead = target.tableHead;
         scroll = target.scroll;
         rows = target.rows;
         shade.setVisibility(up ? View.VISIBLE : View.GONE);
-        shade.setBackgroundColor(pictures ? LIGHT_SHADE : SHADE);
-        pictureWindow = up && pictures;
-        root.setVisibility(up && pictures ? View.INVISIBLE : View.VISIBLE);
+        shade.setBackgroundColor(SHADE);
         page.rows.setDescendantFocusability(up ? ViewGroup.FOCUS_BLOCK_DESCENDANTS : ViewGroup.FOCUS_AFTER_DESCENDANTS);
     }
 
@@ -956,21 +910,10 @@ public final class SettingsActivity extends CardActivity {
             if (focused) {
                 int index = rows.indexOfChild(view);
                 levels.peek().focus = index;
-                showPreview(entry);
                 // The title scrolls with the rows: back on the first row it comes back into view.
                 if (firstRow(index)) scroll.smoothScrollTo(0, 0);
             }
         });
-    }
-
-    private void showPreview(Entry entry) {
-        boolean plain = entry != null && entry.preview != null;
-        boolean pictures = entry != null && entry.mosaic != null;
-        // Among backdrops a row without pictures leaves the last ones around the window.
-        if (pictures || plain || !pictureWindow) mosaic.show(pictures ? entry.mosaic : null);
-        previewLayer.setBackground(plain ? entry.preview : null);
-        previewLayer.setVisibility(plain ? View.VISIBLE : View.GONE);
-        previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
     }
 
     private View label(Entry entry) {
@@ -1088,7 +1031,9 @@ public final class SettingsActivity extends CardActivity {
             getString(circular ? R.string.settings_home_circle_text : R.string.settings_home_grid_text),
             true, () -> enter(this::showHomes)));
         entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null,
-            getString(R.string.settings_backdrop_text), true, () -> enter(this::showBackdrops)));
+            getString(R.string.settings_backdrop_text), true, () -> open(new Intent(this, PictureGridActivity.class))));
+        // Only for a collection that changes by itself: with one picture or the weather it means nothing.
+        if (Look.timedBackdrop(this)) entries.add(paceEntry(false));
         entries.add(groupLabel(circular ? R.string.settings_section_circle : R.string.settings_section_grid));
         if (circular) {
             // The wheel has no rows, no dock and no names under the circles.
@@ -1642,7 +1587,6 @@ public final class SettingsActivity extends CardActivity {
 
     @Override protected void onDestroy() {
         stopSearch();
-        mosaic.show(null);
         fire.close();
         super.onDestroy();
     }
@@ -1984,136 +1928,6 @@ public final class SettingsActivity extends CardActivity {
         return Fire.settings();
     }
 
-    private Entry weatherBackdrop(String name, int picture, String text) {
-        boolean ready = Weather.active(this);
-        return new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : ready ? null : getString(R.string.first_place_title),
-            getDrawable(picture), getString(R.string.settings_weather_backdrop_text, text), false, () -> {
-                if (!ready) {
-                    sayLong(getString(R.string.settings_place_first));
-                    return;
-                }
-                Look.setBackdrop(this, name);
-                dressBackdrop();
-                refresh();
-            });
-    }
-
-    private Entry plainBackdrop(String name, String text) {
-        Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
-            getDrawable(R.drawable.ic_image), text, false, () -> {
-                Look.setBackdrop(this, name);
-                dressBackdrop();
-                refresh();
-            });
-        entry.mark = 0;
-        return entry;
-    }
-
-    private void showBackdrops() {
-        List<Entry> weather = new ArrayList<>();
-        Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
-            getString(R.string.settings_backdrop_pictures_text));
-        pictures.mosaic = Look.PICTURES_FOLDER;
-        pictures.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.PICTURES_FOLDER)) weather.add(pictures);
-        Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
-            getString(R.string.settings_backdrop_photos_text));
-        photos.mosaic = Look.PHOTOS_FOLDER;
-        photos.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.PHOTOS_FOLDER)) weather.add(photos);
-        Entry aerial = weatherBackdrop(Look.AERIAL, R.drawable.ic_photo,
-            getString(R.string.settings_backdrop_aerial_text));
-        aerial.mosaic = Look.AERIAL_FOLDER;
-        aerial.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.AERIAL_FOLDER)) weather.add(aerial);
-        List<Entry> timed = new ArrayList<>();
-        Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
-        drawn.mosaic = Look.ABSTRACT_FOLDER;
-        drawn.mark = R.drawable.ic_restart;
-        if (shown(Look.ABSTRACT_FOLDER)) timed.add(drawn);
-        Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text));
-        shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
-        shapes.mark = R.drawable.ic_restart;
-        if (shown(Look.ABSTRACT_3D_FOLDER)) timed.add(shapes);
-        Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text));
-        city.mosaic = Look.NOX_FOLDER;
-        city.mark = R.drawable.ic_restart;
-        if (shown(Look.NOX_FOLDER)) timed.add(city);
-        Entry nature = plainBackdrop(Look.NATURE, getString(R.string.settings_backdrop_nature_text));
-        nature.mosaic = Look.NATURE_FOLDER;
-        nature.mark = R.drawable.ic_restart;
-        if (shown(Look.NATURE_FOLDER)) timed.add(nature);
-        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
-            Entry mine = plainBackdrop(Look.PERSONAL, getString(R.string.settings_backdrop_personal_timed_text));
-            mine.mark = R.drawable.ic_restart;
-            timed.add(mine);
-        }
-        weather.add(0, groupLabel(R.string.settings_backdrop_weather_group));
-        timed.add(0, groupLabel(R.string.first_backdrop_dynamic));
-        // Under its own heading it is plainly about these sets, so it stays on whatever the backdrop.
-        Entry pace = paceEntry();
-        pace.mark = 0;
-        timed.add(pace);
-        boolean weatherFirst = Weather.active(this);
-        List<Entry> entries = new ArrayList<>(weatherFirst ? weather : timed);
-        entries.addAll(weatherFirst ? timed : weather);
-        entries.add(groupLabel(R.string.first_backdrop_static));
-        entries.add(standardSet());
-        String[][] sets = {{Look.ABSTRACT, Look.ABSTRACT_FOLDER}, {Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER},
-            {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
-        for (String[] set : sets) if (shown(set[1])) entries.add(pictureSet(set[0], set[1]));
-        entries.add(personalSet());
-        showFromChosen(getString(R.string.settings_backdrop), entries);
-    }
-
-    /** A collection has a row only if it is whole on the TV, or inside the app, and was not deleted. */
-    private boolean shown(String folder) { return Packs.listed(this, folder) && !Look.setTaken(this, folder); }
-
-    /** Arriving, the selection starts on what is in use. */
-    private void showFromChosen(String title, List<Entry> entries) {
-        Level level = levels.peek();
-        if (level.focus == 0) {
-            for (int index = 0; index < entries.size(); index++) {
-                if (CHECK.equals(entries.get(index).value)) level.focus = index;
-            }
-        }
-        show(title, entries);
-    }
-
-    private Entry standardSet() {
-        boolean chosen = Arrays.asList(Look.PRESET_NAMES).contains(Look.backdrop(this));
-        Entry entry = new Entry(getString(R.string.settings_backdrop_standard), chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_backdrop_standard_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.TITLE, getString(R.string.settings_backdrop_standard))));
-        entry.preview = Look.preset(Look.backdrop(this));
-        entry.mark = 0;
-        return entry;
-    }
-
-    /** One line for a set: its pictures open as a grid, and the one chosen stays. */
-    private Entry pictureSet(String name, String folder) {
-        boolean chosen = Look.backdrop(this).startsWith(folder + "/");
-        Entry entry = new Entry(name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_backdrop_pick_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.FOLDER, folder).putExtra(PictureGridActivity.TITLE, name)));
-        entry.mosaic = folder;
-        entry.mark = 0;
-        return entry;
-    }
-
-    /** The images sent from a phone: a grid like the sets, empty at first, with Carica under it. */
-    private Entry personalSet() {
-        String name = getString(R.string.settings_backdrop_personal);
-        Entry entry = new Entry(name, Look.personal(this, Look.backdrop(this)) ? CHECK : null, getDrawable(R.drawable.ic_photo),
-            getString(R.string.settings_backdrop_personal_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.PERSONAL, true).putExtra(PictureGridActivity.TITLE, name)));
-        entry.mark = 0;
-        return entry;
-    }
-
     private Entry groupLabel(int name) {
         return groupLabel(getString(name));
     }
@@ -2124,20 +1938,17 @@ public final class SettingsActivity extends CardActivity {
         return entry;
     }
 
-    private Entry paceEntry() {
-        Entry pace = new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)),
-            getDrawable(R.drawable.ic_timer), getString(R.string.settings_abstract_time_text), true,
-            () -> enter(this::showAbstractTimes));
-        return pace;
-    }
-
-    private void showAbstractTimes() {
-        show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
-            indexOf(Look.ABSTRACT_MINUTES, Look.abstractMinutes(this)), R.drawable.ic_timer,
-            getString(R.string.settings_abstract_time_text), index -> {
-                Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
-                refresh();
-            }));
+    /** How long each picture stays: the backdrop's and the screensaver's are two different times. */
+    private Entry paceEntry(boolean forSaver) {
+        int now = forSaver ? Look.saverMinutes(this) : Look.abstractMinutes(this);
+        String text = getString(forSaver ? R.string.settings_saver_minutes_text : R.string.settings_abstract_time_home_text);
+        return new Entry(getString(R.string.settings_abstract_time), minutes(now), null, text, true,
+            () -> enter(() -> show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
+                indexOf(Look.ABSTRACT_MINUTES, now), R.drawable.ic_timer, text, index -> {
+                    if (forSaver) Look.setSaverMinutes(this, Look.ABSTRACT_MINUTES[index]);
+                    else Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
+                    refresh();
+                }))));
     }
 
     private void showClock() {
@@ -2274,71 +2085,6 @@ public final class SettingsActivity extends CardActivity {
         askText(getString(R.string.first_city_hint), false, getString(R.string.first_search), name -> searchPlace(name.trim()));
     }
 
-    /** A title, one field and one button, all centred, in the same window as the rest of the settings. */
-    private void askText(String title, boolean secret, String action, Consumer<String> done) {
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setGravity(Gravity.CENTER_HORIZONTAL);
-        box.setPadding(dp(24), dp(20), dp(24), dp(20));
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.rgb(30, 33, 40));
-        fill.setCornerRadius(dp(22));
-        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
-        box.setBackground(fill);
-        TextView heading = label(title, 20);
-        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        heading.setGravity(Gravity.CENTER);
-        box.addView(heading, new LinearLayout.LayoutParams(-2, -2));
-        EditText field = new EditText(this);
-        field.setSingleLine(true);
-        field.setTextSize(18);
-        field.setTextColor(Color.WHITE);
-        field.setGravity(Gravity.CENTER);
-        // A rounded field instead of Android's line under the words.
-        GradientDrawable well = new GradientDrawable();
-        well.setColor(Color.argb(40, 255, 255, 255));
-        well.setCornerRadius(dp(12));
-        field.setBackground(well);
-        field.setPadding(dp(16), dp(10), dp(16), dp(10));
-        field.setInputType(secret ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD : InputType.TYPE_CLASS_TEXT);
-        field.setImeOptions(secret ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_SEARCH);
-        LinearLayout.LayoutParams wide = new LinearLayout.LayoutParams(dp(360), -2);
-        wide.topMargin = dp(16);
-        box.addView(field, wide);
-        TextView button = label(action, 18);
-        button.setGravity(Gravity.CENTER);
-        button.setPadding(dp(28), dp(10), dp(28), dp(10));
-        button.setFocusable(true);
-        button.setClickable(true);
-        button.setDefaultFocusHighlightEnabled(false);
-        Drawable rest = softGlass(dp(20));
-        Drawable lit = selectedFill(dp(20));
-        button.setBackground(rest);
-        button.setOnFocusChangeListener((view, focused) -> {
-            view.setBackground(focused ? lit : rest);
-            button.setTextColor(focused ? Fire.INK : Color.WHITE);
-        });
-        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
-        under.topMargin = dp(16);
-        box.addView(button, under);
-        Runnable send = () -> {
-            dialog.dismiss();
-            done.accept(field.getText().toString());
-        };
-        button.setOnClickListener(view -> send.run());
-        field.setOnEditorActionListener((view, code, event) -> {
-            send.run();
-            return true;
-        });
-        dialog.setContentView(box);
-        Window window = dialog.getWindow();
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-    }
-
     private void searchPlace(String name) {
         if (name.isEmpty()) return;
         Background.run(() -> {
@@ -2390,17 +2136,29 @@ public final class SettingsActivity extends CardActivity {
 
     private boolean ownSaver() { return Look.ownSaver(this); }
 
+    /** Who runs it first: with Salotto its own rows, with Fire OS only the way to Fire OS's menu. */
     private void showSaver() {
         boolean on = saverOn();
         boolean own = ownSaver();
+        String picture = own ? Look.saverPicture(this) : null;
         List<Entry> entries = new ArrayList<>(Arrays.asList(
             new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
                 getString(R.string.settings_saver_active_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry(getString(R.string.settings_saver_kind), own ? ownSaverName() : "Fire OS", null,
-                getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
+            new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
+                getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)),
             new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
                 () -> enter(this::showSaverTimes))));
+        if (own) {
+            entries.add(new Entry(getString(R.string.grid_saver_title),
+                picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null,
+                getString(R.string.settings_saver_pictures_text), true,
+                () -> open(new Intent(this, PictureGridActivity.class).putExtra(PictureGridActivity.SAVER, true))));
+            if (picture == null) entries.add(paceEntry(true));
+        } else {
+            entries.add(new Entry(getString(R.string.settings_saver_choose), null, null,
+                getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
+        }
         if (own || !Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         if (own) {
@@ -2412,6 +2170,14 @@ public final class SettingsActivity extends CardActivity {
                 getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
         }
         show(getString(R.string.settings_saver), entries);
+    }
+
+    /** Salotto with its own pictures, or the screensaver Fire OS decides. */
+    private void showSaverManagers() {
+        String[] names = {Brand.NAME, "Fire OS"};
+        show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
+            getString(R.string.settings_saver_managed_text), index -> chooseSaver(index == 0
+                ? new ComponentName(this, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER)));
     }
 
     private String[] saverPlaces() {
@@ -2433,39 +2199,6 @@ public final class SettingsActivity extends CardActivity {
             set.accept(this, !on);
             refresh();
         });
-    }
-
-    /** The rows stay where they are whatever is chosen, so the selection stays on the row pressed. */
-    private void showSaverKinds() {
-        boolean own = ownSaver();
-        List<Entry> entries = new ArrayList<>();
-        entries.add(groupLabel(Brand.NAME));
-        for (Saver saver : SAVERS) if (shown(saver.folder)) entries.add(saverEntry(saver));
-        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
-            Entry mine = saverEntry(personalSaver());
-            mine.mosaic = null;
-            entries.add(mine);
-        }
-        entries.add(paceEntry());
-        entries.add(groupLabel(R.string.settings_saver_native));
-        entries.add(new Entry(getString(R.string.settings_saver_fire), own ? null : CHECK, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_saver_fire_text), false, () -> chooseSaver(Fire.AMAZON_SAVER)));
-        Entry choose = new Entry(getString(R.string.settings_saver_choose), null, getDrawable(R.drawable.ic_s_open),
-            getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu()));
-        choose.off = own;
-        entries.add(choose);
-        show(getString(R.string.settings_saver_kind), entries);
-    }
-
-    private Entry saverEntry(Saver saver) {
-        boolean chosen = ownSaver() && saver.folder.equals(Look.saverFolder(this));
-        Entry entry = new Entry(saver.name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_saver_set_text), false, () -> {
-                Look.setSaverFolder(this, saver.folder);
-                chooseSaver(new ComponentName(this, SaverService.class).flattenToShortString());
-            });
-        entry.mosaic = saver.folder;
-        return entry;
     }
 
     /** The photos of Personale, by the folder's full path: offered, like among the backdrops, from two photos on. */

@@ -80,6 +80,8 @@ final class Look {
     static final String NATURE = "Aerial Nature";
     /** The photos of Personale, changing on the timer like the sets: offered from two photos on. */
     static final String PERSONAL = "Personal";
+    /** Salotto's colours, one after the other, like a collection that changes by itself. */
+    static final String STANDARD_TIMED = "Standard";
     static final int PERSONAL_TIMED_FROM = 2;
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
@@ -123,6 +125,7 @@ final class Look {
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
         if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
         if (PERSONAL.equals(key)) return context.getString(R.string.settings_backdrop_personal);
+        if (STANDARD_TIMED.equals(key)) return context.getString(R.string.settings_backdrop_standard);
         Matcher photo = PHOTO.matcher(key);
         if (photo.matches()) return context.getString(R.string.personal_photo, Integer.parseInt(photo.group(1)));
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
@@ -240,6 +243,53 @@ final class Look {
     static int abstractMinutes(Context context) { return prefs(context).getInt("abstract_minutes", ABSTRACT_DEFAULT); }
     static void setAbstractMinutes(Context context, int value) {
         prefs(context).edit().putInt("abstract_minutes", value).apply();
+    }
+
+    /** The screensaver's own time: until it is chosen, the backdrop's, which both used to share. */
+    static int saverMinutes(Context context) { return prefs(context).getInt("saver_minutes", abstractMinutes(context)); }
+    static void setSaverMinutes(Context context, int value) {
+        prefs(context).edit().putInt("saver_minutes", value).apply();
+    }
+
+    /** A collection that changes by itself is on the Home, not one picture of it. */
+    static boolean timedBackdrop(Context context) {
+        return timedFolder(context) != null || STANDARD_TIMED.equals(backdrop(context));
+    }
+
+    /**
+     * What to draw now. The same as backdrop, except for Salotto's colours changing by themselves:
+     * then one of them, kept for the backdrop's time and then any other.
+     */
+    static String shownBackdrop(Context context) {
+        String chosen = backdrop(context);
+        if (!STANDARD_TIMED.equals(chosen)) return chosen;
+        SharedPreferences saved = prefs(context);
+        String shown = saved.getString("preset", null);
+        long now = System.currentTimeMillis();
+        long since = now - saved.getLong("preset_at", 0);
+        List<String> all = Arrays.asList(PRESET_NAMES);
+        if (all.contains(shown) && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        List<String> others = new ArrayList<>(all);
+        others.remove(shown);
+        String picked = others.get(new Random().nextInt(others.size()));
+        saved.edit().putString("preset", picked).putLong("preset_at", now).apply();
+        return picked;
+    }
+
+    /**
+     * The one picture the screensaver keeps, or null when its pictures take turns. Only while it
+     * still belongs to the screensaver's set and is still there.
+     */
+    static String saverPicture(Context context) {
+        String picture = prefs(context).getString("saver_picture", null);
+        if (picture == null) return null;
+        String folder = saverFolder(context);
+        if (picture.startsWith("/")) return folder.startsWith("/") && new File(picture).isFile() ? picture : null;
+        return picture.startsWith(folder + "/") && !taken(context, picture) ? picture : null;
+    }
+    static void setSaverPicture(Context context, String value) {
+        if (value == null) prefs(context).edit().remove("saver_picture").apply();
+        else prefs(context).edit().putString("saver_picture", value).apply();
     }
 
     /** The one on show until its time is up, then any other: nothing is decided ahead. */
@@ -392,6 +442,12 @@ final class Look {
     static void take(Context context, String picture) {
         addTaken(context, picture);
         new File(Packs.root(context), picture).delete();
+    }
+
+    /** Asked back by the user with Download: the set is wanted again. Pictures taken one by one stay taken. */
+    static void untakeSet(Context context, String folder) {
+        Set<String> taken = new HashSet<>(prefs(context).getStringSet(TAKEN, Collections.emptySet()));
+        if (taken.remove(folder + WHOLE)) prefs(context).edit().putStringSet(TAKEN, taken).apply();
     }
 
     static void takeSet(Context context, String folder) {
@@ -561,7 +617,7 @@ final class Look {
 
     /** What is behind the Home now, by name: it changes only when the picture does. */
     static String currentName(Context context) {
-        return weatherPictures(context) ? Weather.picture(context) : backdrop(context);
+        return weatherPictures(context) ? Weather.picture(context) : shownBackdrop(context);
     }
 
     /** That same backdrop as a small bitmap, for a page that lays it under itself. On the main thread. */
@@ -603,7 +659,7 @@ final class Look {
 
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
-        String chosen = backdrop(context);
+        String chosen = shownBackdrop(context);
         File file = new File(personalFolder(context), chosen);
         if (!file.isFile()) {
             trim();

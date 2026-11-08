@@ -2,6 +2,14 @@ package it.simplemal.firehome;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import java.util.function.IntConsumer;
+import android.widget.EditText;
+import android.view.inputmethod.EditorInfo;
+import android.view.WindowManager;
+import android.view.Window;
+import android.text.InputType;
+import android.graphics.Typeface;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -547,6 +555,107 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected void appInfo(String pkg) {
         open(new Intent(this, SettingsActivity.class)
             .putExtra(SettingsActivity.SECTION, SettingsActivity.APP).putExtra(SettingsActivity.PACKAGE, pkg));
+    }
+
+    /** A title, one field and one button, all centred, in Salotto's own window: not Android's, with its line under the words. */
+    protected void askText(String title, boolean secret, String action, Consumer<String> done) {
+        Dialog dialog = new Dialog(this);
+        LinearLayout box = windowBox(dialog, title);
+        EditText field = new EditText(this);
+        field.setSingleLine(true);
+        field.setTextSize(18);
+        field.setTextColor(Color.WHITE);
+        field.setGravity(Gravity.CENTER);
+        // A rounded field instead of Android's line under the words.
+        GradientDrawable well = new GradientDrawable();
+        well.setColor(Color.argb(40, 255, 255, 255));
+        well.setCornerRadius(dp(12));
+        field.setBackground(well);
+        field.setPadding(dp(16), dp(10), dp(16), dp(10));
+        field.setInputType(secret ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD : InputType.TYPE_CLASS_TEXT);
+        field.setImeOptions(secret ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_SEARCH);
+        LinearLayout.LayoutParams wide = new LinearLayout.LayoutParams(dp(360), -2);
+        wide.topMargin = dp(16);
+        box.addView(field, wide);
+        TextView button = windowButton(action);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(16);
+        box.addView(button, under);
+        Runnable send = () -> {
+            dialog.dismiss();
+            done.accept(field.getText().toString());
+        };
+        button.setOnClickListener(view -> send.run());
+        field.setOnEditorActionListener((view, code, event) -> {
+            send.run();
+            return true;
+        });
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        dialog.show();
+    }
+
+    /** The same window with one button for each choice, one under the other: OK picks it. */
+    protected void pickText(String title, List<String> names, IntConsumer done) {
+        Dialog dialog = new Dialog(this);
+        LinearLayout box = windowBox(dialog, title);
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(LinearLayout.VERTICAL);
+        for (int index = 0; index < names.size(); index++) {
+            int choice = index;
+            TextView button = windowButton(names.get(index));
+            button.setOnClickListener(view -> {
+                dialog.dismiss();
+                done.accept(choice);
+            });
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(360), -2);
+            place.topMargin = dp(10);
+            column.addView(button, place);
+        }
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.addView(column);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(6);
+        box.addView(scroll, under);
+        dialog.show();
+    }
+
+    /** A rounded dark window with its title centred: what askText and pickText fill. */
+    private LinearLayout windowBox(Dialog dialog, String title) {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(24), dp(20), dp(24), dp(20));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.rgb(30, 33, 40));
+        fill.setCornerRadius(dp(22));
+        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
+        box.setBackground(fill);
+        TextView heading = label(title, 20);
+        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        heading.setGravity(Gravity.CENTER);
+        box.addView(heading, new LinearLayout.LayoutParams(-2, -2));
+        dialog.setContentView(box);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        return box;
+    }
+
+    private TextView windowButton(String text) {
+        TextView button = label(text, 18);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(28), dp(10), dp(28), dp(10));
+        button.setFocusable(true);
+        button.setClickable(true);
+        button.setDefaultFocusHighlightEnabled(false);
+        Drawable rest = softGlass(dp(20));
+        Drawable lit = selectedFill(dp(20));
+        button.setBackground(rest);
+        button.setOnFocusChangeListener((view, focused) -> {
+            view.setBackground(focused ? lit : rest);
+            button.setTextColor(focused ? Fire.INK : Color.WHITE);
+        });
+        return button;
     }
 
     protected AlertDialog.Builder dialog() {

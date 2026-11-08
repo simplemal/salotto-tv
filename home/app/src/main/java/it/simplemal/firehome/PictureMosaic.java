@@ -45,10 +45,6 @@ final class PictureMosaic extends FrameLayout {
     private static final int ROWS = 5;
     private static final float TILE_SHARE = 0.25f;
     private static final float GAP_SHARE = 0.024f;
-    private static final int AROUND_COLUMNS = 4;
-    /** Around a window many tiles are in view: one changes at a time, and seldom. */
-    private static final long AROUND_EVERY_MS = 6000;
-    private static final float AROUND_GAP_SHARE = 0.016f;
     private static final float RADIUS_SHARE = 0.008f;
     /** The middle column stands under the title of the page, with half a column on either side. */
     private static final float MIDDLE_COLUMN = 0.24f;
@@ -84,8 +80,6 @@ final class PictureMosaic extends FrameLayout {
         final ImageView coming = picture();
         final float centerX;
         final float centerY;
-        /** Whole on screen and clear of the window in the middle: only these change. */
-        boolean seen = true;
         boolean filled;
         boolean busy;
 
@@ -167,34 +161,15 @@ final class PictureMosaic extends FrameLayout {
     private final Drawable base = Look.plainBackdrop();
     private final FrameLayout grid;
     private List<String> files = new ArrayList<>();
-    private long every = EVERY_MS;
-    private boolean oneAtATime;
-    private boolean turnNext;
     private String folder;
     private int next;
     private long started;
 
     PictureMosaic(Context context) {
-        this(context, 0, 0);
-    }
-
-    /**
-     * With a window size, the pictures fill the whole screen around a window of that size in the
-     * middle: four columns, the outer two whole beside it. Without, they stay on the left of a page.
-     */
-    PictureMosaic(Context context, int clearWidth, int clearHeight) {
         super(context);
+        setBackground(Look.plainBackdrop());
         setVisibility(GONE);
         DisplayMetrics screen = getResources().getDisplayMetrics();
-        if (clearWidth > 0) {
-            grid = new FrameLayout(context);
-            addView(grid, new LayoutParams(-1, -1));
-            placeAround(screen, clearWidth, clearHeight);
-            every = AROUND_EVERY_MS;
-            oneAtATime = true;
-            return;
-        }
-        setBackground(Look.plainBackdrop());
         int shown = Math.round(screen.widthPixels * FADE_TO);
         grid = new FrameLayout(context);
         addView(grid, new LayoutParams(shown, -1, Gravity.TOP | Gravity.LEFT));
@@ -238,33 +213,6 @@ final class PictureMosaic extends FrameLayout {
         tiles.sort(Comparator.comparingDouble(tile -> Math.abs(tile.centerX - middleX) + Math.abs(tile.centerY - middleY)));
     }
 
-    /** Columns staggered like the others, the tiles in view first. */
-    private void placeAround(DisplayMetrics screen, int clearWidth, int clearHeight) {
-        float gap = screen.widthPixels * AROUND_GAP_SHARE;
-        int width = Math.round((screen.widthPixels - gap * (AROUND_COLUMNS + 1)) / AROUND_COLUMNS);
-        int height = width * 9 / 16;
-        float radius = screen.widthPixels * RADIUS_SHARE;
-        float clearLeft = (screen.widthPixels - clearWidth) / 2f;
-        float clearTop = (screen.heightPixels - clearHeight) / 2f;
-        int rows = (int) Math.ceil(screen.heightPixels / (height + gap)) + 2;
-        for (int column = 0; column < AROUND_COLUMNS; column++) {
-            float left = gap + column * (width + gap);
-            for (int row = 0; row < rows; row++) {
-                float top = height * (START_Y + (column % 2) * COLUMN_STEP_Y) + row * (height + gap);
-                Tile tile = new Tile(left, top, width, height, radius);
-                boolean inside = left >= 0 && top >= 0 && left + width <= screen.widthPixels && top + height <= screen.heightPixels;
-                boolean behind = left < clearLeft + clearWidth && left + width > clearLeft
-                    && top < clearTop + clearHeight && top + height > clearTop;
-                tile.seen = inside && !behind;
-                tiles.add(tile);
-            }
-        }
-        float middleX = screen.widthPixels / 2f;
-        float middleY = screen.heightPixels / 2f;
-        tiles.sort(Comparator.comparing((Tile tile) -> !tile.seen)
-            .thenComparingDouble(tile -> Math.abs(tile.centerX - middleX) + Math.abs(tile.centerY - middleY)));
-    }
-
     /** Null stops it and lets the pictures go. */
     void show(String wanted) {
         if (wanted == null ? folder == null : wanted.equals(folder)) return;
@@ -295,7 +243,7 @@ final class PictureMosaic extends FrameLayout {
         }
         started = SystemClock.uptimeMillis();
         for (Tile tile : tiles) load(tile, false);
-        postDelayed(change, every);
+        postDelayed(change, EVERY_MS);
     }
 
     private void sortMoments(Properties table, String wanted) {
@@ -341,17 +289,12 @@ final class PictureMosaic extends FrameLayout {
         if (folder == null || SystemClock.uptimeMillis() - started > RUNS_FOR_MS) return;
         List<Tile> free = new ArrayList<>();
         for (Tile tile : tiles) {
-            if (tile.seen && tile.filled && !tile.busy) free.add(tile);
+            if (tile.filled && !tile.busy) free.add(tile);
         }
         Collections.shuffle(free);
-        if (oneAtATime) {
-            turnNext = !turnNext;
-            if (free.size() > 0) load(free.get(0), turnNext);
-        } else {
-            if (free.size() > 0) load(free.get(0), true);
-            if (free.size() > 1) load(free.get(1), false);
-        }
-        postDelayed(change, every);
+        if (free.size() > 0) load(free.get(0), true);
+        if (free.size() > 1) load(free.get(1), false);
+        postDelayed(change, EVERY_MS);
     }
 
     private void load(Tile tile, boolean turns) {

@@ -1,59 +1,68 @@
 {
-  "versionName": "1.0.23",
+  "versionName": "1.0.24-beta.1",
   "changes": {
     "en": [
-      "Support for the Fire TV Stick Lite",
-      "While the Home loads, a spinner covers it until it is all ready",
-      "Screensaver and task manager opened from the control center close it",
-      "Fixed a crash at first start on Fire TVs with Fire OS 7"
+      "New settings: the sections on the left, the choices on the right",
+      "Backdrops and screensaver in one page, with the pictures of each collection",
+      "The screensaver can keep one picture and has its own time",
+      "Salotto’s colours can change by themselves, like the collections",
+      "A collection you removed comes back with Download"
     ],
     "es": [
-      "Compatibilidad con el Fire TV Stick Lite",
-      "Mientras el Home se carga, una rueda lo cubre hasta que está listo",
-      "El salvapantallas y el administrador de tareas abiertos desde el centro de control lo cierran",
-      "Corregido un cierre en el primer inicio en los Fire TV con Fire OS 7"
+      "Ajustes nuevos: las secciones a la izquierda, las opciones a la derecha",
+      "Fondos y salvapantallas en una sola página, con las imágenes de cada colección",
+      "El salvapantallas puede mostrar una sola imagen y tiene su propio tiempo",
+      "Los colores de Salotto pueden cambiar solos, como las colecciones",
+      "Una colección que quitaste vuelve con Descargar"
     ],
     "fr": [
-      "Prise en charge du Fire TV Stick Lite",
-      "Pendant le chargement de la Home, une roue la couvre jusqu’à ce qu’elle soit prête",
-      "L’économiseur d’écran et le gestionnaire de tâches ouverts depuis le centre de contrôle le ferment",
-      "Correction d’une fermeture au premier démarrage sur les Fire TV sous Fire OS 7"
+      "Nouveaux réglages : les sections à gauche, les choix à droite",
+      "Fonds et économiseur d’écran sur une seule page, avec les images de chaque collection",
+      "L’économiseur peut garder une seule image et a son propre rythme",
+      "Les couleurs de Salotto peuvent changer toutes seules, comme les collections",
+      "Une collection supprimée revient avec Télécharger"
     ],
     "de": [
-      "Unterstützung für den Fire TV Stick Lite",
-      "Während Home lädt, verdeckt ein Ladekreis sie, bis alles bereit ist",
-      "Bildschirmschoner und Task-Manager, aus dem Kontrollzentrum geöffnet, schließen es",
-      "Absturz beim ersten Start auf Fire TVs mit Fire OS 7 behoben"
+      "Neue Einstellungen: die Bereiche links, die Auswahl rechts",
+      "Hintergründe und Bildschirmschoner auf einer Seite, mit den Bildern jeder Sammlung",
+      "Der Bildschirmschoner kann ein Bild behalten und hat seine eigene Zeit",
+      "Die Farben von Salotto können von selbst wechseln, wie die Sammlungen",
+      "Eine entfernte Sammlung kommt mit Herunterladen zurück"
     ],
     "pt": [
-      "Suporte ao Fire TV Stick Lite",
-      "Enquanto o Home carrega, um indicador o cobre até estar tudo pronto",
-      "Protetor de tela e gerenciador de tarefas abertos pela central de controle a fecham",
-      "Corrigido um fechamento na primeira inicialização em Fire TVs com Fire OS 7"
+      "Configurações novas: as seções à esquerda, as escolhas à direita",
+      "Fundos e protetor de tela em uma só página, com as imagens de cada coleção",
+      "O protetor de tela pode manter uma só imagem e tem seu próprio tempo",
+      "As cores do Salotto podem mudar sozinhas, como as coleções",
+      "Uma coleção removida volta com Baixar"
     ],
     "ru": [
-      "Поддержка Fire TV Stick Lite",
-      "Пока главный экран загружается, его закрывает индикатор, пока всё не будет готово",
-      "Заставка и диспетчер задач, открытые из центра управления, закрывают его",
-      "Исправлено закрытие при первом запуске на Fire TV с Fire OS 7"
+      "Новые настройки: разделы слева, выбор справа",
+      "Фоны и заставка на одной странице, с изображениями каждой коллекции",
+      "Заставка может показывать одно изображение и имеет своё время",
+      "Цвета Salotto могут меняться сами, как коллекции",
+      "Удалённая коллекция возвращается кнопкой «Скачать»"
     ],
     "ar": [
-      "دعم Fire TV Stick Lite",
-      "أثناء تحميل الشاشة الرئيسية يغطيها مؤشر دوّار حتى تجهز بالكامل",
-      "شاشة التوقف ومدير المهام عند فتحهما من مركز التحكم يغلقانه",
-      "إصلاح إغلاق عند التشغيل الأول على أجهزة Fire TV بنظام Fire OS 7"
+      "إعدادات جديدة: الأقسام على اليسار والخيارات على اليمين",
+      "الخلفيات وشاشة التوقف في صفحة واحدة، مع صور كل مجموعة",
+      "يمكن لشاشة التوقف إبقاء صورة واحدة ولها وقتها الخاص",
+      "يمكن أن تتغير ألوان Salotto وحدها، مثل المجموعات",
+      "المجموعة التي حذفتها تعود بزر تنزيل"
     ],
     "hi": [
-      "Fire TV Stick Lite के लिए सपोर्ट",
-      "होम लोड होते समय, पूरी तरह तैयार होने तक एक स्पिनर उसे ढके रहता है",
-      "कंट्रोल सेंटर से खोले गए स्क्रीनसेवर और टास्क मैनेजर उसे बंद कर देते हैं",
-      "Fire OS 7 वाले Fire TV पर पहली बार शुरू करते समय बंद होने की समस्या ठीक की गई"
+      "नई सेटिंग: बाईं ओर हिस्से, दाईं ओर विकल्प",
+      "बैकग्राउंड और स्क्रीनसेवर एक ही पेज पर, हर संग्रह की तस्वीरों के साथ",
+      "स्क्रीनसेवर एक ही तस्वीर रख सकता है और उसका अपना समय है",
+      "Salotto के रंग संग्रहों की तरह अपने-आप बदल सकते हैं",
+      "हटाया गया संग्रह डाउनलोड करें से वापस आता है"
     ],
     "zh": [
-      "支持 Fire TV Stick Lite",
-      "主屏幕加载时，加载图标会遮住它，直到全部就绪",
-      "从控制中心打开屏保和任务管理器时会关闭控制中心",
-      "修复 Fire OS 7 的 Fire TV 首次启动时闪退的问题"
+      "全新设置：左侧是分区，右侧是选项",
+      "背景和屏保合为一页，显示每个图片集的图片",
+      "屏保可以只显示一张图片，并有自己的更换时间",
+      "Salotto 的颜色可以像图片集一样自动更换",
+      "删除的图片集可以用“下载”找回"
     ]
   }
 }
