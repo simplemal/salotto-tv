@@ -761,7 +761,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private LinearLayout.LayoutParams rowSize() {
-        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, -2);
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
         size.bottomMargin = dp(8);
         return size;
     }
@@ -773,16 +773,6 @@ public final class SettingsActivity extends CardActivity {
         return size;
     }
 
-    /** Under the row with the focus: what it does. Hidden on the others. */
-    private TextView why(Entry entry) {
-        TextView text = label(entry.text != null ? entry.text : "", 15);
-        text.setLineSpacing(dp(2), 1f);
-        text.setPadding(dp(20), 0, dp(16), dp(12));
-        text.setTextColor(Fire.INK);
-        text.setAlpha(0.72f);
-        text.setVisibility(View.GONE);
-        return text;
-    }
 
     private LinearLayout.LayoutParams tableRowSize(Entry entry) {
         LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(TABLE_ROW));
@@ -803,32 +793,25 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private View tableRow(Entry entry) {
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(TABLE_PADDING), 0, dp(TABLE_PADDING), 0);
-        box.addView(row, new LinearLayout.LayoutParams(-1, dp(TABLE_ROW)));
-        TextView why = why(entry);
-        why.setTextSize(13);
-        why.setPadding(dp(TABLE_PADDING), 0, dp(TABLE_PADDING), dp(8));
-        box.addView(why, new LinearLayout.LayoutParams(-1, -2));
         TextView title = label(entry.title, 14);
         title.setSingleLine(true);
         title.setEllipsize(TextUtils.TruncateAt.END);
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         TextView[] cells = addColumns(row, entry.columns, 13);
         for (TextView cell : cells) cell.setAlpha(0.8f);
-        selectable(box, entry, why, focused -> {
+        selectable(row, entry, focused -> {
             int text = focused ? Fire.INK : Color.WHITE;
             title.setTextColor(text);
             for (TextView cell : cells) cell.setTextColor(text);
         });
-        return box;
+        return row;
     }
 
     /** What every row does on a click and with the focus; `paint` recolours what is inside it. */
-    private void selectable(LinearLayout row, Entry entry, TextView why, Consumer<Boolean> paint) {
+    private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint) {
         row.setFocusable(true);
         row.setClickable(true);
         row.setDefaultFocusHighlightEnabled(false);
@@ -849,13 +832,9 @@ public final class SettingsActivity extends CardActivity {
             view.setBackground(focused ? focusFill() : rest);
             float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
-            boolean explained = focused && why.getText().length() > 0;
-            why.setVisibility(explained ? View.VISIBLE : View.GONE);
             if (focused) {
                 levels.peek().focus = rows.indexOfChild(view) - rowOffset;
                 showPreview(entry);
-                // Grown by its explanation, the row may now run past the bottom of the list.
-                if (explained) view.post(() -> view.requestRectangleOnScreen(new Rect(0, 0, view.getWidth(), view.getHeight())));
             }
         });
     }
@@ -880,14 +859,9 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private View row(Entry entry) {
-        LinearLayout box = new LinearLayout(this);
-        box.setOrientation(LinearLayout.VERTICAL);
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(20), 0, dp(16), 0);
-        box.addView(row, new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT)));
-        TextView why = why(entry);
-        box.addView(why, new LinearLayout.LayoutParams(-1, -2));
         TextView title = label(entry.title, 20);
         if (entry.family != null) title.setTypeface(Typeface.create(entry.family, Typeface.NORMAL));
         title.setSingleLine(true);
@@ -918,7 +892,7 @@ public final class SettingsActivity extends CardActivity {
         chevron.setPadding(dp(12), 0, 0, dp(3));
         chevron.setAlpha(0.75f);
         if (!onOff) row.addView(chevron);
-        selectable(box, entry, why, focused -> {
+        selectable(row, entry, focused -> {
             int text = focused ? Fire.INK : Color.WHITE;
             title.setTextColor(text);
             value.setTextColor(text);
@@ -928,11 +902,11 @@ public final class SettingsActivity extends CardActivity {
             title.setCompoundDrawableTintList(ColorStateList.valueOf(text));
         });
         if (entry.off) {
-            box.setFocusable(false);
-            box.setClickable(false);
-            box.setAlpha(0.4f);
+            row.setFocusable(false);
+            row.setClickable(false);
+            row.setAlpha(0.4f);
         }
-        return box;
+        return row;
     }
 
     /** Only one row has the focus, so they can all share this. */
