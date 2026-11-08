@@ -368,4 +368,23 @@
     <string name="settings_like_date">مثل التاريخ</string>
     <string name="settings_weather_font_text">نمط السطر الأول من الطقس.</string>
     <string name="settings_weather_size_text">حجم السطر الأول من الطقس.</string>
+    <string name="settings_cat_home">الشاشة الرئيسية</string>
+    <string name="settings_cat_home_text">الترتيب والخلفية وترتيب التطبيقات على الشاشة الرئيسية.</string>
+    <string name="settings_cat_clock">الساعة والطقس</string>
+    <string name="settings_cat_clock_text">الوقت والتاريخ والطقس على الشاشة الرئيسية، مع خطها وحجمها.</string>
+    <string name="settings_cat_saver_text">متى تبدأ، وأي صور تستخدم، وماذا تعرض فوقها.</string>
+    <string name="settings_cat_apps_text">كل التطبيقات المثبتة، ومدير المهام، والمساحة التي يشغلها كل تطبيق.</string>
+    <string name="settings_cat_screen_text">الصورة والصوت والاتصال بالتلفزيون.</string>
+    <string name="settings_cat_network">الشبكة وBluetooth</string>
+    <string name="settings_cat_network_text">الاتصال بالإنترنت وأجهزة التحكم وأجهزة Bluetooth.</string>
+    <string name="settings_cat_system">النظام</string>
+    <string name="settings_cat_system_text">اللغة والإشعارات والخصوصية ومعلومات عن جهاز Fire TV هذا.</string>
+    <string name="settings_cat_salotto_text">التحديثات ونسخة من اختياراتك وأدوات Salotto.</string>
+    <string name="settings_section_circle">الشاشة الرئيسية الدائرية</string>
+    <string name="settings_section_grid">الشاشة الرئيسية الشبكية</string>
+    <string name="settings_section_home_apps">التطبيقات على الشاشة الرئيسية</string>
+    <string name="settings_section_saver_shows">ما تعرضه</string>
+    <string name="settings_section_tv">التلفزيون</string>
+    <string name="settings_section_device">جهاز Fire TV هذا</string>
+    <string name="settings_fire_open">فتح إعدادات Fire TV</string>
 </resources>

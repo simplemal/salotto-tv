@@ -356,4 +356,23 @@
     <string name="settings_like_date">Как дата</string>
     <string name="settings_weather_font_text">Стиль первой строки погоды.</string>
     <string name="settings_weather_size_text">Размер первой строки погоды.</string>
+    <string name="settings_cat_home">Главный экран</string>
+    <string name="settings_cat_home_text">Расположение, фон и порядок приложений на главном экране.</string>
+    <string name="settings_cat_clock">Часы и погода</string>
+    <string name="settings_cat_clock_text">Время, дата и погода на главном экране, их шрифт и размер.</string>
+    <string name="settings_cat_saver_text">Когда она запускается, какие изображения использует и что показывает поверх.</string>
+    <string name="settings_cat_apps_text">Все установленные приложения, диспетчер задач и место, занятое каждым.</string>
+    <string name="settings_cat_screen_text">Изображение, звук и связь с телевизором.</string>
+    <string name="settings_cat_network">Сеть и Bluetooth</string>
+    <string name="settings_cat_network_text">Подключение к Интернету, пульты и устройства Bluetooth.</string>
+    <string name="settings_cat_system">Система</string>
+    <string name="settings_cat_system_text">Язык, уведомления, конфиденциальность и сведения об этом Fire TV.</string>
+    <string name="settings_cat_salotto_text">Обновления, копия ваших настроек и инструменты Salotto.</string>
+    <string name="settings_section_circle">Круглый главный экран</string>
+    <string name="settings_section_grid">Главный экран сеткой</string>
+    <string name="settings_section_home_apps">Приложения на главном экране</string>
+    <string name="settings_section_saver_shows">Что показывает</string>
+    <string name="settings_section_tv">Телевизор</string>
+    <string name="settings_section_device">Этот Fire TV</string>
+    <string name="settings_fire_open">Открыть настройки Fire TV</string>
 </resources>

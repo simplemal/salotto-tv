@@ -345,4 +345,23 @@
     <string name="settings_like_date">Como la fecha</string>
     <string name="settings_weather_font_text">El estilo de la primera línea del tiempo.</string>
     <string name="settings_weather_size_text">El tamaño de la primera línea del tiempo.</string>
+    <string name="settings_cat_home">Home</string>
+    <string name="settings_cat_home_text">Disposición, fondo y orden de las apps en el Home.</string>
+    <string name="settings_cat_clock">Reloj y tiempo</string>
+    <string name="settings_cat_clock_text">Hora, fecha y tiempo en el Home, con su tipo de letra y su tamaño.</string>
+    <string name="settings_cat_saver_text">Cuándo se inicia, qué imágenes usa y qué muestra encima.</string>
+    <string name="settings_cat_apps_text">Todas las apps instaladas, el administrador de tareas y el espacio que ocupa cada una.</string>
+    <string name="settings_cat_screen_text">Imagen, sonido y conexión con el televisor.</string>
+    <string name="settings_cat_network">Red y Bluetooth</string>
+    <string name="settings_cat_network_text">Conexión a Internet, mandos y dispositivos Bluetooth.</string>
+    <string name="settings_cat_system">Sistema</string>
+    <string name="settings_cat_system_text">Idioma, notificaciones, privacidad e información sobre este Fire TV.</string>
+    <string name="settings_cat_salotto_text">Actualizaciones, copia de tus ajustes y herramientas de Salotto.</string>
+    <string name="settings_section_circle">Home circular</string>
+    <string name="settings_section_grid">Home en cuadrícula</string>
+    <string name="settings_section_home_apps">Apps en el Home</string>
+    <string name="settings_section_saver_shows">Qué muestra</string>
+    <string name="settings_section_tv">Televisor</string>
+    <string name="settings_section_device">Este Fire TV</string>
+    <string name="settings_fire_open">Abrir los ajustes de Fire TV</string>
 </resources>

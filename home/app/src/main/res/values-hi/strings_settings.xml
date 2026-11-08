@@ -344,4 +344,23 @@
     <string name="settings_like_date">तारीख जैसा</string>
     <string name="settings_weather_font_text">मौसम की पहली पंक्ति की शैली।</string>
     <string name="settings_weather_size_text">मौसम की पहली पंक्ति कितनी बड़ी है।</string>
+    <string name="settings_cat_home">होम</string>
+    <string name="settings_cat_home_text">होम पर ऐप की व्यवस्था, बैकग्राउंड और क्रम।</string>
+    <string name="settings_cat_clock">घड़ी और मौसम</string>
+    <string name="settings_cat_clock_text">होम पर समय, तारीख़ और मौसम, उनके फ़ॉन्ट और आकार के साथ।</string>
+    <string name="settings_cat_saver_text">यह कब शुरू होता है, कौन-सी तस्वीरें दिखाता है और ऊपर क्या दिखाता है।</string>
+    <string name="settings_cat_apps_text">सभी इंस्टॉल ऐप, टास्क मैनेजर और हर ऐप की जगह।</string>
+    <string name="settings_cat_screen_text">तस्वीर, आवाज़ और TV से जुड़ाव।</string>
+    <string name="settings_cat_network">नेटवर्क और Bluetooth</string>
+    <string name="settings_cat_network_text">इंटरनेट कनेक्शन, रिमोट और Bluetooth डिवाइस।</string>
+    <string name="settings_cat_system">सिस्टम</string>
+    <string name="settings_cat_system_text">भाषा, सूचनाएँ, प्राइवेसी और इस Fire TV की जानकारी।</string>
+    <string name="settings_cat_salotto_text">अपडेट, आपकी पसंद की कॉपी और Salotto के टूल।</string>
+    <string name="settings_section_circle">गोल होम</string>
+    <string name="settings_section_grid">ग्रिड होम</string>
+    <string name="settings_section_home_apps">होम पर ऐप</string>
+    <string name="settings_section_saver_shows">यह क्या दिखाता है</string>
+    <string name="settings_section_tv">TV</string>
+    <string name="settings_section_device">यह Fire TV</string>
+    <string name="settings_fire_open">Fire TV सेटिंग खोलें</string>
 </resources>

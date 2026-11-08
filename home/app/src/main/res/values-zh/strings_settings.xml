@@ -339,4 +339,23 @@
     <string name="settings_like_date">与日期相同</string>
     <string name="settings_weather_font_text">天气第一行的样式。</string>
     <string name="settings_weather_size_text">天气第一行的大小。</string>
+    <string name="settings_cat_home">主屏幕</string>
+    <string name="settings_cat_home_text">主屏幕上应用的布局、背景和顺序。</string>
+    <string name="settings_cat_clock">时钟和天气</string>
+    <string name="settings_cat_clock_text">主屏幕上的时间、日期和天气，以及它们的字体和大小。</string>
+    <string name="settings_cat_saver_text">何时启动、使用哪些图片以及在上面显示什么。</string>
+    <string name="settings_cat_apps_text">所有已安装的应用、任务管理器以及每个应用占用的空间。</string>
+    <string name="settings_cat_screen_text">画面、声音以及与电视的连接。</string>
+    <string name="settings_cat_network">网络和 Bluetooth</string>
+    <string name="settings_cat_network_text">互联网连接、遥控器和 Bluetooth 设备。</string>
+    <string name="settings_cat_system">系统</string>
+    <string name="settings_cat_system_text">语言、通知、隐私以及这台 Fire TV 的信息。</string>
+    <string name="settings_cat_salotto_text">更新、你的设置副本以及 Salotto 的工具。</string>
+    <string name="settings_section_circle">圆形主屏幕</string>
+    <string name="settings_section_grid">网格主屏幕</string>
+    <string name="settings_section_home_apps">主屏幕上的应用</string>
+    <string name="settings_section_saver_shows">显示内容</string>
+    <string name="settings_section_tv">电视</string>
+    <string name="settings_section_device">这台 Fire TV</string>
+    <string name="settings_fire_open">打开 Fire TV 设置</string>
 </resources>

@@ -344,4 +344,23 @@
     <string name="settings_like_date">Come Data</string>
     <string name="settings_weather_font_text">Lo stile della prima riga del meteo.</string>
     <string name="settings_weather_size_text">Quanto è grande la prima riga del meteo.</string>
+    <string name="settings_cat_home">Home</string>
+    <string name="settings_cat_home_text">Disposizione, sfondo e ordine delle app sulla Home.</string>
+    <string name="settings_cat_clock">Orologio e meteo</string>
+    <string name="settings_cat_clock_text">Ora, data e meteo sulla Home, con il loro carattere e la loro dimensione.</string>
+    <string name="settings_cat_saver_text">Quando parte, quali immagini usa e cosa mostra sopra.</string>
+    <string name="settings_cat_apps_text">Tutte le app installate, il task manager e lo spazio occupato da ognuna.</string>
+    <string name="settings_cat_screen_text">Immagine, suono e collegamento con la TV.</string>
+    <string name="settings_cat_network">Rete e Bluetooth</string>
+    <string name="settings_cat_network_text">Connessione a Internet, telecomandi e dispositivi Bluetooth.</string>
+    <string name="settings_cat_system">Sistema</string>
+    <string name="settings_cat_system_text">Lingua, notifiche, privacy e informazioni su questa Fire TV.</string>
+    <string name="settings_cat_salotto_text">Aggiornamenti, copia delle scelte e strumenti di Salotto.</string>
+    <string name="settings_section_circle">Home circolare</string>
+    <string name="settings_section_grid">Home a griglia</string>
+    <string name="settings_section_home_apps">App sulla Home</string>
+    <string name="settings_section_saver_shows">Cosa mostra</string>
+    <string name="settings_section_tv">TV</string>
+    <string name="settings_section_device">Questa Fire TV</string>
+    <string name="settings_fire_open">Apri le impostazioni di Fire TV</string>
 </resources>
