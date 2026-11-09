@@ -16,21 +16,25 @@ import android.widget.FrameLayout;
 
 /**
  * The closing after an app opened from the wheel, as the user asked on 2026-11-09: the screen black
- * with only the app's circle, small in its place. Then a ring of the app's own colour comes in from
- * past the corners and closes onto the circle, thinner and thinner until it is gone under it, and
- * outside the ring the Home is already there.
+ * with only the app's circle, small in its place. The black closes quickly onto the circle and the
+ * app's own colour is all round it, as wide as the opening left it; then that colour closes onto the
+ * circle too, a ring thinner and thinner until it is gone under it, and outside it the Home is there.
  *
- * Two layers, each closed by Android's circular reveal: under, the ring's colour; over, the black
- * with the circle, always a little inside it. The reveal runs on the drawing thread, so it stays
- * smooth while the Home, on the main thread, is busy coming back.
+ * Two layers, each closed by Android's circular reveal: under, the colour; over, the black with the
+ * circle, closing faster. The reveal runs on the drawing thread, so it stays smooth while the Home,
+ * on the main thread, is busy coming back.
  */
 final class CircleClose extends FrameLayout {
-    /** Simple, and slowing down at the end, as the user asked: the ring settles onto the icon. */
-    static final long MS = 600;
+    /** The whole closing, until the colour has settled onto the icon. */
+    static final long MS = 560;
+    /** The black goes first and fast: the colour is soon all round the icon. */
+    private static final long BLACK_MS = 260;
+    /** Then the colour closes quickly, slowing down only at the end. */
+    private static final long COLOUR_DELAY_MS = 100;
     private static final float SETTLE = 1.8f;
-    /** The black starts just past the farthest corner, the ring this much farther out. */
+    private static final float BLACK_SETTLE = 2.5f;
+    /** Both start just past the farthest corner. */
     private static final float FROM = 1.05f;
-    private static final int RING_DP = 14;
 
     private final float x;
     private final float y;
@@ -86,22 +90,21 @@ final class CircleClose extends FrameLayout {
         post(() -> {
             if (!isAttachedToWindow()) return;
             float far = (float) Math.hypot(Math.max(x, getWidth() - x), Math.max(y, getHeight() - y)) * FROM;
-            float width = RING_DP * getResources().getDisplayMetrics().density;
-            // Both end on the circle at the same moment: the ring between them thins to nothing.
-            Animator outer = reveal(ring, far + width);
-            Animator inner = reveal(black, far);
-            inner.addListener(new AnimatorListenerAdapter() {
+            Animator inner = reveal(black, far, BLACK_MS, BLACK_SETTLE);
+            Animator outer = reveal(ring, far, MS - COLOUR_DELAY_MS, SETTLE);
+            outer.setStartDelay(COLOUR_DELAY_MS);
+            outer.addListener(new AnimatorListenerAdapter() {
                 @Override public void onAnimationEnd(Animator animation) { done.run(); }
             });
-            outer.start();
             inner.start();
+            outer.start();
         });
     }
 
-    private Animator reveal(View layer, float from) {
+    private Animator reveal(View layer, float from, long ms, float settle) {
         Animator shrink = ViewAnimationUtils.createCircularReveal(layer, Math.round(x), Math.round(y), from, radius);
-        shrink.setDuration(MS);
-        shrink.setInterpolator(new DecelerateInterpolator(SETTLE));
+        shrink.setDuration(ms);
+        shrink.setInterpolator(new DecelerateInterpolator(settle));
         return shrink;
     }
 }
