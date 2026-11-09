@@ -166,6 +166,7 @@ public final class MainActivity extends CardActivity {
     private String weatherSymbol;
     private boolean pillDrawn;
     private boolean pillClock;
+    private boolean pillWithDate;
     private String pillSymbol;
     private LinearLayout pillRow;
     private TextView pillWeather;
@@ -508,12 +509,13 @@ public final class MainActivity extends CardActivity {
         // The buttons alone, without the pill's glass, on the wheel at the bottom and on the clean Home at the top.
         // The wheel's is a list over its button; the clean Home's the grid's tiles, flat, under its buttons.
         panel.setLook(circular, clean);
-        // On the wheel the date goes above the time, where the eye starts reading the corner.
+        // The date goes above the time, where the eye starts reading: on the glass Home too, as on
+        // the wheel (the user's choice of 2026-11-09).
         hero.removeView(date);
-        hero.addView(date, corners ? 0 : hero.indexOfChild(clock) + 1);
+        hero.addView(date, 0);
         hero.post(this::alignDate);
         // The big digits carry room above them for accents they never have: under the date it reads as a gap.
-        clock.setIncludeFontPadding(!corners);
+        clock.setIncludeFontPadding(false);
         panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(corners ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(corners ? 14 : 40);
@@ -1037,16 +1039,19 @@ public final class MainActivity extends CardActivity {
         // The clean Home's time is in its line at the top, or not wanted: never in the buttons.
         boolean clockInView = clean || bigClock && !raised;
         String symbol = raised ? weatherSymbol : null;
+        // The date already on the left is not repeated in the pill: only once it is out of view.
+        boolean withDate = !clockInView && (raised || date.getVisibility() != View.VISIBLE);
         // Called at every step of a scroll, and almost every step changes nothing.
-        if (pillDrawn && clockInView == pillClock && Objects.equals(symbol, pillSymbol)) return;
+        if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
         pillClock = clockInView;
+        pillWithDate = withDate;
         pillSymbol = symbol;
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
         clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
         pillShade.animate().alpha(clockInView ? 0 : 1).setDuration(PILL_MS).start();
-        pillDate.setVisibility(time);
+        pillDate.setVisibility(withDate ? View.VISIBLE : View.GONE);
         pillTime.setVisibility(time);
         pillWeather.setVisibility(symbol != null ? View.VISIBLE : View.GONE);
         if (symbol != null) pillWeather.setText(WeatherIcon.in(this, symbol));
