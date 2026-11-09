@@ -80,6 +80,9 @@ public final class MainActivity extends CardActivity {
      */
     private static final float CLEAN_EDGE = 0.75f;
     private static final int CLEAN_EDGE_ALPHA = 128;
+    /** On an icon with a dark background the line is stronger, 70%: the user's choice of 2026-11-09. */
+    private static final int CLEAN_EDGE_DARK_ALPHA = 179;
+    private static final float CLEAN_DARK = 0.3f;
     /** How far towards white that line goes from the app's colour. */
     private static final float CLEAN_EDGE_LIGHT = 0.45f;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
@@ -2042,9 +2045,11 @@ public final class MainActivity extends CardActivity {
             Background.draw(() -> {
                 Bitmap square = circleArt(tag, size);
                 int colour = glowOf(square);
+                // The icon's own background, along its edge, where the line is drawn.
+                boolean dark = brightness(CircleArt.rim(square)) < CLEAN_DARK;
                 Bitmap made = Squircle.cut(square);
                 square.recycle();
-                colourEdge(made, colour);
+                colourEdge(made, colour, dark);
                 CIRCLE_ART.put(key, made);
                 runOnUiThread(() -> {
                     image.setImageBitmap(made);
@@ -2060,7 +2065,7 @@ public final class MainActivity extends CardActivity {
      * A very thin line along the squircle in the app's own colour, the one the wheel glows with:
      * the user's request of 2026-11-09. Drawn into the picture, inside its edge.
      */
-    private void colourEdge(Bitmap squircle, int colour) {
+    private void colourEdge(Bitmap squircle, int colour, boolean dark) {
         int size = squircle.getWidth();
         float line = getResources().getDisplayMetrics().density * CLEAN_EDGE;
         Path edge = Squircle.path(size - line);
@@ -2069,8 +2074,13 @@ public final class MainActivity extends CardActivity {
         rim.setStyle(Paint.Style.STROKE);
         rim.setStrokeWidth(line);
         // Its own colour exactly vanished on an icon of one colour: a little lighter, the same hue.
-        rim.setColor(Color.argb(CLEAN_EDGE_ALPHA, lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
+        rim.setColor(Color.argb(dark ? CLEAN_EDGE_DARK_ALPHA : CLEAN_EDGE_ALPHA, lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
         new Canvas(squircle).drawPath(edge, rim);
+    }
+
+    /** 0 for black, 1 for white, as the eye weighs the three colours. */
+    private static float brightness(int colour) {
+        return (0.299f * Color.red(colour) + 0.587f * Color.green(colour) + 0.114f * Color.blue(colour)) / 255f;
     }
 
     private static int lighter(int channel) {
