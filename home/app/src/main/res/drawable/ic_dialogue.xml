@@ -1,8 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
-    <!-- A person speaking: round head, half-circle shoulders and the sound beside them. -->
-    <path android:fillColor="#FFFFFFFF" android:pathData="M8.5,4.4 a4.3,4.3 0 1 0 0,8.6 a4.3,4.3 0 1 0 0,-8.6 Z" />
-    <path android:fillColor="#FFFFFFFF" android:pathData="M1.2,21.6 C1.2,17.4 4.4,14.6 8.5,14.6 C12.6,14.6 15.8,17.4 15.8,21.6 Z" />
-    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="1.5" android:strokeLineCap="round"
-        android:pathData="M15,6 A3.8,3.8 0 0 1 15,11.4 M17.6,3.6 A7.4,7.4 0 0 1 17.6,13.8 M20.2,1.2 A10.8,10.8 0 0 1 20.2,16.2" />
+    android:width="24dp" android:height="24dp" android:viewportWidth="31" android:viewportHeight="31">
+    <!-- A person speaking: round head, half-circle shoulders and the sound beside them. The frame is
+         wider on the left so that the person, not person and sound together, is in its middle
+         (the user's request of 2026-11-09): the person is at 8.5 in the drawing, the sound reaches 24. -->
+    <group android:translateX="7" android:translateY="3.5">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M8.5,4.4 a4.3,4.3 0 1 0 0,8.6 a4.3,4.3 0 1 0 0,-8.6 Z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M1.2,21.6 C1.2,17.4 4.4,14.6 8.5,14.6 C12.6,14.6 15.8,17.4 15.8,21.6 Z" />
+        <path android:strokeColor="#FFFFFFFF" android:strokeWidth="1.5" android:strokeLineCap="round"
+            android:pathData="M15,6 A3.8,3.8 0 0 1 15,11.4 M17.6,3.6 A7.4,7.4 0 0 1 17.6,13.8 M20.2,1.2 A10.8,10.8 0 0 1 20.2,16.2" />
+    </group>
 </vector>
