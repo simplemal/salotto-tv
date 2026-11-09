@@ -353,7 +353,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         caption.setGravity(Gravity.CENTER);
         caption.setSingleLine(true);
         caption.setEllipsize(TextUtils.TruncateAt.END);
-        caption.setPadding(0, dp(8), 0, dp(10));
+        // A square app grows a lot with the focus: its name starts below where the picture reaches then.
+        caption.setPadding(0, dp(8) + (square ? Math.round((focusScale() - 1) * artHeight / 2) : 0), 0, dp(10));
         caption.setVisibility(restingCaption());
         if (square && darkInk) {
             caption.setTextColor(DARK_TEXT);

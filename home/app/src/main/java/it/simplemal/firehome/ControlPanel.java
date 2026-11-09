@@ -71,6 +71,7 @@ final class ControlPanel extends LinearLayout {
     private static final int LIST_VALUE = 110;
     private static final int LIST_LIFT = 12;
     private static final int LIST_FILL = Color.rgb(28, 29, 32);
+    private static final int FLAT_FILL = Color.argb(225, 28, 29, 32);
     /** As bright as the line of the glass panel. */
     private static final int RIM_LIGHT = 235;
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
@@ -263,27 +264,48 @@ final class ControlPanel extends LinearLayout {
     }
 
     /** A list over its button on the circular Home, the tiles under the pill on the grid. Built again only on a change. */
-    void setListed(boolean list) {
-        if (list == listed) return;
-        listed = list;
-        removeAllViews();
-        tiles.clear();
-        last = null;
-        refreshers.clear();
-        chosen = null;
-        hint.setVisibility(GONE);
-        if (list) buildList();
-        else build();
+    void setListed(boolean list) { setLook(list, false); }
+
+    /**
+     * The list over its button, or the tiles under the pill. `clean`: the clean Home's tiles, the
+     * grid's ones under its buttons in the middle, on a flat fill with no glass.
+     */
+    void setLook(boolean list, boolean clean) {
+        if (list != listed) {
+            listed = list;
+            removeAllViews();
+            tiles.clear();
+            last = null;
+            refreshers.clear();
+            chosen = null;
+            hint.setVisibility(GONE);
+            if (list) buildList();
+            else build();
+            addRest();
+        }
         // The list is one plain colour inside the glass line: no sheen, nothing to blend with what is behind it.
-        setBackground(list ? solid() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
-        addRest();
+        setBackground(list ? solid() : clean ? flat() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
+        int across = list ? Gravity.START : clean ? Gravity.CENTER_HORIZONTAL : Gravity.END;
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
-        spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | Gravity.END;
+        spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | across;
         spot.topMargin = list ? 0 : host.dp(TOP);
-        spot.rightMargin = list ? 0 : host.dp(EDGE);
+        spot.rightMargin = list || clean ? 0 : host.dp(EDGE);
         spot.leftMargin = 0;
         spot.bottomMargin = 0;
         setLayoutParams(spot);
+        // The line of hints under the tiles goes with them.
+        FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
+        under.gravity = Gravity.TOP | across;
+        under.rightMargin = list || clean ? 0 : host.dp(EDGE);
+        line.setLayoutParams(under);
+    }
+
+    /** The clean Home's: one dark colour, a little see-through, and no line of light around it. */
+    private Drawable flat() {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(FLAT_FILL);
+        fill.setCornerRadius(host.dp(PANEL_RADIUS));
+        return fill;
     }
 
     /** The list stands on the button, centred on it and a little above it, inside the screen. */

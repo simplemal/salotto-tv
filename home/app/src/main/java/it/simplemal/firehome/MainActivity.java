@@ -504,14 +504,15 @@ public final class MainActivity extends CardActivity {
         }
         boolean corners = cornersOnTop();
         // The buttons alone, without the pill's glass, on the wheel at the bottom and on the clean Home at the top.
-        panel.setListed(corners);
+        // The wheel's is a list over its button; the clean Home's the grid's tiles, flat, under its buttons.
+        panel.setLook(circular, clean);
         // On the wheel the date goes above the time, where the eye starts reading the corner.
         hero.removeView(date);
         hero.addView(date, corners ? 0 : hero.indexOfChild(clock) + 1);
         hero.post(this::alignDate);
         // The big digits carry room above them for accents they never have: under the date it reads as a gap.
         clock.setIncludeFontPadding(!corners);
-        panelShade.setBackground(corners ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
+        panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
         heroPlace.leftMargin = dp(corners ? 32 : DOCK_MARGIN + DOCK_SIDE);
         heroPlace.topMargin = dp(corners ? 14 : 40);
         hero.setLayoutParams(heroPlace);
@@ -820,7 +821,6 @@ public final class MainActivity extends CardActivity {
         });
         controlButton.setOnKeyListener((view, code, event) -> {
             if (outOfRow(code, false)) return backToWheel(code, event);
-            if (clean) return downToApps(code, event);
             int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
             if (code != toPanel) return false;
             // On the wheel Up goes back to the apps: the panel opens with the button itself.
@@ -1465,6 +1465,14 @@ public final class MainActivity extends CardActivity {
         style = Look.homeStyle(this);
         circular = style == Look.HOME_CIRCLE;
         clean = style == Look.HOME_CLEAN;
+        // The blur at the bottom of the picture is for a first row resting there.
+        boolean bottomBlur = !(clean && (Look.appsOnly(this) || Look.cleanRowMiddle(this)));
+        if (bottomBlur != BottomBlur.on) {
+            BottomBlur.on = bottomBlur;
+            Look.trim();
+            weatherView.forget();
+            plainBackdrop = null;
+        }
         wheel.setGlow(Look.glow(this));
         // Gone, not hidden: neither the arrows nor the grid's spacing find it.
         footer.setVisibility(Look.credits(this) ? View.VISIBLE : View.GONE);
