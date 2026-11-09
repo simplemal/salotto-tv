@@ -271,8 +271,11 @@ final class ControlPanel extends LinearLayout {
     private boolean cleanLook;
     private static final int CLEAN_UNIT = 48;
     private static final int CLEAN_GAP = 5;
-    /** With no panel under them the clean Home's tiles carry the dark themselves. */
-    private static final int CLEAN_TILE_OFF = Color.argb(200, 0, 0, 0);
+    /**
+     * With no panel under them the clean Home's tiles carry the dark themselves, opaque: over the
+     * apps, with the first row in the middle or at the top, nothing see-through could be read.
+     */
+    private static final int CLEAN_TILE_OFF = Color.rgb(30, 31, 34);
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }
