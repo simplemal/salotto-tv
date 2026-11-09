@@ -1458,6 +1458,12 @@ public final class MainActivity extends CardActivity {
         showPillClock();
     }
 
+    /** Out of sight: a control centre left open for the screensaver or the task manager closes now, unseen. */
+    @Override protected void onStop() {
+        super.onStop();
+        leave();
+    }
+
     @Override protected void onPause() {
         super.onPause();
         showing = false;

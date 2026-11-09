@@ -157,9 +157,12 @@ final class ControlPanel extends LinearLayout {
 
     private void saver() { away(Fire.screensaver(getContext())); }
 
-    /** The screensaver and the task manager: coming back from them, the panel would only be in the way. */
+    /**
+     * The screensaver and the task manager open at once, over the panel as it is: it closes behind
+     * them, once the Home is out of sight (MainActivity.onStop), and is gone when they are left.
+     * Closed first, the selection was seen jumping to an app on the way out (2026-11-09).
+     */
     private void away(Intent page) {
-        host.leave();
         host.open(page);
     }
 
