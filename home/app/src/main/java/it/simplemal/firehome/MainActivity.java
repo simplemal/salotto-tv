@@ -428,7 +428,7 @@ public final class MainActivity extends CardActivity {
         root.addView(panelShade, new FrameLayout.LayoutParams(-1, -1));
         panel = ControlPanel.addTo(this, root, controlButton, true);
         panel.setVisibility(View.GONE);
-        panel.leadDownTo(this::firstCard);
+        panel.leadDownTo(this::lastAppView);
         root.getViewTreeObserver().addOnGlobalFocusChangeListener((before, after) -> followFocus(after));
         hint = label(getString(R.string.main_move_hint), 16);
         hint.setVisibility(View.GONE);
@@ -614,23 +614,38 @@ public final class MainActivity extends CardActivity {
             int width = picture.getWidth();
             int height = picture.getHeight();
             boolean light;
+            boolean below = darkInk;
             if (clean) {
                 // The whole line at the top; and under the first row, for the names and the credits.
                 light = lightness(picture, width / 16, width * 15 / 16, 0, height / 8) > LIGHT_LINE;
-                boolean below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
-                if (below != darkInk) {
-                    darkInk = below;
-                    toneFooter();
-                    render(focusedTag());
-                }
+                below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
             } else {
                 // The wheel's buttons, at the bottom in the middle.
                 light = lightness(picture, width * 3 / 8, width * 5 / 8, height * 5 / 6, height) > LIGHT_CORNER;
             }
-            if (light == lightCorner) return;
-            lightCorner = light;
-            tonePill();
+            boolean dark = below;
+            pendingTone = () -> {
+                if (dark != darkInk) {
+                    darkInk = dark;
+                    toneFooter();
+                    render(focusedTag());
+                }
+                if (light == lightCorner) return;
+                lightCorner = light;
+                tonePill();
+            };
+            // With a new backdrop on its way, together with it: never before or after (2026-11-09).
+            if (backdropsComing == 0 && swapsComing == 0) placedTone();
         });
+    }
+
+    /** The colours read for the backdrop now on show, waiting for it if it was still coming. */
+    private Runnable pendingTone;
+
+    private void placedTone() {
+        Runnable tone = pendingTone;
+        pendingTone = null;
+        if (tone != null) tone.run();
     }
 
     private static double lightness(Bitmap picture, int left, int right, int top, int bottom) {
@@ -865,10 +880,10 @@ public final class MainActivity extends CardActivity {
         return code == (end ? toEnd : toStart);
     }
 
-    /** The clean Home's buttons are at the top: Down goes to the first app, however far below it is. */
+    /** The clean Home's buttons are at the top: Down goes to the app selected last, however far below it is. */
     private boolean downToApps(int code, KeyEvent event) {
         if (!clean || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
-        View first = firstCard();
+        View first = lastAppView();
         if (first != null && event.getAction() == KeyEvent.ACTION_DOWN) first.requestFocus();
         return true;
     }
@@ -988,6 +1003,13 @@ public final class MainActivity extends CardActivity {
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
         view.setOnKeyListener((changed, code, event) -> {
+            // Up from the credits: back on the app that was selected.
+            if (!circular && code == KeyEvent.KEYCODE_DPAD_UP) {
+                View back = lastAppView();
+                if (back == null) return false;
+                if (event.getAction() == KeyEvent.ACTION_DOWN) back.requestFocus();
+                return true;
+            }
             if (!circular || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
             if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
             return true;
@@ -1139,9 +1161,18 @@ public final class MainActivity extends CardActivity {
             wheel.requestFocus();
             return;
         }
-        View tile = lastApp != null ? page.findViewWithTag(lastApp) : null;
-        if (tile == null) tile = firstCard();
+        View tile = lastAppView();
         if (tile != null) tile.requestFocus();
+    }
+
+    /**
+     * Where the apps are entered again from the buttons, the control centre or the credits: the app
+     * selected last, not the first or the one in the middle (the user's request of 2026-11-09).
+     */
+    private View lastAppView() {
+        if (circular) return wheel;
+        View tile = lastApp != null ? page.findViewWithTag(lastApp) : null;
+        return tile != null ? tile : firstCard();
     }
 
     /** After the backdrop has come in, or the question would open over an empty Home. */
@@ -1213,6 +1244,7 @@ public final class MainActivity extends CardActivity {
                 }
                 place.run();
                 backdropsComing--;
+                placedTone();
                 homeMaybeReady();
             });
         } else if (scene == null) {
@@ -1235,6 +1267,7 @@ public final class MainActivity extends CardActivity {
         }
         place.run();
         backdropsComing--;
+        placedTone();
         homeMaybeReady();
     }
 
@@ -1245,6 +1278,7 @@ public final class MainActivity extends CardActivity {
             swapsComing--;
             backdropsComing--;
             place.run();
+            placedTone();
             if (soft != null) showBlur(soft);
             else blurBackdrop();
             homeMaybeReady();

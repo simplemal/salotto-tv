@@ -319,8 +319,11 @@ final class ControlPanel extends LinearLayout {
         under.gravity = Gravity.TOP | across;
         under.rightMargin = list || clean ? 0 : host.dp(EDGE);
         int padding = clean ? 0 : PADDING;
-        under.topMargin = host.dp(TOP + 2 * padding + 4 * unit + 3 * gap + 6);
-        under.width = host.dp(2 * padding + 2 * wide() + gap);
+        // Two rows on the clean Home, four elsewhere.
+        int tall = clean ? 2 * unit + gap : 4 * unit + 3 * gap;
+        int wide = clean ? 2 * wide() + 4 * unit + 5 * gap : 2 * wide() + gap;
+        under.topMargin = host.dp(TOP + 2 * padding + tall + 6);
+        under.width = host.dp(2 * padding + wide);
         line.setLayoutParams(under);
     }
 
@@ -402,7 +405,8 @@ final class ControlPanel extends LinearLayout {
 
     private void build() {
         LinearLayout upper = new LinearLayout(getContext());
-        addView(upper);
+        // As wide as its tiles: filling the width, it would not count, and alone it left the panel 1 pixel wide.
+        addView(upper, new LayoutParams(-2, -2));
         Tile power = big(R.drawable.ic_power, getContext().getString(R.string.panel_standby), TaskService::standby);
         upper.addView(power.view, size(wide(), wide(), 0, 0));
         first = power.view;
@@ -415,7 +419,25 @@ final class ControlPanel extends LinearLayout {
         upper.addView(side, new LayoutParams(-2, -2));
         ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(gap));
 
-        LinearLayout modes = row();
+        // The clean Home's in two rows: the small tiles' two rows go beside Wi-Fi and Bluetooth.
+        LinearLayout modes;
+        LinearLayout tools;
+        if (cleanLook) {
+            LinearLayout small = new LinearLayout(getContext());
+            small.setOrientation(VERTICAL);
+            LayoutParams beside = new LayoutParams(-2, -2);
+            beside.setMarginStart(host.dp(gap));
+            upper.addView(small, beside);
+            modes = new LinearLayout(getContext());
+            small.addView(modes);
+            tools = new LinearLayout(getContext());
+            LayoutParams under = new LayoutParams(-2, -2);
+            under.topMargin = host.dp(gap);
+            small.addView(tools, under);
+        } else {
+            modes = row();
+            tools = null;
+        }
         audioSwitch(modes, R.drawable.ic_dialogue, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
         audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, gap, SettingsActivity.LEVELER);
         Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), gap,
@@ -423,7 +445,7 @@ final class ControlPanel extends LinearLayout {
         Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), gap,
             () -> change(() -> Veil.nextWarm(getContext())));
 
-        LinearLayout tools = row();
+        if (tools == null) tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> saver());
         Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), gap, () -> {
             nextTimer();

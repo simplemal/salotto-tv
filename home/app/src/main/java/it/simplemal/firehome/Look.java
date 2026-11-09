@@ -361,6 +361,9 @@ final class Look {
         long left = saved.getLong("home_left", 0);
         long away = System.currentTimeMillis() - left;
         if (left == 0 || away <= 0 || !saved.contains("abstract_at")) return;
+        // A picture chosen after leaving, on the way back, has no time away to make up for: moved
+        // into the future it looked expired, and another one faded in over it (2026-11-09).
+        if (saved.getLong("abstract_at", 0) >= left) return;
         saved.edit().putLong("abstract_at", saved.getLong("abstract_at", 0) + away).apply();
     }
 
