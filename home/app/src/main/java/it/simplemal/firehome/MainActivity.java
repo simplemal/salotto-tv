@@ -2014,7 +2014,8 @@ public final class MainActivity extends CardActivity {
      * from the main thread the first time. Salotto's settings and Tutte le app are drawn here too.
      */
     private View squircleCard(LinearLayout row, String tag, int size) {
-        String key = circleKey(tag, size) + "/squircle";
+        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag);
+        String key = circleKey(tag, size) + "/squircle" + (edged ? "/edge" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2052,7 +2053,7 @@ public final class MainActivity extends CardActivity {
                 boolean dark = brightness(CircleArt.rim(square)) < CLEAN_DARK;
                 Bitmap made = Squircle.cut(square);
                 square.recycle();
-                colourEdge(made, colour, dark);
+                if (edged) colourEdge(made, colour, dark);
                 CIRCLE_ART.put(key, made);
                 runOnUiThread(() -> {
                     image.setImageBitmap(made);

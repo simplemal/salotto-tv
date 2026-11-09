@@ -316,6 +316,7 @@
     <string name="settings_glow_text">Dietro l\'app accesa, un alone del suo colore. Spento, resta solo l\'ombra scura dei cerchi.</string>
     <string name="settings_wheel_motion">Apertura e chiusura animate</string>
     <string name="settings_wheel_motion_text">L\'app si apre da un cerchio del suo colore che si allarga, e tornando alla Home il colore si richiude nel cerchio. Ancora in prova.</string>
+    <string name="settings_app_edge">Bordo sulle app</string>
     <string name="settings_wheel_blur">Sfocatura dello sfondo</string>
     <string name="settings_wheel_blur_text">Lo sfondo dietro la ruota è sfocato, così app, ora e meteo risaltano. Le scene animate del meteo si vedono ferme.</string>
     <string name="settings_time_group">Orario</string>

@@ -336,6 +336,7 @@
     <string name="settings_glow_text">خلف التطبيق المضاء هالة بلونه. عند الإيقاف يبقى فقط الظل الداكن للدوائر.</string>
     <string name="settings_wheel_motion">حركة الفتح والإغلاق</string>
     <string name="settings_wheel_motion_text">يُفتح التطبيق من دائرة بلونه تتسع، وعند العودة إلى الرئيسية ينغلق اللون في الدائرة. ما زالت قيد التجربة.</string>
+    <string name="settings_app_edge">إطار حول التطبيقات</string>
     <string name="settings_wheel_blur">خلفية ضبابية</string>
     <string name="settings_wheel_blur_text">تصبح الخلفية خلف العجلة ضبابية فتبرز التطبيقات والوقت والطقس. تظهر مشاهد الطقس المتحركة ثابتة.</string>
     <string name="settings_time_group">الوقت</string>

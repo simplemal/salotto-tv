@@ -1087,6 +1087,11 @@ public final class SettingsActivity extends CardActivity {
                     Look.setCleanBlur(this, !blur);
                     refresh();
                 }));
+                boolean edge = Look.cleanEdge(this);
+                entries.add(new Entry(getString(R.string.settings_app_edge), edge ? YES : NO, null, null, false, () -> {
+                    Look.setCleanEdge(this, !edge);
+                    refresh();
+                }));
             }
         }
         boolean credits = Look.credits(this);
