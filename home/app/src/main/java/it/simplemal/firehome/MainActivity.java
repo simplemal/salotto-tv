@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -204,7 +205,7 @@ public final class MainActivity extends CardActivity {
     private static final int CLEAN_TILE = 56;
     private static final int CLEAN_GAP = 14;
     /** Where the first row stops once a lower one has the focus: under the line at the top. */
-    private static final int CLEAN_DOCK_TOP = 72;
+    private static final int CLEAN_DOCK_TOP = 100;
     private static final int CLEAN_PILL_TOP = 18;
     private static final int CLEAN_ICON_GAP = 22;
     private Bitmap squirclePlaceholder;
@@ -219,6 +220,7 @@ public final class MainActivity extends CardActivity {
     private static final int CLEAN_BAR_SP = 17;
     private static final int CLEAN_BAR_GAP = 14;
     private static final int ALL_APPS_FILL = Color.argb(28, 255, 255, 255);
+    private static final int ALL_APPS_EDGE = Color.argb(90, 255, 255, 255);
     private WheelHome wheel;
     private LinearLayout weatherCorner;
     private TextView cornerLine;
@@ -1625,6 +1627,9 @@ public final class MainActivity extends CardActivity {
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
         foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
+        // The clean Home's first row at the top would show them at once: they stay just under the screen.
+        // Close under the edge: reaching them then moves the apps up only a little, not under the line at the top.
+        if (clean && appsOnly) foot.topMargin = Math.max(foot.topMargin, shelf + screen - cards + dp(4));
         if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
@@ -1958,6 +1963,15 @@ public final class MainActivity extends CardActivity {
         Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
         fill.setColor(ALL_APPS_FILL);
         canvas.drawPath(Squircle.path(size), fill);
+        // A light line along its edge: so faint a veil would be lost among the apps' own colours.
+        float line = dp(1);
+        Path edge = Squircle.path(size - line);
+        edge.offset(line / 2, line / 2);
+        Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rim.setStyle(Paint.Style.STROKE);
+        rim.setStrokeWidth(line);
+        rim.setColor(ALL_APPS_EDGE);
+        canvas.drawPath(edge, rim);
         Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
         icon.setTint(Color.WHITE);
         int inset = size * 3 / 10;
@@ -1988,6 +2002,12 @@ public final class MainActivity extends CardActivity {
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
         int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        // A page not laid out yet has nothing to scroll: a smooth scroll there went back to the bottom,
+        // and a first row wanted at the top stayed low as the Home started.
+        if (!page.isLaidOut() || page.isLayoutRequested()) {
+            if (target == shelf) restRaised();
+            return;
+        }
         scroll.smoothScrollTo(0, target);
     }
 
