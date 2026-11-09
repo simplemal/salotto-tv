@@ -225,6 +225,7 @@
     <string name="settings_show_on_home">Mostrar en Inicio</string>
     <string name="settings_big">Grande</string>
     <string name="settings_clock_show_text">Si está apagado, la hora queda pequeña junto a los botones.</string>
+    <string name="settings_clock_hidden_text">Si está apagado, la hora no se ve en la Home.</string>
     <string name="settings_font">Tipo de letra</string>
     <string name="settings_font_text">El estilo de las cifras del reloj.</string>
     <string name="settings_size">Tamaño</string>
@@ -322,6 +323,7 @@
     <string name="settings_wheel_blur_text">El fondo detrás de la rueda se desenfoca, así las apps, la hora y el tiempo resaltan. Las escenas animadas del tiempo se ven quietas.</string>
     <string name="settings_time_group">Hora</string>
     <string name="settings_date_show_text">Si está apagada, la fecha queda pequeña junto a los botones.</string>
+    <string name="settings_date_hidden_text">Si está apagada, la fecha no se ve en la Home.</string>
     <string name="settings_date_font_text">El estilo de las letras de la fecha.</string>
     <string name="settings_date_size_text">El tamaño de la fecha.</string>
     <string name="settings_date_long">Largo</string>

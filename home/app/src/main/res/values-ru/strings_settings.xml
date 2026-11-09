@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">Показывать на главном экране</string>
     <string name="settings_big">Крупно</string>
     <string name="settings_clock_show_text">Если выключено, время остаётся мелким рядом с кнопками.</string>
+    <string name="settings_clock_hidden_text">Если выключено, время не показывается на главном экране.</string>
     <string name="settings_font">Шрифт</string>
     <string name="settings_font_text">Стиль цифр на часах.</string>
     <string name="settings_size">Размер</string>
@@ -331,6 +332,7 @@
     <string name="settings_wheel_blur_text">Фон за колесом размыт, чтобы приложения, время и погода выделялись. Анимированные сцены погоды показываются неподвижными.</string>
     <string name="settings_time_group">Время</string>
     <string name="settings_date_show_text">Если выключено, дата остаётся мелкой рядом с кнопками.</string>
+    <string name="settings_date_hidden_text">Если выключено, дата не показывается на главном экране.</string>
     <string name="settings_date_font_text">Стиль букв даты.</string>
     <string name="settings_date_size_text">Размер даты.</string>
     <string name="settings_date_long">Полный</string>

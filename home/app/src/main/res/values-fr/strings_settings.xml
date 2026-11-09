@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">Afficher sur l’Accueil</string>
     <string name="settings_big">En grand</string>
     <string name="settings_clock_show_text">Désactivé, l’heure reste petite à côté des boutons.</string>
+    <string name="settings_clock_hidden_text">Désactivé, l’heure n’apparaît pas sur la Home.</string>
     <string name="settings_font">Police</string>
     <string name="settings_font_text">Le style des chiffres de l’horloge.</string>
     <string name="settings_size">Taille</string>
@@ -321,6 +322,7 @@
     <string name="settings_wheel_blur_text">Le fond derrière la roue est flou, pour que les apps, l’heure et la météo ressortent. Les scènes météo animées restent figées.</string>
     <string name="settings_time_group">Heure</string>
     <string name="settings_date_show_text">Désactivé, la date reste petite à côté des boutons.</string>
+    <string name="settings_date_hidden_text">Désactivé, la date n’apparaît pas sur la Home.</string>
     <string name="settings_date_font_text">Le style des lettres de la date.</string>
     <string name="settings_date_size_text">La taille de la date.</string>
     <string name="settings_date_long">Long</string>

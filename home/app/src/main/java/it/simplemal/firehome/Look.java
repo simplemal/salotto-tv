@@ -220,7 +220,7 @@ final class Look {
     private static final int GLASS_DATE_FONT = 1;
     private static final int GLASS_DATE_SIZE = 0;
 
-    private static boolean glass(Context context) { return homeStyle(context) == HOME_GRID; }
+    static boolean glass(Context context) { return homeStyle(context) == HOME_GRID; }
 
     private static int ownInt(Context context, String key, int fallback) {
         SharedPreferences saved = prefs(context);

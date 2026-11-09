@@ -2057,10 +2057,14 @@ public final class SettingsActivity extends CardActivity {
         boolean visible = Look.clock(this);
         boolean enabled = Weather.enabled(this);
         String place = Weather.place(this);
+        // The wheel keeps the left of its buttons clear: off, nothing is left small there, so the
+        // switch shows or hides. On the glass Home off leaves it small: the switch is Large.
+        boolean wheel = Look.circular(this);
+        String shown = getString(wheel ? R.string.settings_show_on_home : R.string.settings_big);
         show(getString(R.string.settings_cat_clock), Arrays.asList(
             groupLabel(R.string.settings_time_group),
-            new Entry(getString(R.string.settings_big), visible ? YES : NO, null,
-                getString(R.string.settings_clock_show_text), false, () -> {
+            new Entry(shown, visible ? YES : NO, null,
+                getString(wheel ? R.string.settings_clock_hidden_text : R.string.settings_clock_show_text), false, () -> {
                     Look.setClock(this, !visible);
                     refresh();
                 }),
@@ -2074,8 +2078,8 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }),
             groupLabel(R.string.settings_date),
-            new Entry(getString(R.string.settings_big), Look.date(this) ? YES : NO, null,
-                getString(R.string.settings_date_show_text), false, () -> {
+            new Entry(shown, Look.date(this) ? YES : NO, null,
+                getString(wheel ? R.string.settings_date_hidden_text : R.string.settings_date_show_text), false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();
                 }),
@@ -2086,8 +2090,8 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
                 getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats)),
             groupLabel(R.string.settings_weather),
-            new Entry(getString(R.string.settings_big), enabled ? YES : NO, null,
-                getString(R.string.settings_weather_big_text), false, () -> {
+            new Entry(shown, enabled ? YES : NO, null,
+                getString(wheel ? R.string.settings_weather_show_text : R.string.settings_weather_big_text), false, () -> {
                     Weather.setEnabled(this, !enabled);
                     refresh();
                 }),

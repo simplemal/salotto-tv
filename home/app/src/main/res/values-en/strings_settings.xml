@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">Show on the Home</string>
     <string name="settings_big">Large</string>
     <string name="settings_clock_show_text">When off, the time stays small next to the buttons.</string>
+    <string name="settings_clock_hidden_text">When off, the time is not shown on the Home.</string>
     <string name="settings_font">Font</string>
     <string name="settings_font_text">The style of the clock digits.</string>
     <string name="settings_size">Size</string>
@@ -321,6 +322,7 @@
     <string name="settings_wheel_blur_text">The backdrop behind the wheel is blurred, so apps, time and weather stand out. Animated weather scenes look still.</string>
     <string name="settings_time_group">Time</string>
     <string name="settings_date_show_text">When off, the date stays small next to the buttons.</string>
+    <string name="settings_date_hidden_text">When off, the date is not shown on the Home.</string>
     <string name="settings_date_font_text">The style of the date’s letters.</string>
     <string name="settings_date_size_text">How big the date is.</string>
     <string name="settings_date_long">Long</string>

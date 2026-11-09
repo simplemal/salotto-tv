@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">إظهار في الرئيسية</string>
     <string name="settings_big">كبير</string>
     <string name="settings_clock_show_text">عند الإيقاف يبقى الوقت صغيرًا بجانب الأزرار.</string>
+    <string name="settings_clock_hidden_text">عند الإيقاف لا يظهر الوقت على الشاشة الرئيسية.</string>
     <string name="settings_font">الخط</string>
     <string name="settings_font_text">شكل أرقام الساعة.</string>
     <string name="settings_size">الحجم</string>
@@ -341,6 +342,7 @@
     <string name="settings_wheel_blur_text">تصبح الخلفية خلف العجلة ضبابية فتبرز التطبيقات والوقت والطقس. تظهر مشاهد الطقس المتحركة ثابتة.</string>
     <string name="settings_time_group">الوقت</string>
     <string name="settings_date_show_text">عند الإيقاف يبقى التاريخ صغيرًا بجانب الأزرار.</string>
+    <string name="settings_date_hidden_text">عند الإيقاف لا يظهر التاريخ على الشاشة الرئيسية.</string>
     <string name="settings_date_font_text">نمط حروف التاريخ.</string>
     <string name="settings_date_size_text">حجم التاريخ.</string>
     <string name="settings_date_long">كامل</string>

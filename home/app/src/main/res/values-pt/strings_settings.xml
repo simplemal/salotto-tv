@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">Mostrar no Início</string>
     <string name="settings_big">Grande</string>
     <string name="settings_clock_show_text">Desligado, a hora fica pequena ao lado dos botões.</string>
+    <string name="settings_clock_hidden_text">Desligado, a hora não aparece na Home.</string>
     <string name="settings_font">Fonte</string>
     <string name="settings_font_text">O estilo dos números do relógio.</string>
     <string name="settings_size">Tamanho</string>
@@ -321,6 +322,7 @@
     <string name="settings_wheel_blur_text">O fundo atrás da roda fica desfocado, assim os apps, a hora e o tempo se destacam. As cenas animadas do tempo ficam paradas.</string>
     <string name="settings_time_group">Hora</string>
     <string name="settings_date_show_text">Desligada, a data fica pequena ao lado dos botões.</string>
+    <string name="settings_date_hidden_text">Desligada, a data não aparece na Home.</string>
     <string name="settings_date_font_text">O estilo das letras da data.</string>
     <string name="settings_date_size_text">O tamanho da data.</string>
     <string name="settings_date_long">Longo</string>

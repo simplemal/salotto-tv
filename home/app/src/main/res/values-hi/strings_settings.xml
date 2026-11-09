@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">होम पर दिखाएं</string>
     <string name="settings_big">बड़ा</string>
     <string name="settings_clock_show_text">बंद होने पर समय बटनों के पास छोटा दिखता है।</string>
+    <string name="settings_clock_hidden_text">बंद होने पर समय होम पर नहीं दिखता।</string>
     <string name="settings_font">फ़ॉन्ट</string>
     <string name="settings_font_text">घड़ी के अंकों की शैली।</string>
     <string name="settings_size">आकार</string>
@@ -321,6 +322,7 @@
     <string name="settings_wheel_blur_text">पहिए के पीछे की पृष्ठभूमि धुंधली होती है, ताकि ऐप, समय और मौसम उभरकर दिखें। मौसम के एनिमेटेड दृश्य स्थिर दिखते हैं।</string>
     <string name="settings_time_group">समय</string>
     <string name="settings_date_show_text">बंद होने पर तारीख बटनों के पास छोटी दिखती है।</string>
+    <string name="settings_date_hidden_text">बंद होने पर तारीख होम पर नहीं दिखती।</string>
     <string name="settings_date_font_text">तारीख के अक्षरों की शैली।</string>
     <string name="settings_date_size_text">तारीख कितनी बड़ी है।</string>
     <string name="settings_date_long">पूरा</string>

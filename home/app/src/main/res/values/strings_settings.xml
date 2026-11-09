@@ -224,6 +224,7 @@
     <string name="settings_show_on_home">Mostra sulla Home</string>
     <string name="settings_big">Grande</string>
     <string name="settings_clock_show_text">Spento, l’orario resta piccolo accanto ai pulsanti.</string>
+    <string name="settings_clock_hidden_text">Spento, l’orario non si vede sulla Home.</string>
     <string name="settings_font">Carattere</string>
     <string name="settings_font_text">Lo stile delle cifre dell’orologio.</string>
     <string name="settings_size">Dimensione</string>
@@ -321,6 +322,7 @@
     <string name="settings_wheel_blur_text">Lo sfondo dietro la ruota è sfocato, così app, ora e meteo risaltano. Le scene animate del meteo si vedono ferme.</string>
     <string name="settings_time_group">Orario</string>
     <string name="settings_date_show_text">Spenta, la data resta piccola accanto ai pulsanti.</string>
+    <string name="settings_date_hidden_text">Spenta, la data non si vede sulla Home.</string>
     <string name="settings_date_font_text">Lo stile delle lettere della data.</string>
     <string name="settings_date_size_text">Quanto è grande la data.</string>
     <string name="settings_date_long">Esteso</string>
