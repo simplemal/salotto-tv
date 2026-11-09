@@ -235,6 +235,7 @@
     <string name="settings_date">Дата</string>
     <string name="settings_date_text">Показывает дату под часами.</string>
     <string name="settings_off">Выключено</string>
+    <string name="settings_weather_big_text">Если выключено, рядом с кнопками остаётся только значок текущей погоды.</string>
     <string name="settings_weather_show_text">Когда выключено, Salotto не запрашивает погоду в интернете.</string>
     <string name="settings_place">Место</string>
     <string name="settings_place_unset">Не выбрано</string>

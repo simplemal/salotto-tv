@@ -235,6 +235,7 @@
     <string name="settings_date">التاريخ</string>
     <string name="settings_date_text">يعرض التاريخ تحت الساعة.</string>
     <string name="settings_off">متوقف</string>
+    <string name="settings_weather_big_text">عند الإيقاف تبقى أيقونة الطقس الحالي فقط بجانب الأزرار.</string>
     <string name="settings_weather_show_text">عندما يكون متوقفًا لا يطلب Salotto الطقس من الإنترنت.</string>
     <string name="settings_place">المكان</string>
     <string name="settings_place_unset">لم يُختر بعد</string>

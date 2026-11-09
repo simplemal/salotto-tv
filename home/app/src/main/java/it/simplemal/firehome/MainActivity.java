@@ -164,6 +164,7 @@ public final class MainActivity extends CardActivity {
     private boolean bigClock;
     private boolean appsOnly;
     private String weatherSymbol;
+    private boolean weatherBig;
     private boolean pillDrawn;
     private boolean pillClock;
     private boolean pillWithDate;
@@ -1038,12 +1039,12 @@ public final class MainActivity extends CardActivity {
         boolean raised = !clean && scroll.getScrollY() > shelf / 2;
         // The clean Home's time is in its line at the top, or not wanted: never in the buttons.
         boolean clockInView = clean || bigClock && !raised;
-        String symbol = raised ? weatherSymbol : null;
+        String symbol = raised || !weatherBig ? weatherSymbol : null;
         // Time and date not big stay small in the pill (2026-11-09: the switch is called Large), and
         // the date on the left is not repeated there: only once it is out of view. Not on the clean
         // Home, which has its own line at the top.
         boolean withDate = !clean && (raised || date.getVisibility() != View.VISIBLE);
-        boolean small = !clockInView || withDate;
+        boolean small = !clockInView || withDate || symbol != null;
         // Called at every step of a scroll, and almost every step changes nothing.
         if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
@@ -1460,7 +1461,9 @@ public final class MainActivity extends CardActivity {
         String tomorrow = shown ? Weather.tomorrow(this) : null;
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
-        weatherSymbol = shown ? Weather.symbol(this) : null;
+        // Not large, today's symbol alone stays next to the buttons; the clean Home has its own line.
+        weatherSymbol = shown || !clean ? Weather.symbol(this) : null;
+        weatherBig = shown;
         if (cornersOnTop()) showWeatherCorner();
         if (clean) showCleanWeather();
         showPillClock();

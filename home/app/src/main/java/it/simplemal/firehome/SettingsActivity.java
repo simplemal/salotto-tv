@@ -2081,8 +2081,8 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
                 getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats)),
             groupLabel(R.string.settings_weather),
-            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null,
-                getString(R.string.settings_weather_show_text), false, () -> {
+            new Entry(getString(R.string.settings_big), enabled ? YES : NO, null,
+                getString(R.string.settings_weather_big_text), false, () -> {
                     Weather.setEnabled(this, !enabled);
                     refresh();
                 }),

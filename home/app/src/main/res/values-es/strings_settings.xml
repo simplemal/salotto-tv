@@ -236,6 +236,7 @@
     <string name="settings_date">Fecha</string>
     <string name="settings_date_text">Muestra la fecha bajo el reloj.</string>
     <string name="settings_off">Apagado</string>
+    <string name="settings_weather_big_text">Si está apagado, solo queda el icono del tiempo actual junto a los botones.</string>
     <string name="settings_weather_show_text">Cuando está apagado, Salotto no pide el tiempo a Internet.</string>
     <string name="settings_place">Lugar</string>
     <string name="settings_place_unset">Por elegir</string>

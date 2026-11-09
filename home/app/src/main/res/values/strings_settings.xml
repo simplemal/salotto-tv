@@ -235,6 +235,7 @@
     <string name="settings_date">Data</string>
     <string name="settings_date_text">Mostra la data sotto l’orologio.</string>
     <string name="settings_off">Spento</string>
+    <string name="settings_weather_big_text">Spento, resta solo l’icona del meteo di adesso accanto ai pulsanti.</string>
     <string name="settings_weather_show_text">Quando è spento Salotto non chiede il meteo a Internet.</string>
     <string name="settings_place">Luogo</string>
     <string name="settings_place_unset">Da scegliere</string>

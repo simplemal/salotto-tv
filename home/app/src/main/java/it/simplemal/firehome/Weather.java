@@ -242,9 +242,11 @@ final class Weather {
      * Read from the network with a place, when the Home writes it or a weather backdrop follows it.
      * With the weather off the Home, its backdrop gave way to another one and the place was asked
      * for again at every press (2026-11-09); off, with any other backdrop, nothing is asked.
+     * On the glass and the wheel Homes the switch is Large: off, today's symbol stays small next to
+     * the buttons, so it is read all the same (2026-11-09).
      */
     static boolean active(Context context) {
-        return place(context) != null && (enabled(context) || Look.weatherChosen(context));
+        return place(context) != null && (enabled(context) || Look.weatherChosen(context) || !Look.clean(context));
     }
 
     /** Never two readings at once, and offline a failure waits a while before the next try. */

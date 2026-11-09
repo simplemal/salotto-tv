@@ -235,6 +235,7 @@
     <string name="settings_date">तारीख</string>
     <string name="settings_date_text">घड़ी के नीचे तारीख दिखाता है।</string>
     <string name="settings_off">बंद</string>
+    <string name="settings_weather_big_text">बंद होने पर बटनों के पास सिर्फ़ अभी के मौसम का आइकन रहता है।</string>
     <string name="settings_weather_show_text">बंद होने पर Salotto इंटरनेट से मौसम नहीं मंगाता।</string>
     <string name="settings_place">स्थान</string>
     <string name="settings_place_unset">चुनना बाकी है</string>

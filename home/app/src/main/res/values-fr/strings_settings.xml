@@ -235,6 +235,7 @@
     <string name="settings_date">Date</string>
     <string name="settings_date_text">Affiche la date sous l’horloge.</string>
     <string name="settings_off">Désactivé</string>
+    <string name="settings_weather_big_text">Désactivé, seule l’icône de la météo actuelle reste à côté des boutons.</string>
     <string name="settings_weather_show_text">Quand c’est désactivé, Salotto ne demande pas la météo à Internet.</string>
     <string name="settings_place">Lieu</string>
     <string name="settings_place_unset">À choisir</string>

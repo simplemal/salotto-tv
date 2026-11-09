@@ -235,6 +235,7 @@
     <string name="settings_date">Data</string>
     <string name="settings_date_text">Mostra a data abaixo do relógio.</string>
     <string name="settings_off">Desligado</string>
+    <string name="settings_weather_big_text">Desligado, fica só o ícone do tempo agora ao lado dos botões.</string>
     <string name="settings_weather_show_text">Quando está desligado, o Salotto não consulta o clima na internet.</string>
     <string name="settings_place">Lugar</string>
     <string name="settings_place_unset">A escolher</string>

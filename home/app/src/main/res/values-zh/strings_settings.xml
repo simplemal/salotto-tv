@@ -236,6 +236,7 @@
     <string name="settings_date">日期</string>
     <string name="settings_date_text">在时钟下方显示日期。</string>
     <string name="settings_off">关闭</string>
+    <string name="settings_weather_big_text">关闭后，按钮旁边只保留当前天气的图标。</string>
     <string name="settings_weather_show_text">关闭时，Salotto 不会上网获取天气。</string>
     <string name="settings_place">地点</string>
     <string name="settings_place_unset">待选择</string>

@@ -235,6 +235,7 @@
     <string name="settings_date">Date</string>
     <string name="settings_date_text">Shows the date under the clock.</string>
     <string name="settings_off">Off</string>
+    <string name="settings_weather_big_text">When off, only the icon of the weather right now stays next to the buttons.</string>
     <string name="settings_weather_show_text">When it’s off, Salotto doesn’t ask the internet for the weather.</string>
     <string name="settings_place">Place</string>
     <string name="settings_place_unset">To be chosen</string>
