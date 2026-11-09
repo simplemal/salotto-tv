@@ -24,6 +24,7 @@
     <string name="first_no_connection">Falha na conexão. Tente novamente ou escolha Agora não.</string>
     <string name="first_place_title">Escolha o lugar</string>
     <string name="first_place_text">A previsão do tempo virá daqui.</string>
+    <string name="first_home_text">Escolha como ele fica. Você pode mudar nas Configurações.</string>
     <string name="first_remote_title">Mantenha um botão pressionado</string>
     <string name="first_remote_text">São atalhos do Salotto: eles não aparecem escritos no controle remoto.</string>
     <string name="first_key_back">Voltar</string>

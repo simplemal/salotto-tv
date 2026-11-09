@@ -19,6 +19,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -95,6 +96,7 @@ final class WheelHome extends FrameLayout {
     private static final long CLOSE_MS = 350;
     /** The glow reaches this far from the circle's centre, as a multiple of its radius. */
     private static final float GLOW_REACH = 1.3f;
+    private static final float WIDE_REACH = 1.8f;
     private static final int GLOW_ALPHA = 105;
     private static final float[] GLOW_STEPS = {1f, 0.75f, 0.35f, 0f};
     private static final float AWAY_GLOW = 0.5f;
@@ -129,6 +131,7 @@ final class WheelHome extends FrameLayout {
     private boolean moving;
     /** The halo of the app's colour: off, the circles keep only their dark shadow. */
     private boolean tinted = true;
+    private boolean wide;
     private boolean closing;
     private ObjectAnimator sway;
 
@@ -325,7 +328,7 @@ final class WheelHome extends FrameLayout {
         place();
     }
 
-    private int glowReach() { return Math.round(dp(shape.big) / 2f * GLOW_REACH); }
+    private int glowReach() { return Math.round(dp(shape.big) / 2f * (wide ? WIDE_REACH : GLOW_REACH)); }
 
     private int colourOf(String tag) {
         Integer colour = colours.get(tag);
@@ -346,9 +349,21 @@ final class WheelHome extends FrameLayout {
         return Color.argb(alpha, Color.red(colour), Color.green(colour), Color.blue(colour));
     }
 
-    void setTinted(boolean on) {
-        if (tinted == on) return;
+    /** Off, normal or wide, as Look names them: a wide one is the same glow reaching farther. */
+    void setGlow(int level) {
+        boolean on = level != Look.GLOW_OFF;
+        boolean farther = level == Look.GLOW_WIDE;
+        if (tinted == on && wide == farther) return;
         tinted = on;
+        if (wide != farther) {
+            wide = farther;
+            int reach = glowReach();
+            for (int index = 0; index < glows.size(); index++) {
+                View glow = glows.get(index);
+                glow.setLayoutParams(new LayoutParams(2 * reach, 2 * reach, Gravity.TOP | Gravity.START));
+                glow.setBackground(glowFill(colourOf((String) circles.get(index).getTag())));
+            }
+        }
         place();
     }
 
@@ -421,7 +436,7 @@ final class WheelHome extends FrameLayout {
     /** From now the portal is the circle's background, wide, with the app's circle small in its place. */
     void portalToCircle() {
         Bitmap art = litArt();
-        if (portal != null && art != null) portal.toCircle(CircleArt.rim(art), art);
+        if (portal != null && art != null) portal.toCircle(Color.BLACK, art);
     }
 
     /** The Home all in the app's colour at once, under the window that opens on the app. */
@@ -449,12 +464,15 @@ final class WheelHome extends FrameLayout {
         if (art != null) {
             // The circle's background closing onto the app's circle, on the drawing thread: smooth
             // while the Home is busy coming back.
-            CircleClose circle = new CircleClose(getContext(), CircleArt.rim(art), art, leaving.x, leaving.y, leaving.start);
-            addView(circle, new LayoutParams(-1, -1));
+            // Over the whole Home, the clock and the buttons too: they are back under it already,
+            // and the Home outside the ring is the finished one.
+            CircleClose circle = new CircleClose(getContext(), litColour(), art, leaving.x, leaving.y, leaving.start);
+            ViewGroup home = (ViewGroup) getParent();
+            home.addView(circle, new LayoutParams(-1, -1));
             circle.setTranslationZ(dp(20));
             removeView(leaving);
             circle.close(() -> {
-                removeView(circle);
+                home.removeView(circle);
                 if (portal == leaving) portal = null;
                 closing = false;
                 done.run();
@@ -476,14 +494,18 @@ final class WheelHome extends FrameLayout {
         shrink.start();
     }
 
-    @Override public boolean onKeyDown(int code, KeyEvent event) {
+    /** Left or Right as the remote means them: the next app that way comes to the top. */
+    void turnToward(int code) {
         boolean mirrored = getLayoutDirection() == LAYOUT_DIRECTION_RTL;
+        boolean right = code == KeyEvent.KEYCODE_DPAD_RIGHT;
+        turn(right != mirrored ? 1 : -1);
+    }
+
+    @Override public boolean onKeyDown(int code, KeyEvent event) {
         switch (code) {
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                turn(mirrored ? 1 : -1);
-                return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                turn(mirrored ? -1 : 1);
+                turnToward(code);
                 return true;
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (listener != null) listener.up();
@@ -544,7 +566,7 @@ final class WheelHome extends FrameLayout {
             invalidate();
         }
 
-        /** The closing: the circle's own background shrinks onto the app's circle, which stays small in its place. */
+        /** The closing: black all round the app's circle, which stays small in its place. */
         void toCircle(int background, Bitmap circle) {
             ring.setColor(background);
             art = circle;

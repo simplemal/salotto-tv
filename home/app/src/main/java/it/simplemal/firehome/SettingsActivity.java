@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.usage.StorageStats;
 import android.app.usage.StorageStatsManager;
 import android.bluetooth.BluetoothAdapter;
@@ -15,8 +16,8 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Outline;
 import android.graphics.Typeface;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -34,8 +35,10 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewOutlineProvider;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -64,26 +67,34 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONException;
 
-/** A tree of settings like tvOS: picture and explanation on the left, the current level on the right. */
+/** Settings in two columns: the sections on the left, always there; the page of the one chosen on the right. */
 public final class SettingsActivity extends CardActivity {
     private static final String CHECK = "✓";
     private static final int COLUMN_TOP = 44;
-    private static final int PICTURE_SIZE = 120;
     private static final int NO_MARK = -1;
     private static final int LABEL_SP = 15;
     private static final int LABEL_ROOM = 6;
     private static final int MARK_SIZE = 20;
     private static final int MARK_GAP = 12;
-    private static final int PREVIEW_SP = 12;
-    private static final int PREVIEW_MARGIN = 24;
-    /** As wide as a preview of the screen needs: an icon stays square in the middle. */
-    private static final int PICTURE_WIDTH = 213;
     private static final int LOCK_SIZE = 16;
     private static final int WIFI_5GHZ = 5000;
-    /** Its middle sits just above the middle of the 540-tall screen. */
-    private static final int PICTURE_TOP = 170;
-    private static final int EXPLANATION_TOP = PICTURE_TOP + PICTURE_SIZE + 22;
-    private static final int EXPLANATION_SP = 16;
+    /** The column of sections, and the room between it and the page. */
+    private static final int MENU_WIDTH = 262;
+    private static final int MENU_GAP = 28;
+    private static final int MENU_ROW = 40;
+    private static final int ROWS_TOP = 14;
+    private static final int ROW_HEIGHT = 48;
+    /** In the window everything is a size smaller. */
+    private static final int SMALL_ROW_HEIGHT = 40;
+    /** The outer columns of pictures stay whole beside it, see PictureMosaic. */
+    private static final int POPUP_WIDTH = 440;
+    private static final int POPUP_HEIGHT = 390;
+    private static final int SHADE = Color.argb(150, 0, 0, 0);
+    private static final long SECTION_PAUSE_MS = 140;
+    private static final int APPS_SECTION = 3;
+    private static final int SCREEN_SECTION = 4;
+    private static final int NETWORK_SECTION = 5;
+    private static final int FIRE_SECTION = 8;
     static final String RESOLUTION = "pq_video_resolution";
     private static final String[] RESOLUTIONS = {"-1", "97", "96", "16", "31", "4", "19"};
     private static final int[] RESOLUTION_NAMES = {R.string.settings_resolution_auto, R.string.settings_resolution_4k_60,
@@ -135,7 +146,7 @@ public final class SettingsActivity extends CardActivity {
     private static final int ROW_ROOM = 14;
     private static final int[] TABLE_COLUMNS = {R.string.settings_table_stick, R.string.settings_table_tv,
         R.string.settings_table_in_use};
-    private static final int[] TABLE_WIDTHS = {96, 96, 112};
+    private static final int[] TABLE_WIDTHS = {78, 78, 92};
     private static final int TABLE_ROW = 34;
     private static final int TABLE_PADDING = 14;
 
@@ -171,14 +182,12 @@ public final class SettingsActivity extends CardActivity {
         boolean locked;
         /** Shown but not to be chosen: the focus skips it. */
         boolean off;
-        /** The backdrop this row would give: the page turns into it while the row has the focus. */
-        Drawable preview;
-        /** The pictures of this row: they become the page's background while it has the focus. */
-        String mosaic;
         /** A heading for the rows below it: not a row. */
         boolean label;
         /** Beside the title: what kind of backdrop it is. Zero keeps the room empty, to stay lined up. */
         int mark = NO_MARK;
+        /** One of a list of choices: pressing it also closes the window of choices. */
+        boolean picks;
 
         Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
             this.title = title;
@@ -199,7 +208,33 @@ public final class SettingsActivity extends CardActivity {
         String opened;
         /** The real page is on screen: reading it again must not replace it with the waiting one. */
         boolean drawn;
+        /** Under the title: what the whole section is for. Only the first page of a section has it. */
+        String about;
+        String title;
+        /** Above the title of a window: where it was opened from, the heading over its row or the page. */
+        String context;
         Level(Runnable show) { this.show = show; }
+    }
+
+    private static final class Pane {
+        TextView heading;
+        LinearLayout tableHead;
+        ScrollView scroll;
+        LinearLayout rows;
+    }
+
+    /** One line of the column on the left: a section with its first page. */
+    private static final class Section {
+        final int name;
+        final int icon;
+        final int about;
+        final Runnable show;
+        Section(int name, int icon, int about, Runnable show) {
+            this.name = name;
+            this.icon = icon;
+            this.about = about;
+            this.show = show;
+        }
     }
 
     /** Opens directly on a section, for the control panel. */
@@ -229,13 +264,35 @@ public final class SettingsActivity extends CardActivity {
      * go back there, the user's wish of 2026-11-04. Leaving them with Back forgets it.
      */
     private static List<Spot> leftAt;
+    private static int leftSection;
+    private static boolean leftInMenu = true;
     private LinearLayout root;
     private TextView heading;
-    private ImageView picture;
-    private PictureMosaic mosaic;
-    private TextView previewNote;
-    private boolean previewing;
-    private TextView explanation;
+    private TextView about;
+    private LinearLayout menu;
+    private Section[] sections;
+    private int section;
+    /** The focus is on the column on the left: the page on the right only shows what is there. */
+    private boolean inMenu = true;
+    /** Moving quickly down the column draws only the page where it stops. */
+    private final Runnable showSection = this::openSection;
+    /** The section's page, and the window over it for everything a row opens: the same size for all. */
+    private Pane page;
+    private Pane popup;
+    private FrameLayout shade;
+    private TextView eyebrow;
+    /** The rows being built belong to the window: a size smaller. */
+    private boolean small;
+    private ImageView backdropView;
+    /** A key pressed in the column: its release must not reach the page it opened. */
+    private int heldInMenu;
+    /** Fire OS answers slowly: the page shows what was read last and reads again when it is stale. */
+    private String[] picture;
+    private String[] sound;
+    private boolean avStale = true;
+    private boolean avReading;
+    /** The network page opened from the Bluetooth tile starts on the Bluetooth rows. */
+    private boolean toRemotes;
     private LinearLayout rows;
     private ScrollView scroll;
     private LinearLayout tableHead;
@@ -244,13 +301,6 @@ public final class SettingsActivity extends CardActivity {
     private Level uninstalling;
     private boolean resumedOnce;
     private Drawable focusFill;
-
-    private FrameLayout.LayoutParams placed(int width, int height, int top) {
-        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(width, height,
-            Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        place.topMargin = dp(top);
-        return place;
-    }
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -261,41 +311,155 @@ public final class SettingsActivity extends CardActivity {
         DeviceInfo.prepare();
         root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackground(Look.plainBackdrop());
         root.setPadding(dp(MARGIN), 0, dp(MARGIN), 0);
-        previewNote = label(getString(R.string.first_preview), PREVIEW_SP);
-        previewNote.setAlpha(0.7f);
-        previewNote.setVisibility(View.GONE);
 
         LinearLayout panes = new LinearLayout(this);
         root.addView(panes, new LinearLayout.LayoutParams(-1, 0, 1));
 
-        // Fixed places: moving from one row to the next changes the words, never the layout.
-        FrameLayout left = new FrameLayout(this);
-        left.setPadding(dp(16), 0, dp(40), 0);
-        heading = label("", 28);
-        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        heading.setGravity(Gravity.CENTER);
-        heading.setSingleLine(true);
-        heading.setEllipsize(TextUtils.TruncateAt.END);
-        left.addView(heading, placed(-1, -2, COLUMN_TOP));
-        picture = new ImageView(this);
-        picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        picture.setClipToOutline(true);
-        picture.setOutlineProvider(new ViewOutlineProvider() {
-            @Override public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(12));
+        // On the left the sections, always there; on the right the page of the one chosen.
+        sections = new Section[]{
+            new Section(R.string.settings_cat_home, R.drawable.ic_s_home, R.string.settings_cat_home_text, this::showHome),
+            new Section(R.string.settings_cat_clock, R.drawable.ic_clock, R.string.settings_cat_clock_text, this::showClock),
+            new Section(R.string.settings_saver, R.drawable.ic_image, R.string.settings_cat_saver_text, this::showSaver),
+            new Section(R.string.settings_apps, R.drawable.ic_apps, R.string.settings_cat_apps_text, this::showApps),
+            new Section(R.string.settings_screen, R.drawable.ic_s_tv, R.string.settings_cat_screen_text, this::showScreen),
+            new Section(R.string.settings_cat_network, R.drawable.ic_wifi, R.string.settings_cat_network_text, this::showNetwork),
+            new Section(R.string.settings_cat_system, R.drawable.ic_settings, R.string.settings_cat_system_text, this::showSystem),
+            new Section(0, R.drawable.ic_salotto, R.string.settings_cat_salotto_text, this::showSalotto),
+            new Section(R.string.settings_fire, R.drawable.ic_s_open, 0, this::showFire)};
+        LinearLayout left = new LinearLayout(this);
+        left.setOrientation(LinearLayout.VERTICAL);
+        left.setPadding(0, dp(COLUMN_TOP - 8), dp(MENU_GAP), 0);
+        TextView title = label(getString(R.string.settings_title), 26);
+        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        title.setSingleLine(true);
+        title.setPadding(dp(14), 0, dp(8), dp(14));
+        left.addView(title);
+        menu = new LinearLayout(this);
+        menu.setOrientation(LinearLayout.VERTICAL);
+        for (int index = 0; index < sections.length; index++) {
+            if (index == FIRE_SECTION) {
+                View line = new View(this);
+                line.setBackgroundColor(Color.argb(40, 255, 255, 255));
+                LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(-1, Math.max(1, dp(1)));
+                place.setMargins(dp(14), dp(6), dp(14), dp(8));
+                menu.addView(line, place);
             }
-        });
-        left.addView(picture, placed(dp(PICTURE_WIDTH), dp(PICTURE_SIZE), PICTURE_TOP));
-        mosaic = new PictureMosaic(this);
-        explanation = label("", EXPLANATION_SP);
-        explanation.setGravity(Gravity.CENTER_HORIZONTAL);
-        explanation.setLineSpacing(dp(3), 1f);
-        left.addView(explanation, placed(-1, -2, EXPLANATION_TOP));
-        panes.addView(left, new LinearLayout.LayoutParams(0, -1, 45));
+            menu.addView(menuRow(index), menuRowSize());
+        }
+        left.addView(menu, new LinearLayout.LayoutParams(-1, -2));
+        panes.addView(left, new LinearLayout.LayoutParams(dp(MENU_WIDTH + MENU_GAP), -1));
 
-        scroll = new ScrollView(this) {
+        about = label("", 15);
+        about.setAlpha(0.7f);
+        about.setMaxLines(2);
+        about.setEllipsize(TextUtils.TruncateAt.END);
+        about.setPadding(dp(14), dp(4), dp(14), 0);
+        page = pane(COLUMN_TOP - 8);
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        // Title and description scroll with the rows: no row ever slides under a fixed header.
+        LinearLayout pageColumn = new LinearLayout(this);
+        pageColumn.setOrientation(LinearLayout.VERTICAL);
+        page.scroll.removeView(page.rows);
+        pageColumn.addView(page.heading, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(about, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(page.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        pageColumn.addView(page.rows, new LinearLayout.LayoutParams(-1, -2));
+        page.scroll.addView(pageColumn);
+        list.addView(page.scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        panes.addView(list, new LinearLayout.LayoutParams(0, -1, 1));
+
+        // Everything a row opens comes up in the middle, over the page, always the same size.
+        popup = pane(18);
+        popup.heading.setTextSize(20);
+        popup.heading.setPadding(dp(16), 0, dp(16), dp(4));
+        eyebrow = label("", 13);
+        eyebrow.setAlpha(0.6f);
+        eyebrow.setSingleLine(true);
+        eyebrow.setEllipsize(TextUtils.TruncateAt.END);
+        eyebrow.setPadding(dp(16), dp(16), dp(16), dp(2));
+        // The title scrolls with the rows, so that a long list never cuts it.
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(LinearLayout.VERTICAL);
+        popup.scroll.removeView(popup.rows);
+        column.addView(eyebrow, new LinearLayout.LayoutParams(-1, -2));
+        column.addView(popup.heading, new LinearLayout.LayoutParams(-1, -2));
+        column.addView(popup.tableHead, new LinearLayout.LayoutParams(-1, -2));
+        column.addView(popup.rows, new LinearLayout.LayoutParams(-1, -2));
+        popup.scroll.addView(column);
+        // As tall as what it holds, up to POPUP_HEIGHT, and always in the middle.
+        LinearLayout card = new LinearLayout(this) {
+            @Override protected void onMeasure(int widthSpec, int heightSpec) {
+                super.onMeasure(widthSpec, MeasureSpec.makeMeasureSpec(dp(POPUP_HEIGHT), MeasureSpec.AT_MOST));
+            }
+        };
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setClickable(true);
+        // The rows run to the rounded edge and go under it, not under a band above it.
+        card.setPadding(dp(8), 0, dp(8), 0);
+        card.setClipToOutline(true);
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.rgb(30, 33, 40));
+        fill.setCornerRadius(dp(22));
+        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
+        card.setBackground(fill);
+        card.setElevation(dp(24));
+        card.addView(popup.scroll, new LinearLayout.LayoutParams(-1, -2));
+        shade = new FrameLayout(this);
+        shade.setClickable(true);
+        shade.setOnClickListener(view -> onBackPressed());
+        // Clickable makes it focusable on its own: with the focus on it, the window's rows had none.
+        shade.setFocusable(false);
+        shade.setVisibility(View.GONE);
+        shade.addView(card, new FrameLayout.LayoutParams(dp(POPUP_WIDTH), -2, Gravity.CENTER));
+
+        backdropView = new ImageView(this);
+        backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        backdropView.setBackground(MenuBackdrop.base(this));
+        FrameLayout stage = new FrameLayout(this);
+        stage.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
+        stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
+        stage.addView(shade, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(stage);
+        usePane(false);
+        dressBackdrop();
+        // A mouse click puts the window in touch mode, which drops the selection: take it back.
+        root.getViewTreeObserver().addOnTouchModeChangeListener(touching -> {
+            if (touching) rows.post(this::selectCurrent);
+        });
+        // From the control panel or an app card, Back returns there and not to the settings.
+        String asked = getIntent().getStringExtra(SECTION);
+        if (asked != null) {
+            inMenu = false;
+            toRemotes = REMOTES.equals(asked);
+            if (APP.equals(asked)) {
+                section = APPS_SECTION;
+                String pkg = getIntent().getStringExtra(PACKAGE);
+                enter(() -> showApp(pkg));
+            } else {
+                section = SCREEN.equals(asked) ? SCREEN_SECTION : NETWORK_SECTION;
+                openSection();
+            }
+        } else {
+            section = Math.min(leftSection, sections.length - 1);
+            inMenu = leftAt == null || leftInMenu;
+            openSection();
+            if (!inMenu) goBack(leftAt);
+        }
+        paintMenu();
+        if (inMenu) menu.post(this::selectCurrent);
+    }
+
+    /** A title, the head of a table and the rows under them, scrolling. */
+    private Pane pane(int top) {
+        Pane pane = new Pane();
+        pane.heading = label("", 26);
+        pane.heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        pane.heading.setSingleLine(true);
+        pane.heading.setEllipsize(TextUtils.TruncateAt.END);
+        pane.heading.setPadding(dp(14), dp(top), dp(14), 0);
+        pane.scroll = new ScrollView(this) {
             /** Keeps the focused row's rounded ends inside the list. */
             @Override protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
                 Rect room = new Rect(rect);
@@ -303,46 +467,170 @@ public final class SettingsActivity extends CardActivity {
                 return super.computeScrollDeltaToGetChildRectOnScreen(room);
             }
         };
-        scroll.setVerticalScrollBarEnabled(false);
-        scroll.setClipChildren(false);
-        scroll.setFillViewport(true);
-        rows = new LinearLayout(this);
-        rows.setOrientation(LinearLayout.VERTICAL);
-        rows.setClipChildren(false);
-        rows.setClipToPadding(false);
-        rows.setPadding(dp(8), dp(COLUMN_TOP), dp(8), dp(16));
-        scroll.addView(rows);
-        LinearLayout list = new LinearLayout(this);
-        list.setOrientation(LinearLayout.VERTICAL);
-        tableHead = new LinearLayout(this);
-        tableHead.setPadding(dp(8 + TABLE_PADDING), dp(COLUMN_TOP - 20), dp(8 + TABLE_PADDING), 0);
-        tableHead.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
-        for (TextView name : addColumns(tableHead, strings(TABLE_COLUMNS), 12)) name.setAlpha(0.6f);
-        list.addView(tableHead, new LinearLayout.LayoutParams(-1, -2));
-        list.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
-        panes.addView(list, new LinearLayout.LayoutParams(0, -1, 55));
-        FrameLayout stage = new FrameLayout(this);
-        stage.addView(mosaic, new FrameLayout.LayoutParams(-1, -1));
-        stage.addView(root, new FrameLayout.LayoutParams(-1, -1));
-        setContentView(stage);
-        FrameLayout.LayoutParams corner = new FrameLayout.LayoutParams(-2, -2, Gravity.BOTTOM | Gravity.START);
-        corner.bottomMargin = dp(PREVIEW_MARGIN);
-        corner.setMarginStart(dp(PREVIEW_MARGIN));
-        addContentView(previewNote, corner);
-        // A mouse click puts the window in touch mode, which drops the selection: take it back.
-        root.getViewTreeObserver().addOnTouchModeChangeListener(touching -> {
-            if (touching) rows.post(this::selectCurrent);
-        });
-        // From the control panel or an app card, Back returns there and not to the settings.
-        String section = getIntent().getStringExtra(SECTION);
-        if (NETWORK.equals(section)) enter(this::showNetwork);
-        else if (REMOTES.equals(section)) enter(this::showRemotes);
-        else if (SCREEN.equals(section)) enter(this::showScreen);
-        else if (APP.equals(section)) enter(() -> showApp(getIntent().getStringExtra(PACKAGE)));
-        else {
-            enter(this::showRoot);
-            goBack(leftAt);
+        pane.scroll.setVerticalScrollBarEnabled(false);
+        pane.scroll.setClipChildren(false);
+        pane.scroll.setFillViewport(true);
+        pane.rows = new LinearLayout(this);
+        pane.rows.setOrientation(LinearLayout.VERTICAL);
+        pane.rows.setClipChildren(false);
+        pane.rows.setClipToPadding(false);
+        pane.scroll.addView(pane.rows);
+        pane.tableHead = new LinearLayout(this);
+        pane.tableHead.setPadding(dp(8 + TABLE_PADDING), dp(12), dp(8 + TABLE_PADDING), 0);
+        pane.tableHead.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
+        for (TextView name : addColumns(pane.tableHead, strings(TABLE_COLUMNS), 12)) name.setAlpha(0.6f);
+        pane.tableHead.setVisibility(View.GONE);
+        return pane;
+    }
+
+    /** The Home's own backdrop, blurred and darkened, usually made beforehand by the Home. Until it is ready, the plain one. */
+    private void dressBackdrop() {
+        Bitmap ready = MenuBackdrop.ready(this);
+        if (ready != null) {
+            backdropView.setImageBitmap(ready);
+            return;
         }
+        MenuBackdrop.make(this, made -> {
+            if (!isDestroyed()) backdropView.setImageBitmap(made);
+        });
+    }
+
+    private String sectionName(Section part) {
+        return part.name == 0 ? Brand.NAME : getString(part.name);
+    }
+
+    private LinearLayout.LayoutParams menuRowSize() {
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(MENU_ROW));
+        size.bottomMargin = dp(4);
+        return size;
+    }
+
+    /** Icon and name: a click chooses it with the mouse, the remote moves through dispatchKeyEvent. */
+    private View menuRow(int index) {
+        LinearLayout row = new LinearLayout(this);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), 0, dp(12), 0);
+        row.setDefaultFocusHighlightEnabled(false);
+        row.setClickable(true);
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(sections[index].icon);
+        icon.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+        row.addView(icon, new LinearLayout.LayoutParams(dp(22), dp(22)));
+        TextView name = label(sectionName(sections[index]), 17);
+        name.setSingleLine(true);
+        name.setEllipsize(TextUtils.TruncateAt.END);
+        name.setPaddingRelative(dp(14), 0, 0, 0);
+        row.addView(name, new LinearLayout.LayoutParams(0, -2, 1));
+        row.setTag(new Drawable[]{selectedFill(dp(10)), softGlass(dp(10))});
+        row.setOnClickListener(view -> {
+            // A window still open goes too: the click is a choice of the column.
+            if (index != section || levels.size() > 1) chooseSection(index);
+            if (!inMenu) goMenu();
+        });
+        return row;
+    }
+
+    private View menuRowAt(int index) {
+        return menu.getChildAt(index < FIRE_SECTION ? index : index + 1);
+    }
+
+    /** Lit while the focus is here, only marked while it is on the page. */
+    private void paintMenu() {
+        for (int index = 0; index < sections.length; index++) {
+            LinearLayout row = (LinearLayout) menuRowAt(index);
+            Drawable[] fills = (Drawable[]) row.getTag();
+            boolean chosen = index == section;
+            boolean lit = chosen && inMenu;
+            row.setBackground(lit ? fills[0] : chosen ? fills[1] : null);
+            int ink = lit ? Fire.INK : Color.WHITE;
+            ((ImageView) row.getChildAt(0)).setImageTintList(ColorStateList.valueOf(ink));
+            TextView name = (TextView) row.getChildAt(1);
+            name.setTextColor(ink);
+            name.setTypeface(Typeface.create(chosen ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));
+            row.setFocusable(inMenu);
+        }
+    }
+
+    /** Ends every level of the section on screen, with what each stops on leaving. */
+    private void clearLevels() {
+        while (!levels.isEmpty()) {
+            Level gone = levels.pop();
+            if (gone.leave != null) gone.leave.run();
+        }
+    }
+
+    /** The column moves at once; the page follows when the moving stops. */
+    private void chooseSection(int index) {
+        section = index;
+        clearLevels();
+        paintMenu();
+        Section part = sections[index];
+        heading.setText(Brand.mark(this, sectionName(part)));
+        about.setText(part.about == 0 ? "" : getString(part.about));
+        about.setVisibility(part.about == 0 ? View.GONE : View.VISIBLE);
+        usePane(false);
+        rows.removeAllViews();
+        tableHead.setVisibility(View.GONE);
+        rows.removeCallbacks(showSection);
+        rows.postDelayed(showSection, SECTION_PAUSE_MS);
+    }
+
+    private void openSection() {
+        rows.removeCallbacks(showSection);
+        clearLevels();
+        Section part = sections[section];
+        Level level = new Level(part.show);
+        level.about = part.about == 0 ? null : getString(part.about);
+        levels.push(level);
+        part.show.run();
+    }
+
+    private void moveSection(int step) {
+        int next = Math.max(0, Math.min(sections.length - 1, section + step));
+        if (next == section) return;
+        chooseSection(next);
+        menuRowAt(next).requestFocus();
+    }
+
+    private void goMenu() {
+        inMenu = true;
+        paintMenu();
+        menuRowAt(section).requestFocusFromTouch();
+    }
+
+    private void goPage() {
+        if (levels.isEmpty()) openSection();
+        inMenu = false;
+        selectCurrent();
+        paintMenu();
+    }
+
+    /** Up and down move through the column by hand: the focus must never slip onto the page. */
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        int code = event.getKeyCode();
+        boolean rtl = getWindow().getDecorView().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+        int towardMenu = rtl ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
+        int towardPage = rtl ? KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT;
+        boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
+        boolean ours = code == KeyEvent.KEYCODE_DPAD_UP || code == KeyEvent.KEYCODE_DPAD_DOWN || code == towardMenu
+            || code == towardPage || code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER;
+        if (!down && code == heldInMenu) {
+            heldInMenu = 0;
+            return true;
+        }
+        if (inMenu && ours) {
+            if (!down) return true;
+            heldInMenu = code;
+            if (code == KeyEvent.KEYCODE_DPAD_UP) moveSection(-1);
+            else if (code == KeyEvent.KEYCODE_DPAD_DOWN) moveSection(1);
+            else if (code != towardMenu && event.getRepeatCount() == 0) goPage();
+            return true;
+        }
+        if (!inMenu && code == towardMenu && rows.findFocus() != null) {
+            if (down && event.getRepeatCount() == 0) onBackPressed();
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     /** Down the same rows as last time, as long as they are still there and still open a level. */
@@ -374,12 +662,18 @@ public final class SettingsActivity extends CardActivity {
             way.add(new Spot(level.focus, level.opened));
         }
         leftAt = way;
+        leftSection = section;
+        leftInMenu = inMenu;
     }
 
     /** Coming back from an app or a page elsewhere, what is listed here may have changed. The first time it is fresh. */
     @Override protected void onResume() {
         super.onResume();
-        if (resumedOnce) refresh();
+        avStale = true;
+        if (resumedOnce) {
+            dressBackdrop();
+            refresh();
+        }
         resumedOnce = true;
     }
 
@@ -399,8 +693,28 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void enter(Runnable show) {
-        levels.push(new Level(show));
+        Level level = new Level(show);
+        if (!levels.isEmpty()) level.context = contextOf(levels.peek());
+        levels.push(level);
         show.run();
+    }
+
+    /** «Tipo» alone says little: the heading over its row, or the page it is on, says of what. */
+    private String contextOf(Level parent) {
+        if (shownEntries != null) {
+            for (int index = Math.min(parent.focus, shownEntries.size()) - 1; index >= 0; index--) {
+                if (shownEntries.get(index).label) return shownEntries.get(index).title;
+            }
+        }
+        return parent.title;
+    }
+
+    /** After a choice its window closes, and the page shows it. */
+    private void closeChoices(Level level) {
+        if (levels.peek() != level || levels.size() < 2) return;
+        levels.pop();
+        if (level.leave != null) level.leave.run();
+        refresh();
     }
 
     /** Redraws the level after a choice, staying on the same row. Late answers can find no level left. */
@@ -422,14 +736,24 @@ public final class SettingsActivity extends CardActivity {
         if (levels.peek() == level) onBackPressed();
     }
 
+    /** Back closes the choices, then goes up the levels, then to the column, then out. */
     @Override public void onBackPressed() {
         if (levels.isEmpty()) return;
+        boolean asked = getIntent().getStringExtra(SECTION) != null;
+        if (inMenu || levels.size() == 1 && asked) {
+            leftAt = null;
+            leftSection = 0;
+            leftInMenu = true;
+            finish();
+            return;
+        }
+        if (levels.size() == 1) {
+            goMenu();
+            return;
+        }
         Level left = levels.pop();
         if (left.leave != null) left.leave.run();
-        if (levels.isEmpty()) {
-            leftAt = null;
-            finish();
-        } else refresh();
+        refresh();
     }
 
     private void show(String title, List<Entry> entries) {
@@ -438,40 +762,84 @@ public final class SettingsActivity extends CardActivity {
 
     /** The note stays under the rows, for what is true of all of them. */
     private void show(String title, List<Entry> entries, String note) {
+        Level level = levels.peek();
+        usePane(levels.size() > 1);
+        small = levels.size() > 1;
+        level.title = title;
         heading.setText(Brand.mark(this, title));
+        if (small) {
+            eyebrow.setText(level.context != null ? Brand.mark(this, level.context) : "");
+            eyebrow.setVisibility(level.context != null ? View.VISIBLE : View.GONE);
+        }
+        if (levels.size() == 1) {
+            about.setText(level.about != null ? level.about : "");
+            about.setVisibility(level.about != null ? View.VISIBLE : View.GONE);
+        }
         boolean table = entries.get(0).columns != null;
         tableHead.setVisibility(table ? View.VISIBLE : View.GONE);
-        rows.setPadding(dp(8), dp(table ? 8 : COLUMN_TOP), dp(8), dp(16));
+        rows.setPadding(dp(8), dp(table ? 8 : ROWS_TOP), dp(8), dp(16));
         // The rows of the table must not run under its head.
         scroll.setClipChildren(table);
-        explanation.setTextSize(table ? 14 : EXPLANATION_SP);
         rows.removeAllViews();
-        shownEntries = entries;
         for (Entry entry : entries) {
-            if (entry.label) rows.addView(label(entry));
+            if (entry.label) rows.addView(label(entry), new LinearLayout.LayoutParams(-1, -2));
             else rows.addView(table ? tableRow(entry) : row(entry), table ? tableRowSize(entry) : rowSize());
         }
-        if (note != null) {
-            TextView line = label(note, 16);
-            line.setAlpha(0.75f);
-            line.setPadding(dp(20), dp(8), dp(16), 0);
-            rows.addView(line, new LinearLayout.LayoutParams(-1, -2));
+        if (note != null) rows.addView(note(note), new LinearLayout.LayoutParams(-1, -2));
+        shownEntries = entries;
+        // A list of choices opens on the one in use, the user's request of 2026-11-09, not on the first.
+        if (!level.drawn) {
+            for (int index = 0; index < entries.size(); index++) {
+                if (CHECK.equals(entries.get(index).value)) {
+                    level.focus = index;
+                    break;
+                }
+            }
         }
-        int focus = levels.peek().focus;
-        levels.peek().drawn = true;
-        if (focus == 0) scroll.scrollTo(0, 0);
-        selectRow(focus);
+        level.drawn = true;
+        if (level.focus == 0 || inMenu || firstRow(level.focus)) scroll.scrollTo(0, 0);
+        if (!inMenu) selectRow(level.focus);
     }
 
-    /** A plain requestFocus fails after a touch, leaving no row selected and the old text on the left. */
+    /** No row can have the focus above this one: up there are only the title and the headings. */
+    private boolean firstRow(int index) {
+        for (int row = 0; row < Math.min(index, rows.getChildCount()); row++) {
+            if (rows.getChildAt(row).isFocusable()) return false;
+        }
+        return true;
+    }
+
+    /** The page for the first level of a section; the window over it for the levels below. */
+    private void usePane(boolean up) {
+        Pane target = up ? popup : page;
+        heading = target.heading;
+        tableHead = target.tableHead;
+        scroll = target.scroll;
+        rows = target.rows;
+        shade.setVisibility(up ? View.VISIBLE : View.GONE);
+        shade.setBackgroundColor(SHADE);
+        page.rows.setDescendantFocusability(up ? ViewGroup.FOCUS_BLOCK_DESCENDANTS : ViewGroup.FOCUS_AFTER_DESCENDANTS);
+    }
+
+    private TextView note(String text) {
+        TextView line = label(text, 16);
+        line.setAlpha(0.75f);
+        line.setPadding(dp(20), dp(8), dp(16), 0);
+        return line;
+    }
+
+    /** A plain requestFocus fails after a touch, leaving no row selected. */
     private void selectRow(int index) {
-        int row = Math.min(index, rows.getChildCount() - 1);
-        while (row < rows.getChildCount() - 1 && !rows.getChildAt(row).isFocusable()) row++;
+        int count = rows.getChildCount();
+        if (count == 0) return;
+        int row = Math.min(Math.max(0, index), count - 1);
+        while (row < count - 1 && !rows.getChildAt(row).isFocusable()) row++;
         rows.getChildAt(row).requestFocusFromTouch();
     }
 
     private void selectCurrent() {
-        if (!levels.isEmpty() && rows.getChildCount() > 0) selectRow(levels.peek().focus);
+        if (inMenu) menuRowAt(section).requestFocusFromTouch();
+        else if (!levels.isEmpty() && rows.getChildCount() > 0) selectRow(levels.peek().focus);
     }
 
     /** The window enters touch mode as it gets the focus, which drops what was selected before. */
@@ -481,10 +849,11 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private LinearLayout.LayoutParams rowSize() {
-        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(48));
-        size.bottomMargin = dp(8);
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(small ? SMALL_ROW_HEIGHT : ROW_HEIGHT));
+        size.bottomMargin = dp(small ? 6 : 8);
         return size;
     }
+
 
     private LinearLayout.LayoutParams tableRowSize(Entry entry) {
         LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(TABLE_ROW));
@@ -530,49 +899,50 @@ public final class SettingsActivity extends CardActivity {
         Drawable rest = softGlass(dp(12));
         row.setBackground(rest);
         row.setOnClickListener(v -> {
-            levels.peek().focus = rows.indexOfChild(v);
-            levels.peek().opened = entry.title;
+            // A click, with a mouse or on a preview of the screen, reaches the page without the
+            // keys that would have left the column: Back would then still close everything.
+            if (inMenu) {
+                inMenu = false;
+                paintMenu();
+            }
+            Level level = levels.peek();
+            level.focus = rows.indexOfChild(v);
+            level.opened = entry.title;
             entry.action.run();
+            if (entry.picks && !isFinishing()) closeChoices(level);
         });
         row.setOnFocusChangeListener((view, focused) -> {
             paint.accept(focused);
             view.setBackground(focused ? focusFill() : rest);
-            float scale = focused ? 1.03f : 1f;
+            float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
             if (focused) {
-                levels.peek().focus = rows.indexOfChild(view);
-                picture.setImageDrawable(entry.pkg != null ? appIcon(entry.pkg) : entry.picture);
-                showPreview(entry);
-                explanation.setText(Brand.mark(this, entry.text));
+                int index = rows.indexOfChild(view);
+                levels.peek().focus = index;
+                // The title scrolls with the rows: back on the first row it comes back into view.
+                // Rows just built go there at once: a glide still running would pull the page back
+                // up after the focus has moved on to the row it was left on (2026-11-09).
+                if (firstRow(index)) {
+                    if (view.isLaidOut()) scroll.smoothScrollTo(0, 0);
+                    else scroll.scrollTo(0, 0);
+                }
             }
         });
     }
 
-    private void showPreview(Entry entry) {
-        boolean plain = entry.preview != null;
-        boolean pictures = entry.mosaic != null;
-        mosaic.show(entry.mosaic);
-        if (plain) root.setBackground(entry.preview);
-        else if (pictures) root.setBackground(null);
-        else if (previewing) root.setBackground(Look.plainBackdrop());
-        previewing = plain || pictures;
-        previewNote.setVisibility(plain ? View.VISIBLE : View.GONE);
-        picture.setVisibility(pictures ? View.INVISIBLE : View.VISIBLE);
-    }
-
     private View label(Entry entry) {
-        TextView label = label(entry.title, LABEL_SP);
+        TextView label = label(entry.title, small ? 13 : LABEL_SP);
         label.setText(Brand.mark(this, entry.title));
         label.setAlpha(0.7f);
-        label.setPadding(dp(20), dp(LABEL_ROOM), dp(16), dp(8));
+        label.setPadding(dp(small ? 16 : 20), dp(LABEL_ROOM), dp(16), dp(small ? 6 : 8));
         return label;
     }
 
     private View row(Entry entry) {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(20), 0, dp(16), 0);
-        TextView title = label(entry.title, 20);
+        row.setPadding(dp(small ? 16 : 20), 0, dp(small ? 12 : 16), 0);
+        TextView title = label(entry.title, small ? 17 : 20);
         if (entry.family != null) title.setTypeface(Typeface.create(entry.family, Typeface.NORMAL));
         title.setSingleLine(true);
         if (entry.mark != NO_MARK) {
@@ -585,10 +955,10 @@ public final class SettingsActivity extends CardActivity {
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         boolean onOff = YES.equals(entry.value) || NO.equals(entry.value);
         ToggleView toggle = onOff ? new ToggleView(this, YES.equals(entry.value)) : null;
-        TextView value = label(onOff || entry.value == null ? "" : entry.value, 18);
+        TextView value = label(onOff || entry.value == null ? "" : entry.value, small ? 15 : 18);
         value.setSingleLine(true);
         value.setEllipsize(TextUtils.TruncateAt.END);
-        value.setMaxWidth(dp(230));
+        value.setMaxWidth(dp(small ? 170 : 230));
         value.setAlpha(0.75f);
         row.addView(value);
         ImageView lock = new ImageView(this);
@@ -597,8 +967,8 @@ public final class SettingsActivity extends CardActivity {
         LinearLayout.LayoutParams lockPlace = new LinearLayout.LayoutParams(dp(LOCK_SIZE), dp(LOCK_SIZE));
         lockPlace.setMarginStart(dp(8));
         if (entry.locked) row.addView(lock, lockPlace);
-        if (onOff) row.addView(toggle, new LinearLayout.LayoutParams(dp(38), dp(21)));
-        TextView chevron = label(entry.branch ? "›" : "", 24);
+        if (onOff) row.addView(toggle, new LinearLayout.LayoutParams(dp(small ? 34 : 38), dp(small ? 19 : 21)));
+        TextView chevron = label(entry.branch ? "›" : "", small ? 20 : 24);
         chevron.setPadding(dp(12), 0, 0, dp(3));
         chevron.setAlpha(0.75f);
         if (!onOff) row.addView(chevron);
@@ -633,54 +1003,17 @@ public final class SettingsActivity extends CardActivity {
         }
     }
 
-    private void showRoot() {
-        show(getString(R.string.settings_title), Arrays.asList(
-            new Entry(getString(R.string.settings_look), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_palette),
-                getString(R.string.settings_look_text), true, () -> enter(this::showLook)),
-            new Entry(getString(R.string.settings_clock_and_date), clockValue(), getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_clock_and_date_text),
-                true, () -> enter(this::showClock)),
-            new Entry(getString(R.string.settings_weather), weatherValue(), getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_weather_text),
-                true, () -> enter(this::showWeather)),
-            new Entry(getString(R.string.settings_apps), null, getDrawable(R.drawable.ic_apps),
-                getString(R.string.settings_apps_text),
-                true, () -> enter(this::showApps)),
-            new Entry(getString(R.string.settings_screen), null, getDrawable(R.drawable.ic_s_tv),
-                getString(R.string.settings_screen_text),
-                true, () -> enter(this::showScreen)),
-            new Entry(getString(R.string.panel_notifications), notificationValue(), getDrawable(R.drawable.ic_s_notify),
-                getString(R.string.settings_notifications_text), false, () -> {
-                    NotificationCounter.seen(this);
-                    open(Fire.notifications());
-                }),
-            new Entry(getString(R.string.settings_language), Language.name(this), getDrawable(R.drawable.ic_s_language),
-                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
-            new Entry(getString(R.string.settings_network), null, getDrawable(R.drawable.ic_s_language),
-                getString(R.string.settings_network_text), true, () -> enter(this::showNetwork)),
-            new Entry(getString(R.string.settings_remotes), null, getDrawable(R.drawable.ic_s_settings_remote),
-                getString(R.string.settings_remotes_text),
-                true, () -> enter(this::showRemotes)),
-            new Entry(getString(R.string.settings_device), null, getDrawable(R.drawable.ic_s_developer_board),
-                getString(R.string.settings_device_text), true, () -> enter(this::showDevice)),
-            new Entry(getString(R.string.settings_privacy), null, getDrawable(R.drawable.ic_s_privacy),
-                getString(R.string.settings_privacy_text), true, () -> enter(this::showPrivacy)),
-            new Entry(getString(R.string.settings_backup), null, getDrawable(R.drawable.ic_s_backup),
-                getString(R.string.settings_backup_text), true, () -> enter(this::showBackup)),
-            new Entry(getString(R.string.settings_tools), null, getDrawable(R.drawable.ic_s_build),
-                getString(R.string.settings_tools_text), true, () -> enter(this::showTools)),
-            new Entry(getString(R.string.settings_update), null, getDrawable(R.drawable.ic_s_update),
-                getString(R.string.settings_update_text),
-                true, () -> enter(this::showUpdate)),
-            new Entry(getString(R.string.settings_about), BuildVersion.name(this), getDrawable(R.drawable.ic_s_info),
-                getString(R.string.settings_about_text), true,
-                () -> open(new Intent(this, AboutActivity.class))),
-            new Entry(getString(R.string.settings_fire), null, getDrawable(R.drawable.ic_s_open),
-                getString(R.string.settings_fire_text),
-                false, () -> {
-                    TaskService.wantFireSettings();
-                    open(fireOsSettings());
-                })));
+    /** What Salotto cannot do stays in Fire OS: one row to get there. */
+    private void showFire() {
+        show(getString(R.string.settings_fire), Collections.singletonList(
+            new Entry(getString(R.string.settings_fire_open), null, null, getString(R.string.settings_fire_text), false, () -> {
+                TaskService.wantFireSettings();
+                open(fireOsSettings());
+            })));
+    }
+
+    private Entry info(String title, String value, String text) {
+        return new Entry(title, value, null, text, false, () -> { });
     }
 
     private String notificationValue() {
@@ -702,74 +1035,87 @@ public final class SettingsActivity extends CardActivity {
             }));
     }
 
-    private String clockValue() {
-        if (!Look.clock(this)) return getString(R.string.settings_hidden);
-        return getString(R.string.settings_clock_value, Look.fontNames(this)[Look.font(this)],
-            inSentence(Look.sizeNames(this)[Look.size(this)]));
-    }
 
-    private void showLook() {
-        boolean circular = Look.circular(this);
+
+    private static final int[] HOME_NAMES = {R.string.settings_home_grid, R.string.settings_home_circle, R.string.settings_home_clean};
+    private static final int[] HOME_SECTIONS = {R.string.settings_section_grid, R.string.settings_section_circle, R.string.settings_section_clean};
+
+    private void showHome() {
+        int style = Look.homeStyle(this);
+        boolean circular = style == Look.HOME_CIRCLE;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), getDrawable(R.drawable.ic_s_wallpaper),
-            getString(R.string.settings_backdrop_text),
-            true, () -> enter(this::showBackdrops)));
-        entries.add(new Entry(getString(R.string.settings_home),
-            getString(circular ? R.string.settings_home_circle : R.string.settings_home_grid), getDrawable(R.drawable.ic_s_grid),
-            getString(circular ? R.string.settings_home_circle_text : R.string.settings_home_grid_text),
+        entries.add(new Entry(getString(R.string.settings_home), getString(HOME_NAMES[style]), null, null,
             true, () -> enter(this::showHomes)));
+        entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null,
+            getString(R.string.settings_backdrop_text), true, () -> open(new Intent(this, PictureGridActivity.class))));
+        // Only for a collection that changes by itself: with one picture or the weather it means nothing.
+        if (Look.timedBackdrop(this)) entries.add(paceEntry(false));
+        entries.add(groupLabel(HOME_SECTIONS[style]));
         if (circular) {
             // The wheel has no rows, no dock and no names under the circles.
-            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), getDrawable(R.drawable.ic_s_grid),
-                getString(R.string.settings_wheel_text),
-                true, () -> enter(this::showWheel)));
-            boolean glow = Look.tintGlow(this);
-            entries.add(new Entry(getString(R.string.settings_glow), glow ? YES : NO, getDrawable(R.drawable.ic_s_palette),
-                getString(R.string.settings_glow_text), false, () -> {
-                    Look.setTintGlow(this, !glow);
-                    refresh();
-                }));
+            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
+                getString(R.string.settings_wheel_text), true, () -> enter(this::showWheel)));
+            entries.add(new Entry(getString(R.string.settings_glow), glowNames()[Look.glow(this)], null,
+                getString(R.string.settings_glow_text), true, () -> enter(this::showGlow)));
             boolean motion = Look.wheelMotion(this);
-            Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, getDrawable(R.drawable.ic_s_open),
+            Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, null,
                 getString(R.string.settings_wheel_motion_text), false, () -> {
                     Look.setWheelMotion(this, !motion);
                     refresh();
                 });
-            // The Sticks of 2020 cannot draw it smoothly: shown, always off, not to be chosen.
-            opening.off = Fire.STICK_2020;
+            // Where it cannot be drawn smoothly: shown, always off, not to be chosen.
+            opening.off = !Features.CIRCLE_ANIMATION;
             entries.add(opening);
             boolean blur = Look.wheelBlur(this);
-            entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, getDrawable(R.drawable.ic_s_wallpaper),
+            entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null,
                 getString(R.string.settings_wheel_blur_text), false, () -> {
                     Look.setWheelBlur(this, !blur);
                     refresh();
                 }));
         } else {
-            entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), getDrawable(R.drawable.ic_s_grid),
-                getString(R.string.settings_grid_text),
-                true, () -> enter(this::showColumns)));
-            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], getDrawable(R.drawable.ic_s_label),
-                getString(R.string.settings_app_names_text),
-                true, () -> enter(this::showNames)));
-            entries.add(new Entry(getString(R.string.settings_dock), getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom),
-                getDrawable(R.drawable.ic_s_grid), getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
+            // The clean Home has twelve apps a row, always.
+            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
+                getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
+            entries.add(new Entry(getString(R.string.settings_first_row),
+                getString(Look.appsOnly(this) ? R.string.settings_dock_top
+                    : style == Look.HOME_CLEAN && Look.cleanRowMiddle(this) ? R.string.settings_row_middle : R.string.settings_dock_bottom), null,
+                getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
+            if (style == Look.HOME_CLEAN) {
+                // Its own switch, off at first: the wheel's is not touched.
+                boolean blur = Look.cleanBlur(this);
+                entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null, null, false, () -> {
+                    Look.setCleanBlur(this, !blur);
+                    refresh();
+                }));
+                boolean edge = Look.cleanEdge(this);
+                entries.add(new Entry(getString(R.string.settings_app_edge), edge ? YES : NO, null, null, false, () -> {
+                    Look.setCleanEdge(this, !edge);
+                    refresh();
+                }));
+            }
         }
-        entries.add(new Entry(getString(R.string.settings_saver), saverValue(), getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_saver_text), true, () -> enter(this::showSaver)));
-        show(getString(R.string.settings_look), entries);
+        boolean credits = Look.credits(this);
+        entries.add(new Entry(getString(R.string.settings_credits), credits ? YES : NO, null, null, false, () -> {
+            Look.setCredits(this, !credits);
+            refresh();
+        }));
+        show(getString(R.string.settings_cat_home), entries);
     }
 
     private String wheelName(int count) {
         return getString(count == 5 ? R.string.settings_wheel_five : R.string.settings_wheel_three);
     }
 
+    /** The order they are offered in, the user's of 2026-11-09: Clean first, Glass last. */
+    private static final int[] HOME_ORDER = {Look.HOME_CLEAN, Look.HOME_CIRCLE, Look.HOME_GRID};
+
     private void showHomes() {
-        String[] names = {getString(R.string.settings_home_grid), getString(R.string.settings_home_circle)};
-        show(getString(R.string.settings_home), choices(names, Look.circular(this) ? 1 : 0, R.drawable.ic_s_grid,
-            index -> getString(index == 1 ? R.string.settings_home_circle_text : R.string.settings_home_grid_text), index -> {
-                Look.setCircular(this, index == 1);
-                refresh();
-            }));
+        String[] names = new String[HOME_ORDER.length];
+        for (int index = 0; index < names.length; index++) names[index] = getString(HOME_NAMES[HOME_ORDER[index]]);
+        show(getString(R.string.settings_home), choices(names, indexOf(HOME_ORDER, Look.homeStyle(this)), R.drawable.ic_s_grid, index -> null, index -> {
+            Look.setHomeStyle(this, HOME_ORDER[index]);
+            refresh();
+        }));
     }
 
     private void showWheel() {
@@ -783,13 +1129,27 @@ public final class SettingsActivity extends CardActivity {
             }));
     }
 
+    private String[] glowNames() {
+        return new String[]{getString(R.string.settings_glow_off), getString(R.string.settings_glow_normal), getString(R.string.settings_glow_wide)};
+    }
+
+    private void showGlow() {
+        show(getString(R.string.settings_glow), choices(glowNames(), Look.glow(this), R.drawable.ic_apps,
+            getString(R.string.settings_glow_text), index -> {
+                Look.setGlow(this, index);
+                refresh();
+            }));
+    }
+
     /** The rows of a list with one choice marked: each runs `choose` with its own index. */
     private List<Entry> choices(String[] names, int chosen, int picture, IntFunction<String> text, IntConsumer choose) {
         List<Entry> entries = new ArrayList<>();
         for (int index = 0; index < names.length; index++) {
             int choice = index;
-            entries.add(new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture),
-                text.apply(index), false, () -> choose.accept(choice)));
+            Entry entry = new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture),
+                text.apply(index), false, () -> choose.accept(choice));
+            entry.picks = true;
+            entries.add(entry);
         }
         return entries;
     }
@@ -800,7 +1160,6 @@ public final class SettingsActivity extends CardActivity {
 
     private String minutes(int count) { return getResources().getQuantityString(R.plurals.settings_minutes, count, count); }
 
-    private String appsPerRow(int count) { return getResources().getQuantityString(R.plurals.settings_apps_per_row, count, count); }
 
     private String[] minuteNames(int[] minutes) {
         String[] names = new String[minutes.length];
@@ -816,10 +1175,24 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showDock() {
-        String[] names = {getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
-        show(getString(R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+        // The clean Home has no dock to see: its first row of apps, at the bottom or at the top.
+        boolean clean = Look.clean(this);
+        if (clean) {
+            // Only here: in the middle as well. Listed as on the screen, the top first (2026-11-09).
+            String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_row_middle), getString(R.string.settings_dock_bottom)};
+            int chosen = Look.appsOnly(this) ? 0 : Look.cleanRowMiddle(this) ? 1 : 2;
+            show(getString(R.string.settings_first_row), choices(names, chosen, R.drawable.ic_s_grid, index -> null, index -> {
+                Look.setAppsOnly(this, index == 0);
+                Look.setCleanRowMiddle(this, index == 1);
+                refresh();
+            }));
+            return;
+        }
+        // The glass Home calls it the first row too (2026-11-09): the word dock is gone.
+        String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_dock_bottom)};
+        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 0 : 1, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
-                Look.setAppsOnly(this, index == 1);
+                Look.setAppsOnly(this, index == 0);
                 refresh();
             }));
     }
@@ -832,36 +1205,26 @@ public final class SettingsActivity extends CardActivity {
             }));
     }
 
+    /** Every installed app has its row, with its space and the ways to close or remove it. */
     private void showApps() {
-        show(getString(R.string.settings_apps), Arrays.asList(
-            new Entry(getString(R.string.settings_all_apps), null, getDrawable(R.drawable.ic_apps),
+        List<Entry> entries = new ArrayList<>(Arrays.asList(
+            new Entry(getString(R.string.settings_all_apps), null, null,
                 getString(R.string.settings_all_apps_text),
                 false, () -> open(new Intent(this, AppsActivity.class))),
-            new Entry(getString(R.string.settings_task_manager), null, getDrawable(R.drawable.ic_tasks),
+            new Entry(getString(R.string.settings_task_manager), null, null,
                 getString(R.string.settings_task_manager_text),
                 false, () -> open(new Intent(this, TasksActivity.class))),
-            new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, getDrawable(R.drawable.ic_s_menu),
+            new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, null,
                 getString(R.string.settings_held_keys_text),
-                false, () -> changeSystem(() -> TaskService.setKeys(this, !TaskService.keysOn(this)))),
-            new Entry(getString(R.string.settings_sort_home), null, getDrawable(R.drawable.ic_s_sort),
-                getString(R.string.settings_sort_home_text), false, () -> {
-                    HomeApps.sort(this, HomeApps.load(this));
-                    say(getString(R.string.settings_home_sorted));
-                }),
-            new Entry(getString(R.string.settings_manage_apps), null, getDrawable(R.drawable.ic_s_widgets),
-                getString(R.string.settings_manage_apps_text),
-                true, () -> enter(this::showManageApps))));
-    }
-
-    private void showManageApps() {
-        List<Entry> entries = new ArrayList<>();
+                false, () -> changeSystem(() -> TaskService.setKeys(this, !TaskService.keysOn(this))))));
+        entries.add(groupLabel(R.string.settings_manage_apps));
         for (HomeApps.App app : HomeApps.installed(this)) {
             Entry entry = new Entry(app.label, null, null, getString(R.string.settings_manage_app_text),
                 true, () -> enter(() -> showApp(app.pkg)));
             entry.pkg = app.pkg;
             entries.add(entry);
         }
-        show(getString(R.string.settings_manage_apps), entries);
+        show(getString(R.string.settings_apps), entries);
     }
 
     private String appVersion(String pkg) {
@@ -912,7 +1275,7 @@ public final class SettingsActivity extends CardActivity {
         }
         entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
             () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-        if (Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+        if (!Features.CLEAR_DATA_HERE) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
             false, () -> open(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)))));
         else entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
             false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
@@ -931,36 +1294,54 @@ public final class SettingsActivity extends CardActivity {
 
     @Override protected void appRemoved() { backFrom(uninstalling); }
 
+    /** Picture and sound come from Fire OS, slowly: the page opens at once and they join it. */
     private void showScreen() {
+        Level level = levels.peek();
+        readAv(level);
         boolean cec = Settings.Global.getInt(getContentResolver(), CEC_ENABLED, 1) == 1;
         boolean tvOff = Settings.Global.getInt(getContentResolver(), CEC_TV_OFF, 0) == 1;
-        boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
-        boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
-        Drawable picture = getDrawable(R.drawable.ic_image);
-        show(getString(R.string.settings_screen), Arrays.asList(
-            new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), getDrawable(R.drawable.ic_timer),
-                getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)),
-            new Entry(getString(R.string.settings_cec), cec ? YES : NO, getDrawable(R.drawable.ic_s_hdmi),
-                getString(R.string.settings_cec_text), false,
-                () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_ENABLED, cec ? 0 : 1))),
-            new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, getDrawable(R.drawable.ic_power),
-                getString(R.string.settings_tv_off_text), false,
-                () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))),
-            new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, getDrawable(R.drawable.ic_s_music),
-                getString(R.string.settings_sounds_text), false,
-                () -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
-                    Settings.System.SOUND_EFFECTS_ENABLED, clicks ? 0 : 1))),
-            new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, getDrawable(R.drawable.ic_s_speed),
-                getString(R.string.settings_quick_animations_text), false,
-                () -> changeSystem(() -> {
-                    float scale = quick ? 1 : QUICK_SCALE;
-                    Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
-                    Settings.Global.putFloat(getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, scale);
-                })),
-            new Entry(getString(R.string.settings_video), null, getDrawable(R.drawable.ic_s_movie), getString(R.string.settings_video_text), true, () -> enter(this::showVideo)),
-            new Entry(getString(R.string.settings_audio), null, getDrawable(R.drawable.ic_s_volume), getString(R.string.settings_audio_text), true, () -> enter(this::showAudio)),
-            new Entry(getString(R.string.settings_standards), null, getDrawable(R.drawable.ic_s_standards), getString(R.string.settings_standards_text),
-                true, () -> enter(this::showStandards))));
+        List<Entry> entries = new ArrayList<>();
+        entries.add(groupLabel(R.string.settings_video));
+        if (picture == null) entries.add(reading());
+        else entries.addAll(videoRows(level));
+        entries.add(groupLabel(R.string.settings_audio));
+        if (sound == null) entries.add(reading());
+        else entries.addAll(audioRows(level));
+        entries.add(groupLabel(R.string.settings_section_tv));
+        entries.add(new Entry(getString(R.string.settings_cec), cec ? YES : NO, null,
+            getString(R.string.settings_cec_text), false,
+            () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_ENABLED, cec ? 0 : 1))));
+        entries.add(new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, null,
+            getString(R.string.settings_tv_off_text), false,
+            () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))));
+        entries.add(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null,
+            getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)));
+        entries.add(new Entry(getString(R.string.settings_standards), null, null, getString(R.string.settings_standards_text),
+            true, () -> enter(this::showStandards)));
+        show(getString(R.string.settings_screen), entries);
+    }
+
+    private Entry reading() {
+        return info(getString(R.string.settings_reading), null, getString(R.string.settings_a_moment));
+    }
+
+    /** Read again after every change and every return to the page; until then the last values stay. */
+    private void readAv(Level level) {
+        if (!avStale || avReading) return;
+        avReading = true;
+        avStale = false;
+        Background.run(() -> {
+            String[] seen = {fire.read(FireSettings.PICTURE, RESOLUTION), fire.read(FireSettings.PICTURE, RANGE),
+                fire.read(FireSettings.PICTURE, COLOR_FORMAT), fire.read(FireSettings.PICTURE, COLOR_DEPTH)};
+            String[] heard = {fire.read(FireSettings.AUDIO, LEVELER), fire.read(FireSettings.AUDIO, DIALOGUE)};
+            runOnUiThread(() -> {
+                avReading = false;
+                if (isDestroyed()) return;
+                picture = seen;
+                sound = heard;
+                refreshIf(level);
+            });
+        });
     }
 
     /** Read again at each visit, keeping the row: what it shows changes with the TV and the choices. */
@@ -1008,62 +1389,45 @@ public final class SettingsActivity extends CardActivity {
         level.drawn = false;
     }
 
-    private void showVideo() {
-        Level level = levels.peek();
-        showWaiting(getString(R.string.settings_video));
-        Background.run(() -> {
-            String resolution = fire.read(FireSettings.PICTURE, RESOLUTION);
-            String range = fire.read(FireSettings.PICTURE, RANGE);
-            String format = fire.read(FireSettings.PICTURE, COLOR_FORMAT);
-            String depth = fire.read(FireSettings.PICTURE, COLOR_DEPTH);
-            runOnUiThread(() -> {
-                if (levels.peek() != level) return;
-                Drawable picture = getDrawable(R.drawable.ic_image);
-                List<Entry> entries = new ArrayList<>();
-                entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), getDrawable(R.drawable.ic_s_aspect),
-                    resolutionText(), true, () -> enter(() -> showResolutions(resolution))));
-                entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), getDrawable(R.drawable.ic_s_hdr),
-                    getString(R.string.settings_hdr_text), true,
-                    () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range))));
-                entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), getDrawable(R.drawable.ic_s_palette),
-                    getString(R.string.settings_color_format_text), true,
-                    () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format))));
-                if (depth != null && !depth.isEmpty()) {
-                    entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), getDrawable(R.drawable.ic_s_gradient),
-                        getString(R.string.settings_color_depth_text), true,
-                        () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth))));
-                }
-                entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), getDrawable(R.drawable.ic_s_quality),
-                    getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality)));
-                show(getString(R.string.settings_video), entries);
-            });
-        });
+    private List<Entry> videoRows(Level level) {
+        String resolution = picture[0];
+        String range = picture[1];
+        String format = picture[2];
+        String depth = picture[3];
+        List<Entry> entries = new ArrayList<>();
+        // A page of its own: a wrong one can leave the screen black, and the page counts down the way back.
+        entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), null,
+            resolutionText(), true, () -> enter(() -> showResolutions(resolution))));
+        entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), null,
+            getString(R.string.settings_hdr_text), true,
+            () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range))));
+        entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), null,
+            getString(R.string.settings_color_format_text), true,
+            () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format))));
+        if (depth != null && !depth.isEmpty()) {
+            entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), null,
+                getString(R.string.settings_color_depth_text), true,
+                () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth))));
+        }
+        entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), null,
+            getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality)));
+        return entries;
     }
 
-    private void showAudio() {
-        Level level = levels.peek();
-        showWaiting(getString(R.string.settings_audio));
-        Background.run(() -> {
-            String leveler = fire.read(FireSettings.AUDIO, LEVELER);
-            String dialogue = fire.read(FireSettings.AUDIO, DIALOGUE);
-            runOnUiThread(() -> {
-                if (levels.peek() != level) return;
-                Drawable picture = getDrawable(R.drawable.ic_image);
-                boolean even = "true".equals(leveler);
-                boolean clear = "true".equals(dialogue);
-                String surround = surroundNow();
-                show(getString(R.string.settings_audio), Arrays.asList(
-                    new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), getDrawable(R.drawable.ic_s_surround),
-                        getString(R.string.settings_surround_text), true,
-                        () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
-                    new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, getDrawable(R.drawable.ic_dialogue),
-                        getString(R.string.settings_dialogue_text), false,
-                        () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
-                    new Entry(getString(R.string.settings_leveler), even ? YES : NO, getDrawable(R.drawable.ic_leveler),
-                        getString(R.string.settings_leveler_text), false,
-                        () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level)))));
-            });
-        });
+    private List<Entry> audioRows(Level level) {
+        boolean even = "true".equals(sound[0]);
+        boolean clear = "true".equals(sound[1]);
+        String surround = surroundNow();
+        return Arrays.asList(
+            new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
+                getString(R.string.settings_surround_text), true,
+                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
+            new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null,
+                getString(R.string.settings_dialogue_text), false,
+                () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
+            new Entry(getString(R.string.settings_leveler), even ? YES : NO, null,
+                getString(R.string.settings_leveler_text), false,
+                () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level))));
     }
 
     /** The service names this value differently when read; the system setting is unambiguous. */
@@ -1077,17 +1441,22 @@ public final class SettingsActivity extends CardActivity {
             boolean written = fire.write(provider, id, action);
             runOnUiThread(() -> {
                 if (isDestroyed()) return;
+                avStale = true;
                 if (!written) sayLong(getString(R.string.settings_fire_refused));
                 done.run();
             });
         });
     }
 
+    /** The choices close as soon as one is pressed; the page shows it once Fire OS has taken it. */
     private void showChoices(String title, String provider, String id, String[] actions, String[] names, String current) {
         Level level = levels.peek();
         show(title, choices(names, Arrays.asList(actions).indexOf(current), R.drawable.ic_image,
             getString(R.string.settings_fire_may_refuse),
-            index -> writeFire(provider, id, actions[index], () -> backFrom(level))));
+            index -> writeFire(provider, id, actions[index], () -> {
+                if (levels.peek() == level) closeChoices(level);
+                else refresh();
+            })));
     }
 
     private String resolutionText() {
@@ -1101,15 +1470,18 @@ public final class SettingsActivity extends CardActivity {
     private void showResolutions(String current) {
         List<String> values = new ArrayList<>(Arrays.asList(RESOLUTIONS));
         List<String> names = new ArrayList<>(Arrays.asList(strings(RESOLUTION_NAMES)));
-        // The Stick of 2020 stops at 1080p: the two 4K lines, after Auto, would only give a black screen.
-        if (Fire.STICK_2020) {
+        // Without 4K the two 4K lines, after Auto, would only give a black screen.
+        if (!Features.RESOLUTION_4K) {
             values.subList(1, 3).clear();
             names.subList(1, 3).clear();
         }
-        show(getString(R.string.settings_resolution), choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
+        List<Entry> entries = choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
             resolutionText(), index -> {
                 if (!values.get(index).equals(current)) changeResolution(current, values.get(index));
-            }));
+            });
+        // The window stays while the question counts down: it closes when the answer comes.
+        for (Entry entry : entries) entry.picks = false;
+        show(getString(R.string.settings_resolution), entries);
     }
 
     /** Fire OS does not go back by itself, and with no picture nobody could reach the setting. */
@@ -1160,6 +1532,7 @@ public final class SettingsActivity extends CardActivity {
             own.write(FireSettings.PICTURE, RESOLUTION, previous);
             own.close();
             runOnUiThread(() -> {
+                avStale = true;
                 if (!isDestroyed()) onBackPressed();
             });
         });
@@ -1181,24 +1554,22 @@ public final class SettingsActivity extends CardActivity {
     }
 
     @SuppressLint("MissingPermission")
-    private void showRemotes() {
-        Drawable picture = getDrawable(R.drawable.ic_bluetooth);
+    private List<Entry> remoteRows() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         List<Entry> entries = new ArrayList<>();
         if (adapter == null || !adapter.isEnabled()) {
-            entries.add(new Entry(getString(R.string.settings_bluetooth_off), null, picture, getString(R.string.settings_bluetooth_off_text), false, () -> { }));
-            show("Bluetooth", entries);
-            return;
+            entries.add(info(getString(R.string.settings_bluetooth_off), null, getString(R.string.settings_bluetooth_off_text)));
+            return entries;
         }
-        entries.add(new Entry(getString(R.string.settings_find_devices), null, picture,
-            getString(R.string.settings_find_devices_text),
-            true, () -> enter(this::showBluetoothSearch)));
         for (BluetoothDevice device : adapter.getBondedDevices()) {
             String name = device.getName() != null ? device.getName() : device.getAddress();
-            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), picture,
+            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), null,
                 getString(R.string.settings_press_to_forget_device), false, () -> forgetBluetooth(device, name)));
         }
-        show("Bluetooth", entries);
+        entries.add(new Entry(getString(R.string.settings_find_devices), null, null,
+            getString(R.string.settings_find_devices_text),
+            true, () -> enter(this::showBluetoothSearch)));
+        return entries;
     }
 
     /** Hidden in the SDK, though open to apps. The remote in use may be the one being removed. */
@@ -1268,7 +1639,6 @@ public final class SettingsActivity extends CardActivity {
 
     @Override protected void onDestroy() {
         stopSearch();
-        mosaic.show(null);
         fire.close();
         super.onDestroy();
     }
@@ -1292,22 +1662,50 @@ public final class SettingsActivity extends CardActivity {
         else rows.postDelayed(() -> waitCounter(before, level, tries - 1), COUNTER_MS);
     }
 
-    private void showPrivacy() {
+    private List<Entry> privacyRows() {
         boolean adsLimited = Settings.Secure.getInt(getContentResolver(), ADS_LIMITED, 1) == 1;
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
         boolean counted = NotificationCounter.allowed(this);
-        Drawable picture = getDrawable(R.drawable.ic_settings);
         List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, getDrawable(R.drawable.ic_s_ads),
+            new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, null,
                 getString(R.string.settings_limit_ads_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
-            new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, getDrawable(R.drawable.ic_s_chart),
+            new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, null,
                 getString(R.string.settings_usage_data_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), USAGE_METRICS, metrics ? 0 : 1)))));
-        if (!Fire.ANDROID_9) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, getDrawable(R.drawable.ic_s_notify),
+        if (Features.NOTIFICATION_COUNT) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, null,
             getString(R.string.settings_notification_count_text), false,
             () -> changeCounter(counted)));
-        show(getString(R.string.settings_privacy), entries);
+        return entries;
+    }
+
+    private void showSystem() {
+        boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
+        boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
+        List<Entry> entries = new ArrayList<>(Arrays.asList(
+            new Entry(getString(R.string.settings_language), Language.name(this), null,
+                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
+            new Entry(getString(R.string.panel_notifications), notificationValue(), null,
+                getString(R.string.settings_notifications_text), false, () -> {
+                    NotificationCounter.seen(this);
+                    open(Fire.notifications());
+                }),
+            new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, null,
+                getString(R.string.settings_sounds_text), false,
+                () -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
+                    Settings.System.SOUND_EFFECTS_ENABLED, clicks ? 0 : 1))),
+            new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, null,
+                getString(R.string.settings_quick_animations_text), false,
+                () -> changeSystem(() -> {
+                    float scale = quick ? 1 : QUICK_SCALE;
+                    Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
+                    Settings.Global.putFloat(getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, scale);
+                }))));
+        entries.add(groupLabel(R.string.settings_privacy));
+        entries.addAll(privacyRows());
+        entries.add(groupLabel(R.string.settings_section_device));
+        entries.addAll(deviceRows());
+        show(getString(R.string.settings_cat_system), entries);
     }
 
     private int sleepMinutes() {
@@ -1328,34 +1726,44 @@ public final class SettingsActivity extends CardActivity {
     }
 
     /** With a cable Wi-Fi stays on but idle, and neither its switch nor its networks would mean anything. */
-    private void showWiredNetwork() {
-        List<Entry> entries = infoRows(DeviceInfo.network(this), getDrawable(R.drawable.ic_ethernet), getString(R.string.settings_connection_state));
-        entries.add(new Entry("Wi-Fi", getString(R.string.settings_wifi_on_cable), getDrawable(R.drawable.ic_wifi),
-            getString(R.string.settings_wifi_on_cable_text), false, () -> { }));
-        show(getString(R.string.settings_network), entries);
+    private List<Entry> wiredRows() {
+        List<Entry> entries = infoRows(DeviceInfo.network(this), null, getString(R.string.settings_connection_state));
+        entries.add(info("Wi-Fi", getString(R.string.settings_wifi_on_cable), getString(R.string.settings_wifi_on_cable_text)));
+        return entries;
     }
 
-    private void showNetwork() {
-        if (DeviceInfo.wired(this)) {
-            showWiredNetwork();
-            return;
-        }
-        Drawable picture = getDrawable(R.drawable.ic_wifi);
+    private List<Entry> networkRows() {
+        if (DeviceInfo.wired(this)) return wiredRows();
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();
-        if (Fire.ANDROID_9) {
-            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_on_fire),
+        if (!Features.WIFI_NETWORKS) {
+            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_on_fire),
                 false, () -> open(new Intent(Settings.ACTION_WIFI_SETTINGS))));
         } else {
-            entries.add(new Entry("Wi-Fi", on ? YES : NO, picture, getString(R.string.settings_wifi_text), false,
+            entries.add(new Entry("Wi-Fi", on ? YES : NO, null, getString(R.string.settings_wifi_text), false,
                 () -> setWifi(!on)));
         }
         if (on) {
-            if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, picture, getString(R.string.settings_wifi_networks_text),
+            if (Features.WIFI_NETWORKS) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_networks_text),
                 true, () -> enter(this::showWifi)));
-            entries.addAll(infoRows(DeviceInfo.network(this), picture, getString(R.string.settings_connection_state)));
+            entries.addAll(infoRows(DeviceInfo.network(this), null, getString(R.string.settings_connection_state)));
         }
-        show(getString(R.string.settings_network), entries);
+        return entries;
+    }
+
+    private void showNetwork() {
+        Level level = levels.peek();
+        List<Entry> entries = new ArrayList<>();
+        entries.add(groupLabel(R.string.settings_network));
+        entries.addAll(networkRows());
+        entries.add(groupLabel(R.string.settings_remotes));
+        int remotes = entries.size();
+        entries.addAll(remoteRows());
+        if (toRemotes) {
+            toRemotes = false;
+            level.focus = remotes;
+        }
+        show(getString(R.string.settings_cat_network), entries);
     }
 
     /**
@@ -1456,17 +1864,8 @@ public final class SettingsActivity extends CardActivity {
             connectWifi(name, security, "");
             return;
         }
-        EditText password = new EditText(this);
-        password.setSingleLine(true);
-        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        AlertDialog dialog = dialog()
-            .setTitle(getString(R.string.settings_wifi_password, name)).setView(password)
-            .setNegativeButton(getString(R.string.settings_cancel), null)
-            .setPositiveButton(getString(R.string.settings_wifi_join), (d, button) -> connectWifi(name, security, password.getText().toString()))
-            .create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-        centerButton(dialog);
+        askText(getString(R.string.settings_wifi_password, name), true, getString(R.string.settings_wifi_join),
+            password -> connectWifi(name, security, password));
     }
 
     private void connectWifi(String name, String security, String password) {
@@ -1490,74 +1889,66 @@ public final class SettingsActivity extends CardActivity {
             }));
     }
 
-    private void showDevice() {
-        Drawable picture = getDrawable(R.drawable.ic_settings);
-        List<Entry> entries = infoRows(DeviceInfo.system(this), picture, getString(R.string.settings_device_info_text));
-        if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_usb), null, getDrawable(R.drawable.ic_s_usb), getString(R.string.settings_usb_text),
+    private List<Entry> deviceRows() {
+        List<Entry> entries = infoRows(DeviceInfo.system(this), null, getString(R.string.settings_device_info_text));
+        if (Features.USB_SETTINGS) entries.add(new Entry(getString(R.string.settings_usb), null, null, getString(R.string.settings_usb_text),
             true, () -> enter(this::showUsb)));
-        entries.add(new Entry(getString(R.string.settings_standby), null, getDrawable(R.drawable.ic_power), getString(R.string.settings_standby_text), false,
+        entries.add(new Entry(getString(R.string.settings_standby), null, null, getString(R.string.settings_standby_text), false,
             TaskService::standby));
-        entries.add(new Entry(getString(R.string.settings_restart), null, getDrawable(R.drawable.ic_restart), getString(R.string.settings_restart_text), false,
+        entries.add(new Entry(getString(R.string.settings_restart), null, null, getString(R.string.settings_restart_text), false,
             () -> confirm(getString(R.string.settings_restart_question), getString(R.string.settings_restart_warning), getString(R.string.settings_restart),
-                () -> {
-                    TaskService.restart();
-                })));
-        show(getString(R.string.settings_device), entries);
+                TaskService::restart)));
+        return entries;
     }
 
-    private void showBackup() {
-        Drawable picture = getDrawable(R.drawable.ic_apps);
-        show(getString(R.string.settings_backup), Arrays.asList(
-            new Entry(getString(R.string.settings_save_choices), null, getDrawable(R.drawable.ic_s_save),
-                getString(R.string.settings_save_choices_text), false, () -> {
-                    try {
-                        Backup.save(this);
-                        say(getString(R.string.settings_choices_saved));
-                        refresh();
-                    } catch (IOException | JSONException e) {
-                        sayLong(getString(R.string.settings_save_failed));
-                    }
-                }),
-            new Entry(getString(R.string.settings_restore_choices), Backup.exists(this) ? null : getString(R.string.settings_no_backup), getDrawable(R.drawable.ic_s_restore),
-                getString(R.string.settings_restore_choices_text), false, () -> {
-                    try {
-                        Backup.restore(this);
-                        say(getString(R.string.settings_choices_restored));
-                        root.setBackground(Look.plainBackdrop());
-                        refresh();
-                    } catch (IOException | JSONException e) {
-                        sayLong(getString(R.string.settings_nothing_to_restore));
-                    }
-                })));
-    }
-
-    private void showUpdate() {
+    private void showSalotto() {
         boolean beta = Updater.beta(this);
-        show(getString(R.string.settings_update), Arrays.asList(
-            new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), getDrawable(R.drawable.ic_s_update),
-                getString(R.string.settings_update_text), true, () -> open(new Intent(this, UpdateActivity.class))),
-            new Entry(getString(R.string.settings_beta), beta ? YES : NO, getDrawable(R.drawable.ic_s_build),
-                getString(R.string.settings_beta_text), false, () -> {
-                    Updater.setBeta(this, !beta);
-                    refresh();
-                })));
-    }
-
-    private void showTools() {
         boolean doubleHome = HomeCover.doubleHome;
-        show(getString(R.string.settings_tools), Arrays.asList(
-            new Entry(getString(R.string.settings_tour), null, getDrawable(R.drawable.ic_salotto),
-                getString(R.string.settings_tour_text), false,
-                () -> open(new Intent(this, FirstRunActivity.class))),
-            new Entry("AirPlay", null, appIcon(Fire.AIRPLAY),
-                getString(R.string.settings_airplay_text),
-                false, () -> openPackage(Fire.AIRPLAY)),
-            new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, getDrawable(R.drawable.ic_s_home),
-                getString(R.string.settings_double_home_text),
-                false, () -> {
-                    TaskService.rememberDoubleHome(this, !doubleHome);
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(getString(R.string.settings_about), null, null,
+            getString(R.string.settings_about_text), true, () -> open(new Intent(this, AboutActivity.class))));
+        entries.add(groupLabel(R.string.settings_update));
+        entries.add(new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), null,
+            getString(R.string.settings_update_text), true, () -> open(new Intent(this, UpdateActivity.class))));
+        entries.add(new Entry(getString(R.string.settings_beta), beta ? YES : NO, null,
+            getString(R.string.settings_beta_text), false, () -> {
+                Updater.setBeta(this, !beta);
+                refresh();
+            }));
+        entries.add(groupLabel(R.string.settings_backup));
+        entries.add(new Entry(getString(R.string.settings_save_choices), null, null,
+            getString(R.string.settings_save_choices_text), false, () -> {
+                try {
+                    Backup.save(this);
+                    say(getString(R.string.settings_choices_saved));
                     refresh();
-                })));
+                } catch (IOException | JSONException e) {
+                    sayLong(getString(R.string.settings_save_failed));
+                }
+            }));
+        entries.add(new Entry(getString(R.string.settings_restore_choices), Backup.exists(this) ? null : getString(R.string.settings_no_backup), null,
+            getString(R.string.settings_restore_choices_text), false, () -> {
+                try {
+                    Backup.restore(this);
+                    say(getString(R.string.settings_choices_restored));
+                    dressBackdrop();
+                    refresh();
+                } catch (IOException | JSONException e) {
+                    sayLong(getString(R.string.settings_nothing_to_restore));
+                }
+            }));
+        entries.add(groupLabel(R.string.settings_tools));
+        entries.add(new Entry(getString(R.string.settings_tour), null, null,
+            getString(R.string.settings_tour_text), false,
+            () -> open(new Intent(this, FirstRunActivity.class))));
+        entries.add(new Entry("AirPlay", null, null, getString(R.string.settings_airplay_text),
+            false, () -> openPackage(Fire.AIRPLAY)));
+        entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null,
+            getString(R.string.settings_double_home_text), false, () -> {
+                TaskService.rememberDoubleHome(this, !doubleHome);
+                refresh();
+            }));
+        show(Brand.NAME, entries);
     }
 
     /** "public:8,1 mounted 1234-ABCD": one line for each disk. */
@@ -1589,135 +1980,6 @@ public final class SettingsActivity extends CardActivity {
         return Fire.settings();
     }
 
-    private Entry weatherBackdrop(String name, int picture, String text) {
-        boolean ready = Weather.active(this);
-        return new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : ready ? null : getString(R.string.first_place_title),
-            getDrawable(picture), getString(R.string.settings_weather_backdrop_text, text), false, () -> {
-                if (!ready) {
-                    sayLong(getString(R.string.settings_place_first));
-                    return;
-                }
-                Look.setBackdrop(this, name);
-                refresh();
-            });
-    }
-
-    private Entry plainBackdrop(String name, String text) {
-        Entry entry = new Entry(Look.backdropName(this, name), name.equals(Look.backdrop(this)) ? CHECK : null,
-            getDrawable(R.drawable.ic_image), text, false, () -> {
-                Look.setBackdrop(this, name);
-                root.setBackground(Look.plainBackdrop());
-                refresh();
-            });
-        entry.mark = 0;
-        return entry;
-    }
-
-    private void showBackdrops() {
-        List<Entry> weather = new ArrayList<>();
-        Entry pictures = weatherBackdrop(Look.PICTURES, R.drawable.ic_image,
-            getString(R.string.settings_backdrop_pictures_text));
-        pictures.mosaic = Look.PICTURES_FOLDER;
-        pictures.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.PICTURES_FOLDER)) weather.add(pictures);
-        Entry photos = weatherBackdrop(Look.PHOTOS, R.drawable.ic_photo,
-            getString(R.string.settings_backdrop_photos_text));
-        photos.mosaic = Look.PHOTOS_FOLDER;
-        photos.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.PHOTOS_FOLDER)) weather.add(photos);
-        Entry aerial = weatherBackdrop(Look.AERIAL, R.drawable.ic_photo,
-            getString(R.string.settings_backdrop_aerial_text));
-        aerial.mosaic = Look.AERIAL_FOLDER;
-        aerial.mark = R.drawable.ic_cloud;
-        if (Packs.listed(this, Look.AERIAL_FOLDER)) weather.add(aerial);
-        List<Entry> timed = new ArrayList<>();
-        Entry drawn = plainBackdrop(Look.ABSTRACT, getString(R.string.settings_backdrop_abstract_text));
-        drawn.mosaic = Look.ABSTRACT_FOLDER;
-        drawn.mark = R.drawable.ic_restart;
-        if (shown(Look.ABSTRACT_FOLDER)) timed.add(drawn);
-        Entry shapes = plainBackdrop(Look.ABSTRACT_3D, getString(R.string.settings_backdrop_abstract3d_text));
-        shapes.mosaic = Look.ABSTRACT_3D_FOLDER;
-        shapes.mark = R.drawable.ic_restart;
-        if (shown(Look.ABSTRACT_3D_FOLDER)) timed.add(shapes);
-        Entry city = plainBackdrop(Look.NOX, getString(R.string.settings_backdrop_nox_text));
-        city.mosaic = Look.NOX_FOLDER;
-        city.mark = R.drawable.ic_restart;
-        if (shown(Look.NOX_FOLDER)) timed.add(city);
-        Entry nature = plainBackdrop(Look.NATURE, getString(R.string.settings_backdrop_nature_text));
-        nature.mosaic = Look.NATURE_FOLDER;
-        nature.mark = R.drawable.ic_restart;
-        if (shown(Look.NATURE_FOLDER)) timed.add(nature);
-        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
-            Entry mine = plainBackdrop(Look.PERSONAL, getString(R.string.settings_backdrop_personal_timed_text));
-            mine.mark = R.drawable.ic_restart;
-            timed.add(mine);
-        }
-        weather.add(0, groupLabel(R.string.settings_backdrop_weather_group));
-        timed.add(0, groupLabel(R.string.first_backdrop_dynamic));
-        // Under its own heading it is plainly about these sets, so it stays on whatever the backdrop.
-        Entry pace = paceEntry();
-        pace.mark = 0;
-        timed.add(pace);
-        boolean weatherFirst = Weather.active(this);
-        List<Entry> entries = new ArrayList<>(weatherFirst ? weather : timed);
-        entries.addAll(weatherFirst ? timed : weather);
-        entries.add(groupLabel(R.string.first_backdrop_static));
-        entries.add(standardSet());
-        String[][] sets = {{Look.ABSTRACT, Look.ABSTRACT_FOLDER}, {Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER},
-            {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
-        for (String[] set : sets) if (shown(set[1])) entries.add(pictureSet(set[0], set[1]));
-        entries.add(personalSet());
-        showFromChosen(getString(R.string.settings_backdrop), entries);
-    }
-
-    /** A collection has a row only if it is whole on the TV, or inside the app, and was not deleted. */
-    private boolean shown(String folder) { return Packs.listed(this, folder) && !Look.setTaken(this, folder); }
-
-    /** Arriving, the selection starts on what is in use. */
-    private void showFromChosen(String title, List<Entry> entries) {
-        Level level = levels.peek();
-        if (level.focus == 0) {
-            for (int index = 0; index < entries.size(); index++) {
-                if (CHECK.equals(entries.get(index).value)) level.focus = index;
-            }
-        }
-        show(title, entries);
-    }
-
-    private Entry standardSet() {
-        boolean chosen = Arrays.asList(Look.PRESET_NAMES).contains(Look.backdrop(this));
-        Entry entry = new Entry(getString(R.string.settings_backdrop_standard), chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_backdrop_standard_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.TITLE, getString(R.string.settings_backdrop_standard))));
-        entry.preview = Look.preset(Look.backdrop(this));
-        entry.mark = 0;
-        return entry;
-    }
-
-    /** One line for a set: its pictures open as a grid, and the one chosen stays. */
-    private Entry pictureSet(String name, String folder) {
-        boolean chosen = Look.backdrop(this).startsWith(folder + "/");
-        Entry entry = new Entry(name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_backdrop_pick_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.FOLDER, folder).putExtra(PictureGridActivity.TITLE, name)));
-        entry.mosaic = folder;
-        entry.mark = 0;
-        return entry;
-    }
-
-    /** The images sent from a phone: a grid like the sets, empty at first, with Carica under it. */
-    private Entry personalSet() {
-        String name = getString(R.string.settings_backdrop_personal);
-        Entry entry = new Entry(name, Look.personal(this, Look.backdrop(this)) ? CHECK : null, getDrawable(R.drawable.ic_photo),
-            getString(R.string.settings_backdrop_personal_text), true,
-            () -> open(new Intent(this, PictureGridActivity.class)
-                .putExtra(PictureGridActivity.PERSONAL, true).putExtra(PictureGridActivity.TITLE, name)));
-        entry.mark = 0;
-        return entry;
-    }
-
     private Entry groupLabel(int name) {
         return groupLabel(getString(name));
     }
@@ -1728,57 +1990,122 @@ public final class SettingsActivity extends CardActivity {
         return entry;
     }
 
-    private Entry paceEntry() {
-        Entry pace = new Entry(getString(R.string.settings_abstract_time), minutes(Look.abstractMinutes(this)),
-            getDrawable(R.drawable.ic_timer), getString(R.string.settings_abstract_time_text), true,
-            () -> enter(this::showAbstractTimes));
-        return pace;
+    /** How long each picture stays: the backdrop's and the screensaver's are two different times. */
+    private Entry paceEntry(boolean forSaver) {
+        int now = forSaver ? Look.saverMinutes(this) : Look.abstractMinutes(this);
+        String text = getString(forSaver ? R.string.settings_saver_minutes_text : R.string.settings_abstract_time_home_text);
+        return new Entry(getString(R.string.settings_abstract_time), minutes(now), null, text, true,
+            () -> enter(() -> show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
+                indexOf(Look.ABSTRACT_MINUTES, now), R.drawable.ic_timer, text, index -> {
+                    if (forSaver) Look.setSaverMinutes(this, Look.ABSTRACT_MINUTES[index]);
+                    else Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
+                    refresh();
+                }))));
     }
 
-    private void showAbstractTimes() {
-        show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
-            indexOf(Look.ABSTRACT_MINUTES, Look.abstractMinutes(this)), R.drawable.ic_timer,
-            getString(R.string.settings_abstract_time_text), index -> {
-                Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
-                refresh();
-            }));
+    private static final int[] CLEAN_SHOW_NAMES = {R.string.settings_clean_both, R.string.settings_clean_time,
+        R.string.settings_clean_date, R.string.settings_clean_none};
+
+    /** On the clean Home, for now, only what the line at the top shows and its font; the weather's place and units. */
+    private void showCleanClock() {
+        boolean enabled = Weather.enabled(this);
+        String place = Weather.place(this);
+        show(getString(R.string.settings_cat_clock), Arrays.asList(
+            groupLabel(R.string.settings_time_group),
+            new Entry(getString(R.string.settings_show_on_home), getString(CLEAN_SHOW_NAMES[Look.cleanShows(this)]), null, null,
+                true, () -> enter(this::showCleanShows)),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.cleanFont(this)], null, null,
+                true, () -> enter(this::showCleanFonts)),
+            groupLabel(R.string.settings_weather),
+            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null,
+                getString(R.string.settings_weather_show_text), false, () -> {
+                    Weather.setEnabled(this, !enabled);
+                    refresh();
+                }),
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null,
+                getString(R.string.settings_place_text), true, this::askPlace),
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null,
+                getString(R.string.settings_units_text), false, () -> {
+                    Weather.setFahrenheit(this, !Weather.fahrenheit(this));
+                    refresh();
+                })));
+    }
+
+    private void showCleanShows() {
+        String[] names = new String[CLEAN_SHOW_NAMES.length];
+        for (int index = 0; index < names.length; index++) names[index] = getString(CLEAN_SHOW_NAMES[index]);
+        show(getString(R.string.settings_show_on_home), choices(names, Look.cleanShows(this), R.drawable.ic_clock, index -> null, index -> {
+            Look.setCleanShows(this, index);
+            refresh();
+        }));
+    }
+
+    private void showCleanFonts() {
+        List<Entry> entries = choices(Look.fontNames(this), Look.cleanFont(this), R.drawable.ic_clock, index -> null, index -> {
+            Look.setCleanFont(this, index);
+            refresh();
+        });
+        for (int index = 0; index < entries.size(); index++) entries.get(index).family = Look.FONT_FAMILIES[index];
+        show(getString(R.string.settings_font), entries);
     }
 
     private void showClock() {
+        if (Look.clean(this)) {
+            showCleanClock();
+            return;
+        }
         boolean visible = Look.clock(this);
-        show(getString(R.string.settings_clock), Arrays.asList(
+        boolean enabled = Weather.enabled(this);
+        String place = Weather.place(this);
+        // The wheel keeps the left of its buttons clear: off, nothing is left small there, so the
+        // switch shows or hides. On the glass Home off leaves it small: the switch is Large.
+        boolean wheel = Look.circular(this);
+        String shown = getString(wheel ? R.string.settings_show_on_home : R.string.settings_big);
+        show(getString(R.string.settings_cat_clock), Arrays.asList(
             groupLabel(R.string.settings_time_group),
-            new Entry(getString(R.string.settings_show_on_home), visible ? YES : NO, getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_clock_show_text), false, () -> {
+            new Entry(shown, visible ? YES : NO, null,
+                getString(wheel ? R.string.settings_clock_hidden_text : R.string.settings_clock_show_text), false, () -> {
                     Look.setClock(this, !visible);
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], getDrawable(R.drawable.ic_clock),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], null,
                 getString(R.string.settings_font_text), true, () -> enter(this::showFonts)),
-            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], getDrawable(R.drawable.ic_clock),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], null,
                 getString(R.string.settings_size_text), true, () -> enter(this::showSizes)),
-            new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), getDrawable(R.drawable.ic_clock),
+            new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), null,
                 getString(R.string.settings_hours_text), false, () -> {
                     Look.setHours24(this, !Look.hours24(this));
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_seconds), Look.seconds(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_seconds_text), false, () -> {
-                    Look.setSeconds(this, !Look.seconds(this));
-                    refresh();
-                }),
             groupLabel(R.string.settings_date),
-            new Entry(getString(R.string.settings_show_on_home), Look.date(this) ? YES : NO, getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_date_show_text), false, () -> {
+            new Entry(shown, Look.date(this) ? YES : NO, null,
+                getString(wheel ? R.string.settings_date_hidden_text : R.string.settings_date_show_text), false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], getDrawable(R.drawable.ic_clock),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], null,
                 getString(R.string.settings_date_font_text), true, () -> enter(this::showDateFonts)),
-            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], getDrawable(R.drawable.ic_clock),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], null,
                 getString(R.string.settings_date_size_text), true, () -> enter(this::showDateSizes)),
-            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), getDrawable(R.drawable.ic_clock),
-                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats))));
+            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
+                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats)),
+            groupLabel(R.string.settings_weather),
+            new Entry(shown, enabled ? YES : NO, null,
+                getString(wheel ? R.string.settings_weather_show_text : R.string.settings_weather_big_text), false, () -> {
+                    Weather.setEnabled(this, !enabled);
+                    refresh();
+                }),
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null,
+                getString(R.string.settings_place_text), true, this::askPlace),
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null,
+                getString(R.string.settings_units_text), false, () -> {
+                    Weather.setFahrenheit(this, !Weather.fahrenheit(this));
+                    refresh();
+                }),
+            new Entry(getString(R.string.settings_font), weatherFontName(), null,
+                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts)),
+            new Entry(getString(R.string.settings_size), weatherSizeName(), null,
+                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes))));
     }
 
     private String dateFormatName(boolean numeric) {
@@ -1855,61 +2182,8 @@ public final class SettingsActivity extends CardActivity {
             }));
     }
 
-    private String weatherValue() {
-        String place = Weather.place(this);
-        return !Weather.enabled(this) ? getString(R.string.settings_off) : place != null ? place : getString(R.string.first_place_title);
-    }
-
-    private void showWeather() {
-        boolean enabled = Weather.enabled(this);
-        String place = Weather.place(this);
-        show(getString(R.string.settings_weather), Arrays.asList(
-            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_weather_show_text), false, () -> {
-                    Weather.setEnabled(this, !enabled);
-                    refresh();
-                }),
-            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_place_text),
-                true, this::askPlace),
-            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_units_text), false, () -> {
-                    Weather.setFahrenheit(this, !Weather.fahrenheit(this));
-                    refresh();
-                }),
-            new Entry(getString(R.string.settings_font), weatherFontName(), getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts)),
-            new Entry(getString(R.string.settings_size), weatherSizeName(), getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes))));
-    }
-
     private void askPlace() {
-        EditText name = new EditText(this);
-        name.setSingleLine(true);
-        name.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        AlertDialog dialog = dialog()
-            .setTitle(getString(R.string.first_city_hint)).setView(name)
-            .setPositiveButton(getString(R.string.first_search), (d, button) -> searchPlace(name.getText().toString().trim()))
-            .create();
-        name.setOnEditorActionListener((view, action, event) -> {
-            dialog.dismiss();
-            searchPlace(name.getText().toString().trim());
-            return true;
-        });
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.show();
-        centerButton(dialog);
-    }
-
-    /** The dialog's own bar leaves its only button off centre, under a line that is centred. */
-    private void centerButton(AlertDialog dialog) {
-        View button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        LinearLayout bar = (LinearLayout) button.getParent();
-        for (int index = 0; index < bar.getChildCount(); index++) {
-            if (bar.getChildAt(index) != button) bar.getChildAt(index).setVisibility(View.GONE);
-        }
-        bar.setGravity(Gravity.CENTER_HORIZONTAL);
-        bar.setPadding(0, bar.getPaddingTop(), 0, bar.getPaddingBottom());
+        askText(getString(R.string.first_city_hint), false, getString(R.string.first_search), name -> searchPlace(name.trim()));
     }
 
     private void searchPlace(String name) {
@@ -1963,27 +2237,48 @@ public final class SettingsActivity extends CardActivity {
 
     private boolean ownSaver() { return Look.ownSaver(this); }
 
+    /** Who runs it first: with Salotto its own rows, with Fire OS only the way to Fire OS's menu. */
     private void showSaver() {
         boolean on = saverOn();
         boolean own = ownSaver();
-        Drawable picture = getDrawable(R.drawable.ic_image);
+        String picture = own ? Look.saverPicture(this) : null;
         List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_saver_active), on ? YES : NO, picture,
+            new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
                 getString(R.string.settings_saver_active_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry(getString(R.string.settings_saver_kind), own ? ownSaverName() : "Fire OS", getDrawable(R.drawable.ic_photo),
-                getString(R.string.settings_saver_kind_text), true, () -> enter(this::showSaverKinds)),
-            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), picture, saverWait(), true, () -> enter(this::showSaverTimes))));
+            new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
+                getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)),
+            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
+                () -> enter(this::showSaverTimes))));
         if (own) {
+            entries.add(new Entry(getString(R.string.grid_saver_title),
+                picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null,
+                getString(R.string.settings_saver_pictures_text), true,
+                () -> open(new Intent(this, PictureGridActivity.class).putExtra(PictureGridActivity.SAVER, true))));
+            if (picture == null) entries.add(paceEntry(true));
+        } else {
+            entries.add(new Entry(getString(R.string.settings_saver_choose), null, null,
+                getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
+        }
+        if (own || Features.FIRE_SAVER_NOW) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
+            () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
+        if (own) {
+            entries.add(groupLabel(R.string.settings_section_saver_shows));
             entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
             entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
             entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
-            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], getDrawable(R.drawable.ic_clock),
+            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], null,
                 getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
         }
-        if (own || !Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_saver_start), null, picture, getString(R.string.settings_saver_start_text), false,
-            () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         show(getString(R.string.settings_saver), entries);
+    }
+
+    /** Salotto with its own pictures, or the screensaver Fire OS decides. */
+    private void showSaverManagers() {
+        String[] names = {Brand.NAME, "Fire OS"};
+        show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
+            getString(R.string.settings_saver_managed_text), index -> chooseSaver(index == 0
+                ? new ComponentName(this, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER)));
     }
 
     private String[] saverPlaces() {
@@ -2005,39 +2300,6 @@ public final class SettingsActivity extends CardActivity {
             set.accept(this, !on);
             refresh();
         });
-    }
-
-    /** The rows stay where they are whatever is chosen, so the selection stays on the row pressed. */
-    private void showSaverKinds() {
-        boolean own = ownSaver();
-        List<Entry> entries = new ArrayList<>();
-        entries.add(groupLabel(Brand.NAME));
-        for (Saver saver : SAVERS) if (shown(saver.folder)) entries.add(saverEntry(saver));
-        if (Look.images(this).size() >= Look.PERSONAL_TIMED_FROM) {
-            Entry mine = saverEntry(personalSaver());
-            mine.mosaic = null;
-            entries.add(mine);
-        }
-        entries.add(paceEntry());
-        entries.add(groupLabel(R.string.settings_saver_native));
-        entries.add(new Entry(getString(R.string.settings_saver_fire), own ? null : CHECK, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_saver_fire_text), false, () -> chooseSaver(Fire.AMAZON_SAVER)));
-        Entry choose = new Entry(getString(R.string.settings_saver_choose), null, getDrawable(R.drawable.ic_s_open),
-            getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu()));
-        choose.off = own;
-        entries.add(choose);
-        show(getString(R.string.settings_saver_kind), entries);
-    }
-
-    private Entry saverEntry(Saver saver) {
-        boolean chosen = ownSaver() && saver.folder.equals(Look.saverFolder(this));
-        Entry entry = new Entry(saver.name, chosen ? CHECK : null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_saver_set_text), false, () -> {
-                Look.setSaverFolder(this, saver.folder);
-                chooseSaver(new ComponentName(this, SaverService.class).flattenToShortString());
-            });
-        entry.mosaic = saver.folder;
-        return entry;
     }
 
     /** The photos of Personale, by the folder's full path: offered, like among the backdrops, from two photos on. */
@@ -2099,17 +2361,6 @@ public final class SettingsActivity extends CardActivity {
         show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.size(this), R.drawable.ic_clock,
             getString(R.string.settings_size_text), index -> {
                 Look.setSize(this, index);
-                refresh();
-            }));
-    }
-
-    private void showColumns() {
-        int[] columns = Look.COLUMN_CHOICES;
-        String[] names = new String[columns.length];
-        for (int index = 0; index < columns.length; index++) names[index] = appsPerRow(columns[index]);
-        show(getString(R.string.settings_grid), choices(names, indexOf(columns, Look.columns(this)), R.drawable.ic_apps,
-            index -> getString(columns[index] == 6 ? R.string.settings_grid_six : R.string.settings_grid_five), index -> {
-                Look.setColumns(this, columns[index]);
                 refresh();
             }));
     }

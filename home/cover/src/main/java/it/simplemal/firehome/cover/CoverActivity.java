@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +20,10 @@ import android.widget.ImageView;
  * question about the install covers it whole, and going then left Fire OS's Home on screen while
  * Salotto was being replaced, seen by the user on 2026-11-05. Covered, it waits underneath, and comes
  * back to the front when the question goes.
+ *
+ * Started with no picture, by adb before it replaces Salotto, it shows Salotto's sofa on black: the
+ * same wait, from outside. Then nothing would bring Salotto back, since it returns when it sees
+ * Fire OS's Home, which this covers: so as soon as the new Salotto is installed, this opens it.
  */
 public final class CoverActivity extends Activity {
     private static final String SALOTTO = "it.simplemal.firehome";
@@ -32,13 +37,29 @@ public final class CoverActivity extends Activity {
     private final BroadcastReceiver close = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) { finish(); }
     };
+    private boolean waitsForInstall;
+    private final BroadcastReceiver installed = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (intent.getData() != null && SALOTTO.equals(intent.getData().getSchemeSpecificPart())) openSalotto();
+        }
+    };
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         ImageView picture = new ImageView(this);
         picture.setScaleType(ImageView.ScaleType.FIT_XY);
         byte[] page = getIntent().getByteArrayExtra(EXTRA_PAGE);
-        if (page != null) picture.setImageBitmap(BitmapFactory.decodeByteArray(page, 0, page.length));
+        if (page != null) {
+            picture.setImageBitmap(BitmapFactory.decodeByteArray(page, 0, page.length));
+        } else {
+            picture.setScaleType(ImageView.ScaleType.CENTER);
+            picture.setBackgroundColor(Color.BLACK);
+            picture.setImageResource(R.drawable.logo);
+            IntentFilter added = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+            added.addDataScheme("package");
+            registerReceiver(installed, added);
+            waitsForInstall = true;
+        }
         setContentView(picture);
         registerReceiver(close, new IntentFilter(CLOSE));
         main.postDelayed(limit, LIMIT_MS);
@@ -46,6 +67,7 @@ public final class CoverActivity extends Activity {
 
     @Override protected void onDestroy() {
         unregisterReceiver(close);
+        if (waitsForInstall) unregisterReceiver(installed);
         main.removeCallbacks(limit);
         super.onDestroy();
     }
@@ -54,11 +76,16 @@ public final class CoverActivity extends Activity {
 
     /** Salotto never came back by itself: its Home knows how to look after an unfinished update. */
     private void backToSalotto() {
+        openSalotto();
+        finish();
+    }
+
+    /** Salotto, in front again, sends close: until then this stays over whatever is underneath. */
+    private void openSalotto() {
         try {
             startActivity(new Intent().setClassName(SALOTTO, SALOTTO + ".MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         } catch (ActivityNotFoundException e) {
             // Nothing left to go to but Fire OS's Home.
         }
-        finish();
     }
 }

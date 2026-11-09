@@ -24,6 +24,7 @@
     <string name="first_no_connection">Verbindung fehlgeschlagen. Versuche es noch einmal oder wähle Nicht jetzt.</string>
     <string name="first_place_title">Wähle den Ort</string>
     <string name="first_place_text">Das Wetter kommt von hier.</string>
+    <string name="first_home_text">Wähle, wie er aussieht. Du kannst das in den Einstellungen ändern.</string>
     <string name="first_remote_title">Halte eine Taste gedrückt</string>
     <string name="first_remote_text">Das sind Kurzbefehle von Salotto: Auf der Fernbedienung stehen sie nicht.</string>
     <string name="first_key_back">Zurück</string>

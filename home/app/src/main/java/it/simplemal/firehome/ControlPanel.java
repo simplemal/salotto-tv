@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -103,8 +104,10 @@ final class ControlPanel extends LinearLayout {
                 paint();
             });
             tiles.add(this);
-            fill.setCornerRadius(host.dp(RADIUS));
-            view.setBackground(fill);
+            fill.setCornerRadius(host.dp(cleanLook ? CLEAN_LIT_RADIUS : RADIUS));
+            // In the clean Home's single block the tiles touch: lit, each keeps a little room
+            // round it, or two lit side by side read as one (2026-11-09).
+            view.setBackground(cleanLook ? new InsetDrawable(fill, host.dp(CLEAN_LIT_INSET)) : fill);
             paint();
         }
 
@@ -119,7 +122,7 @@ final class ControlPanel extends LinearLayout {
                 return;
             }
             boolean lit = selected || active;
-            fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : TILE_OFF);
+            fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : tileOff);
             int ink = lit ? Color.BLACK : Color.WHITE;
             icon.setColorFilter(!lit && linked ? LINKED : ink);
             title.setTextColor(ink);
@@ -157,9 +160,12 @@ final class ControlPanel extends LinearLayout {
 
     private void saver() { away(Fire.screensaver(getContext())); }
 
-    /** The screensaver and the task manager: coming back from them, the panel would only be in the way. */
+    /**
+     * The screensaver and the task manager open at once, over the panel as it is: it closes behind
+     * them, once the Home is out of sight (MainActivity.onStop), and is gone when they are left.
+     * Closed first, the selection was seen jumping to an app on the way out (2026-11-09).
+     */
     private void away(Intent page) {
-        host.leave();
         host.open(page);
     }
 
@@ -263,28 +269,86 @@ final class ControlPanel extends LinearLayout {
     }
 
     /** A list over its button on the circular Home, the tiles under the pill on the grid. Built again only on a change. */
-    void setListed(boolean list) {
-        if (list == listed) return;
-        listed = list;
-        removeAllViews();
-        tiles.clear();
-        last = null;
-        refreshers.clear();
-        chosen = null;
-        hint.setVisibility(GONE);
-        if (list) buildList();
-        else build();
+    void setListed(boolean list) { setLook(list, false); }
+
+    /** The tiles' size and the room between them: the clean Home's are a little roomier, and closer. */
+    private int unit = UNIT;
+    private int gap = GAP;
+    private boolean cleanLook;
+    private static final int CLEAN_UNIT = 48;
+    /**
+     * The clean Home's tiles are one block, the user's trial of 2026-11-09: no room between them, one
+     * margin round them all, black and a little see-through with a very faint light grey line. Each
+     * lights up as before; at rest it is the block itself. With the first row at the top the row
+     * moves to the middle while it is open, so it is never over the apps.
+     */
+    private static final int CLEAN_GAP = 0;
+    private static final int CLEAN_PAD = 6;
+    /** How far a lit tile stays inside its place in the block, and its smaller corners. */
+    private static final int CLEAN_LIT_INSET = 3;
+    private static final int CLEAN_LIT_RADIUS = 8;
+    private static final int CLEAN_BLOCK = Color.argb(200, 0, 0, 0);
+    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
+    private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
+
+    private Drawable block() {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(CLEAN_BLOCK);
+        fill.setCornerRadius(host.dp(RADIUS + CLEAN_PAD));
+        fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
+        return fill;
+    }
+    private int tileOff = TILE_OFF;
+
+    private int wide() { return 2 * unit + gap; }
+
+    /**
+     * The list over its button, or the tiles under the pill. `clean`: the clean Home's tiles, the
+     * grid's ones under its buttons in the middle, on a flat fill with no glass.
+     */
+    void setLook(boolean list, boolean clean) {
+        if (list != listed || clean != cleanLook) {
+            listed = list;
+            cleanLook = clean;
+            unit = clean ? CLEAN_UNIT : UNIT;
+            gap = clean ? CLEAN_GAP : GAP;
+            tileOff = clean ? CLEAN_TILE_OFF : TILE_OFF;
+            // The clean Home's tiles are one block: one margin round them all.
+            int room = host.dp(clean ? CLEAN_PAD : PADDING);
+            setPadding(room, room, room, room);
+            removeAllViews();
+            tiles.clear();
+            last = null;
+            refreshers.clear();
+            chosen = null;
+            hint.setVisibility(GONE);
+            if (list) buildList();
+            else build();
+            addRest();
+        }
         // The list is one plain colour inside the glass line: no sheen, nothing to blend with what is behind it.
-        setBackground(list ? solid() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
-        addRest();
+        setBackground(list ? solid() : clean ? block() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
+        int across = list ? Gravity.START : clean ? Gravity.CENTER_HORIZONTAL : Gravity.END;
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
-        spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | Gravity.END;
+        spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | across;
         spot.topMargin = list ? 0 : host.dp(TOP);
-        spot.rightMargin = list ? 0 : host.dp(EDGE);
+        spot.rightMargin = list || clean ? 0 : host.dp(EDGE);
         spot.leftMargin = 0;
         spot.bottomMargin = 0;
         setLayoutParams(spot);
+        // The line of hints under the tiles goes with them.
+        FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
+        under.gravity = Gravity.TOP | across;
+        under.rightMargin = list || clean ? 0 : host.dp(EDGE);
+        int padding = clean ? CLEAN_PAD : PADDING;
+        // Two rows on the clean Home, four elsewhere.
+        int tall = clean ? 2 * unit + gap : 4 * unit + 3 * gap;
+        int wide = clean ? 2 * wide() + 4 * unit + 5 * gap : 2 * wide() + gap;
+        under.topMargin = host.dp(TOP + 2 * padding + tall + 6);
+        under.width = host.dp(2 * padding + wide);
+        line.setLayoutParams(under);
     }
+
 
     /** The list stands on the button, centred on it and a little above it, inside the screen. */
     void placeOver(View button) {
@@ -297,7 +361,17 @@ final class ControlPanel extends LinearLayout {
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
         int left = at[0] - base[0] + button.getWidth() / 2 - getMeasuredWidth() / 2;
         spot.leftMargin = Math.max(host.dp(16), Math.min(left, parent.getWidth() - getMeasuredWidth() - host.dp(16)));
-        spot.bottomMargin = parent.getHeight() - (at[1] - base[1]) + host.dp(LIST_LIFT);
+        int buttonTop = at[1] - base[1];
+        // Above a button at the bottom, as on the wheel; under one at the top, as on the clean Home.
+        if (buttonTop < parent.getHeight() / 2) {
+            spot.gravity = Gravity.TOP | Gravity.START;
+            spot.topMargin = buttonTop + button.getHeight() + host.dp(LIST_LIFT);
+            spot.bottomMargin = 0;
+        } else {
+            spot.gravity = Gravity.BOTTOM | Gravity.START;
+            spot.topMargin = 0;
+            spot.bottomMargin = parent.getHeight() - buttonTop + host.dp(LIST_LIFT);
+        }
         setLayoutParams(spot);
     }
 
@@ -353,36 +427,55 @@ final class ControlPanel extends LinearLayout {
 
     private void build() {
         LinearLayout upper = new LinearLayout(getContext());
-        addView(upper);
+        // As wide as its tiles: filling the width, it would not count, and alone it left the panel 1 pixel wide.
+        addView(upper, new LayoutParams(-2, -2));
         Tile power = big(R.drawable.ic_power, getContext().getString(R.string.panel_standby), TaskService::standby);
-        upper.addView(power.view, size(WIDE, WIDE, 0, 0));
+        upper.addView(power.view, size(wide(), wide(), 0, 0));
         first = power.view;
         LinearLayout side = new LinearLayout(getContext());
         side.setOrientation(VERTICAL);
         Tile wifi = wide(R.drawable.ic_wifi, "Wi-Fi", () -> settings(SettingsActivity.NETWORK));
-        side.addView(wifi.view, size(WIDE, UNIT, 0, 0));
+        side.addView(wifi.view, size(wide(), unit, 0, 0));
         Tile bluetooth = wide(R.drawable.ic_bluetooth, "Bluetooth", () -> settings(SettingsActivity.REMOTES));
-        side.addView(bluetooth.view, size(WIDE, UNIT, 0, GAP));
+        side.addView(bluetooth.view, size(wide(), unit, 0, gap));
         upper.addView(side, new LayoutParams(-2, -2));
-        ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(GAP));
+        ((LayoutParams) side.getLayoutParams()).setMarginStart(host.dp(gap));
 
-        LinearLayout modes = row();
+        // The clean Home's in two rows: the small tiles' two rows go beside Wi-Fi and Bluetooth.
+        LinearLayout modes;
+        LinearLayout tools;
+        if (cleanLook) {
+            LinearLayout small = new LinearLayout(getContext());
+            small.setOrientation(VERTICAL);
+            LayoutParams beside = new LayoutParams(-2, -2);
+            beside.setMarginStart(host.dp(gap));
+            upper.addView(small, beside);
+            modes = new LinearLayout(getContext());
+            small.addView(modes);
+            tools = new LinearLayout(getContext());
+            LayoutParams under = new LayoutParams(-2, -2);
+            under.topMargin = host.dp(gap);
+            small.addView(tools, under);
+        } else {
+            modes = row();
+            tools = null;
+        }
         audioSwitch(modes, R.drawable.ic_dialogue, R.string.settings_dialogue, 0, SettingsActivity.DIALOGUE);
-        audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, GAP, SettingsActivity.LEVELER);
-        Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), GAP,
+        audioSwitch(modes, R.drawable.ic_leveler, R.string.settings_leveler, gap, SettingsActivity.LEVELER);
+        Tile dim = small(modes, R.drawable.ic_brightness, getContext().getString(R.string.panel_brightness), gap,
             () -> change(() -> Veil.nextDim(getContext())));
-        Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), GAP,
+        Tile warm = small(modes, R.drawable.ic_eye, getContext().getString(R.string.panel_blue_filter), gap,
             () -> change(() -> Veil.nextWarm(getContext())));
 
-        LinearLayout tools = row();
+        if (tools == null) tools = row();
         small(tools, R.drawable.ic_image, getContext().getString(R.string.panel_screensaver), 0, () -> saver());
-        Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), GAP, () -> {
+        Tile timer = small(tools, R.drawable.ic_timer, getContext().getString(R.string.panel_timer), gap, () -> {
             nextTimer();
             refresh();
         });
-        small(tools, R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks), GAP,
+        small(tools, R.drawable.ic_tasks, getContext().getString(R.string.first_does_tasks), gap,
             () -> away(new Intent(getContext(), TasksActivity.class)));
-        small(tools, R.drawable.ic_restart, getContext().getString(R.string.panel_restart), GAP, () -> {
+        small(tools, R.drawable.ic_restart, getContext().getString(R.string.panel_restart), gap, () -> {
             host.panelDone();
             TaskService.restart();
         });
@@ -466,7 +559,7 @@ final class ControlPanel extends LinearLayout {
     private LinearLayout row() {
         LinearLayout row = new LinearLayout(getContext());
         LayoutParams place = new LayoutParams(-2, -2);
-        place.topMargin = host.dp(GAP);
+        place.topMargin = host.dp(gap);
         addView(row, place);
         return row;
     }
@@ -507,7 +600,7 @@ final class ControlPanel extends LinearLayout {
             hint.setVisibility(focused ? VISIBLE : GONE);
         });
         tile.view.setOnClickListener(view -> action.run());
-        row.addView(tile.view, size(UNIT, UNIT, startGap, 0));
+        row.addView(tile.view, size(unit, unit, startGap, 0));
         return tile;
     }
 

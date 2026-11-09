@@ -121,14 +121,16 @@ final class SaverScreen {
     }
 
     private void next() {
-        String file = Look.anyPicture(context, Look.saverFolder(context), shown);
+        String fixed = Look.saverPicture(context);
+        String file = fixed != null ? fixed : Look.anyPicture(context, Look.saverFolder(context), shown);
         if (file == null) return;
         Context app = context.getApplicationContext();
         Background.draw(() -> {
             Bitmap picture = decode(app, file);
             main.post(() -> {
                 if (picture != null) arrive(file, picture);
-                main.postDelayed(next, Look.abstractMinutes(context) * MINUTE_MS);
+                // One picture chosen: it stays, nothing comes after it.
+                if (fixed == null) main.postDelayed(next, Look.saverMinutes(context) * MINUTE_MS);
             });
         });
     }

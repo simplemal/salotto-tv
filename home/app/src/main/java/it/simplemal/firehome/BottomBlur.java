@@ -20,10 +20,17 @@ final class BottomBlur {
     /** Each halving doubles the blur. Android 11 has no blur of its own for a view. */
     private static final int HALVINGS = 4;
 
+    /**
+     * Off when nothing rests at the bottom: the clean Home with its first row in the middle or at
+     * the top, the user's request of 2026-11-09. Set by the Home before it loads a picture.
+     */
+    static volatile boolean on = true;
+
     private BottomBlur() {}
 
     /** `picture` must be mutable. */
     static void apply(Bitmap picture) {
+        if (!on) return;
         int width = picture.getWidth();
         int height = picture.getHeight();
         int top = Math.round(height * START);

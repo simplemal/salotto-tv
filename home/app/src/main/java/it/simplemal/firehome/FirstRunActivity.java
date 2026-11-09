@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Outline;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -21,6 +22,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -43,12 +45,19 @@ import org.json.JSONException;
 public final class FirstRunActivity extends CardActivity {
     private static final String FILE = "first_run";
     private static final String DONE = "done";
+    /**
+     * Which pages were seen: raised only when the pages themselves change, so that after an update
+     * they come back once, and only then (the user's rule of 2026-11-09). 1: the pages up to the
+     * 1.0.24; 2: the choice of the Home, in the 1.1.0.
+     */
+    private static final String SEEN = "seen";
+    private static final int PAGES_VERSION = 2;
     /** What the guide that came before left behind: a Stick that has seen it needs no introduction. */
     private static final String OLD_FILE = "welcome";
     private static final String OLD_DONE = "greeted";
     private static final String RIGHT_TO_LEFT = "ar";
     private static final String NO_NAME = "<unknown ssid>";
-    private static final int PAGES = 6;
+    private static final int PAGES = 7;
     private static final int NETWORK_PAGE = 2;
     private static final int LOGO = 92;
     private static final int NAME_SP = 30;
@@ -86,6 +95,15 @@ public final class FirstRunActivity extends CardActivity {
     private static final int GUIDE_HEIGHT = 220;
     /** The same above and below the drawing. */
     private static final int GUIDE_GAP = 20;
+    /** The three Homes, as the Settings list them: Clean on the left, the user's choice of 2026-11-09. */
+    private static final int[] HOME_STYLES = {Look.HOME_CLEAN, Look.HOME_CIRCLE, Look.HOME_GRID};
+    private static final int[] HOME_PICTURES = {R.drawable.first_home_clean, R.drawable.first_home_circle, R.drawable.first_home_glass};
+    private static final int[] HOME_NAMES = {R.string.settings_home_clean, R.string.settings_home_circle, R.string.settings_home_grid};
+    private static final int HOME_CARD_WIDTH = 240;
+    private static final int HOME_CARD_HEIGHT = 135;
+    private static final int HOME_CARD_GAP = 28;
+    private static final int HOME_CARD_RADIUS = 14;
+    private static final int HOME_NAME_SP = 17;
     private static final int DOT = 7;
     private static final int DOT_GAP = 9;
     private static final int DOTS_BOTTOM = 26;
@@ -126,7 +144,7 @@ public final class FirstRunActivity extends CardActivity {
         new Choice(Look.PRESET_NAMES[4], R.string.first_backdrop_graphite, R.string.first_plain_text, null, 0)};
 
     private final Runnable[] pages = {this::showWelcome, this::showName, this::showNetwork, this::showCity,
-        this::showBackdrop, this::showRemote};
+        this::showBackdrop, this::showHomes, this::showRemote};
     private FrameLayout root;
     private PictureMosaic mosaic;
     private TextView previewNote;
@@ -144,8 +162,10 @@ public final class FirstRunActivity extends CardActivity {
     private String focusedChoice;
 
     static boolean due(Context context) {
-        return !prefs(context).getBoolean(DONE, false)
-            && !context.getSharedPreferences(OLD_FILE, Context.MODE_PRIVATE).getBoolean(OLD_DONE, false);
+        boolean done = prefs(context).getBoolean(DONE, false)
+            || context.getSharedPreferences(OLD_FILE, Context.MODE_PRIVATE).getBoolean(OLD_DONE, false);
+        // Seen before this number existed: the first pages.
+        return !done || prefs(context).getInt(SEEN, 1) < PAGES_VERSION;
     }
 
     private static SharedPreferences prefs(Context context) {
@@ -227,7 +247,7 @@ public final class FirstRunActivity extends CardActivity {
             go(at + 1);
             return;
         }
-        prefs(this).edit().putBoolean(DONE, true).apply();
+        prefs(this).edit().putBoolean(DONE, true).putInt(SEEN, PAGES_VERSION).apply();
         // Fresh, because seen from the Settings the language may have changed on the way.
         startActivity(new Intent(this, MainActivity.class)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
@@ -657,6 +677,83 @@ public final class FirstRunActivity extends CardActivity {
         if (choice.folder == null) root.setBackground(Look.preset(choice.key));
         previewNote.setText(words(R.string.first_preview));
         previewNote.setVisibility(choice.folder != null ? View.GONE : View.VISIBLE);
+    }
+
+    /**
+     * The Home to start with, one of three pictures: no Next, the user's rule of 2026-11-09, a
+     * picture has to be chosen to go on. The one chosen before, or Clean, has the focus.
+     */
+    private void showHomes() {
+        heading(words(R.string.settings_cat_home), words(R.string.first_home_text));
+        LinearLayout row = new LinearLayout(this);
+        // Clean on the left in every language.
+        row.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        row.setClipChildren(false);
+        row.setClipToPadding(false);
+        row.setPadding(0, dp(14), 0, dp(14));
+        page.setClipChildren(false);
+        int chosen = Look.homeChosen(this) ? Look.homeStyle(this) : Look.HOME_CLEAN;
+        View focus = null;
+        for (int index = 0; index < HOME_STYLES.length; index++) {
+            int style = HOME_STYLES[index];
+            View card = homeCard(HOME_PICTURES[index], words(HOME_NAMES[index]), () -> {
+                Look.setHomeStyle(this, style);
+                next();
+            });
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(-2, -2);
+            if (index > 0) place.leftMargin = dp(HOME_CARD_GAP);
+            row.addView(card, place);
+            if (style == chosen) focus = card;
+        }
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(16);
+        page.addView(row, under);
+        focus.requestFocus();
+    }
+
+    /** A picture with rounded corners and its name under it; the focus rings it and lifts it a little. */
+    private View homeCard(int picture, String name, Runnable chosen) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER_HORIZONTAL);
+        card.setFocusable(true);
+        card.setClickable(true);
+        card.setDefaultFocusHighlightEnabled(false);
+        FrameLayout frame = new FrameLayout(this);
+        ImageView image = new ImageView(this);
+        image.setImageResource(picture);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        image.setOutlineProvider(new ViewOutlineProvider() {
+            @Override public void getOutline(View view, Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(HOME_CARD_RADIUS));
+            }
+        });
+        image.setClipToOutline(true);
+        frame.addView(image, new FrameLayout.LayoutParams(-1, -1));
+        GradientDrawable rest = new GradientDrawable();
+        rest.setCornerRadius(dp(HOME_CARD_RADIUS));
+        rest.setStroke(dp(1), Color.argb(70, 255, 255, 255));
+        GradientDrawable ring = new GradientDrawable();
+        ring.setCornerRadius(dp(HOME_CARD_RADIUS));
+        // Thinner than at first: 3 dp was too heavy round a small picture (the user, 2026-11-09).
+        ring.setStroke(dp(2), Color.WHITE);
+        frame.setForeground(rest);
+        card.addView(frame, new LinearLayout.LayoutParams(dp(HOME_CARD_WIDTH), dp(HOME_CARD_HEIGHT)));
+        TextView label = label(name, HOME_NAME_SP);
+        label.setGravity(Gravity.CENTER);
+        label.setAlpha(0.7f);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(12);
+        card.addView(label, under);
+        card.setOnFocusChangeListener((view, focused) -> {
+            frame.setForeground(focused ? ring : rest);
+            label.setAlpha(focused ? 1f : 0.7f);
+            label.setTypeface(Typeface.create(focused ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));
+            float scale = focused ? 1.06f : 1f;
+            view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
+        });
+        card.setOnClickListener(view -> chosen.run());
+        return card;
     }
 
     private void showRemote() {

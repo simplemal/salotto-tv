@@ -73,8 +73,12 @@ final class Weather {
         return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
 
-    static boolean enabled(Context context) { return prefs(context).getBoolean("enabled", true); }
-    static void setEnabled(Context context, boolean value) { prefs(context).edit().putBoolean("enabled", value).apply(); }
+    /** Each Home its own, like the time and the date: see Look.own. */
+    static boolean enabled(Context context) {
+        SharedPreferences saved = prefs(context);
+        return saved.getBoolean(Look.own(context, "enabled"), saved.getBoolean("enabled", true));
+    }
+    static void setEnabled(Context context, boolean value) { prefs(context).edit().putBoolean(Look.own(context, "enabled"), value).apply(); }
     static String place(Context context) { return prefs(context).getString("place", null); }
     /** True once, the first time the Home finds no place: it is asked for only that time. */
     static boolean fahrenheit(Context context) { return prefs(context).getBoolean("fahrenheit", false); }
@@ -234,7 +238,16 @@ final class Weather {
         }
     }
 
-    static boolean active(Context context) { return enabled(context) && place(context) != null; }
+    /**
+     * Read from the network with a place, when the Home writes it or a weather backdrop follows it.
+     * With the weather off the Home, its backdrop gave way to another one and the place was asked
+     * for again at every press (2026-11-09); off, with any other backdrop, nothing is asked.
+     * On the glass Home the switch is Large: off, today's symbol stays small next to the buttons, so
+     * it is read all the same (2026-11-09). The wheel keeps the left of its buttons clear: off is off.
+     */
+    static boolean active(Context context) {
+        return place(context) != null && (enabled(context) || Look.weatherChosen(context) || Look.glass(context));
+    }
 
     /** Never two readings at once, and offline a failure waits a while before the next try. */
     static boolean due(Context context) {

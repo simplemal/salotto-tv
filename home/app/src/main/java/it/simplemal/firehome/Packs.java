@@ -204,6 +204,31 @@ final class Packs {
         return Stop.NETWORK;
     }
 
+    /**
+     * Asked by the user, from the page of backdrops: the collection becomes wanted, even one taken
+     * away before, and every missing one starts coming. The user's rule of 2026-11-09: a collection
+     * taken away never comes back by itself, only when the user asks for it here.
+     */
+    static void ask(Context context, String pack) {
+        Look.untakeSet(context, pack);
+        File chosen = new File(root(context), CHOSEN);
+        if (chosen.isFile()) {
+            String listed = Updater.read(chosen);
+            if (!Arrays.asList(listed.split("\\s+")).contains(pack)) Updater.write(chosen, listed.trim() + "\n" + pack + "\n");
+        }
+        fetchNow(context);
+    }
+
+    /** Blocking: what one collection weighs, from the signed list. -1 if it cannot be read. */
+    static long bytes(String pack) {
+        try {
+            JSONObject item = itemOf(signedList(), pack);
+            return item == null ? -1 : item.getLong("bytes");
+        } catch (Updater.Failure | JSONException | IOException e) {
+            return -1;
+        }
+    }
+
     /** Blocking: how much the missing collections weigh, from the signed list. -1 if it cannot be read. */
     static long missingBytes(Context context) {
         try {

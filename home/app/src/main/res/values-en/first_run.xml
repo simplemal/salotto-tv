@@ -24,6 +24,7 @@
     <string name="first_no_connection">Connection failed. Try again, or choose Not now.</string>
     <string name="first_place_title">Choose the place</string>
     <string name="first_place_text">The weather will come from here.</string>
+    <string name="first_home_text">Choose how it looks. You can change it in Settings.</string>
     <string name="first_remote_title">Hold down a key</string>
     <string name="first_remote_text">These are Salotto’s shortcuts: you won’t find them written on the remote.</string>
     <string name="first_key_back">Back</string>

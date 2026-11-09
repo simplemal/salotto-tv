@@ -2,6 +2,14 @@ package it.simplemal.firehome;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import java.util.function.IntConsumer;
+import android.widget.EditText;
+import android.view.inputmethod.EditorInfo;
+import android.view.WindowManager;
+import android.view.Window;
+import android.text.InputType;
+import android.graphics.Typeface;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -65,7 +73,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     private static final int EDGE_SAMPLE = 32;
     private static final long FOCUS_MS = 140;
     /** Half on the Stick of 2020, which has half the memory. */
-    private static final int CARD_ART_BYTES = (Fire.STICK_2020 ? 8 : 16) * 1024 * 1024;
+    private static final int CARD_ART_BYTES = (Features.LARGE_PICTURE_MEMORY ? 16 : 8) * 1024 * 1024;
     /** Apps whose TV banner is a small logo: their layered icon fills the card far better. */
     private static final List<String> LAYERED_ICON = Arrays.asList("com.aurora.store");
     /** Each app's artwork at the size of its card: a banner alone can be many times larger. */
@@ -130,6 +138,17 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     }
 
     protected float focusScale() { return 1.08f; }
+
+    /** Square cards, cut to a squircle by their own picture: the clean Home's. */
+    protected boolean squareCards() { return false; }
+
+    /** The squircle's corners as a rounded rectangle, for the shadow under it. */
+    private static final float SQUIRCLE_CORNER = 0.24f;
+    private static final int SQUARE_CAPTION_ROOM = 14;
+    /** Over a light picture: black words, a little see-through, and a black see-through ring. */
+    protected static final int DARK_TEXT = Color.argb(217, 0, 0, 0);
+    /** The clean Home's apps sit on a light picture: their names and their ring are drawn dark. */
+    protected boolean darkInk;
 
     protected void onCardFocus(View tile) { }
 
@@ -301,26 +320,49 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     /** The artwork is the card: no frame, no fixed caption, focus lifts it like tvOS. */
     protected View card(LinearLayout row, String tag, String name, Drawable drawable, Drawable back,
             int look, int width, Runnable action, Runnable hold) {
-        int radius = dp(10);
+        boolean square = squareCards();
+        int artHeight = square ? width : width * 9 / 16;
+        int radius = square ? Math.round(width * SQUIRCLE_CORNER) : dp(10);
         ImageView image = new ImageView(this);
-        dress(image, drawable, back, look);
-        Drawable restEdge = glassEdge(radius, CARD_REFLECTION, CARD_LIGHT);
-        // Only one card has the focus, so one ring is enough for the whole page.
-        if (focusRing == null) focusRing = focusEdge(radius);
+        Drawable restEdge;
+        Drawable ring;
+        if (square) {
+            // The picture is already cut to the squircle: nothing to clip, and the lines follow it.
+            image.setScaleType(ImageView.ScaleType.FIT_XY);
+            image.setImageDrawable(drawable);
+            // No glass on the clean Home: at rest the picture alone.
+            restEdge = null;
+            // No ring on the clean Home: the selected app grows, see focusScale.
+            ring = null;
+        } else {
+            dress(image, drawable, back, look);
+            restEdge = glassEdge(radius, CARD_REFLECTION, CARD_LIGHT);
+            // Only one card has the focus, so one ring is enough for the whole page.
+            if (focusRing == null) focusRing = focusEdge(radius);
+            ring = focusRing;
+            image.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+                }
+            });
+            image.setClipToOutline(true);
+        }
         image.setForeground(restEdge);
-        image.setOutlineProvider(new ViewOutlineProvider() {
-            @Override public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
-            }
-        });
-        image.setClipToOutline(true);
 
-        TextView caption = label(name, 14);
+        TextView caption = label(name, square ? 12 : 14);
         caption.setGravity(Gravity.CENTER);
         caption.setSingleLine(true);
         caption.setEllipsize(TextUtils.TruncateAt.END);
-        caption.setPadding(0, dp(8), 0, dp(10));
+        // A square app grows a lot with the focus: its name starts below where the picture reaches then.
+        caption.setPadding(0, dp(8) + (square ? Math.round((focusScale() - 1) * artHeight / 2) : 0), 0, dp(10));
         caption.setVisibility(restingCaption());
+        if (square && darkInk) {
+            caption.setTextColor(DARK_TEXT);
+            caption.setShadowLayer(0, 0, 0, 0);
+        } else if (square) {
+            // White on the picture: a short soft shadow, more below and to the right, a little above and to the left.
+            caption.setShadowLayer(2.5f * getResources().getDisplayMetrics().density, dp(1), dp(1), Color.argb(190, 0, 0, 0));
+        }
 
         LinearLayout tile = new LinearLayout(this);
         tile.setOrientation(LinearLayout.VERTICAL);
@@ -330,9 +372,10 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         tile.setDefaultFocusHighlightEnabled(false);
         // A marked card zooms as one piece, so the check mark stays in its corner.
         View art = isMarked(tag) ? marked(image) : image;
-        tile.addView(art, new LinearLayout.LayoutParams(-1, width * 9 / 16));
+        tile.addView(art, new LinearLayout.LayoutParams(-1, artHeight));
         // Narrow cards let their caption overflow rather than cut the name short.
-        int captionWidth = Math.max(width, dp(MIN_CAPTION));
+        // A squircle's name has only the room of its column: the next one starts close by.
+        int captionWidth = square ? width + dp(SQUARE_CAPTION_ROOM) : Math.max(width, dp(MIN_CAPTION));
         LinearLayout.LayoutParams captionSize = new LinearLayout.LayoutParams(captionWidth, -2);
         captionSize.leftMargin = (width - captionWidth) / 2;
         tile.addView(caption, captionSize);
@@ -368,7 +411,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         }
         // Glass has no shadow: it would show through as rectangles inside the card.
         CardShadow shadow = look == GLASS ? null
-            : new CardShadow(width, width * 9 / 16, radius, dp(1), focusScale());
+            : new CardShadow(width, artHeight, radius, dp(1), focusScale());
         tile.setBackground(shadow);
         tile.setOutlineProvider(null);
         tile.setOnFocusChangeListener((view, focused) -> {
@@ -381,7 +424,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
                 zoom.setUpdateListener(step -> shadow.setLift(from + (to - from) * step.getAnimatedFraction()));
             }
             zoom.start();
-            image.setForeground(focused ? focusRing : restEdge);
+            image.setForeground(focused ? ring : restEdge);
             if (cardNames == Look.NAMES_ON_FOCUS && showsCaption(view)) {
                 caption.setVisibility(focused ? View.VISIBLE : View.INVISIBLE);
             }
@@ -547,6 +590,107 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected void appInfo(String pkg) {
         open(new Intent(this, SettingsActivity.class)
             .putExtra(SettingsActivity.SECTION, SettingsActivity.APP).putExtra(SettingsActivity.PACKAGE, pkg));
+    }
+
+    /** A title, one field and one button, all centred, in Salotto's own window: not Android's, with its line under the words. */
+    protected void askText(String title, boolean secret, String action, Consumer<String> done) {
+        Dialog dialog = new Dialog(this);
+        LinearLayout box = windowBox(dialog, title);
+        EditText field = new EditText(this);
+        field.setSingleLine(true);
+        field.setTextSize(18);
+        field.setTextColor(Color.WHITE);
+        field.setGravity(Gravity.CENTER);
+        // A rounded field instead of Android's line under the words.
+        GradientDrawable well = new GradientDrawable();
+        well.setColor(Color.argb(40, 255, 255, 255));
+        well.setCornerRadius(dp(12));
+        field.setBackground(well);
+        field.setPadding(dp(16), dp(10), dp(16), dp(10));
+        field.setInputType(secret ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD : InputType.TYPE_CLASS_TEXT);
+        field.setImeOptions(secret ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_SEARCH);
+        LinearLayout.LayoutParams wide = new LinearLayout.LayoutParams(dp(360), -2);
+        wide.topMargin = dp(16);
+        box.addView(field, wide);
+        TextView button = windowButton(action);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(16);
+        box.addView(button, under);
+        Runnable send = () -> {
+            dialog.dismiss();
+            done.accept(field.getText().toString());
+        };
+        button.setOnClickListener(view -> send.run());
+        field.setOnEditorActionListener((view, code, event) -> {
+            send.run();
+            return true;
+        });
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        dialog.show();
+    }
+
+    /** The same window with one button for each choice, one under the other: OK picks it. */
+    protected void pickText(String title, List<String> names, IntConsumer done) {
+        Dialog dialog = new Dialog(this);
+        LinearLayout box = windowBox(dialog, title);
+        LinearLayout column = new LinearLayout(this);
+        column.setOrientation(LinearLayout.VERTICAL);
+        for (int index = 0; index < names.size(); index++) {
+            int choice = index;
+            TextView button = windowButton(names.get(index));
+            button.setOnClickListener(view -> {
+                dialog.dismiss();
+                done.accept(choice);
+            });
+            LinearLayout.LayoutParams place = new LinearLayout.LayoutParams(dp(360), -2);
+            place.topMargin = dp(10);
+            column.addView(button, place);
+        }
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.addView(column);
+        LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
+        under.topMargin = dp(6);
+        box.addView(scroll, under);
+        dialog.show();
+    }
+
+    /** A rounded dark window with its title centred: what askText and pickText fill. */
+    private LinearLayout windowBox(Dialog dialog, String title) {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER_HORIZONTAL);
+        box.setPadding(dp(24), dp(20), dp(24), dp(20));
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.rgb(30, 33, 40));
+        fill.setCornerRadius(dp(22));
+        fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
+        box.setBackground(fill);
+        TextView heading = label(title, 20);
+        heading.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        heading.setGravity(Gravity.CENTER);
+        box.addView(heading, new LinearLayout.LayoutParams(-2, -2));
+        dialog.setContentView(box);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        return box;
+    }
+
+    private TextView windowButton(String text) {
+        TextView button = label(text, 18);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(28), dp(10), dp(28), dp(10));
+        button.setFocusable(true);
+        button.setClickable(true);
+        button.setDefaultFocusHighlightEnabled(false);
+        Drawable rest = softGlass(dp(20));
+        Drawable lit = selectedFill(dp(20));
+        button.setBackground(rest);
+        button.setOnFocusChangeListener((view, focused) -> {
+            view.setBackground(focused ? lit : rest);
+            button.setTextColor(focused ? Fire.INK : Color.WHITE);
+        });
+        return button;
     }
 
     protected AlertDialog.Builder dialog() {

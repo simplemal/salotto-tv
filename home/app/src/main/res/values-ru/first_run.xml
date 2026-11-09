@@ -24,6 +24,7 @@
     <string name="first_no_connection">Не удалось подключиться. Повторите попытку или выберите «Не сейчас».</string>
     <string name="first_place_title">Выберите место</string>
     <string name="first_place_text">Прогноз будет для этого места.</string>
+    <string name="first_home_text">Выберите, как он выглядит. Это можно изменить в настройках.</string>
     <string name="first_remote_title">Удерживайте кнопку</string>
     <string name="first_remote_text">Это быстрые команды Salotto: на пульте они не обозначены.</string>
     <string name="first_key_back">Назад</string>

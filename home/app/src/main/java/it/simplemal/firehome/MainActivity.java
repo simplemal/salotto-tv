@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -71,6 +72,22 @@ public final class MainActivity extends CardActivity {
     private static final int DOCK_TOP = 112;
     private static final int SNAP_FRACTION = 3;
     private static final int PILL_MS = 220;
+    /** The clean Home's tiles closing before the first row climbs back to the top. */
+    private static final int PANEL_QUICK_MS = 90;
+    /**
+     * The clean Home's coloured line along each app, in dp, half see-through: one pixel came out
+     * ragged along the curves, and 0.75 dp at full strength was too thick (2026-11-09).
+     */
+    private static final float CLEAN_EDGE = 0.75f;
+    private static final int CLEAN_EDGE_ALPHA = 128;
+    /**
+     * On an icon with a dark background the line is fainter, 70% see-through: the user's choice of
+     * 2026-11-09 (read the other way round at first, as 70% strong).
+     */
+    private static final int CLEAN_EDGE_DARK_ALPHA = 77;
+    private static final float CLEAN_DARK = 0.3f;
+    /** How far towards white that line goes from the app's colour. */
+    private static final float CLEAN_EDGE_LIGHT = 0.45f;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
 
     /** The Home decides where to scroll: the first row stays low, like tvOS. */
@@ -125,6 +142,12 @@ public final class MainActivity extends CardActivity {
     private final Runnable saver = () -> startActivity(new Intent(this, SaverActivity.class));
     private View panelShade;
     private boolean panelOpen;
+    /**
+     * Clean, first row at the top: where the Home scrolls while the control centre is open, the
+     * first row in the middle, clear of its tiles (2026-11-09). -1 elsewhere.
+     */
+    private int panelRest = -1;
+    private long climbAt;
     private TextView footer;
     private boolean reenabledChecked;
     private long timeSeen;
@@ -163,8 +186,10 @@ public final class MainActivity extends CardActivity {
     private boolean bigClock;
     private boolean appsOnly;
     private String weatherSymbol;
+    private boolean weatherBig;
     private boolean pillDrawn;
     private boolean pillClock;
+    private boolean pillWithDate;
     private String pillSymbol;
     private LinearLayout pillRow;
     private TextView pillWeather;
@@ -180,6 +205,7 @@ public final class MainActivity extends CardActivity {
     private List<String> shownApps = new ArrayList<>();
     private String shown;
     private String lookShown;
+    private String cardsShown;
     private LinearLayout dock;
     private String plainBackdrop;
     private String moving;
@@ -192,6 +218,34 @@ public final class MainActivity extends CardActivity {
     private int rowHeight;
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
+    /**
+     * The clean Home: rows of squircles like the grid's cards, twelve a row and centred, with the time
+     * and the weather in the top corners as on the wheel, the buttons at the top in the middle and
+     * the credits at the very bottom.
+     */
+    private boolean clean;
+    private int style = -1;
+    private ImageView networkButton;
+    private static final int CLEAN_COLUMNS = 12;
+    private static final int CLEAN_TILE = 56;
+    private static final int CLEAN_GAP = 14;
+    /** Where the first row stops once a lower one has the focus: under the line at the top. */
+    private static final int CLEAN_DOCK_TOP = 100;
+    private static final int CLEAN_PILL_TOP = 18;
+    private static final int CLEAN_ICON_GAP = 22;
+    private Bitmap squirclePlaceholder;
+    /**
+     * The clean Home's line at the top: time and date on the left, from where a full row's first app
+     * starts, today's weather on the right, where its last one ends. Small, in one chosen font.
+     */
+    private LinearLayout cleanBar;
+    private TextClock cleanTime;
+    private TextClock cleanDate;
+    private TextView cleanWeather;
+    private static final int CLEAN_BAR_SP = 17;
+    private static final int CLEAN_BAR_GAP = 14;
+    private static final int ALL_APPS_FILL = Color.argb(28, 255, 255, 255);
+    private static final int ALL_APPS_EDGE = Color.argb(90, 255, 255, 255);
     private WheelHome wheel;
     private LinearLayout weatherCorner;
     private TextView cornerLine;
@@ -209,6 +263,19 @@ public final class MainActivity extends CardActivity {
     private static final int ALL_APPS_CIRCLE = 60;
     private static final int BESIDE_ALL_APPS = 22;
     private static final float LIGHT_CORNER = 0.72f;
+    /**
+     * The clean Home's words are small: past this they read better black than white. On the TV's
+     * cloudy sky, 0.72, the line stayed white and hard to read (2026-11-09).
+     */
+    private static final float LIGHT_LINE = 0.5f;
+    /**
+     * Over a light picture the free buttons and the clean Home's line turn black, a little
+     * see-through: the words hardly, the icons a touch more, as the middle ones are drawn thicker.
+     */
+    private static final int DARK_ICON_ALPHA = 200;
+    /** Over a darker picture one shadow for all of them, words and icons alike. */
+    private static final int SHADOW_DP = 3;
+    private static final int SHADOW_ALPHA = 170;
     private static final int WEATHER_DAY_WIDTH = 50;
     /** One press opens one app: a second one while the first is starting is ignored. */
     private boolean opening;
@@ -235,9 +302,21 @@ public final class MainActivity extends CardActivity {
      * all there: the user's request of 2026-11-07, instead of watching it being built.
      */
     private FrameLayout loadingMask;
+    private View loadingMiddle;
     private boolean loading;
     private boolean looked;
     private static final long LOADING_LIMIT_MS = 10000;
+    /**
+     * A switch between layouts shows its loading at least this long. Back with the Home key the
+     * cover shows the Home of before for a moment, and a quick new one was ready under it: the
+     * loading never showed (2026-11-09).
+     */
+    private static final long LOADING_LEAST_MS = 800;
+    private long loadingUntil;
+    private static final long MENU_BACKDROP_DELAY_MS = 4000;
+    private final Runnable menuBackdrop = () -> {
+        if (!isDestroyed()) MenuBackdrop.prepare(this);
+    };
     private static final long LOADING_OUT_MS = 200;
     private static final int LOADING_WHEEL = 40;
     private final Runnable endLoading = this::hideLoading;
@@ -249,7 +328,7 @@ public final class MainActivity extends CardActivity {
     private static final long CLOSE_LATEST_MS = 450;
     /** The weather's corner on the wheel: a little lower than the top, the date lined up with it. */
     private static final int WEATHER_TOP = 34;
-    private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
+    private static final int CIRCLE_ART_BYTES = (Features.LARGE_PICTURE_MEMORY ? 12 : 6) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
     };
@@ -338,7 +417,8 @@ public final class MainActivity extends CardActivity {
         scroll.setClipChildren(false);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setOnScrollChangeListener((view, x, y, oldX, oldY) -> {
-            float alpha = shelf > 0 ? Math.max(0f, 1f - 2f * y / shelf) : 1f;
+            // On the clean Home the time and the weather stay: the dock stops under them.
+            float alpha = clean || shelf <= 0 ? 1f : Math.max(0f, 1f - 2f * y / shelf);
             weatherView.setScroll(shelf > 0 ? Math.min(1f, (float) y / shelf) : 0);
             hero.setAlpha(alpha);
             clockShade.setAlpha(alpha);
@@ -359,6 +439,7 @@ public final class MainActivity extends CardActivity {
         root.addView(wheel, new FrameLayout.LayoutParams(-1, -1));
         root.addView(allAppsCircle(), allAppsPlace());
         root.addView(weatherCorner(), weatherCornerPlace());
+        root.addView(cleanBar(), cleanBarPlace());
         // While the backdrop fades the cards cost one picture, instead of all their shadows and glass.
         weatherView.setOnFade(fading -> scroll.setLayerType(fading ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null));
 
@@ -372,7 +453,7 @@ public final class MainActivity extends CardActivity {
         root.addView(panelShade, new FrameLayout.LayoutParams(-1, -1));
         panel = ControlPanel.addTo(this, root, controlButton, true);
         panel.setVisibility(View.GONE);
-        panel.leadDownTo(this::firstCard);
+        panel.leadDownTo(this::lastAppView);
         root.getViewTreeObserver().addOnGlobalFocusChangeListener((before, after) -> followFocus(after));
         hint = label(getString(R.string.main_move_hint), 16);
         hint.setVisibility(View.GONE);
@@ -448,68 +529,85 @@ public final class MainActivity extends CardActivity {
         } else {
             root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
         }
-        panel.setListed(circular);
-        // On the wheel the date goes above the time, where the eye starts reading the corner.
+        boolean corners = cornersOnTop();
+        // The buttons alone, without the pill's glass, on the wheel at the bottom and on the clean Home at the top.
+        // The wheel's is a list over its button; the clean Home's the grid's tiles, flat, under its buttons.
+        panel.setLook(circular, clean);
+        // The date goes above the time, where the eye starts reading: on the glass Home too, as on
+        // the wheel (the user's choice of 2026-11-09).
         hero.removeView(date);
-        hero.addView(date, circular ? 0 : hero.indexOfChild(clock) + 1);
+        hero.addView(date, 0);
         hero.post(this::alignDate);
         // The big digits carry room above them for accents they never have: under the date it reads as a gap.
-        clock.setIncludeFontPadding(!circular);
+        clock.setIncludeFontPadding(false);
         panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
-        heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
-        heroPlace.topMargin = dp(circular ? 14 : 40);
+        heroPlace.leftMargin = dp(corners ? 32 : DOCK_MARGIN + DOCK_SIDE);
+        heroPlace.topMargin = dp(corners ? 14 : 40);
         hero.setLayoutParams(heroPlace);
         FrameLayout.LayoutParams pillSpot = (FrameLayout.LayoutParams) pillBox.getLayoutParams();
-        pillSpot.gravity = circular ? Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL : Gravity.TOP | Gravity.END;
-        pillSpot.topMargin = circular ? 0 : dp(22);
-        pillSpot.rightMargin = circular ? 0 : dp(DOCK_MARGIN);
+        pillSpot.gravity = circular ? Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
+            : clean ? Gravity.TOP | Gravity.CENTER_HORIZONTAL : Gravity.TOP | Gravity.END;
+        pillSpot.topMargin = circular ? 0 : dp(clean ? CLEAN_PILL_TOP : 22);
+        pillSpot.rightMargin = corners ? 0 : dp(DOCK_MARGIN);
         pillSpot.bottomMargin = circular ? dp(12) : 0;
         pillBox.setLayoutParams(pillSpot);
-        pillBox.setBackground(circular ? null : pillGlass);
-        pillBox.setForeground(circular ? null : pillEdge);
-        int icon = dp(circular ? FREE_ICON : PILL_ICON);
-        for (ImageView button : new ImageView[]{controlButton, pillButton}) {
+        pillBox.setBackground(corners ? null : pillGlass);
+        pillBox.setForeground(corners ? null : pillEdge);
+        networkButton.setVisibility(clean ? View.VISIBLE : View.GONE);
+        if (clean) networkButton.setImageResource(DeviceInfo.wired(this) ? R.drawable.ic_ethernet : R.drawable.ic_wifi);
+        int icon = dp(corners ? FREE_ICON : PILL_ICON);
+        for (ImageView button : new ImageView[]{controlButton, networkButton, pillButton}) {
             LinearLayout.LayoutParams size = (LinearLayout.LayoutParams) button.getLayoutParams();
             size.width = icon;
             size.height = icon;
             button.setLayoutParams(size);
-            int inset = dp(circular ? 2 : 3);
+            int inset = dp(corners ? 2 : 3);
             button.setPadding(inset, inset, inset, inset);
         }
         // Set again as layout params: a margin end changed in place is not applied once the button is
         // on screen, and switching to the wheel left Tutte le app 3 dp from it instead of 22 (2026-11-06).
         LinearLayout.LayoutParams beside = (LinearLayout.LayoutParams) controlButton.getLayoutParams();
-        beside.setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
+        beside.setMarginEnd(dp(circular ? BESIDE_ALL_APPS : clean ? CLEAN_ICON_GAP : PILL_ICON_GAP));
         controlButton.setLayoutParams(beside);
+        LinearLayout.LayoutParams network = (LinearLayout.LayoutParams) networkButton.getLayoutParams();
+        network.setMarginEnd(dp(CLEAN_ICON_GAP));
+        networkButton.setLayoutParams(network);
         FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
         weatherSpot.rightMargin = dp(32);
         weatherSpot.topMargin = dp(WEATHER_TOP);
         weatherCorner.setLayoutParams(weatherSpot);
         footer.setTextSize(circular ? 7 : FOOTER_SP);
+        lightCorner = false;
         tonePill();
     }
 
+    /** Time and weather in the two top corners, the buttons free of glass: the wheel and the clean Home. */
+    private boolean cornersOnTop() { return circular || clean; }
+
     /** White with a small shadow over a medium or dark picture, black over a very light one. */
     private void tonePill() {
-        int ink = circular && lightCorner ? Color.BLACK : Color.WHITE;
-        for (TextView text : new TextView[]{pillTime, pillDate, pillWeather}) {
-            text.setTextColor(ink);
-            if (circular && !lightCorner) text.setShadowLayer(dp(3), 0, dp(1), Color.argb(170, 0, 0, 0));
-            else text.setShadowLayer(0, 0, 0, 0);
+        boolean dark = cornersOnTop() && lightCorner;
+        for (TextView text : new TextView[]{pillTime, pillDate, pillWeather, cleanTime, cleanDate, cleanWeather}) {
+            text.setTextColor(dark ? DARK_TEXT : Color.WHITE);
+            if (dark || !cornersOnTop()) text.setShadowLayer(0, 0, 0, 0);
+            else text.setShadowLayer(dp(SHADOW_DP), 0, dp(1), Color.argb(SHADOW_ALPHA, 0, 0, 0));
         }
         lightPillIcon(controlButton, controlButton.hasFocus());
+        if (networkButton != null) lightPillIcon(networkButton, networkButton.hasFocus());
         lightPillIcon(pillButton, pillButton.hasFocus());
     }
 
     @Override protected void lightPillIcon(ImageView button, boolean lit) {
         if (!pillRings.containsKey(button)) pillRings.put(button, button.getBackground());
-        if (!circular || lit) {
+        if (!cornersOnTop() || lit) {
             button.setBackground(pillRings.get(button));
+            button.setImageAlpha(255);
             super.lightPillIcon(button, lit);
             return;
         }
         button.setBackground(lightCorner ? null : iconShadow(button));
         button.setColorFilter(lightCorner ? Color.BLACK : Color.WHITE);
+        button.setImageAlpha(lightCorner ? DARK_ICON_ALPHA : 255);
     }
 
     /** A soft dark copy of the icon, a little lower, drawn under it. */
@@ -521,12 +619,12 @@ public final class MainActivity extends CardActivity {
         icon.setBounds(inset, inset, size - inset, size - inset);
         icon.draw(new Canvas(shape));
         Paint blur = new Paint();
-        blur.setMaskFilter(new BlurMaskFilter(dp(2), BlurMaskFilter.Blur.NORMAL));
+        blur.setMaskFilter(new BlurMaskFilter(dp(SHADOW_DP), BlurMaskFilter.Blur.NORMAL));
         int[] offset = new int[2];
         Bitmap alpha = shape.extractAlpha(blur, offset);
         Bitmap shadow = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Paint dark = new Paint();
-        dark.setColor(Color.argb(150, 0, 0, 0));
+        dark.setColor(Color.argb(SHADOW_ALPHA, 0, 0, 0));
         new Canvas(shadow).drawBitmap(alpha, offset[0], offset[1] + dp(1), dark);
         shape.recycle();
         alpha.recycle();
@@ -536,25 +634,65 @@ public final class MainActivity extends CardActivity {
     /** How light the picture is around the buttons at the bottom, read again only when it changes. */
     private void readCorner() {
         String name = Look.currentName(this);
-        if (!circular || Objects.equals(name, cornerRead)) return;
+        if (!cornersOnTop() || Objects.equals(name, cornerRead)) return;
         cornerRead = name;
         Look.current(this, picture -> {
             int width = picture.getWidth();
             int height = picture.getHeight();
-            double sum = 0;
-            int count = 0;
-            for (int x = width * 3 / 8; x < width * 5 / 8; x += 4) {
-                for (int y = height * 5 / 6; y < height; y += 4) {
-                    int pixel = picture.getPixel(x, y);
-                    sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
-                    count++;
-                }
+            boolean light;
+            boolean below = darkInk;
+            if (clean) {
+                // The whole line at the top; and under the first row, for the names and the credits.
+                light = lightness(picture, width / 16, width * 15 / 16, 0, height / 8) > LIGHT_LINE;
+                below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
+            } else {
+                // The wheel's buttons, at the bottom in the middle.
+                light = lightness(picture, width * 3 / 8, width * 5 / 8, height * 5 / 6, height) > LIGHT_CORNER;
             }
-            boolean light = count > 0 && sum / count > LIGHT_CORNER;
-            if (light == lightCorner) return;
-            lightCorner = light;
-            tonePill();
+            boolean dark = below;
+            pendingTone = () -> {
+                if (dark != darkInk) {
+                    darkInk = dark;
+                    toneFooter();
+                    render(focusedTag());
+                }
+                if (light == lightCorner) return;
+                lightCorner = light;
+                tonePill();
+            };
+            // With a new backdrop on its way, together with it: never before or after (2026-11-09).
+            if (backdropsComing == 0 && swapsComing == 0) placedTone();
         });
+    }
+
+    /** The colours read for the backdrop now on show, waiting for it if it was still coming. */
+    private Runnable pendingTone;
+
+    private void placedTone() {
+        Runnable tone = pendingTone;
+        pendingTone = null;
+        if (tone != null) tone.run();
+    }
+
+    private static double lightness(Bitmap picture, int left, int right, int top, int bottom) {
+        double sum = 0;
+        int count = 0;
+        for (int x = left; x < right; x += 4) {
+            for (int y = top; y < bottom; y += 4) {
+                int pixel = picture.getPixel(x, y);
+                sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : 0;
+    }
+
+    /** The credits at rest: light grey with a shadow, or black on the clean Home's light picture. */
+    private void toneFooter() {
+        if (footer.hasFocus()) return;
+        footer.setTextColor(clean && darkInk ? DARK_TEXT : FOOTER_INK);
+        if (clean && darkInk) footer.setShadowLayer(0, 0, 0, 0);
+        else footer.setShadowLayer(dp(3), 0, dp(1), Color.argb(200, 0, 0, 0));
     }
 
     /** The circular Home's weather: the line of now, then today and the next days in columns. */
@@ -578,8 +716,66 @@ public final class MainActivity extends CardActivity {
         return weatherCorner;
     }
 
+    private View cleanBar() {
+        cleanBar = new LinearLayout(this);
+        cleanBar.setGravity(Gravity.CENTER_VERTICAL);
+        cleanBar.setVisibility(View.GONE);
+        cleanTime = new TextClock(this);
+        cleanDate = new TextClock(this);
+        cleanWeather = label("", CLEAN_BAR_SP);
+        cleanWeather.setSingleLine(true);
+        for (TextView text : new TextView[]{cleanTime, cleanDate, cleanWeather}) {
+            text.setTextSize(CLEAN_BAR_SP);
+            text.setTextColor(Color.WHITE);
+            text.setShadowLayer(dp(SHADOW_DP), 0, dp(1), Color.argb(SHADOW_ALPHA, 0, 0, 0));
+        }
+        cleanBar.addView(cleanTime);
+        LinearLayout.LayoutParams after = new LinearLayout.LayoutParams(-2, -2);
+        after.setMarginStart(dp(CLEAN_BAR_GAP));
+        cleanBar.addView(cleanDate, after);
+        cleanBar.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
+        cleanBar.addView(cleanWeather);
+        return cleanBar;
+    }
+
+    /** As wide as a full row of apps, on the line of the buttons in the middle. */
+    private FrameLayout.LayoutParams cleanBarPlace() {
+        int row = CLEAN_COLUMNS * (dp(CLEAN_TILE) + dp(CLEAN_GAP));
+        int side = Math.max(0, (getResources().getDisplayMetrics().widthPixels - row) / 2 + dp(CLEAN_GAP) / 2);
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-1, dp(FREE_ICON), Gravity.TOP);
+        place.topMargin = dp(CLEAN_PILL_TOP) + dp(6);
+        place.leftMargin = side;
+        place.rightMargin = side;
+        return place;
+    }
+
+    /** What the line shows, in its font: time, date, both or neither, and today's weather. */
+    private void styleCleanBar() {
+        Typeface font = Typeface.create(Look.FONT_FAMILIES[Look.cleanFont(this)], Typeface.NORMAL);
+        int shows = Look.cleanShows(this);
+        String time = Look.timePattern(this);
+        String day = Look.datePattern(this);
+        cleanTime.setFormat24Hour(time);
+        cleanTime.setFormat12Hour(time);
+        cleanDate.setFormat24Hour(day);
+        cleanDate.setFormat12Hour(day);
+        cleanTime.setVisibility(shows == Look.SHOW_BOTH || shows == Look.SHOW_TIME ? View.VISIBLE : View.GONE);
+        cleanDate.setVisibility(shows == Look.SHOW_BOTH || shows == Look.SHOW_DATE ? View.VISIBLE : View.GONE);
+        // Alone, the date starts where the time would.
+        ((LinearLayout.LayoutParams) cleanDate.getLayoutParams()).setMarginStart(shows == Look.SHOW_BOTH ? dp(CLEAN_BAR_GAP) : 0);
+        for (TextView text : new TextView[]{cleanTime, cleanDate, cleanWeather}) text.setTypeface(font);
+        cleanBar.requestLayout();
+    }
+
+    /** Only today, as it is now: the days after it are for the other Homes. */
+    private void showCleanWeather() {
+        String line = Weather.enabled(this) ? Weather.line(this) : null;
+        cleanWeather.setVisibility(line != null ? View.VISIBLE : View.GONE);
+        if (line != null && !line.contentEquals(cleanWeather.getText())) cleanWeather.setText(WeatherIcon.in(this, line));
+    }
+
     private void alignDate() {
-        if (!circular || hero == null || date.getParent() != hero || cornerLine.getVisibility() != View.VISIBLE) {
+        if (!cornersOnTop() || hero == null || date.getParent() != hero || cornerLine.getVisibility() != View.VISIBLE) {
             if (hero != null) hero.setTranslationY(0);
             return;
         }
@@ -608,11 +804,12 @@ public final class MainActivity extends CardActivity {
     }
 
     private void showWeatherCorner() {
-        String line = Weather.line(this);
+        boolean shown = Weather.enabled(this);
+        String line = shown ? Weather.line(this) : null;
         cornerLine.setVisibility(line != null ? View.VISIBLE : View.GONE);
         if (line != null && !line.contentEquals(cornerLine.getText())) cornerLine.setText(WeatherIcon.in(this, line));
         cornerDays.removeAllViews();
-        for (Weather.Day day : Weather.days(this)) {
+        for (Weather.Day day : shown ? Weather.days(this) : new ArrayList<Weather.Day>()) {
             LinearLayout column = new LinearLayout(this);
             column.setOrientation(LinearLayout.VERTICAL);
             column.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -666,6 +863,7 @@ public final class MainActivity extends CardActivity {
             else panel.opening().requestFocus();
         });
         controlButton.setOnKeyListener((view, code, event) -> {
+            if (outOfRow(code, false)) return backToWheel(code, event);
             int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
             if (code != toPanel) return false;
             // On the wheel Up goes back to the apps: the panel opens with the button itself.
@@ -674,11 +872,20 @@ public final class MainActivity extends CardActivity {
         });
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
         beside.setMarginEnd(dp(PILL_ICON_GAP));
+        // Only on the clean Home: Rete e Bluetooth, first, before the control centre.
+        networkButton = pillIcon(R.drawable.ic_wifi, getString(R.string.settings_cat_network));
+        networkButton.setVisibility(View.GONE);
+        networkButton.setOnClickListener(v -> open(new Intent(this, SettingsActivity.class)
+            .putExtra(SettingsActivity.SECTION, SettingsActivity.NETWORK)));
+        networkButton.setOnKeyListener((view, code, event) -> downToApps(code, event));
+        pillRow.addView(networkButton, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillRow.addView(controlButton, beside);
         pillRow.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillButton = settings;
         // The wheel covers the whole screen, so the arrows would not find it from the buttons by themselves.
         settings.setOnKeyListener((view, code, event) -> {
+            if (outOfRow(code, true)) return backToWheel(code, event);
+            if (clean) return downToApps(code, event);
             if (!circular || code != KeyEvent.KEYCODE_DPAD_UP) return false;
             if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
             return true;
@@ -687,10 +894,39 @@ public final class MainActivity extends CardActivity {
         return pillBox;
     }
 
+    /**
+     * On the wheel, the arrow that leads out of the row of buttons at its end: past the settings, or
+     * before the control centre. There is nothing more that way on the screen.
+     */
+    private boolean outOfRow(int code, boolean end) {
+        if (!circular) return false;
+        boolean rtl = pillRow.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+        int toEnd = rtl ? KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT;
+        int toStart = rtl ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
+        return code == (end ? toEnd : toStart);
+    }
+
+    /** The clean Home's buttons are at the top: Down goes to the app selected last, however far below it is. */
+    private boolean downToApps(int code, KeyEvent event) {
+        if (!clean || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
+        View first = lastAppView();
+        if (first != null && event.getAction() == KeyEvent.ACTION_DOWN) first.requestFocus();
+        return true;
+    }
+
+    /** Back on the wheel, already on the next app that way. */
+    private boolean backToWheel(int code, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            wheel.requestFocus();
+            wheel.turnToward(code);
+        }
+        return true;
+    }
+
     /** Open while the focus is on its button or inside it. Touching clears the focus: that says nothing. */
     private void followFocus(View focus) {
         // On the wheel the panel covers the middle of the screen: it opens only when the button is pressed.
-        if (focus != null) showPanel(focus == controlButton && !circular || isInside(focus, panel));
+        if (focus != null) showPanel(focus == controlButton && !panel.listed() || isInside(focus, panel));
     }
 
     private boolean isInside(View view, View parent) {
@@ -700,10 +936,11 @@ public final class MainActivity extends CardActivity {
         return false;
     }
 
-    /** The panel follows the focus: it goes to where the Home rests, the wheel or the first card. */
+    /** The panel follows the focus: it goes to where the Home rests, the wheel or the app selected last. */
     @Override public void leave() {
         if (!panelOpen) return;
-        View rest = circular ? wheel : dock != null && dock.getChildCount() > 0 ? dock.getChildAt(0) : null;
+        // The app selected last, as everywhere: the first one showed for a moment before the screensaver.
+        View rest = lastAppView();
         if (rest != null) rest.requestFocus();
         showPanel(false);
     }
@@ -711,6 +948,16 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
+        // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
+        // Closing, the tiles go quickly first and the row climbs only then: together they met on the
+        // way (2026-11-09).
+        boolean quick = !open && panelRest >= 0;
+        long closing = quick ? PANEL_QUICK_MS : PILL_MS;
+        if (panelRest >= 0 && open) scroll.smoothScrollTo(0, panelRest);
+        if (quick) {
+            climbAt = SystemClock.uptimeMillis() + PANEL_QUICK_MS;
+            root.postDelayed(() -> { if (!panelOpen) scroll.smoothScrollTo(0, shelf); }, PANEL_QUICK_MS);
+        }
         panelShade.animate().cancel();
         panel.hideHint();
         if (!open) panel.closed();
@@ -735,7 +982,7 @@ public final class MainActivity extends CardActivity {
             panelShade.setAlpha(0f);
             panelShade.animate().alpha(1f).setDuration(PILL_MS).start();
         } else {
-            panelShade.animate().alpha(0f).setDuration(PILL_MS).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
+            panelShade.animate().alpha(0f).setDuration(closing).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
         }
         // The tiles drop in from the pill.
         if (open) {
@@ -745,7 +992,7 @@ public final class MainActivity extends CardActivity {
             panel.setTranslationY(-dp(12));
             panel.animate().alpha(1f).translationY(0).setDuration(PILL_MS).start();
         } else {
-            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(PILL_MS)
+            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(closing)
                 .withEndAction(() -> panel.setVisibility(View.GONE)).start();
         }
     }
@@ -783,12 +1030,23 @@ public final class MainActivity extends CardActivity {
         view.setGravity(Gravity.CENTER_VERTICAL);
         int radius = dp(FOOTER_RADIUS);
         view.setOnFocusChangeListener((changed, focused) -> {
-            view.setBackground(focused ? new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}) : null);
-            view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
-            if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
+            // No glass on the clean Home: the same flat veil as Tutte le app.
+            view.setBackground(!focused ? null : clean ? plainFill(radius)
+                : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
+            view.setTextColor(focused ? Color.WHITE : clean && darkInk ? DARK_TEXT : FOOTER_INK);
+            // Only if they are not on the screen already: with the first row at the top they are, and
+            // reaching them must not move the Home (the user's rule of 2026-11-09).
+            if (focused && !circular && !onScreen(view)) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
         view.setOnKeyListener((changed, code, event) -> {
+            // Up from the credits: back on the app that was selected.
+            if (!circular && code == KeyEvent.KEYCODE_DPAD_UP) {
+                View back = lastAppView();
+                if (back == null) return false;
+                if (event.getAction() == KeyEvent.ACTION_DOWN) back.requestFocus();
+                return true;
+            }
             if (!circular || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
             if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
             return true;
@@ -796,24 +1054,47 @@ public final class MainActivity extends CardActivity {
         return view;
     }
 
+    /** Wholly inside what the scroll shows now. */
+    private boolean onScreen(View view) {
+        int top = scroll.getScrollY();
+        return view.getParent() == page && view.getTop() >= top && view.getBottom() <= top + scroll.getHeight();
+    }
+
+    private Drawable plainFill(int radius) {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(ALL_APPS_FILL);
+        fill.setCornerRadius(radius);
+        return fill;
+    }
+
     private void showPillClock() {
-        boolean raised = scroll.getScrollY() > shelf / 2;
-        boolean clockInView = bigClock && !raised;
-        String symbol = raised ? weatherSymbol : null;
+        // On the clean Home the big clock is never covered.
+        boolean raised = !clean && scroll.getScrollY() > shelf / 2;
+        // The clean Home's time is in its line at the top, or not wanted: never in the buttons.
+        // Nor on the wheel: the left of its buttons is kept clear, the user's rule of 2026-11-09, so
+        // time, date and weather not shown large are not shown at all.
+        boolean clockInView = clean || circular || bigClock && !raised;
+        String symbol = !circular && (raised || !weatherBig) ? weatherSymbol : null;
+        // Time and date not big stay small in the pill (2026-11-09: the switch is called Large), and
+        // the date on the left is not repeated there: only once it is out of view. Not on the clean
+        // Home, which has its own line at the top.
+        boolean withDate = !clean && !circular && (raised || date.getVisibility() != View.VISIBLE);
+        boolean small = !clockInView || withDate || symbol != null;
         // Called at every step of a scroll, and almost every step changes nothing.
-        if (pillDrawn && clockInView == pillClock && Objects.equals(symbol, pillSymbol)) return;
+        if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
         pillClock = clockInView;
+        pillWithDate = withDate;
         pillSymbol = symbol;
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
-        clockShade.setVisibility(bigClock ? View.VISIBLE : View.GONE);
-        pillShade.animate().alpha(clockInView ? 0 : 1).setDuration(PILL_MS).start();
-        pillDate.setVisibility(time);
+        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
+        pillShade.animate().alpha(small ? 1 : 0).setDuration(PILL_MS).start();
+        pillDate.setVisibility(withDate ? View.VISIBLE : View.GONE);
         pillTime.setVisibility(time);
         pillWeather.setVisibility(symbol != null ? View.VISIBLE : View.GONE);
         if (symbol != null) pillWeather.setText(WeatherIcon.in(this, symbol));
-        pillRow.setPadding(clockInView ? dp(6) : dp(16), dp(6), dp(6), dp(6));
+        pillRow.setPadding(small ? dp(16) : dp(6), dp(6), dp(6), dp(6));
     }
 
     private void animatePill() {
@@ -839,7 +1120,7 @@ public final class MainActivity extends CardActivity {
         // Dock up, the Home stays where it is and the panel opens over it: no slide down and back.
         if (!appsOnly) scroll.smoothScrollTo(0, 0);
         showPanel(true);
-        panel.openEmpty(onCards ? from : firstCard());
+        panel.openEmpty(onCards ? from : lastAppView());
     }
 
     /** The cover needs the Home as it is now, and a press leaves no time to take it. */
@@ -877,10 +1158,9 @@ public final class MainActivity extends CardActivity {
             if (TaskService.closeOverAll()) {
                 // The Home key or Back: the cover closes the circle over everything.
                 wheel.dropPortal();
-                TaskService.afterHomeCover(() -> {
-                    HomeCover.disarm();
-                    fadeCorners(true, null);
-                });
+                // Back at once, under the cover: outside the ring the Home is already whole.
+                cornersNow();
+                TaskService.afterHomeCover(HomeCover::disarm);
             } else {
                 // Back: the app has gone by itself; the same closing, drawn here.
                 wheel.portalToCircle();
@@ -895,13 +1175,20 @@ public final class MainActivity extends CardActivity {
         home = HomeApps.load(this);
         List<String> apps = visible();
         String look = Look.signature(this);
+        String cards = Look.cardsSignature(this);
+        // Back from a setting that draws the Home again, the loading covers the rebuild: a moment of
+        // black showed on the Stick, the user's report of 2026-11-09. Only then, never after a pause.
+        boolean changed = looked && (!look.equals(lookShown) || !cards.equals(cardsShown));
+        cardsShown = cards;
         if (!look.equals(lookShown)) {
             lookShown = look;
             applyLook();
         }
+        if (changed && !loading) showLoading(true);
         // A Home loaded again, under its mask, starts from the first app, in the grid and on the wheel:
         // the user's request of 2026-11-07.
-        if (!state(apps).equals(shown)) render(loading && !apps.isEmpty() ? apps.get(0) : focusedTag(), apps);
+        // A setting changed keeps the app selected last.
+        if (!state(apps).equals(shown)) render(loading && !changed && !apps.isEmpty() ? apps.get(0) : focusedTag(), apps);
         // The wheel keeps a button's focus otherwise, the control centre's one after a switch from the grid.
         if (loading && circular) wheel.requestFocus();
         if (appsOnly) restRaised();
@@ -910,7 +1197,34 @@ public final class MainActivity extends CardActivity {
         ticker.post(weatherCheck);
         weatherView.resume();
         root.postDelayed(offerStart, OFFER_START_MS);
+        backToApp();
         homeMaybeReady();
+    }
+
+    /**
+     * Back on the Home from the settings or the control centre: on the app that was selected, not
+     * on the button, in every layout (the user's request of 2026-11-09). On the grid that also
+     * takes the dock where it now belongs, if it has just been moved.
+     */
+    private void backToApp() {
+        View focus = getCurrentFocus();
+        if (focus != controlButton && focus != pillButton && focus != networkButton) return;
+        if (circular) {
+            wheel.requestFocus();
+            return;
+        }
+        View tile = lastAppView();
+        if (tile != null) tile.requestFocus();
+    }
+
+    /**
+     * Where the apps are entered again from the buttons, the control centre or the credits: the app
+     * selected last, not the first or the one in the middle (the user's request of 2026-11-09).
+     */
+    private View lastAppView() {
+        if (circular) return wheel;
+        View tile = lastApp != null ? page.findViewWithTag(lastApp) : null;
+        return tile != null ? tile : firstCard();
     }
 
     /** After the backdrop has come in, or the question would open over an empty Home. */
@@ -957,13 +1271,14 @@ public final class MainActivity extends CardActivity {
      * old one in one step: the user's request of 2026-11-07, a fade over the blur used to stall.
      */
     private void showBackdrop(boolean chosen) {
-        if (circular) readCorner();
+        if (cornersOnTop()) readCorner();
         String scene = Look.weatherPictures(this) ? Weather.picture(this)
             : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
-        String plain = scene == null ? Look.backdrop(this) : null;
+        // Salotto's colours changing by themselves: the one due now, so that a new one is a change.
+        String plain = scene == null ? Look.shownBackdrop(this) : null;
         String before = plainBackdrop;
         plainBackdrop = plain;
-        boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || Fire.STICK_2020;
+        boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || !Features.BACKDROP_FADE;
         if (plain != null && !plain.equals(before)) {
             backdropsComing++;
             Look.show(this, picture -> {
@@ -981,6 +1296,7 @@ public final class MainActivity extends CardActivity {
                 }
                 place.run();
                 backdropsComing--;
+                placedTone();
                 homeMaybeReady();
             });
         } else if (scene == null) {
@@ -1003,6 +1319,7 @@ public final class MainActivity extends CardActivity {
         }
         place.run();
         backdropsComing--;
+        placedTone();
         homeMaybeReady();
     }
 
@@ -1013,6 +1330,7 @@ public final class MainActivity extends CardActivity {
             swapsComing--;
             backdropsComing--;
             place.run();
+            placedTone();
             if (soft != null) showBlur(soft);
             else blurBackdrop();
             homeMaybeReady();
@@ -1082,7 +1400,12 @@ public final class MainActivity extends CardActivity {
         weatherView.setCovered(blurred.getVisibility() == View.VISIBLE && blurred.getAlpha() == 1f && blurred.getDrawable() != null);
     }
 
-    private void showLoading() {
+    /**
+     * The mask over a Home being built. With its wheel and words only for a switch between grid and
+     * wheel: when the Home starts again by itself, after Fire OS closed it behind an app, it is plain,
+     * so that coming back from an app never shows a loading.
+     */
+    private void showLoading(boolean switching) {
         if (loadingMask == null) {
             loadingMask = new FrameLayout(this);
             loadingMask.setBackground(Look.plainBackdrop());
@@ -1099,9 +1422,12 @@ public final class MainActivity extends CardActivity {
             LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
             under.topMargin = dp(16);
             middle.addView(words, under);
+            loadingMiddle = middle;
             loadingMask.addView(middle, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
             root.addView(loadingMask, new FrameLayout.LayoutParams(-1, -1));
         }
+        loadingMiddle.setVisibility(switching ? View.VISIBLE : View.GONE);
+        loadingUntil = switching ? SystemClock.uptimeMillis() + LOADING_LEAST_MS : 0;
         loadingMask.animate().cancel();
         loadingMask.setAlpha(1f);
         loadingMask.setVisibility(View.VISIBLE);
@@ -1113,6 +1439,11 @@ public final class MainActivity extends CardActivity {
 
     /** Everything asked for has arrived: one frame later, so that it is drawn, the mask goes. */
     private void homeMaybeReady() {
+        if (homeReady()) {
+            // The settings' backdrop is made now, while nothing else is going on, and not when they open.
+            root.removeCallbacks(menuBackdrop);
+            root.postDelayed(menuBackdrop, MENU_BACKDROP_DELAY_MS);
+        }
         if (!loading || !homeReady()) return;
         root.postOnAnimation(() -> {
             if (homeReady()) hideLoading();
@@ -1127,6 +1458,12 @@ public final class MainActivity extends CardActivity {
 
     private void hideLoading() {
         if (!loading) return;
+        long wait = loadingUntil - SystemClock.uptimeMillis();
+        if (wait > 0) {
+            root.removeCallbacks(endLoading);
+            root.postDelayed(endLoading, wait);
+            return;
+        }
         loading = false;
         root.removeCallbacks(endLoading);
         loadingMask.animate().alpha(0f).setDuration(LOADING_OUT_MS).withEndAction(() -> loadingMask.setVisibility(View.GONE)).start();
@@ -1157,16 +1494,27 @@ public final class MainActivity extends CardActivity {
         ticker.postDelayed(weatherCheck, WEATHER_CHECK_MS);
     }
 
+    /** The weather written on the Home only if it is wanted there: read it is all the same, for the backdrops. */
     private void showWeather() {
-        String line = Weather.line(this);
+        boolean shown = Weather.enabled(this);
+        String line = shown ? Weather.line(this) : null;
         weather.setVisibility(line != null ? View.VISIBLE : View.GONE);
         if (line != null && !line.contentEquals(weather.getText())) weather.setText(WeatherIcon.in(this, line));
-        String tomorrow = Weather.tomorrow(this);
+        String tomorrow = shown ? Weather.tomorrow(this) : null;
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
-        weatherSymbol = Weather.symbol(this);
-        if (circular) showWeatherCorner();
+        // Not large, today's symbol alone stays next to the buttons; the clean Home has its own line.
+        weatherSymbol = shown || !clean ? Weather.symbol(this) : null;
+        weatherBig = shown;
+        if (cornersOnTop()) showWeatherCorner();
+        if (clean) showCleanWeather();
         showPillClock();
+    }
+
+    /** Out of sight: a control centre left open for the screensaver or the task manager closes now, unseen. */
+    @Override protected void onStop() {
+        super.onStop();
+        leave();
     }
 
     @Override protected void onPause() {
@@ -1217,13 +1565,27 @@ public final class MainActivity extends CardActivity {
 
     private void applyLook() {
         // Read before the backdrop, which blurs itself only when the wheel is shown and the blur chosen.
-        boolean wasCircular = circular;
-        circular = Look.circular(this);
-        wheel.setTinted(Look.tintGlow(this));
-        // Also when the Home starts: until then only the window's grey would show, the user's report of 2026-11-07.
-        if (!looked || circular != wasCircular) showLoading();
+        int wasStyle = style;
+        style = Look.homeStyle(this);
+        circular = style == Look.HOME_CIRCLE;
+        clean = style == Look.HOME_CLEAN;
+        // The blur at the bottom of the picture is for a first row resting there.
+        boolean bottomBlur = !(clean && (Look.appsOnly(this) || Look.cleanRowMiddle(this)));
+        if (bottomBlur != BottomBlur.on) {
+            BottomBlur.on = bottomBlur;
+            Look.trim();
+            weatherView.forget();
+            plainBackdrop = null;
+        }
+        wheel.setGlow(Look.glow(this));
+        // Gone, not hidden: neither the arrows nor the grid's spacing find it.
+        footer.setVisibility(Look.credits(this) ? View.VISIBLE : View.GONE);
+        // Also when the Home starts, plain: until then only the window's grey would show, the user's
+        // report of 2026-11-07. The loading itself only for a switch, the user's request of 2026-11-09.
+        if (!looked || style != wasStyle) showLoading(looked);
         looked = true;
-        boolean blur = circular && Look.wheelBlur(this);
+        // Each its own: the clean Home's blur starts off and does not follow the wheel's.
+        boolean blur = circular && Look.wheelBlur(this) || clean && Look.cleanBlur(this);
         boolean blurOn = blur && blurred.getVisibility() != View.VISIBLE;
         if (blurOn) blurReady = false;
         if (blurOn) {
@@ -1237,8 +1599,8 @@ public final class MainActivity extends CardActivity {
         coverScene();
         showBackdrop(true);
         if (blurOn) blurBackdrop();
-        if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
-        columns = Look.columns(this);
+        if (dock != null) dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
+        columns = clean ? CLEAN_COLUMNS : Look.columns(this);
         clock.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
         clock.setTextSize(Look.SIZES[Look.size(this)]);
         alignInk(clock);
@@ -1247,20 +1609,32 @@ public final class MainActivity extends CardActivity {
         appsOnly = Look.appsOnly(this) && !circular;
         scroll.setVisibility(circular ? View.GONE : View.VISIBLE);
         wheel.setVisibility(circular ? View.VISIBLE : View.GONE);
-        weatherRow.setVisibility(circular ? View.GONE : View.VISIBLE);
+        weatherRow.setVisibility(cornersOnTop() ? View.GONE : View.VISIBLE);
+        // The clean Home has its own small line at the top instead of the big clock and the weather's corner.
         weatherCorner.setVisibility(circular ? View.VISIBLE : View.GONE);
         weatherShade.setVisibility(circular ? View.VISIBLE : View.GONE);
-        if (circular) {
-            scroll.scrollTo(0, 0);
+        hero.setVisibility(clean ? View.GONE : View.VISIBLE);
+        cleanBar.setVisibility(clean ? View.VISIBLE : View.GONE);
+        if (clean) {
+            styleCleanBar();
+            showCleanWeather();
+        }
+        if (circular) scroll.scrollTo(0, 0);
+        if (cornersOnTop()) {
             hero.setAlpha(1);
             clockShade.setAlpha(1);
             showWeatherCorner();
         }
         allAppsCircle.setVisibility(circular ? View.VISIBLE : View.GONE);
-        if (circular != wasCircular) {
+        if (style != wasStyle) {
             placeFooter();
             placeCorners();
             cornerRead = null;
+            // Dark names belong to the clean Home only: read again for it, white elsewhere.
+            if (!clean && darkInk) {
+                darkInk = false;
+                toneFooter();
+            }
         }
         readCorner();
         if (appsOnly) restRaised();
@@ -1287,6 +1661,7 @@ public final class MainActivity extends CardActivity {
 
     private void render(String focus, List<String> apps) {
         stopJiggle();
+        focus = neighbourOf(focus, apps);
         if (circular) {
             renderWheel(focus, apps);
             return;
@@ -1296,17 +1671,23 @@ public final class MainActivity extends CardActivity {
         shownApps = apps;
         shown = state(apps);
         int inset = dp(DOCK_SIDE);
-        int width = cardWidth(columns, dp(DOCK_MARGIN) + inset);
-        int imageHeight = width * 9 / 16;
+        int width = clean ? dp(CLEAN_TILE) : cardWidth(columns, dp(DOCK_MARGIN) + inset);
+        int imageHeight = clean ? width : width * 9 / 16;
         rowHeight = imageHeight + dp(CAPTION_HEIGHT);
 
         // The first row rests low: below it only a third of the next row shows.
         int screen = getResources().getDisplayMetrics().heightPixels;
-        int dockPadding = dp(DOCK_HEIGHT_PADDING);
-        int dockHeight = imageHeight + 2 * dockPadding;
+        // The clean Home's first row is a row like the others, names included: no dock around it.
+        int dockPadding = clean ? 0 : dp(DOCK_HEIGHT_PADDING);
+        int dockHeight = clean ? rowHeight : imageHeight + 2 * dockPadding;
         int rowGap = dp(20);
-        int top = screen - dockHeight - rowGap - imageHeight / 3;
-        shelf = top - dp(DOCK_TOP);
+        // The clean Home's first row can also rest in the middle: of the room under the line at the top.
+        int lineBottom = dp(CLEAN_PILL_TOP) + dp(6) + dp(FREE_ICON);
+        int middle = lineBottom + (screen - lineBottom - dockHeight) / 2;
+        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? middle
+            : screen - dockHeight - rowGap - imageHeight / 3;
+        panelRest = clean && appsOnly ? top - middle : -1;
+        shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
         ((FrameLayout.LayoutParams) weatherRow.getLayoutParams()).bottomMargin = screen - top + dp(WEATHER_GAP);
@@ -1321,15 +1702,25 @@ public final class MainActivity extends CardActivity {
             if (index % columns == 0) {
                 row = row(page);
                 row.setPadding(inset, index == 0 ? dockPadding : 0, inset, index == 0 ? dockPadding : 0);
+                // Fewer than twelve in a row sit in the middle, not at the start.
+                if (clean) row.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (index == 0) {
                     dock = row;
-                    dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
+                    // The clean Home's dock is only its row of apps: no glass under it.
+                    dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }
             }
-            View tile = index == apps.size() ? allAppsCard(row, width) : homeCard(row, apps.get(index), width);
-            if (index < columns) ((LinearLayout) tile).getChildAt(1).setVisibility(View.GONE);
+            View tile = clean ? squircleCard(row, index == apps.size() ? ALL_APPS : apps.get(index), width)
+                : index == apps.size() ? allAppsCard(row, width) : homeCard(row, apps.get(index), width);
+            if (clean) {
+                // The same room on both sides: the row's middle is the screen's.
+                LinearLayout.LayoutParams around = (LinearLayout.LayoutParams) tile.getLayoutParams();
+                around.leftMargin = dp(CLEAN_GAP) / 2;
+                around.rightMargin = dp(CLEAN_GAP) / 2;
+            }
+            if (index < columns && !clean) ((LinearLayout) tile).getChildAt(1).setVisibility(View.GONE);
             if (first == null) first = tile;
             if (focus != null && focus.equals(tile.getTag())) target = tile;
         }
@@ -1344,6 +1735,22 @@ public final class MainActivity extends CardActivity {
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
         if (moving != null && target != null) startJiggle(target);
+    }
+
+    /**
+     * An app taken off the Home, or uninstalled, leaves the selection to the one before it, or with
+     * none before to the one after: the user's request of 2026-11-09, instead of the first app.
+     */
+    private String neighbourOf(String focus, List<String> apps) {
+        if (focus == null || apps.contains(focus) || !shownApps.contains(focus)) return focus;
+        int gone = shownApps.indexOf(focus);
+        for (int index = gone - 1; index >= 0; index--) {
+            if (apps.contains(shownApps.get(index))) return shownApps.get(index);
+        }
+        for (int index = gone + 1; index < shownApps.size(); index++) {
+            if (apps.contains(shownApps.get(index))) return shownApps.get(index);
+        }
+        return null;
     }
 
     /** The grid keeps the credits after its last row; the wheel has them small, at the top edge, in the middle. */
@@ -1376,7 +1783,7 @@ public final class MainActivity extends CardActivity {
                 circle.setBackgroundColor(Color.rgb(60, 64, 72));
                 artComing++;
                 Background.draw(() -> {
-                    Bitmap made = circleArt(tag, size);
+                    Bitmap made = circleArt(tag, size, false);
                     int glow = glowOf(made);
                     CIRCLE_ART.put(key, made);
                     synchronized (CIRCLE_GLOW) { CIRCLE_GLOW.put(key, glow); }
@@ -1422,7 +1829,7 @@ public final class MainActivity extends CardActivity {
     }
 
     /** Salotto's own two circles are drawn here; an app's comes from its artwork, see CircleArt. */
-    private Bitmap circleArt(String tag, int size) {
+    private Bitmap circleArt(String tag, int size, boolean square) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         if (ALL_APPS.equals(tag) || HomeApps.SETTINGS.equals(tag)) {
@@ -1444,7 +1851,7 @@ public final class MainActivity extends CardActivity {
             return made;
         }
         made.recycle();
-        return CircleArt.make(art.image, art.back, art.look == BANNER, size, tag);
+        return CircleArt.make(art.image, art.back, art.look == BANNER, size, tag, square);
     }
 
     /**
@@ -1562,10 +1969,29 @@ public final class MainActivity extends CardActivity {
     }
 
     private void closePortal() {
-        wheel.closePortal(() -> {
-            HomeCover.disarm();
-            fadeCorners(true, null);
+        wheel.closePortal(HomeCover::disarm);
+        // Under the closing, which is over the whole Home: nothing comes in after it.
+        cornersNow();
+    }
+
+    /** Time, weather and the buttons there at once, where something covers the Home. */
+    private void cornersNow() {
+        for (View corner : new View[]{hero, clockShade, weatherCorner, weatherShade, pillBox, footer}) {
+            corner.animate().cancel();
+            corner.setAlpha(1f);
+        }
+    }
+
+    private void scrollWhenLaidOut(int target) {
+        page.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                page.removeOnLayoutChangeListener(this);
+                scroll.post(() -> scroll.smoothScrollTo(0, target));
+            }
         });
+        // Asked for anyway: a page already laid out would never call back.
+        page.requestLayout();
     }
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
@@ -1591,6 +2017,118 @@ public final class MainActivity extends CardActivity {
         return appCard(row, HomeApps.label(this, pkg), pkg, width, () -> showMenu(pkg));
     }
 
+    @Override protected boolean squareCards() { return clean; }
+
+    /**
+     * An app on the clean Home: its picture as on the wheel, square and cut to a squircle, made away
+     * from the main thread the first time. Salotto's settings and Tutte le app are drawn here too.
+     */
+    private View squircleCard(LinearLayout row, String tag, int size) {
+        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag);
+        // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
+        // size, the picture was soft and its curves came out in steps (2026-11-09).
+        int grown = Math.round(size * CLEAN_FOCUS_SCALE);
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "");
+        Bitmap known = CIRCLE_ART.get(key);
+        Runnable action;
+        Runnable hold;
+        if (ALL_APPS.equals(tag)) {
+            action = () -> open(new Intent(this, AppsActivity.class));
+            hold = null;
+        } else if (HomeApps.SETTINGS.equals(tag)) {
+            action = () -> open(new Intent(this, SettingsActivity.class));
+            hold = () -> showMenu(tag);
+        } else {
+            action = () -> openPackage(tag);
+            hold = () -> showMenu(tag);
+        }
+        if (squirclePlaceholder == null || squirclePlaceholder.getWidth() != size) {
+            Bitmap plain = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            plain.eraseColor(CircleArt.PLAIN);
+            squirclePlaceholder = Squircle.cut(plain);
+            plain.recycle();
+        }
+        // Tutte le app: a light veil and the icon, drawn at once, with no shadow under it.
+        if (ALL_APPS.equals(tag) && known == null) {
+            known = allAppsSquircle(grown);
+            CIRCLE_ART.put(key, known);
+        }
+        Bitmap shown = known != null ? known : squirclePlaceholder;
+        View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null,
+            ALL_APPS.equals(tag) ? GLASS : ICON, size, action, hold);
+        if (known == null) {
+            ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
+            artComing++;
+            Background.draw(() -> {
+                Bitmap square = circleArt(tag, grown, true);
+                int colour = glowOf(square);
+                // The icon's own background, along its edge, where the line is drawn.
+                boolean dark = brightness(CircleArt.rim(square)) < CLEAN_DARK;
+                Bitmap made = Squircle.cut(square);
+                square.recycle();
+                if (edged) colourEdge(made, colour, dark);
+                CIRCLE_ART.put(key, made);
+                runOnUiThread(() -> {
+                    image.setImageBitmap(made);
+                    artComing--;
+                    artShown();
+                });
+            });
+        }
+        return tile;
+    }
+
+    /**
+     * A very thin line along the squircle in the app's own colour, the one the wheel glows with:
+     * the user's request of 2026-11-09. Drawn into the picture, inside its edge.
+     */
+    private void colourEdge(Bitmap squircle, int colour, boolean dark) {
+        int size = squircle.getWidth();
+        // The picture is drawn at its focused size: at rest the line is as thin as asked.
+        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE * CLEAN_FOCUS_SCALE;
+        Path edge = Squircle.path(size - line);
+        edge.offset(line / 2, line / 2);
+        Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rim.setStyle(Paint.Style.STROKE);
+        rim.setStrokeWidth(line);
+        // Its own colour exactly vanished on an icon of one colour: a little lighter, the same hue.
+        rim.setColor(Color.argb(dark ? CLEAN_EDGE_DARK_ALPHA : CLEAN_EDGE_ALPHA, lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
+        new Canvas(squircle).drawPath(edge, rim);
+    }
+
+    /** 0 for black, 1 for white, as the eye weighs the three colours. */
+    private static float brightness(int colour) {
+        return (0.299f * Color.red(colour) + 0.587f * Color.green(colour) + 0.114f * Color.blue(colour)) / 255f;
+    }
+
+    private static int lighter(int channel) {
+        return Math.round(channel + (255 - channel) * CLEAN_EDGE_LIGHT);
+    }
+
+    private Bitmap allAppsSquircle(int size) {
+        Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        fill.setColor(ALL_APPS_FILL);
+        canvas.drawPath(Squircle.path(size), fill);
+        // A light line along its edge: so faint a veil would be lost among the apps' own colours.
+        // Drawn at the focused size, it is one dp at rest.
+        float line = dp(1) * CLEAN_FOCUS_SCALE;
+        Path edge = Squircle.path(size - line);
+        edge.offset(line / 2, line / 2);
+        Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rim.setStyle(Paint.Style.STROKE);
+        rim.setStrokeWidth(line);
+        rim.setColor(ALL_APPS_EDGE);
+        canvas.drawPath(edge, rim);
+        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        icon.setTint(Color.WHITE);
+        int inset = size * 3 / 10;
+        icon.setBounds(inset, inset, size - inset, size - inset);
+        icon.draw(canvas);
+        return made;
+    }
+
     /** Pinned last: it cannot be moved or removed, so every app stays reachable. */
     private View allAppsCard(LinearLayout row, int width) {
         return card(row, ALL_APPS, getString(R.string.main_all_apps), getDrawable(R.drawable.ic_apps), null, GLASS, width,
@@ -1602,13 +2140,29 @@ public final class MainActivity extends CardActivity {
 
     /** The dock shows only the artwork, as on tvOS. */
     @Override protected boolean showsCaption(View tile) {
-        return tile.getParent() != page.getChildAt(0);
+        return clean || tile.getParent() != page.getChildAt(0);
     }
 
+    /** The app selected last, to come back to after the settings or the control centre. */
+    private String lastApp;
+
     @Override protected void onCardFocus(View tile) {
+        if (tile.getTag() instanceof String) lastApp = (String) tile.getTag();
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
         int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        // Back on the first row from the clean Home's control centre: the row climbs only once its
+        // tiles are gone, from showPanel. Climbing now, it went up through them (2026-11-09).
+        if (index == 0 && panelRest >= 0 && (panelOpen || SystemClock.uptimeMillis() < climbAt)) return;
+        // A page not laid out yet has nothing to scroll: a smooth scroll there went back to the bottom,
+        // and a first row wanted at the top stayed low as the Home started. It waits for the layout,
+        // and is never skipped: back up from the credits the first row stayed at the top (2026-11-09).
+        if (!page.isLaidOut() || page.isLayoutRequested()) {
+            // At the top as the Home starts: there at once, without a slide.
+            if (appsOnly && target == shelf) restRaised();
+            else scrollWhenLaidOut(target);
+            return;
+        }
         scroll.smoothScrollTo(0, target);
     }
 
@@ -1662,7 +2216,8 @@ public final class MainActivity extends CardActivity {
                     home.remove(pkg);
                     if (!app) HomeApps.setSettingsOff(this, true);
                     HomeApps.save(this, home);
-                    render(null);
+                    // Its neighbour takes the selection, not the first app: see neighbourOf.
+                    render(pkg);
                 } else if (choice == 2) {
                     appInfo(pkg);
                 } else {
@@ -1773,7 +2328,13 @@ public final class MainActivity extends CardActivity {
             || key == KeyEvent.KEYCODE_DPAD_DOWN || key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
     }
 
-    @Override protected float focusScale() { return moving != null ? 1.12f : super.focusScale(); }
+    /** The clean Home's selected app has no ring: it grows clearly instead, the user's choice of 2026-11-09. */
+    private static final float CLEAN_FOCUS_SCALE = 1.3f;
+
+    @Override protected float focusScale() {
+        if (clean) return CLEAN_FOCUS_SCALE;
+        return moving != null ? 1.12f : super.focusScale();
+    }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
         // The circle is closing over the Home: the arrows would move the wheel under it.
@@ -1782,6 +2343,12 @@ public final class MainActivity extends CardActivity {
         if (moving == null && appsOnly && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP
                 && dock != null && isInside(getCurrentFocus(), dock)) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) controlButton.requestFocus();
+            return true;
+        }
+        // Down from the last row reaches the credits at once: off the screen, a first press only scrolled.
+        if (moving == null && !circular && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && lastRowHas(getCurrentFocus())
+                && footer.getVisibility() == View.VISIBLE && footer.getParent() == page) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) footer.requestFocus();
             return true;
         }
         if (moving == null) return super.dispatchKeyEvent(event);
@@ -1802,10 +2369,22 @@ public final class MainActivity extends CardActivity {
         }
     }
 
+    private boolean lastRowHas(View focus) {
+        if (focus == null || !(focus.getParent() instanceof View)) return false;
+        int row = page.indexOfChild((View) focus.getParent());
+        return row >= 0 && row == page.indexOfChild(footer) - 1;
+    }
+
     /** Back leaves a move or returns to the first row; the Home itself has nothing behind it. */
     @Override public void onBackPressed() {
+        View focus = getCurrentFocus();
+        boolean onButtons = focus == controlButton || focus == pillButton || focus == networkButton || isInside(focus, panel);
         if (moving != null) stopMoving();
-        else if (circular) {
+        // From the buttons or the control centre: back on the app selected last, not the first (2026-11-09).
+        else if (onButtons && lastAppView() != null) {
+            lastAppView().requestFocus();
+            showPanel(false);
+        } else if (circular) {
             wheel.requestFocus();
             wheel.turnToFirst();
         } else if (firstCard() != null) firstCard().requestFocus();

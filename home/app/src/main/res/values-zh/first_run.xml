@@ -24,6 +24,7 @@
     <string name="first_no_connection">连接失败。请重试，或选择“以后再说”。</string>
     <string name="first_place_title">选择地点</string>
     <string name="first_place_text">将显示这里的天气。</string>
+    <string name="first_home_text">选择它的样子。之后可以在设置中更改。</string>
     <string name="first_remote_title">长按按键</string>
     <string name="first_remote_text">这些是 Salotto 的快捷操作，遥控器上没有标注。</string>
     <string name="first_key_back">返回</string>

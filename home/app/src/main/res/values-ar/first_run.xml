@@ -24,6 +24,7 @@
     <string name="first_no_connection">تعذّر الاتصال. حاول مرة أخرى أو اختر «ليس الآن».</string>
     <string name="first_place_title">اختر المكان</string>
     <string name="first_place_text">سيأتي الطقس من هنا.</string>
+    <string name="first_home_text">اختر شكلها. يمكنك تغييره لاحقًا من الإعدادات.</string>
     <string name="first_remote_title">اضغط مطولًا على زر</string>
     <string name="first_remote_text">هذه اختصارات Salotto، ولن تجدها مكتوبة على جهاز التحكم.</string>
     <string name="first_key_back">رجوع</string>

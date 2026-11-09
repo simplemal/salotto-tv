@@ -31,7 +31,6 @@ final class Look {
     private static final int SMALL_SAMPLE = 4;
     private static final int SMALL_WIDTH = 480;
     private static final int SMALL_HEIGHT = 270;
-    static final int[] COLUMN_CHOICES = {5, 6};
     private static final int[] FONT_LABELS = {R.string.look_font_thin, R.string.look_font_light, R.string.look_font_normal,
         R.string.look_font_medium, R.string.look_font_serif, R.string.look_font_mono, R.string.look_font_cursive};
     static final String[] FONT_FAMILIES = {"sans-serif-thin", "sans-serif-light", "sans-serif",
@@ -80,6 +79,8 @@ final class Look {
     static final String NATURE = "Aerial Nature";
     /** The photos of Personale, changing on the timer like the sets: offered from two photos on. */
     static final String PERSONAL = "Personal";
+    /** Salotto's colours, one after the other, like a collection that changes by itself. */
+    static final String STANDARD_TIMED = "Standard";
     static final int PERSONAL_TIMED_FROM = 2;
     static final String PICTURES_FOLDER = "meteo-illustrato";
     static final String PHOTOS_FOLDER = "meteo-foto";
@@ -123,6 +124,7 @@ final class Look {
         if (PHOTOS.equals(key)) return context.getString(R.string.first_backdrop_photos);
         if (AERIAL.equals(key)) return context.getString(R.string.first_backdrop_aerial);
         if (PERSONAL.equals(key)) return context.getString(R.string.settings_backdrop_personal);
+        if (STANDARD_TIMED.equals(key)) return context.getString(R.string.settings_backdrop_standard);
         Matcher photo = PHOTO.matcher(key);
         if (photo.matches()) return context.getString(R.string.personal_photo, Integer.parseInt(photo.group(1)));
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
@@ -136,8 +138,8 @@ final class Look {
         return words.isEmpty() ? path : words.substring(0, 1).toUpperCase(Locale.getDefault()) + words.substring(1);
     }
 
-    static int columns(Context context) { return prefs(context).getInt("columns", 6); }
-    static void setColumns(Context context, int value) { prefs(context).edit().putInt("columns", value).apply(); }
+    /** Six apps in each row: the choice of five is gone (2026-11-09), and one saved before is not read. */
+    static int columns(Context context) { return 6; }
     /** The date's sizes, small to large; the middle one is what it always had. */
     static final int[] DATE_SIZES = {16, 20, 26};
     /** The date's letters: the medium sans it always had. */
@@ -145,16 +147,16 @@ final class Look {
     /** The weather's first line: like the date unless chosen apart, the first choice offered. */
     static final int LIKE_DATE = -1;
 
-    static int dateFont(Context context) { return prefs(context).getInt("date_font", DATE_FONT); }
-    static void setDateFont(Context context, int value) { prefs(context).edit().putInt("date_font", value).apply(); }
-    static int dateSize(Context context) { return prefs(context).getInt("date_size", 1); }
-    static void setDateSize(Context context, int value) { prefs(context).edit().putInt("date_size", value).apply(); }
-    static boolean dateNumeric(Context context) { return prefs(context).getBoolean("date_numeric", false); }
-    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean("date_numeric", value).apply(); }
-    static int weatherFont(Context context) { return prefs(context).getInt("weather_font", LIKE_DATE); }
-    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt("weather_font", value).apply(); }
-    static int weatherSize(Context context) { return prefs(context).getInt("weather_size", LIKE_DATE); }
-    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt("weather_size", value).apply(); }
+    static int dateFont(Context context) { return ownInt(context, "date_font", glass(context) ? GLASS_DATE_FONT : DATE_FONT); }
+    static void setDateFont(Context context, int value) { prefs(context).edit().putInt(own(context, "date_font"), value).apply(); }
+    static int dateSize(Context context) { return ownInt(context, "date_size", glass(context) ? GLASS_DATE_SIZE : 1); }
+    static void setDateSize(Context context, int value) { prefs(context).edit().putInt(own(context, "date_size"), value).apply(); }
+    static boolean dateNumeric(Context context) { return ownBoolean(context, "date_numeric", false); }
+    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "date_numeric"), value).apply(); }
+    static int weatherFont(Context context) { return ownInt(context, "weather_font", LIKE_DATE); }
+    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt(own(context, "weather_font"), value).apply(); }
+    static int weatherSize(Context context) { return ownInt(context, "weather_size", LIKE_DATE); }
+    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt(own(context, "weather_size"), value).apply(); }
 
     /** The weather's first line, resolved: its own choice, or the date's. */
     static int weatherFontShown(Context context) { int own = weatherFont(context); return own == LIKE_DATE ? dateFont(context) : own; }
@@ -166,47 +168,123 @@ final class Look {
             dateNumeric(context) ? "ddMMyyyy" : "EEEEdMMMM");
     }
 
-    static int font(Context context) { return prefs(context).getInt("font", 2); }
-    static void setFont(Context context, int value) { prefs(context).edit().putInt("font", value).apply(); }
-    static int size(Context context) { return prefs(context).getInt("size", 1); }
-    static void setSize(Context context, int value) { prefs(context).edit().putInt("size", value).apply(); }
-    static boolean clock(Context context) { return prefs(context).getBoolean("clock", true); }
-    static void setClock(Context context, boolean value) { prefs(context).edit().putBoolean("clock", value).apply(); }
+    /** The clean Home's line at the top: time and date, one of them, or neither. */
+    static final int SHOW_BOTH = 0;
+    static final int SHOW_TIME = 1;
+    static final int SHOW_DATE = 2;
+    static final int SHOW_NONE = 3;
+    static int cleanShows(Context context) { return prefs(context).getInt("clean_shows", SHOW_BOTH); }
+    static void setCleanShows(Context context, int value) { prefs(context).edit().putInt("clean_shows", value).apply(); }
+    /** One font for the clean Home's whole line, the medium sans until chosen. */
+    static int cleanFont(Context context) { return prefs(context).getInt("clean_font", 2); }
+    static void setCleanFont(Context context, int value) { prefs(context).edit().putInt("clean_font", value).apply(); }
+
+    static int font(Context context) { return ownInt(context, "font", glass(context) ? GLASS_FONT : 2); }
+    static void setFont(Context context, int value) { prefs(context).edit().putInt(own(context, "font"), value).apply(); }
+    static int size(Context context) { return ownInt(context, "size", 1); }
+    static void setSize(Context context, int value) { prefs(context).edit().putInt(own(context, "size"), value).apply(); }
+    static boolean clock(Context context) { return ownBoolean(context, "clock", true); }
+    static void setClock(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "clock"), value).apply(); }
     static int names(Context context) { return prefs(context).getInt("names", NAMES_ON_FOCUS); }
     static void setNames(Context context, int value) { prefs(context).edit().putInt("names", value).apply(); }
-    static boolean hours24(Context context) { return prefs(context).getBoolean("hours24", true); }
-    static void setHours24(Context context, boolean value) { prefs(context).edit().putBoolean("hours24", value).apply(); }
-    static boolean seconds(Context context) { return prefs(context).getBoolean("seconds", false); }
-    static void setSeconds(Context context, boolean value) { prefs(context).edit().putBoolean("seconds", value).apply(); }
-    static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
+    static boolean hours24(Context context) { return ownBoolean(context, "hours24", true); }
+    static void setHours24(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "hours24"), value).apply(); }
+    static boolean date(Context context) { return ownBoolean(context, "date", true); }
     /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
     static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
+    /** The clean Home's first row in the middle of the screen, rather than low: its own choice. */
+    static boolean cleanRowMiddle(Context context) { return prefs(context).getBoolean("clean_row_middle", false); }
+    static void setCleanRowMiddle(Context context, boolean value) { prefs(context).edit().putBoolean("clean_row_middle", value).apply(); }
     static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
-    static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
+    static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "date"), value).apply(); }
     /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
-    static boolean circular(Context context) { return prefs(context).getBoolean("circular", false); }
-    static void setCircular(Context context, boolean value) { prefs(context).edit().putBoolean("circular", value).apply(); }
+    /** The Home's three layouts: cards in a grid, circles on a wheel, or the clean one with squircles. */
+    static final int HOME_GRID = 0;
+    static final int HOME_CIRCLE = 1;
+    static final int HOME_CLEAN = 2;
+
+    /** Until one is chosen here, what the old switch between grid and wheel said. */
+    /**
+     * Time, date and weather are each Home's own: a change on one leaves the others as they are
+     * (the user's rule of 2026-11-09). Every Home writes its own name; until it has, it reads what
+     * all of them shared before.
+     */
+    static String own(Context context, String key) { return key + "_home" + homeStyle(context); }
+
+    /**
+     * The glass Home's own start, the user's of 2026-11-09: the time thin, the date light and small.
+     * The rest is as on the other Homes: time and date large, 24 hours, the long date, the weather
+     * large and like the date.
+     */
+    private static final int GLASS_FONT = 0;
+    private static final int GLASS_DATE_FONT = 1;
+    private static final int GLASS_DATE_SIZE = 0;
+
+    static boolean glass(Context context) { return homeStyle(context) == HOME_GRID; }
+
+    private static int ownInt(Context context, String key, int fallback) {
+        SharedPreferences saved = prefs(context);
+        return saved.getInt(own(context, key), saved.getInt(key, fallback));
+    }
+
+    private static boolean ownBoolean(Context context, String key, boolean fallback) {
+        SharedPreferences saved = prefs(context);
+        return saved.getBoolean(own(context, key), saved.getBoolean(key, fallback));
+    }
+
+    static int homeStyle(Context context) {
+        return prefs(context).getInt("home_style", prefs(context).getBoolean("circular", false) ? HOME_CIRCLE : HOME_GRID);
+    }
+    /** A Home picked already, on the welcome pages or in Settings. */
+    static boolean homeChosen(Context context) { return prefs(context).contains("home_style"); }
+    static void setHomeStyle(Context context, int style) { prefs(context).edit().putInt("home_style", style).apply(); }
+    static boolean circular(Context context) { return homeStyle(context) == HOME_CIRCLE; }
+    static boolean clean(Context context) { return homeStyle(context) == HOME_CLEAN; }
+    /** The clean Home's own blur, off until chosen: apart from the wheel's. */
+    static boolean cleanBlur(Context context) { return prefs(context).getBoolean("clean_blur", false); }
+    static void setCleanBlur(Context context, boolean on) { prefs(context).edit().putBoolean("clean_blur", on).apply(); }
+    /** The thin line in each app's colour along the clean Home's squircles: a choice, off at first (2026-11-09). */
+    static boolean cleanEdge(Context context) { return prefs(context).getBoolean("clean_edge", false); }
+    static void setCleanEdge(Context context, boolean on) { prefs(context).edit().putBoolean("clean_edge", on).apply(); }
     /** How many circles of the wheel are in view: the lit one and one or two on each side. */
     static final int[] WHEEL_CHOICES = {3, 5};
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
     static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
     /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. On unless chosen: the user's default again, 2026-11-04. */
-    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
-    static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
+    /** The glow around the lit circle: off, normal or wide. */
+    static final int GLOW_OFF = 0;
+    static final int GLOW_NORMAL = 1;
+    static final int GLOW_WIDE = 2;
+
+    /** Until it is chosen here, what the old switch said: on was the normal one. */
+    static int glow(Context context) {
+        return prefs(context).getInt("glow", prefs(context).getBoolean("tint_glow", true) ? GLOW_NORMAL : GLOW_OFF);
+    }
+    static void setGlow(Context context, int level) { prefs(context).edit().putInt("glow", level).apply(); }
     /** An app opening from a circle of its colour and closing back into it: on unless chosen, the user's choice of 2026-11-04. */
-    static boolean wheelMotion(Context context) { return !Fire.STICK_2020 && prefs(context).getBoolean("wheel_motion", true); }
+    static boolean wheelMotion(Context context) { return Features.CIRCLE_ANIMATION && prefs(context).getBoolean("wheel_motion", true); }
     static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
     /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
     static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }
     static void setWheelBlur(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_blur", on).apply(); }
+    /** The line of credits on the Home, at the bottom of the grid or at the top of the wheel: whoever wants can take it away. */
+    static boolean credits(Context context) { return prefs(context).getBoolean("credits", true); }
+    static void setCredits(Context context, boolean on) { prefs(context).edit().putBoolean("credits", on).apply(); }
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
-        return (hours24(context) ? "HH:mm" : "h:mm") + (seconds(context) ? ":ss" : "");
+        // Never the seconds: the user took the choice away on 2026-11-09, on every Home.
+        return hours24(context) ? "HH:mm" : "h:mm";
     }
 
     /** Not a picture: the Home draws it with WeatherView, and it needs a place for the weather. */
+    /** One of the weather's backdrops is the one chosen, or none is yet and the weather's is the first. */
+    static boolean weatherChosen(Context context) {
+        String chosen = prefs(context).getString("backdrop", null);
+        return chosen == null || WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen) || AERIAL.equals(chosen);
+    }
+
     static boolean weatherBackdrop(Context context) {
         return WEATHER.equals(backdrop(context)) || weatherPictures(context);
     }
@@ -242,6 +320,53 @@ final class Look {
         prefs(context).edit().putInt("abstract_minutes", value).apply();
     }
 
+    /** The screensaver's own time: until it is chosen, the backdrop's, which both used to share. */
+    static int saverMinutes(Context context) { return prefs(context).getInt("saver_minutes", abstractMinutes(context)); }
+    static void setSaverMinutes(Context context, int value) {
+        prefs(context).edit().putInt("saver_minutes", value).apply();
+    }
+
+    /** A collection that changes by itself is on the Home, not one picture of it. */
+    static boolean timedBackdrop(Context context) {
+        return timedFolder(context) != null || STANDARD_TIMED.equals(backdrop(context));
+    }
+
+    /**
+     * What to draw now. The same as backdrop, except for Salotto's colours changing by themselves:
+     * then one of them, kept for the backdrop's time and then any other.
+     */
+    static String shownBackdrop(Context context) {
+        String chosen = backdrop(context);
+        if (!STANDARD_TIMED.equals(chosen)) return chosen;
+        SharedPreferences saved = prefs(context);
+        String shown = saved.getString("preset", null);
+        long now = System.currentTimeMillis();
+        long since = now - saved.getLong("preset_at", 0);
+        List<String> all = Arrays.asList(PRESET_NAMES);
+        if (all.contains(shown) && since >= 0 && since < abstractMinutes(context) * MINUTE_MS) return shown;
+        List<String> others = new ArrayList<>(all);
+        others.remove(shown);
+        String picked = others.get(new Random().nextInt(others.size()));
+        saved.edit().putString("preset", picked).putLong("preset_at", now).apply();
+        return picked;
+    }
+
+    /**
+     * The one picture the screensaver keeps, or null when its pictures take turns. Only while it
+     * still belongs to the screensaver's set and is still there.
+     */
+    static String saverPicture(Context context) {
+        String picture = prefs(context).getString("saver_picture", null);
+        if (picture == null) return null;
+        String folder = saverFolder(context);
+        if (picture.startsWith("/")) return folder.startsWith("/") && new File(picture).isFile() ? picture : null;
+        return picture.startsWith(folder + "/") && !taken(context, picture) ? picture : null;
+    }
+    static void setSaverPicture(Context context, String value) {
+        if (value == null) prefs(context).edit().remove("saver_picture").apply();
+        else prefs(context).edit().putString("saver_picture", value).apply();
+    }
+
     /** The one on show until its time is up, then any other: nothing is decided ahead. */
     static String abstractPicture(Context context) {
         if (fixedPicture(context)) return backdrop(context);
@@ -268,6 +393,9 @@ final class Look {
         long left = saved.getLong("home_left", 0);
         long away = System.currentTimeMillis() - left;
         if (left == 0 || away <= 0 || !saved.contains("abstract_at")) return;
+        // A picture chosen after leaving, on the way back, has no time away to make up for: moved
+        // into the future it looked expired, and another one faded in over it (2026-11-09).
+        if (saved.getLong("abstract_at", 0) >= left) return;
         saved.edit().putLong("abstract_at", saved.getLong("abstract_at", 0) + away).apply();
     }
 
@@ -394,6 +522,12 @@ final class Look {
         new File(Packs.root(context), picture).delete();
     }
 
+    /** Asked back by the user with Download: the set is wanted again. Pictures taken one by one stay taken. */
+    static void untakeSet(Context context, String folder) {
+        Set<String> taken = new HashSet<>(prefs(context).getStringSet(TAKEN, Collections.emptySet()));
+        if (taken.remove(folder + WHOLE)) prefs(context).edit().putStringSet(TAKEN, taken).apply();
+    }
+
     static void takeSet(Context context, String folder) {
         addTaken(context, folder + WHOLE);
         File[] files = new File(Packs.root(context), folder).listFiles();
@@ -479,14 +613,16 @@ final class Look {
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
-            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
-            + "/" + tintGlow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
-            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context);
+            + "/" + appsOnly(context) + "/" + homeStyle(context) + "/" + cleanBlur(context) + "/" + wheel(context)
+            + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context) + "/" + cleanShows(context) + "/" + cleanFont(context) + "/" + cleanRowMiddle(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
     static String cardsSignature(Context context) {
-        return columns(context) + "/" + names(context) + "/" + circular(context) + "/" + wheel(context);
+        // Where the clean Home's first row rests changes where its cards are built.
+        return columns(context) + "/" + names(context) + "/" + homeStyle(context) + "/" + wheel(context)
+            + "/" + appsOnly(context) + "/" + cleanRowMiddle(context) + "/" + cleanEdge(context);
     }
 
     /** Where the images of Personale are, sent from a phone or copied before that. */
@@ -561,7 +697,7 @@ final class Look {
 
     /** What is behind the Home now, by name: it changes only when the picture does. */
     static String currentName(Context context) {
-        return weatherPictures(context) ? Weather.picture(context) : backdrop(context);
+        return weatherPictures(context) ? Weather.picture(context) : shownBackdrop(context);
     }
 
     /** That same backdrop as a small bitmap, for a page that lays it under itself. On the main thread. */
@@ -603,7 +739,7 @@ final class Look {
 
     /** Hands over the chosen backdrop: at once, or a moment later for an image not decoded yet. */
     static void show(Context context, Consumer<Drawable> done) {
-        String chosen = backdrop(context);
+        String chosen = shownBackdrop(context);
         File file = new File(personalFolder(context), chosen);
         if (!file.isFile()) {
             trim();

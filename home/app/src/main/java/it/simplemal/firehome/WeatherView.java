@@ -124,7 +124,8 @@ final class WeatherView extends View {
             setVisibility(GONE);
             return false;
         }
-        if (name.equals(wanted)) return false;
+        if (name.equals(wanted) && !forgotten) return false;
+        forgotten = false;
         wanted = name;
         Context context = getContext().getApplicationContext();
         DisplayMetrics screen = getResources().getDisplayMetrics();
@@ -138,6 +139,11 @@ final class WeatherView extends View {
         });
         return true;
     }
+
+    /** The picture on show is to be read again, as it is prepared differently now. */
+    private boolean forgotten;
+
+    void forget() { forgotten = true; }
 
     private void swapIn(Scene loaded, String name, Swap swap) {
         if (loaded == null) {

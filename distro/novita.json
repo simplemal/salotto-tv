@@ -1,59 +1,77 @@
 {
-  "versionName": "1.0.23",
+  "versionName": "1.1.0",
   "changes": {
     "en": [
-      "Support for the Fire TV Stick Lite",
-      "While the Home loads, a spinner covers it until it is all ready",
-      "Screensaver and task manager opened from the control center close it",
-      "Fixed a crash at first start on Fire TVs with Fire OS 7"
+      "New Clean Home, with squircle apps and its own control center",
+      "The grid Home is now called Glass",
+      "On first start, and after this update, you choose the Home: Clean, Circular or Glass",
+      "Time, date and weather set for each Home, large or small next to the buttons",
+      "Circular Home: glow Off, Normal or Wide, and a new way out of apps",
+      "On less powerful Fire TVs the menus have a black background"
     ],
     "es": [
-      "Compatibilidad con el Fire TV Stick Lite",
-      "Mientras el Home se carga, una rueda lo cubre hasta que está listo",
-      "El salvapantallas y el administrador de tareas abiertos desde el centro de control lo cierran",
-      "Corregido un cierre en el primer inicio en los Fire TV con Fire OS 7"
+      "Nuevo Home Limpia, con apps en squircle y su propio centro de control",
+      "El Home en cuadrícula ahora se llama Cristal",
+      "En el primer inicio, y tras esta actualización, eliges el Home: Limpia, Circular o Cristal",
+      "Hora, fecha y tiempo propios de cada Home, grandes o pequeños junto a los botones",
+      "Home circular: brillo Apagado, Normal o Amplio, y una nueva salida de las apps",
+      "En los Fire TV menos potentes los menús tienen fondo negro"
     ],
     "fr": [
-      "Prise en charge du Fire TV Stick Lite",
-      "Pendant le chargement de la Home, une roue la couvre jusqu’à ce qu’elle soit prête",
-      "L’économiseur d’écran et le gestionnaire de tâches ouverts depuis le centre de contrôle le ferment",
-      "Correction d’une fermeture au premier démarrage sur les Fire TV sous Fire OS 7"
+      "Nouvel accueil Épurée, avec des applis en squircle et son propre centre de contrôle",
+      "L’accueil en grille s’appelle désormais Verre",
+      "Au premier démarrage, et après cette mise à jour, vous choisissez l’accueil : Épurée, Circulaire ou Verre",
+      "Heure, date et météo propres à chaque accueil, en grand ou en petit à côté des boutons",
+      "Accueil circulaire : halo Désactivé, Normal ou Large, et une nouvelle sortie des applis",
+      "Sur les Fire TV moins puissants, les menus ont un fond noir"
     ],
     "de": [
-      "Unterstützung für den Fire TV Stick Lite",
-      "Während Home lädt, verdeckt ein Ladekreis sie, bis alles bereit ist",
-      "Bildschirmschoner und Task-Manager, aus dem Kontrollzentrum geöffnet, schließen es",
-      "Absturz beim ersten Start auf Fire TVs mit Fire OS 7 behoben"
+      "Neuer Home Schlicht, mit Squircle-Apps und eigenem Kontrollzentrum",
+      "Der Raster-Home heißt jetzt Glas",
+      "Beim ersten Start und nach diesem Update wählst du den Home: Schlicht, Kreis oder Glas",
+      "Uhrzeit, Datum und Wetter für jeden Home einzeln, groß oder klein neben den Tasten",
+      "Kreis-Home: Leuchten Aus, Normal oder Weit, und ein neuer Ausgang aus Apps",
+      "Auf schwächeren Fire TVs haben die Menüs einen schwarzen Hintergrund"
     ],
     "pt": [
-      "Suporte ao Fire TV Stick Lite",
-      "Enquanto o Home carrega, um indicador o cobre até estar tudo pronto",
-      "Protetor de tela e gerenciador de tarefas abertos pela central de controle a fecham",
-      "Corrigido um fechamento na primeira inicialização em Fire TVs com Fire OS 7"
+      "Novo Home Limpa, com apps em squircle e seu próprio centro de controle",
+      "O Home em grade agora se chama Vidro",
+      "No primeiro início, e depois desta atualização, você escolhe o Home: Limpa, Circular ou Vidro",
+      "Hora, data e tempo próprios de cada Home, grandes ou pequenos ao lado dos botões",
+      "Home circular: brilho Desligado, Normal ou Amplo, e uma nova saída dos apps",
+      "Nos Fire TV menos potentes os menus têm fundo preto"
     ],
     "ru": [
-      "Поддержка Fire TV Stick Lite",
-      "Пока главный экран загружается, его закрывает индикатор, пока всё не будет готово",
-      "Заставка и диспетчер задач, открытые из центра управления, закрывают его",
-      "Исправлено закрытие при первом запуске на Fire TV с Fire OS 7"
+      "Новый главный экран «Чистый»: приложения в форме сквиркла и свой центр управления",
+      "Главный экран сеткой теперь называется «Стекло»",
+      "При первом запуске и после этого обновления выбирается главный экран: «Чистый», «Круг» или «Стекло»",
+      "Время, дата и погода настраиваются для каждого главного экрана: крупно или мелко рядом с кнопками",
+      "Экран «Круг»: свечение «Выкл.», «Обычное» или «Широкое» и новый выход из приложений",
+      "На менее мощных Fire TV у меню чёрный фон"
     ],
     "ar": [
-      "دعم Fire TV Stick Lite",
-      "أثناء تحميل الشاشة الرئيسية يغطيها مؤشر دوّار حتى تجهز بالكامل",
-      "شاشة التوقف ومدير المهام عند فتحهما من مركز التحكم يغلقانه",
-      "إصلاح إغلاق عند التشغيل الأول على أجهزة Fire TV بنظام Fire OS 7"
+      "شاشة رئيسية جديدة «نظيفة»، بتطبيقات على شكل squircle ومركز تحكم خاص بها",
+      "الشاشة الرئيسية الشبكية أصبح اسمها «زجاج»",
+      "عند أول تشغيل، وبعد هذا التحديث، تختار الشاشة الرئيسية: نظيفة أو دائري أو زجاج",
+      "الوقت والتاريخ والطقس خاصة بكل شاشة رئيسية، كبيرة أو صغيرة بجانب الأزرار",
+      "الشاشة الدائرية: توهج متوقف أو عادي أو واسع، وطريقة جديدة للخروج من التطبيقات",
+      "في أجهزة Fire TV الأقل قوة تكون خلفية القوائم سوداء"
     ],
     "hi": [
-      "Fire TV Stick Lite के लिए सपोर्ट",
-      "होम लोड होते समय, पूरी तरह तैयार होने तक एक स्पिनर उसे ढके रहता है",
-      "कंट्रोल सेंटर से खोले गए स्क्रीनसेवर और टास्क मैनेजर उसे बंद कर देते हैं",
-      "Fire OS 7 वाले Fire TV पर पहली बार शुरू करते समय बंद होने की समस्या ठीक की गई"
+      "नया साफ़ होम, squircle ऐप्स और अपने कंट्रोल सेंटर के साथ",
+      "ग्रिड होम का नाम अब ग्लास है",
+      "पहली बार शुरू करते समय, और इस अपडेट के बाद, होम चुनें: साफ़, गोल या ग्लास",
+      "हर होम के लिए अलग समय, तारीख और मौसम, बड़े या बटनों के पास छोटे",
+      "गोल होम: चमक बंद, सामान्य या चौड़ी, और ऐप्स से बाहर आने का नया तरीका",
+      "कम ताकत वाले Fire TV पर मेनू की पृष्ठभूमि काली है"
     ],
     "zh": [
-      "支持 Fire TV Stick Lite",
-      "主屏幕加载时，加载图标会遮住它，直到全部就绪",
-      "从控制中心打开屏保和任务管理器时会关闭控制中心",
-      "修复 Fire OS 7 的 Fire TV 首次启动时闪退的问题"
+      "全新简洁主屏幕，应用为圆角方形，并有自己的控制中心",
+      "网格主屏幕现在叫玻璃",
+      "首次启动时以及本次更新后，选择主屏幕：简洁、圆形或玻璃",
+      "每个主屏幕都有自己的时间、日期和天气设置，可大可小，小时显示在按钮旁",
+      "圆形主屏幕：光晕可选关闭、普通或宽阔，退出应用有新的动画",
+      "在性能较弱的 Fire TV 上，菜单使用黑色背景"
     ]
   }
 }
