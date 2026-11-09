@@ -205,6 +205,7 @@ public final class MainActivity extends CardActivity {
     private List<String> shownApps = new ArrayList<>();
     private String shown;
     private String lookShown;
+    private String cardsShown;
     private LinearLayout dock;
     private String plainBackdrop;
     private String moving;
@@ -1172,13 +1173,20 @@ public final class MainActivity extends CardActivity {
         home = HomeApps.load(this);
         List<String> apps = visible();
         String look = Look.signature(this);
+        String cards = Look.cardsSignature(this);
+        // Back from a setting that draws the Home again, the loading covers the rebuild: a moment of
+        // black showed on the Stick, the user's report of 2026-11-09. Only then, never after a pause.
+        boolean changed = looked && (!look.equals(lookShown) || !cards.equals(cardsShown));
+        cardsShown = cards;
         if (!look.equals(lookShown)) {
             lookShown = look;
             applyLook();
         }
+        if (changed && !loading) showLoading(true);
         // A Home loaded again, under its mask, starts from the first app, in the grid and on the wheel:
         // the user's request of 2026-11-07.
-        if (!state(apps).equals(shown)) render(loading && !apps.isEmpty() ? apps.get(0) : focusedTag(), apps);
+        // A setting changed keeps the app selected last.
+        if (!state(apps).equals(shown)) render(loading && !changed && !apps.isEmpty() ? apps.get(0) : focusedTag(), apps);
         // The wheel keeps a button's focus otherwise, the control centre's one after a switch from the grid.
         if (loading && circular) wheel.requestFocus();
         if (appsOnly) restRaised();
