@@ -104,6 +104,7 @@ final class ControlPanel extends LinearLayout {
             });
             tiles.add(this);
             fill.setCornerRadius(host.dp(RADIUS));
+            if (cleanLook) fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
             view.setBackground(fill);
             paint();
         }
@@ -276,7 +277,9 @@ final class ControlPanel extends LinearLayout {
     private static final int CLEAN_GAP = 5;
     /** The frame around the clean Home's tiles: thin, black, half see-through, no line of light. */
     private static final int CLEAN_FRAME = 8;
-    private static final int CLEAN_FRAME_FILL = Color.argb(128, 0, 0, 0);
+    private static final int CLEAN_FRAME_FILL = Color.argb(190, 0, 0, 0);
+    /** A very faint light grey line along each tile of the clean Home's. */
+    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
     /**
      * With no panel under them the clean Home's tiles carry the dark themselves, opaque: over the
      * apps, with the first row in the middle or at the top, nothing see-through could be read.
