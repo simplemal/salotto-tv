@@ -359,6 +359,9 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         if (square && darkInk) {
             caption.setTextColor(DARK_TEXT);
             caption.setShadowLayer(0, 0, 0, 0);
+        } else if (square) {
+            // White on the picture: a short soft shadow, more below and to the right, a little above and to the left.
+            caption.setShadowLayer(2.5f * getResources().getDisplayMetrics().density, dp(1), dp(1), Color.argb(190, 0, 0, 0));
         }
 
         LinearLayout tile = new LinearLayout(this);

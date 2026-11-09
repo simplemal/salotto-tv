@@ -982,7 +982,9 @@ public final class MainActivity extends CardActivity {
             view.setBackground(!focused ? null : clean ? plainFill(radius)
                 : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
             view.setTextColor(focused ? Color.WHITE : clean && darkInk ? DARK_TEXT : FOOTER_INK);
-            if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
+            // Only if they are not on the screen already: with the first row at the top they are, and
+            // reaching them must not move the Home (the user's rule of 2026-11-09).
+            if (focused && !circular && !onScreen(view)) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
         view.setOnKeyListener((changed, code, event) -> {
@@ -991,6 +993,12 @@ public final class MainActivity extends CardActivity {
             return true;
         });
         return view;
+    }
+
+    /** Wholly inside what the scroll shows now. */
+    private boolean onScreen(View view) {
+        int top = scroll.getScrollY();
+        return view.getParent() == page && view.getTop() >= top && view.getBottom() <= top + scroll.getHeight();
     }
 
     private Drawable plainFill(int radius) {
@@ -1627,9 +1635,6 @@ public final class MainActivity extends CardActivity {
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
         foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
-        // The clean Home's first row at the top would show them at once: they stay just under the screen.
-        // Close under the edge: reaching them then moves the apps up only a little, not under the line at the top.
-        if (clean && appsOnly) foot.topMargin = Math.max(foot.topMargin, shelf + screen - cards + dp(4));
         if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
@@ -1881,6 +1886,18 @@ public final class MainActivity extends CardActivity {
         }
     }
 
+    private void scrollWhenLaidOut(int target) {
+        page.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                page.removeOnLayoutChangeListener(this);
+                scroll.post(() -> scroll.smoothScrollTo(0, target));
+            }
+        });
+        // Asked for anyway: a page already laid out would never call back.
+        page.requestLayout();
+    }
+
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */
     private void restRaised() {
         if (page.isLaidOut() && !page.isLayoutRequested() && page.getHeight() > shelf) {
@@ -2003,9 +2020,12 @@ public final class MainActivity extends CardActivity {
         int rowsOnScreen = 2;
         int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
         // A page not laid out yet has nothing to scroll: a smooth scroll there went back to the bottom,
-        // and a first row wanted at the top stayed low as the Home started.
+        // and a first row wanted at the top stayed low as the Home started. It waits for the layout,
+        // and is never skipped: back up from the credits the first row stayed at the top (2026-11-09).
         if (!page.isLaidOut() || page.isLayoutRequested()) {
-            if (target == shelf) restRaised();
+            // At the top as the Home starts: there at once, without a slide.
+            if (appsOnly && target == shelf) restRaised();
+            else scrollWhenLaidOut(target);
             return;
         }
         scroll.smoothScrollTo(0, target);

@@ -585,7 +585,9 @@ final class Look {
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
     static String cardsSignature(Context context) {
-        return columns(context) + "/" + names(context) + "/" + homeStyle(context) + "/" + wheel(context);
+        // Where the clean Home's first row rests changes where its cards are built.
+        return columns(context) + "/" + names(context) + "/" + homeStyle(context) + "/" + wheel(context)
+            + "/" + appsOnly(context) + "/" + cleanRowMiddle(context);
     }
 
     /** Where the images of Personale are, sent from a phone or copied before that. */

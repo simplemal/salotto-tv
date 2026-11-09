@@ -272,7 +272,7 @@ final class ControlPanel extends LinearLayout {
     private static final int CLEAN_UNIT = 48;
     private static final int CLEAN_GAP = 5;
     /** With no panel under them the clean Home's tiles carry the dark themselves. */
-    private static final int CLEAN_TILE_OFF = Color.argb(150, 0, 0, 0);
+    private static final int CLEAN_TILE_OFF = Color.argb(200, 0, 0, 0);
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }
