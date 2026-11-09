@@ -72,6 +72,8 @@ public final class MainActivity extends CardActivity {
     private static final int DOCK_TOP = 112;
     private static final int SNAP_FRACTION = 3;
     private static final int PILL_MS = 220;
+    /** The clean Home's tiles closing before the first row climbs back to the top. */
+    private static final int PANEL_QUICK_MS = 90;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
 
     /** The Home decides where to scroll: the first row stays low, like tvOS. */
@@ -131,6 +133,7 @@ public final class MainActivity extends CardActivity {
      * first row in the middle, clear of its tiles (2026-11-09). -1 elsewhere.
      */
     private int panelRest = -1;
+    private long climbAt;
     private TextView footer;
     private boolean reenabledChecked;
     private long timeSeen;
@@ -931,7 +934,15 @@ public final class MainActivity extends CardActivity {
         if (open == panelOpen) return;
         panelOpen = open;
         // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
-        if (panelRest >= 0) scroll.smoothScrollTo(0, open ? panelRest : shelf);
+        // Closing, the tiles go quickly first and the row climbs only then: together they met on the
+        // way (2026-11-09).
+        boolean quick = !open && panelRest >= 0;
+        long closing = quick ? PANEL_QUICK_MS : PILL_MS;
+        if (panelRest >= 0 && open) scroll.smoothScrollTo(0, panelRest);
+        if (quick) {
+            climbAt = SystemClock.uptimeMillis() + PANEL_QUICK_MS;
+            root.postDelayed(() -> { if (!panelOpen) scroll.smoothScrollTo(0, shelf); }, PANEL_QUICK_MS);
+        }
         panelShade.animate().cancel();
         panel.hideHint();
         if (!open) panel.closed();
@@ -956,7 +967,7 @@ public final class MainActivity extends CardActivity {
             panelShade.setAlpha(0f);
             panelShade.animate().alpha(1f).setDuration(PILL_MS).start();
         } else {
-            panelShade.animate().alpha(0f).setDuration(PILL_MS).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
+            panelShade.animate().alpha(0f).setDuration(closing).withEndAction(() -> panelShade.setVisibility(View.GONE)).start();
         }
         // The tiles drop in from the pill.
         if (open) {
@@ -966,7 +977,7 @@ public final class MainActivity extends CardActivity {
             panel.setTranslationY(-dp(12));
             panel.animate().alpha(1f).translationY(0).setDuration(PILL_MS).start();
         } else {
-            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(PILL_MS)
+            panel.animate().alpha(0f).translationY(-dp(12)).setDuration(closing)
                 .withEndAction(() -> panel.setVisibility(View.GONE)).start();
         }
     }
@@ -2080,6 +2091,9 @@ public final class MainActivity extends CardActivity {
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
         int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        // Back on the first row from the clean Home's control centre: the row climbs only once its
+        // tiles are gone, from showPanel. Climbing now, it went up through them (2026-11-09).
+        if (index == 0 && panelRest >= 0 && (panelOpen || SystemClock.uptimeMillis() < climbAt)) return;
         // A page not laid out yet has nothing to scroll: a smooth scroll there went back to the bottom,
         // and a first row wanted at the top stayed low as the Home started. It waits for the layout,
         // and is never skipped: back up from the credits the first row stayed at the top (2026-11-09).
