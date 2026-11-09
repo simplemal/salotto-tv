@@ -1,10 +1,10 @@
 {
-  "versionName": "1.1.0-beta.1",
+  "versionName": "1.1.0-beta.2",
   "changes": {
     "en": [
       "New Clean Home, with squircle apps and its own control center",
       "The grid Home is now called Glass",
-      "On first start you choose the Home: Clean, Circular or Glass",
+      "On first start, and after this update, you choose the Home: Clean, Circular or Glass",
       "Time, date and weather set for each Home, large or small next to the buttons",
       "Circular Home: glow Off, Normal or Wide, and a new way out of apps",
       "On less powerful Fire TVs the menus have a black background"
@@ -12,7 +12,7 @@
     "es": [
       "Nuevo Home Limpia, con apps en squircle y su propio centro de control",
       "El Home en cuadrícula ahora se llama Cristal",
-      "En el primer inicio eliges el Home: Limpia, Circular o Cristal",
+      "En el primer inicio, y tras esta actualización, eliges el Home: Limpia, Circular o Cristal",
       "Hora, fecha y tiempo propios de cada Home, grandes o pequeños junto a los botones",
       "Home circular: brillo Apagado, Normal o Amplio, y una nueva salida de las apps",
       "En los Fire TV menos potentes los menús tienen fondo negro"
@@ -20,7 +20,7 @@
     "fr": [
       "Nouvel accueil Épurée, avec des applis en squircle et son propre centre de contrôle",
       "L’accueil en grille s’appelle désormais Verre",
-      "Au premier démarrage, vous choisissez l’accueil : Épurée, Circulaire ou Verre",
+      "Au premier démarrage, et après cette mise à jour, vous choisissez l’accueil : Épurée, Circulaire ou Verre",
       "Heure, date et météo propres à chaque accueil, en grand ou en petit à côté des boutons",
       "Accueil circulaire : halo Désactivé, Normal ou Large, et une nouvelle sortie des applis",
       "Sur les Fire TV moins puissants, les menus ont un fond noir"
@@ -28,7 +28,7 @@
     "de": [
       "Neuer Home Schlicht, mit Squircle-Apps und eigenem Kontrollzentrum",
       "Der Raster-Home heißt jetzt Glas",
-      "Beim ersten Start wählst du den Home: Schlicht, Kreis oder Glas",
+      "Beim ersten Start und nach diesem Update wählst du den Home: Schlicht, Kreis oder Glas",
       "Uhrzeit, Datum und Wetter für jeden Home einzeln, groß oder klein neben den Tasten",
       "Kreis-Home: Leuchten Aus, Normal oder Weit, und ein neuer Ausgang aus Apps",
       "Auf schwächeren Fire TVs haben die Menüs einen schwarzen Hintergrund"
@@ -36,7 +36,7 @@
     "pt": [
       "Novo Home Limpa, com apps em squircle e seu próprio centro de controle",
       "O Home em grade agora se chama Vidro",
-      "No primeiro início você escolhe o Home: Limpa, Circular ou Vidro",
+      "No primeiro início, e depois desta atualização, você escolhe o Home: Limpa, Circular ou Vidro",
       "Hora, data e tempo próprios de cada Home, grandes ou pequenos ao lado dos botões",
       "Home circular: brilho Desligado, Normal ou Amplo, e uma nova saída dos apps",
       "Nos Fire TV menos potentes os menus têm fundo preto"
@@ -44,7 +44,7 @@
     "ru": [
       "Новый главный экран «Чистый»: приложения в форме сквиркла и свой центр управления",
       "Главный экран сеткой теперь называется «Стекло»",
-      "При первом запуске выбирается главный экран: «Чистый», «Круг» или «Стекло»",
+      "При первом запуске и после этого обновления выбирается главный экран: «Чистый», «Круг» или «Стекло»",
       "Время, дата и погода настраиваются для каждого главного экрана: крупно или мелко рядом с кнопками",
       "Экран «Круг»: свечение «Выкл.», «Обычное» или «Широкое» и новый выход из приложений",
       "На менее мощных Fire TV у меню чёрный фон"
@@ -52,7 +52,7 @@
     "ar": [
       "شاشة رئيسية جديدة «نظيفة»، بتطبيقات على شكل squircle ومركز تحكم خاص بها",
       "الشاشة الرئيسية الشبكية أصبح اسمها «زجاج»",
-      "عند أول تشغيل تختار الشاشة الرئيسية: نظيفة أو دائري أو زجاج",
+      "عند أول تشغيل، وبعد هذا التحديث، تختار الشاشة الرئيسية: نظيفة أو دائري أو زجاج",
       "الوقت والتاريخ والطقس خاصة بكل شاشة رئيسية، كبيرة أو صغيرة بجانب الأزرار",
       "الشاشة الدائرية: توهج متوقف أو عادي أو واسع، وطريقة جديدة للخروج من التطبيقات",
       "في أجهزة Fire TV الأقل قوة تكون خلفية القوائم سوداء"
@@ -60,7 +60,7 @@
     "hi": [
       "नया साफ़ होम, squircle ऐप्स और अपने कंट्रोल सेंटर के साथ",
       "ग्रिड होम का नाम अब ग्लास है",
-      "पहली बार शुरू करते समय होम चुनें: साफ़, गोल या ग्लास",
+      "पहली बार शुरू करते समय, और इस अपडेट के बाद, होम चुनें: साफ़, गोल या ग्लास",
       "हर होम के लिए अलग समय, तारीख और मौसम, बड़े या बटनों के पास छोटे",
       "गोल होम: चमक बंद, सामान्य या चौड़ी, और ऐप्स से बाहर आने का नया तरीका",
       "कम ताकत वाले Fire TV पर मेनू की पृष्ठभूमि काली है"
@@ -68,7 +68,7 @@
     "zh": [
       "全新简洁主屏幕，应用为圆角方形，并有自己的控制中心",
       "网格主屏幕现在叫玻璃",
-      "首次启动时选择主屏幕：简洁、圆形或玻璃",
+      "首次启动时以及本次更新后，选择主屏幕：简洁、圆形或玻璃",
       "每个主屏幕都有自己的时间、日期和天气设置，可大可小，小时显示在按钮旁",
       "圆形主屏幕：光晕可选关闭、普通或宽阔，退出应用有新的动画",
       "在性能较弱的 Fire TV 上，菜单使用黑色背景"
