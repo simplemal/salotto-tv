@@ -910,10 +910,11 @@ public final class MainActivity extends CardActivity {
         return false;
     }
 
-    /** The panel follows the focus: it goes to where the Home rests, the wheel or the first card. */
+    /** The panel follows the focus: it goes to where the Home rests, the wheel or the app selected last. */
     @Override public void leave() {
         if (!panelOpen) return;
-        View rest = circular ? wheel : dock != null && dock.getChildCount() > 0 ? dock.getChildAt(0) : null;
+        // The app selected last, as everywhere: the first one showed for a moment before the screensaver.
+        View rest = lastAppView();
         if (rest != null) rest.requestFocus();
         showPanel(false);
     }
