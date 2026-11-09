@@ -74,8 +74,8 @@ public final class MainActivity extends CardActivity {
     private static final int PILL_MS = 220;
     /** The clean Home's tiles closing before the first row climbs back to the top. */
     private static final int PANEL_QUICK_MS = 90;
-    /** The clean Home's coloured line along each app, in dp: as thin as can still be seen. */
-    private static final float CLEAN_EDGE = 0.75f;
+    /** The clean Home's coloured line along each app: one pixel of the screen, 0.75 dp was too thick. */
+    private static final float CLEAN_EDGE = 1f;
     /** How far towards white that line goes from the app's colour. */
     private static final float CLEAN_EDGE_LIGHT = 0.45f;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
@@ -2058,7 +2058,7 @@ public final class MainActivity extends CardActivity {
      */
     private void colourEdge(Bitmap squircle, int colour) {
         int size = squircle.getWidth();
-        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE;
+        float line = CLEAN_EDGE;
         Path edge = Squircle.path(size - line);
         edge.offset(line / 2, line / 2);
         Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
