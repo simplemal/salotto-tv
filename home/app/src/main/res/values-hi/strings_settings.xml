@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 घंटे</string>
     <string name="settings_hours_12">12 घंटे</string>
     <string name="settings_hours_text">ऊपर के छोटे बॉक्स में दिखने वाले समय पर भी लागू होता है।</string>
-    <string name="settings_seconds">सेकंड</string>
-    <string name="settings_seconds_text">सेकंड भी दिखाएं।</string>
     <string name="settings_date">तारीख</string>
     <string name="settings_date_text">घड़ी के नीचे तारीख दिखाता है।</string>
     <string name="settings_off">बंद</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">साफ़</string>
     <string name="settings_section_clean">साफ़ होम</string>
     <string name="settings_first_row">पहली पंक्ति</string>
+    <string name="settings_clean_both">तारीख़ और समय</string>
+    <string name="settings_clean_time">सिर्फ़ समय</string>
+    <string name="settings_clean_date">सिर्फ़ तारीख़</string>
+    <string name="settings_clean_none">कुछ नहीं</string>
 </resources>

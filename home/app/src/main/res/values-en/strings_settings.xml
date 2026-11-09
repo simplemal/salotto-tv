@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 hours</string>
     <string name="settings_hours_12">12 hours</string>
     <string name="settings_hours_text">Also applies to the time in the pill.</string>
-    <string name="settings_seconds">Seconds</string>
-    <string name="settings_seconds_text">Shows the seconds too.</string>
     <string name="settings_date">Date</string>
     <string name="settings_date_text">Shows the date under the clock.</string>
     <string name="settings_off">Off</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">Clean</string>
     <string name="settings_section_clean">Clean Home</string>
     <string name="settings_first_row">First row</string>
+    <string name="settings_clean_both">Date and time</string>
+    <string name="settings_clean_time">Time only</string>
+    <string name="settings_clean_date">Date only</string>
+    <string name="settings_clean_none">Nothing</string>
 </resources>

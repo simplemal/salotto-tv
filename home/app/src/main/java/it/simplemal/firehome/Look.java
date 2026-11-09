@@ -169,6 +169,17 @@ final class Look {
             dateNumeric(context) ? "ddMMyyyy" : "EEEEdMMMM");
     }
 
+    /** The clean Home's line at the top: time and date, one of them, or neither. */
+    static final int SHOW_BOTH = 0;
+    static final int SHOW_TIME = 1;
+    static final int SHOW_DATE = 2;
+    static final int SHOW_NONE = 3;
+    static int cleanShows(Context context) { return prefs(context).getInt("clean_shows", SHOW_BOTH); }
+    static void setCleanShows(Context context, int value) { prefs(context).edit().putInt("clean_shows", value).apply(); }
+    /** One font for the clean Home's whole line, the medium sans until chosen. */
+    static int cleanFont(Context context) { return prefs(context).getInt("clean_font", 2); }
+    static void setCleanFont(Context context, int value) { prefs(context).edit().putInt("clean_font", value).apply(); }
+
     static int font(Context context) { return prefs(context).getInt("font", 2); }
     static void setFont(Context context, int value) { prefs(context).edit().putInt("font", value).apply(); }
     static int size(Context context) { return prefs(context).getInt("size", 1); }
@@ -179,8 +190,6 @@ final class Look {
     static void setNames(Context context, int value) { prefs(context).edit().putInt("names", value).apply(); }
     static boolean hours24(Context context) { return prefs(context).getBoolean("hours24", true); }
     static void setHours24(Context context, boolean value) { prefs(context).edit().putBoolean("hours24", value).apply(); }
-    static boolean seconds(Context context) { return prefs(context).getBoolean("seconds", false); }
-    static void setSeconds(Context context, boolean value) { prefs(context).edit().putBoolean("seconds", value).apply(); }
     static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
     /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
     static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
@@ -230,7 +239,8 @@ final class Look {
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
-        return (hours24(context) ? "HH:mm" : "h:mm") + (seconds(context) ? ":ss" : "");
+        // Never the seconds: the user took the choice away on 2026-11-09, on every Home.
+        return hours24(context) ? "HH:mm" : "h:mm";
     }
 
     /** Not a picture: the Home draws it with WeatherView, and it needs a place for the weather. */
@@ -561,7 +571,7 @@ final class Look {
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
             + "/" + appsOnly(context) + "/" + homeStyle(context) + "/" + cleanBlur(context) + "/" + wheel(context)
             + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
-            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context);
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context) + "/" + cleanShows(context) + "/" + cleanFont(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */

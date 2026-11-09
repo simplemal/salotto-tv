@@ -240,8 +240,6 @@
     <string name="settings_hours_24">24 小时制</string>
     <string name="settings_hours_12">12 小时制</string>
     <string name="settings_hours_text">小标签里的时间也适用。</string>
-    <string name="settings_seconds">秒</string>
-    <string name="settings_seconds_text">同时显示秒。</string>
     <string name="settings_date">日期</string>
     <string name="settings_date_text">在时钟下方显示日期。</string>
     <string name="settings_off">关闭</string>
@@ -385,4 +383,8 @@
     <string name="settings_home_clean">简洁</string>
     <string name="settings_section_clean">简洁主屏幕</string>
     <string name="settings_first_row">第一排</string>
+    <string name="settings_clean_both">日期和时间</string>
+    <string name="settings_clean_time">仅时间</string>
+    <string name="settings_clean_date">仅日期</string>
+    <string name="settings_clean_none">不显示</string>
 </resources>

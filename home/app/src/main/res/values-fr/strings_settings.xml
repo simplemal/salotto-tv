@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 heures</string>
     <string name="settings_hours_12">12 heures</string>
     <string name="settings_hours_text">Vaut aussi pour l’heure dans la pastille.</string>
-    <string name="settings_seconds">Secondes</string>
-    <string name="settings_seconds_text">Affiche aussi les secondes.</string>
     <string name="settings_date">Date</string>
     <string name="settings_date_text">Affiche la date sous l’horloge.</string>
     <string name="settings_off">Désactivé</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">Épurée</string>
     <string name="settings_section_clean">Accueil épuré</string>
     <string name="settings_first_row">Première rangée</string>
+    <string name="settings_clean_both">Date et heure</string>
+    <string name="settings_clean_time">L’heure seule</string>
+    <string name="settings_clean_date">La date seule</string>
+    <string name="settings_clean_none">Rien</string>
 </resources>

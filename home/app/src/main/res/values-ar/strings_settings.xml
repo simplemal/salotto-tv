@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 ساعة</string>
     <string name="settings_hours_12">12 ساعة</string>
     <string name="settings_hours_text">ينطبق أيضًا على الوقت في الشارة.</string>
-    <string name="settings_seconds">الثواني</string>
-    <string name="settings_seconds_text">يعرض الثواني أيضًا.</string>
     <string name="settings_date">التاريخ</string>
     <string name="settings_date_text">يعرض التاريخ تحت الساعة.</string>
     <string name="settings_off">متوقف</string>
@@ -414,4 +412,8 @@
     <string name="settings_home_clean">نظيفة</string>
     <string name="settings_section_clean">الشاشة الرئيسية النظيفة</string>
     <string name="settings_first_row">الصف الأول</string>
+    <string name="settings_clean_both">التاريخ والوقت</string>
+    <string name="settings_clean_time">الوقت فقط</string>
+    <string name="settings_clean_date">التاريخ فقط</string>
+    <string name="settings_clean_none">لا شيء</string>
 </resources>

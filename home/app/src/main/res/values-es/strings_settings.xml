@@ -240,8 +240,6 @@
     <string name="settings_hours_24">24 horas</string>
     <string name="settings_hours_12">12 horas</string>
     <string name="settings_hours_text">Vale también para la hora de la píldora.</string>
-    <string name="settings_seconds">Segundos</string>
-    <string name="settings_seconds_text">Muestra también los segundos.</string>
     <string name="settings_date">Fecha</string>
     <string name="settings_date_text">Muestra la fecha bajo el reloj.</string>
     <string name="settings_off">Apagado</string>
@@ -391,4 +389,8 @@
     <string name="settings_home_clean">Limpia</string>
     <string name="settings_section_clean">Home limpia</string>
     <string name="settings_first_row">Primera fila</string>
+    <string name="settings_clean_both">Fecha y hora</string>
+    <string name="settings_clean_time">Solo la hora</string>
+    <string name="settings_clean_date">Solo la fecha</string>
+    <string name="settings_clean_none">Nada</string>
 </resources>

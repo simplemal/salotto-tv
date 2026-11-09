@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 часа</string>
     <string name="settings_hours_12">12 часов</string>
     <string name="settings_hours_text">Действует и для времени на плашке.</string>
-    <string name="settings_seconds">Секунды</string>
-    <string name="settings_seconds_text">Показывать и секунды.</string>
     <string name="settings_date">Дата</string>
     <string name="settings_date_text">Показывает дату под часами.</string>
     <string name="settings_off">Выключено</string>
@@ -402,4 +400,8 @@
     <string name="settings_home_clean">Чистый</string>
     <string name="settings_section_clean">Чистый главный экран</string>
     <string name="settings_first_row">Первый ряд</string>
+    <string name="settings_clean_both">Дата и время</string>
+    <string name="settings_clean_time">Только время</string>
+    <string name="settings_clean_date">Только дата</string>
+    <string name="settings_clean_none">Ничего</string>
 </resources>

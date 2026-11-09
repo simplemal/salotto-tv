@@ -203,11 +203,24 @@ public final class MainActivity extends CardActivity {
     private static final int CLEAN_COLUMNS = 12;
     private static final int CLEAN_TILE = 56;
     private static final int CLEAN_GAP = 14;
-    /** Where the dock stops once a lower row has the focus: under the time and the weather. */
-    private static final int CLEAN_DOCK_TOP = 176;
+    /** Where the first row stops once a lower one has the focus: under the line at the top. */
+    private static final int CLEAN_DOCK_TOP = 72;
     private static final int CLEAN_PILL_TOP = 18;
     private static final int CLEAN_ICON_GAP = 22;
     private Bitmap squirclePlaceholder;
+    /**
+     * The clean Home's line at the top: time and date on the left, from where a full row's first app
+     * starts, today's weather on the right, where its last one ends. Small, in one chosen font.
+     */
+    private LinearLayout cleanBar;
+    private TextClock cleanTime;
+    private TextClock cleanDate;
+    private TextView cleanWeather;
+    private static final int CLEAN_BAR_SP = 17;
+    /** The clean Home's flat selection: white, a little see-through. */
+    private static final int CLEAN_SELECTED = 215;
+    private static final int CLEAN_BAR_GAP = 14;
+    private static final int ALL_APPS_FILL = Color.argb(28, 255, 255, 255);
     private WheelHome wheel;
     private LinearLayout weatherCorner;
     private TextView cornerLine;
@@ -388,6 +401,7 @@ public final class MainActivity extends CardActivity {
         root.addView(wheel, new FrameLayout.LayoutParams(-1, -1));
         root.addView(allAppsCircle(), allAppsPlace());
         root.addView(weatherCorner(), weatherCornerPlace());
+        root.addView(cleanBar(), cleanBarPlace());
         // While the backdrop fades the cards cost one picture, instead of all their shadows and glass.
         weatherView.setOnFade(fading -> scroll.setLayerType(fading ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null));
 
@@ -620,6 +634,64 @@ public final class MainActivity extends CardActivity {
         // On the wheel the date sits on the line of the weather's first row, whatever their sizes.
         weatherCorner.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> alignDate());
         return weatherCorner;
+    }
+
+    private View cleanBar() {
+        cleanBar = new LinearLayout(this);
+        cleanBar.setGravity(Gravity.CENTER_VERTICAL);
+        cleanBar.setVisibility(View.GONE);
+        cleanTime = new TextClock(this);
+        cleanDate = new TextClock(this);
+        cleanWeather = label("", CLEAN_BAR_SP);
+        cleanWeather.setSingleLine(true);
+        for (TextView text : new TextView[]{cleanTime, cleanDate, cleanWeather}) {
+            text.setTextSize(CLEAN_BAR_SP);
+            text.setTextColor(Color.WHITE);
+            text.setShadowLayer(dp(3), 0, dp(1), Color.argb(200, 0, 0, 0));
+        }
+        cleanBar.addView(cleanTime);
+        LinearLayout.LayoutParams after = new LinearLayout.LayoutParams(-2, -2);
+        after.setMarginStart(dp(CLEAN_BAR_GAP));
+        cleanBar.addView(cleanDate, after);
+        cleanBar.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1));
+        cleanBar.addView(cleanWeather);
+        return cleanBar;
+    }
+
+    /** As wide as a full row of apps, on the line of the buttons in the middle. */
+    private FrameLayout.LayoutParams cleanBarPlace() {
+        int row = CLEAN_COLUMNS * (dp(CLEAN_TILE) + dp(CLEAN_GAP));
+        int side = Math.max(0, (getResources().getDisplayMetrics().widthPixels - row) / 2 + dp(CLEAN_GAP) / 2);
+        FrameLayout.LayoutParams place = new FrameLayout.LayoutParams(-1, dp(FREE_ICON), Gravity.TOP);
+        place.topMargin = dp(CLEAN_PILL_TOP) + dp(6);
+        place.leftMargin = side;
+        place.rightMargin = side;
+        return place;
+    }
+
+    /** What the line shows, in its font: time, date, both or neither, and today's weather. */
+    private void styleCleanBar() {
+        Typeface font = Typeface.create(Look.FONT_FAMILIES[Look.cleanFont(this)], Typeface.NORMAL);
+        int shows = Look.cleanShows(this);
+        String time = Look.timePattern(this);
+        String day = Look.datePattern(this);
+        cleanTime.setFormat24Hour(time);
+        cleanTime.setFormat12Hour(time);
+        cleanDate.setFormat24Hour(day);
+        cleanDate.setFormat12Hour(day);
+        cleanTime.setVisibility(shows == Look.SHOW_BOTH || shows == Look.SHOW_TIME ? View.VISIBLE : View.GONE);
+        cleanDate.setVisibility(shows == Look.SHOW_BOTH || shows == Look.SHOW_DATE ? View.VISIBLE : View.GONE);
+        // Alone, the date starts where the time would.
+        ((LinearLayout.LayoutParams) cleanDate.getLayoutParams()).setMarginStart(shows == Look.SHOW_BOTH ? dp(CLEAN_BAR_GAP) : 0);
+        for (TextView text : new TextView[]{cleanTime, cleanDate, cleanWeather}) text.setTypeface(font);
+        cleanBar.requestLayout();
+    }
+
+    /** Only today, as it is now: the days after it are for the other Homes. */
+    private void showCleanWeather() {
+        String line = Weather.line(this);
+        cleanWeather.setVisibility(line != null ? View.VISIBLE : View.GONE);
+        if (line != null && !line.contentEquals(cleanWeather.getText())) cleanWeather.setText(WeatherIcon.in(this, line));
     }
 
     private void alignDate() {
@@ -867,10 +939,11 @@ public final class MainActivity extends CardActivity {
         view.setGravity(Gravity.CENTER_VERTICAL);
         int radius = dp(FOOTER_RADIUS);
         view.setOnFocusChangeListener((changed, focused) -> {
-            // No glass on the clean Home: a plain dark fill under the words.
+            // No glass on the clean Home: flat white, a little see-through, with dark words.
             view.setBackground(!focused ? null : clean ? plainFill(radius)
                 : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
-            view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
+            view.setTextColor(!focused ? FOOTER_INK : clean ? Fire.INK : Color.WHITE);
+            view.setShadowLayer(focused && clean ? 0 : dp(3), 0, focused && clean ? 0 : dp(1), Color.argb(200, 0, 0, 0));
             if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
@@ -884,7 +957,7 @@ public final class MainActivity extends CardActivity {
 
     private Drawable plainFill(int radius) {
         GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.argb(140, 0, 0, 0));
+        fill.setColor(Color.argb(CLEAN_SELECTED, 255, 255, 255));
         fill.setCornerRadius(radius);
         return fill;
     }
@@ -892,7 +965,8 @@ public final class MainActivity extends CardActivity {
     private void showPillClock() {
         // On the clean Home the big clock is never covered.
         boolean raised = !clean && scroll.getScrollY() > shelf / 2;
-        boolean clockInView = bigClock && !raised;
+        // The clean Home's time is in its line at the top, or not wanted: never in the buttons.
+        boolean clockInView = clean || bigClock && !raised;
         String symbol = raised ? weatherSymbol : null;
         // Called at every step of a scroll, and almost every step changes nothing.
         if (pillDrawn && clockInView == pillClock && Objects.equals(symbol, pillSymbol)) return;
@@ -901,7 +975,7 @@ public final class MainActivity extends CardActivity {
         pillSymbol = symbol;
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
-        clockShade.setVisibility(bigClock ? View.VISIBLE : View.GONE);
+        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
         pillShade.animate().alpha(clockInView ? 0 : 1).setDuration(PILL_MS).start();
         pillDate.setVisibility(time);
         pillTime.setVisibility(time);
@@ -1297,6 +1371,7 @@ public final class MainActivity extends CardActivity {
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
         weatherSymbol = Weather.symbol(this);
         if (cornersOnTop()) showWeatherCorner();
+        if (clean) showCleanWeather();
         showPillClock();
     }
 
@@ -1385,8 +1460,15 @@ public final class MainActivity extends CardActivity {
         scroll.setVisibility(circular ? View.GONE : View.VISIBLE);
         wheel.setVisibility(circular ? View.VISIBLE : View.GONE);
         weatherRow.setVisibility(cornersOnTop() ? View.GONE : View.VISIBLE);
-        weatherCorner.setVisibility(cornersOnTop() ? View.VISIBLE : View.GONE);
-        weatherShade.setVisibility(cornersOnTop() ? View.VISIBLE : View.GONE);
+        // The clean Home has its own small line at the top instead of the big clock and the weather's corner.
+        weatherCorner.setVisibility(circular ? View.VISIBLE : View.GONE);
+        weatherShade.setVisibility(circular ? View.VISIBLE : View.GONE);
+        hero.setVisibility(clean ? View.GONE : View.VISIBLE);
+        cleanBar.setVisibility(clean ? View.VISIBLE : View.GONE);
+        if (clean) {
+            styleCleanBar();
+            showCleanWeather();
+        }
         if (circular) scroll.scrollTo(0, 0);
         if (cornersOnTop()) {
             hero.setAlpha(1);
@@ -1773,8 +1855,14 @@ public final class MainActivity extends CardActivity {
             squirclePlaceholder = Squircle.cut(plain);
             plain.recycle();
         }
+        // Tutte le app: a light veil and the icon, drawn at once, with no shadow under it.
+        if (ALL_APPS.equals(tag) && known == null) {
+            known = allAppsSquircle(size);
+            CIRCLE_ART.put(key, known);
+        }
         Bitmap shown = known != null ? known : squirclePlaceholder;
-        View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null, ICON, size, action, hold);
+        View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null,
+            ALL_APPS.equals(tag) ? GLASS : ICON, size, action, hold);
         if (known == null) {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
@@ -1791,6 +1879,20 @@ public final class MainActivity extends CardActivity {
             });
         }
         return tile;
+    }
+
+    private Bitmap allAppsSquircle(int size) {
+        Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        fill.setColor(ALL_APPS_FILL);
+        canvas.drawPath(Squircle.path(size), fill);
+        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        icon.setTint(Color.WHITE);
+        int inset = size * 3 / 10;
+        icon.setBounds(inset, inset, size - inset, size - inset);
+        icon.draw(canvas);
+        return made;
     }
 
     /** Pinned last: it cannot be moved or removed, so every app stays reachable. */

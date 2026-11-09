@@ -1981,7 +1981,57 @@ public final class SettingsActivity extends CardActivity {
                 }))));
     }
 
+    private static final int[] CLEAN_SHOW_NAMES = {R.string.settings_clean_both, R.string.settings_clean_time,
+        R.string.settings_clean_date, R.string.settings_clean_none};
+
+    /** On the clean Home, for now, only what the line at the top shows and its font; the weather's place and units. */
+    private void showCleanClock() {
+        boolean enabled = Weather.enabled(this);
+        String place = Weather.place(this);
+        show(getString(R.string.settings_cat_clock), Arrays.asList(
+            groupLabel(R.string.settings_time_group),
+            new Entry(getString(R.string.settings_show_on_home), getString(CLEAN_SHOW_NAMES[Look.cleanShows(this)]), null, null,
+                true, () -> enter(this::showCleanShows)),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.cleanFont(this)], null, null,
+                true, () -> enter(this::showCleanFonts)),
+            groupLabel(R.string.settings_weather),
+            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null,
+                getString(R.string.settings_weather_show_text), false, () -> {
+                    Weather.setEnabled(this, !enabled);
+                    refresh();
+                }),
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null,
+                getString(R.string.settings_place_text), true, this::askPlace),
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null,
+                getString(R.string.settings_units_text), false, () -> {
+                    Weather.setFahrenheit(this, !Weather.fahrenheit(this));
+                    refresh();
+                })));
+    }
+
+    private void showCleanShows() {
+        String[] names = new String[CLEAN_SHOW_NAMES.length];
+        for (int index = 0; index < names.length; index++) names[index] = getString(CLEAN_SHOW_NAMES[index]);
+        show(getString(R.string.settings_show_on_home), choices(names, Look.cleanShows(this), R.drawable.ic_clock, index -> null, index -> {
+            Look.setCleanShows(this, index);
+            refresh();
+        }));
+    }
+
+    private void showCleanFonts() {
+        List<Entry> entries = choices(Look.fontNames(this), Look.cleanFont(this), R.drawable.ic_clock, index -> null, index -> {
+            Look.setCleanFont(this, index);
+            refresh();
+        });
+        for (int index = 0; index < entries.size(); index++) entries.get(index).family = Look.FONT_FAMILIES[index];
+        show(getString(R.string.settings_font), entries);
+    }
+
     private void showClock() {
+        if (Look.clean(this)) {
+            showCleanClock();
+            return;
+        }
         boolean visible = Look.clock(this);
         boolean enabled = Weather.enabled(this);
         String place = Weather.place(this);
@@ -1999,11 +2049,6 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), null,
                 getString(R.string.settings_hours_text), false, () -> {
                     Look.setHours24(this, !Look.hours24(this));
-                    refresh();
-                }),
-            new Entry(getString(R.string.settings_seconds), Look.seconds(this) ? YES : NO, null,
-                getString(R.string.settings_seconds_text), false, () -> {
-                    Look.setSeconds(this, !Look.seconds(this));
                     refresh();
                 }),
             groupLabel(R.string.settings_date),

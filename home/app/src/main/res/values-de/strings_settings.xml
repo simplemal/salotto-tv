@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 Stunden</string>
     <string name="settings_hours_12">12 Stunden</string>
     <string name="settings_hours_text">Gilt auch für die Zeit in der Anzeige oben rechts.</string>
-    <string name="settings_seconds">Sekunden</string>
-    <string name="settings_seconds_text">Zeigt auch die Sekunden.</string>
     <string name="settings_date">Datum</string>
     <string name="settings_date_text">Zeigt das Datum unter der Uhr.</string>
     <string name="settings_off">Aus</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">Schlicht</string>
     <string name="settings_section_clean">Schlichte Home</string>
     <string name="settings_first_row">Erste Reihe</string>
+    <string name="settings_clean_both">Datum und Uhrzeit</string>
+    <string name="settings_clean_time">Nur Uhrzeit</string>
+    <string name="settings_clean_date">Nur Datum</string>
+    <string name="settings_clean_none">Nichts</string>
 </resources>

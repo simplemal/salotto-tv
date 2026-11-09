@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 horas</string>
     <string name="settings_hours_12">12 horas</string>
     <string name="settings_hours_text">Vale também para a hora no selo.</string>
-    <string name="settings_seconds">Segundos</string>
-    <string name="settings_seconds_text">Mostra também os segundos.</string>
     <string name="settings_date">Data</string>
     <string name="settings_date_text">Mostra a data abaixo do relógio.</string>
     <string name="settings_off">Desligado</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">Limpa</string>
     <string name="settings_section_clean">Home limpa</string>
     <string name="settings_first_row">Primeira fileira</string>
+    <string name="settings_clean_both">Data e hora</string>
+    <string name="settings_clean_time">Só a hora</string>
+    <string name="settings_clean_date">Só a data</string>
+    <string name="settings_clean_none">Nada</string>
 </resources>

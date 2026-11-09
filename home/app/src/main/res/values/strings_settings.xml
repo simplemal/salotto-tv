@@ -239,8 +239,6 @@
     <string name="settings_hours_24">24 ore</string>
     <string name="settings_hours_12">12 ore</string>
     <string name="settings_hours_text">Vale anche per l’ora nella pillola.</string>
-    <string name="settings_seconds">Secondi</string>
-    <string name="settings_seconds_text">Mostra anche i secondi.</string>
     <string name="settings_date">Data</string>
     <string name="settings_date_text">Mostra la data sotto l’orologio.</string>
     <string name="settings_off">Spento</string>
@@ -390,4 +388,8 @@
     <string name="settings_home_clean">Pulita</string>
     <string name="settings_section_clean">Home pulita</string>
     <string name="settings_first_row">Prima fila</string>
+    <string name="settings_clean_both">Data e ora</string>
+    <string name="settings_clean_time">Solo l’ora</string>
+    <string name="settings_clean_date">Solo la data</string>
+    <string name="settings_clean_none">Niente</string>
 </resources>

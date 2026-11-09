@@ -399,7 +399,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             });
         }
         // Glass has no shadow: it would show through as rectangles inside the card.
-        CardShadow shadow = look == GLASS && !square ? null
+        CardShadow shadow = look == GLASS ? null
             : new CardShadow(width, artHeight, radius, dp(1), focusScale());
         tile.setBackground(shadow);
         tile.setOutlineProvider(null);
