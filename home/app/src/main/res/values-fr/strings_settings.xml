@@ -366,10 +366,7 @@
     <string name="grid_saver_title">Images</string>
     <string name="grid_weather_group">Météo</string>
     <string name="grid_kind_timed">change toute seule</string>
-    <string name="grid_kind_weather">météo</string>
-    <string name="grid_kind_fixed">fixe</string>
     <string name="grid_single">Une seule image</string>
-    <string name="grid_info_standard">Les couleurs et dégradés de Salotto. Choisissez celui qui reste.</string>
     <string name="grid_info_timed">Les images changent toutes seules, dans un ordre aléatoire. La fréquence se choisit sur la page Accueil.</string>
     <string name="grid_info_timed_saver">Les images se succèdent toutes seules. La fréquence se choisit sur la page Économiseur d’écran.</string>
     <string name="grid_info_single">Choisissez l’image qui reste : OK l’affiche en plein écran.</string>

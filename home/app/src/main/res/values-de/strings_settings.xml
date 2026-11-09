@@ -366,10 +366,7 @@
     <string name="grid_saver_title">Bilder</string>
     <string name="grid_weather_group">Wetter</string>
     <string name="grid_kind_timed">wechselt selbst</string>
-    <string name="grid_kind_weather">Wetter</string>
-    <string name="grid_kind_fixed">fest</string>
     <string name="grid_single">Ein Bild</string>
-    <string name="grid_info_standard">Farben und Verläufe von Salotto. Wähle den, der bleibt.</string>
     <string name="grid_info_timed">Die Bilder wechseln von selbst, in zufälliger Reihenfolge. Wie oft, wählst du auf der Seite Home.</string>
     <string name="grid_info_timed_saver">Die Bilder wechseln sich von selbst ab. Wie oft, wählst du auf der Seite Bildschirmschoner.</string>
     <string name="grid_info_single">Wähle das Bild, das bleibt: OK zeigt es auf dem ganzen Bildschirm.</string>

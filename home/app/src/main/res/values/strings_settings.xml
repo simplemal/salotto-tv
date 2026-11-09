@@ -366,10 +366,7 @@
     <string name="grid_saver_title">Immagini</string>
     <string name="grid_weather_group">Meteo</string>
     <string name="grid_kind_timed">cambia da sola</string>
-    <string name="grid_kind_weather">meteo</string>
-    <string name="grid_kind_fixed">fissa</string>
     <string name="grid_single">Singola immagine</string>
-    <string name="grid_info_standard">Colori e sfumature di Salotto. Scegli quello che resta fisso.</string>
     <string name="grid_info_timed">Le immagini cambiano da sole, in ordine casuale. Ogni quanto si sceglie nella pagina Home.</string>
     <string name="grid_info_timed_saver">Le immagini si alternano da sole. Ogni quanto si sceglie nella pagina Salvaschermo.</string>
     <string name="grid_info_single">Scegli l’immagine che resta fissa: OK la mostra a tutto schermo.</string>

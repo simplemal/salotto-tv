@@ -63,7 +63,7 @@ public final class PictureGridActivity extends CardActivity {
     /** The edge of a selected cell stays inside the scrolling area. */
     private static final int SIDE_ROOM = 4;
     private static final int PAGE_START = 34;
-    private static final int PAGE_TOP = 20;
+    private static final int PAGE_TOP = 24;
     private static final int PAGE_END = 24;
     private static final int LIST_WIDTH = 214;
     private static final int LIST_ROW = 38;
@@ -73,6 +73,9 @@ public final class PictureGridActivity extends CardActivity {
     private static final int BAR_HEIGHT = 36;
     private static final int BAR_GAP = 8;
     private static final int INFO_TOP = 10;
+    /** Two lines of words, or one button: the same height for every collection. */
+    private static final int INFO_HEIGHT = 40;
+    private static final int KIND_ROOM = 14;
     private static final int INFO_SP = 14;
     private static final float INFO_ALPHA = 0.72f;
     private static final float LOCKED_ALPHA = 0.5f;
@@ -142,6 +145,7 @@ public final class PictureGridActivity extends CardActivity {
     private int current = -1;
     private final Runnable showFocused = this::showFocused;
     private int focusedItem;
+    private int personalCount;
     private boolean singleOn;
     /** Counts the collections shown: work that finishes for one already gone is dropped. */
     private int shownCount;
@@ -172,6 +176,8 @@ public final class PictureGridActivity extends CardActivity {
     private TextView info;
     private TextView action;
     private Runnable actionRun;
+    /** The weather's place, up in the bar where the others have their switch. */
+    private TextView placeButton;
     private ProgressBar pageWheel;
     private FrameLayout preview;
     private ImageView full;
@@ -192,7 +198,7 @@ public final class PictureGridActivity extends CardActivity {
         root = new FrameLayout(this);
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        backdropView.setBackground(Look.plainBackdrop());
+        backdropView.setBackground(MenuBackdrop.base(this));
         root.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
         dressBackdrop();
 
@@ -203,23 +209,31 @@ public final class PictureGridActivity extends CardActivity {
         eyebrow.setAlpha(0.6f);
         eyebrow.setPadding(dp(14), 0, 0, 0);
         page.addView(eyebrow);
+        // The page's title on the same line as the collection's: the lists under them start together.
+        LinearLayout body = new LinearLayout(this);
+        page.addView(body, new LinearLayout.LayoutParams(-1, bodyHeight()));
+        LinearLayout left = new LinearLayout(this);
+        left.setOrientation(LinearLayout.VERTICAL);
         TextView title = label(getString(saver ? R.string.grid_saver_title : R.string.settings_backdrop), 26);
         title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
-        title.setPadding(dp(14), 0, 0, dp(12));
-        page.addView(title);
-
-        LinearLayout body = new LinearLayout(this);
-        page.addView(body, new LinearLayout.LayoutParams(-1, 0, 1));
+        title.setIncludeFontPadding(false);
+        title.setGravity(Gravity.CENTER_VERTICAL);
+        title.setPadding(dp(14), 0, 0, 0);
+        LinearLayout.LayoutParams titlePlace = new LinearLayout.LayoutParams(-1, dp(BAR_HEIGHT));
+        titlePlace.bottomMargin = dp(BAR_GAP);
+        left.addView(title, titlePlace);
         ScrollView listScroll = new ScrollView(this);
         listScroll.setVerticalScrollBarEnabled(false);
         list = new LinearLayout(this);
         list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(0, dp(SIDE_ROOM), 0, 0);
         listScroll.addView(list);
-        body.addView(listScroll, new LinearLayout.LayoutParams(dp(LIST_WIDTH), -1));
+        left.addView(listScroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        body.addView(left, new LinearLayout.LayoutParams(dp(LIST_WIDTH), -1));
         View divider = new View(this);
         divider.setBackgroundColor(Color.argb(40, 255, 255, 255));
         LinearLayout.LayoutParams line = new LinearLayout.LayoutParams(Math.max(1, dp(1)), -1);
-        line.setMargins(dp(DIVIDER_ROOM), dp(4), dp(DIVIDER_ROOM), dp(28));
+        line.setMargins(dp(DIVIDER_ROOM), 0, dp(DIVIDER_ROOM), 0);
         body.addView(divider, line);
         body.addView(rightColumn(), new LinearLayout.LayoutParams(gridWidth(), -1));
         root.addView(page, new FrameLayout.LayoutParams(-1, -1));
@@ -256,6 +270,8 @@ public final class PictureGridActivity extends CardActivity {
     /** Only what is whole on the TV, or inside the app, and was not taken away. */
     private void collect() {
         collections.clear();
+        // Counted once here: the list asks at every move of the selection.
+        personalCount = Look.images(this).size();
         if (!saver) collections.add(new Collection(getString(R.string.settings_backdrop_standard), null, Look.STANDARD_TIMED, STANDARD));
         String[][] sets = {{Look.ABSTRACT, Look.ABSTRACT_FOLDER}, {Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER},
             {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
@@ -274,7 +290,7 @@ public final class PictureGridActivity extends CardActivity {
     }
 
     /** From two photos on, Personale can change by itself like the app's sets. */
-    private boolean personalTimes() { return Look.images(this).size() >= Look.PERSONAL_TIMED_FROM; }
+    private boolean personalTimes() { return personalCount >= Look.PERSONAL_TIMED_FROM; }
 
     private boolean changesItself(Collection collection) {
         if (collection.missing) return false;
@@ -342,10 +358,13 @@ public final class PictureGridActivity extends CardActivity {
         paintList();
     }
 
-    private int iconOf(Collection collection) {
+    /** As the collection is set now: the arrow that turns while it changes by itself, a picture with one picture. */
+    private int iconOf(int index) {
+        Collection collection = collections.get(index);
         if (collection.missing) return R.drawable.ic_download;
         if (collection.kind == WEATHER) return R.drawable.ic_cloud;
-        return changesItself(collection) ? R.drawable.ic_restart : R.drawable.ic_image;
+        boolean one = index == current ? singleOn : chosenPicture(collection) != null;
+        return changesItself(collection) && !one ? R.drawable.ic_restart : R.drawable.ic_image;
     }
 
     private LinearLayout item(int index) {
@@ -357,7 +376,6 @@ public final class PictureGridActivity extends CardActivity {
         item.setClickable(true);
         item.setDefaultFocusHighlightEnabled(false);
         ImageView icon = new ImageView(this);
-        icon.setImageResource(iconOf(collection));
         item.addView(icon, new LinearLayout.LayoutParams(dp(ICON), dp(ICON)));
         TextView name = label(collection.name, LIST_SP);
         name.setSingleLine(true);
@@ -394,7 +412,9 @@ public final class PictureGridActivity extends CardActivity {
             boolean lit = item.hasFocus();
             item.setBackground(lit ? fills[0] : index == current ? fills[1] : null);
             int ink = lit ? Fire.INK : Color.WHITE;
-            ((ImageView) item.getChildAt(0)).setImageTintList(ColorStateList.valueOf(ink));
+            ImageView icon = (ImageView) item.getChildAt(0);
+            icon.setImageResource(iconOf(index));
+            icon.setImageTintList(ColorStateList.valueOf(ink));
             TextView name = (TextView) item.getChildAt(1);
             name.setTextColor(ink);
             name.setTypeface(Typeface.create(index == current ? "sans-serif-medium" : "sans-serif", Typeface.NORMAL));
@@ -448,22 +468,22 @@ public final class PictureGridActivity extends CardActivity {
         LinearLayout bar = new LinearLayout(this);
         bar.setGravity(Gravity.CENTER_VERTICAL);
         bar.setPadding(dp(SIDE_ROOM), 0, dp(SIDE_ROOM), 0);
-        LinearLayout names = new LinearLayout(this);
-        names.setBaselineAligned(true);
         setTitle = label("", 19);
         setTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         setTitle.setSingleLine(true);
-        names.addView(setTitle);
+        setTitle.setEllipsize(TextUtils.TruncateAt.END);
+        bar.addView(setTitle, new LinearLayout.LayoutParams(0, -2, 1));
+        // What the collection does now, next to the switch that changes it.
         kindLabel = label("", 13);
         kindLabel.setAlpha(0.6f);
         kindLabel.setSingleLine(true);
-        kindLabel.setPaddingRelative(dp(10), 0, 0, 0);
-        names.addView(kindLabel);
-        bar.addView(names, new LinearLayout.LayoutParams(0, -2, 1));
-        deleteSet = quietButton(getString(R.string.grid_delete_set), this::askDeleteSet);
-        LinearLayout.LayoutParams quiet = new LinearLayout.LayoutParams(-2, -2);
-        quiet.setMarginEnd(dp(10));
-        bar.addView(deleteSet, quiet);
+        LinearLayout.LayoutParams kindPlace = new LinearLayout.LayoutParams(-2, -2);
+        kindPlace.setMarginStart(dp(KIND_ROOM));
+        kindPlace.setMarginEnd(dp(KIND_ROOM));
+        bar.addView(kindLabel, kindPlace);
+        placeButton = pill(getString(R.string.grid_change_place));
+        placeButton.setOnClickListener(view -> askPlace());
+        bar.addView(placeButton, new LinearLayout.LayoutParams(-2, dp(BAR_HEIGHT - 2)));
         single = new LinearLayout(this);
         single.setGravity(Gravity.CENTER_VERTICAL);
         single.setPadding(dp(12), 0, dp(14), 0);
@@ -507,7 +527,11 @@ public final class PictureGridActivity extends CardActivity {
         LinearLayout.LayoutParams actionPlace = new LinearLayout.LayoutParams(-2, dp(BAR_HEIGHT - 2));
         actionPlace.setMarginStart(dp(16));
         infoRow.addView(action, actionPlace);
-        LinearLayout.LayoutParams infoPlace = new LinearLayout.LayoutParams(-1, -2);
+        deleteSet = quietButton(getString(R.string.grid_delete_set), this::askDeleteSet);
+        LinearLayout.LayoutParams quiet = new LinearLayout.LayoutParams(-2, -2);
+        quiet.setMarginStart(dp(16));
+        infoRow.addView(deleteSet, quiet);
+        LinearLayout.LayoutParams infoPlace = new LinearLayout.LayoutParams(-1, dp(INFO_HEIGHT));
         infoPlace.topMargin = dp(INFO_TOP);
         column.addView(infoRow, infoPlace);
         return column;
@@ -551,6 +575,8 @@ public final class PictureGridActivity extends CardActivity {
         if (singleOn) {
             applyLock();
             paintSingle();
+            paintBar();
+            paintList();
             // On: the selection goes into the pictures, to say that one can now be picked.
             focusCell(chosenIndex());
             return;
@@ -568,6 +594,29 @@ public final class PictureGridActivity extends CardActivity {
         return !changesItself(collection) || singleOn;
     }
 
+    /**
+     * The bar: what the collection does, only while it changes by itself, next to its switch; for
+     * the weather its place instead, which the title already says is the weather's.
+     */
+    private void paintBar() {
+        Collection collection = collections.get(current);
+        boolean weather = collection.kind == WEATHER && !collection.missing;
+        String kind = collection.missing ? getString(R.string.grid_kind_missing)
+            : changesItself(collection) && !singleOn ? getString(R.string.grid_kind_timed) : null;
+        kindLabel.setText(kind != null ? kind : "");
+        kindLabel.setVisibility(kind != null ? View.VISIBLE : View.GONE);
+        single.setVisibility(singleShown(collection) ? View.VISIBLE : View.GONE);
+        placeButton.setVisibility(weather ? View.VISIBLE : View.GONE);
+        if (weather) placeButton.setText(getString(Weather.place(this) != null ? R.string.grid_change_place : R.string.grid_choose_place));
+    }
+
+    /** The picture the line names: the one selected, else the one kept, else none. */
+    private String namedPicture() {
+        int focused = cells.indexOf(getCurrentFocus());
+        if (focused >= 0) return pictures.get(focused);
+        return chosenPicture(collections.get(current));
+    }
+
     /** What the line under the pictures says, and the button it needs. */
     private void updateInfo() {
         Collection collection = collections.get(current);
@@ -578,19 +627,17 @@ public final class PictureGridActivity extends CardActivity {
             text = downloadText(collection);
             button = Packs.fetching() ? null : getString(R.string.grid_download);
             actionRun = () -> download(collection);
-        } else if (collection.kind == STANDARD && singleOn) {
-            text = getString(R.string.grid_info_standard);
         } else if (collection.kind == WEATHER) {
             String place = Weather.place(this);
             text = place != null ? getString(R.string.grid_info_weather, place) : getString(R.string.grid_info_weather_none);
-            button = getString(place != null ? R.string.grid_change_place : R.string.grid_choose_place);
-            actionRun = this::askPlace;
         } else if (collection.kind == PERSONAL && pictures.isEmpty()) {
             text = getString(R.string.grid_personal_empty);
         } else if (changesItself(collection) && !singleOn) {
             text = getString(saver ? R.string.grid_info_timed_saver : R.string.grid_info_timed);
         } else {
-            text = getString(R.string.grid_info_single);
+            // One picture: its name, the one selected or the one kept.
+            String named = namedPicture();
+            text = named != null ? Look.backdropName(this, named) : getString(R.string.grid_info_single);
         }
         if (collection.kind == PERSONAL) {
             button = getString(R.string.grid_upload);
@@ -607,7 +654,7 @@ public final class PictureGridActivity extends CardActivity {
         if (!changesItself(collection)) singleOn = false;
         else if (chosenPicture(collection) != null) singleOn = true;
         paintList();
-        single.setVisibility(singleShown(collection) ? View.VISIBLE : View.GONE);
+        paintBar();
         paintSingle();
         applyLock();
         markChosen();
@@ -724,8 +771,6 @@ public final class PictureGridActivity extends CardActivity {
             weigh(collection);
         }
         setTitle.setText(collection.name);
-        kindLabel.setText(collection.missing ? getString(R.string.grid_kind_missing) : getString(collection.kind == WEATHER ? R.string.grid_kind_weather
-            : changesItself(collection) ? R.string.grid_kind_timed : R.string.grid_kind_fixed));
         deleteSet.setVisibility(set != null ? View.VISIBLE : View.GONE);
         refreshState();
         int chosen = chosenIndex();
@@ -782,6 +827,10 @@ public final class PictureGridActivity extends CardActivity {
         else if (!files && !personal) cell.setImageDrawable(Look.preset(pictures.get(index)));
         cell.setOnFocusChangeListener((view, focused) -> {
             view.setForeground(focused ? edge() : null);
+            // After the focus has settled: leaving a cell for another names the new one.
+            info.post(() -> {
+                if (!isDestroyed() && index < cells.size() && cells.get(index) == view) updateInfo();
+            });
             if (!focused) return;
             showRowOf(index, true);
             if (files) sharpenInView();
@@ -1275,6 +1324,9 @@ public final class PictureGridActivity extends CardActivity {
 
     private int gridHeight() { return ROWS_SHOWN * dp(CELL_HEIGHT) + (ROWS_SHOWN - 1) * dp(GAP) + 2 * dp(SIDE_ROOM); }
 
+    /** The bar, the pictures and the line under them: the divider ends with them. */
+    private int bodyHeight() { return dp(BAR_HEIGHT) + dp(BAR_GAP) + gridHeight() + dp(INFO_TOP) + dp(INFO_HEIGHT); }
+
     // ---------- keys ----------
 
     private boolean inList(View view) { return view != null && view.getParent() == list; }
@@ -1283,6 +1335,7 @@ public final class PictureGridActivity extends CardActivity {
     private void enterRight() {
         Collection collection = collections.get(current);
         if (single.getVisibility() == View.VISIBLE) single.requestFocus();
+        else if (placeButton.getVisibility() == View.VISIBLE) placeButton.requestFocus();
         else if (gridOpen() && !cells.isEmpty()) focusCell(chosenIndex());
         else if (action.getVisibility() == View.VISIBLE) action.requestFocus();
         else if (collection.kind == TIMED && deleteSet.getVisibility() == View.VISIBLE) deleteSet.requestFocus();

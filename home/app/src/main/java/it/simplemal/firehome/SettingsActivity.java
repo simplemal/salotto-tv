@@ -416,7 +416,7 @@ public final class SettingsActivity extends CardActivity {
 
         backdropView = new ImageView(this);
         backdropView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        backdropView.setBackground(Look.plainBackdrop());
+        backdropView.setBackground(MenuBackdrop.base(this));
         FrameLayout stage = new FrameLayout(this);
         stage.addView(backdropView, new FrameLayout.LayoutParams(-1, -1));
         stage.addView(root, new FrameLayout.LayoutParams(-1, -1));

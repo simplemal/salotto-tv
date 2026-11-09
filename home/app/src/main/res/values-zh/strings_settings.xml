@@ -361,10 +361,7 @@
     <string name="grid_saver_title">图片</string>
     <string name="grid_weather_group">天气</string>
     <string name="grid_kind_timed">自动更换</string>
-    <string name="grid_kind_weather">天气</string>
-    <string name="grid_kind_fixed">固定</string>
     <string name="grid_single">单张图片</string>
-    <string name="grid_info_standard">Salotto 的颜色和渐变。选择要保留的一个。</string>
     <string name="grid_info_timed">图片会以随机顺序自动更换。更换频率在主屏幕页面中选择。</string>
     <string name="grid_info_timed_saver">图片会自动轮换。轮换频率在屏保页面中选择。</string>
     <string name="grid_info_single">选择要保留的图片：按 OK 全屏显示。</string>

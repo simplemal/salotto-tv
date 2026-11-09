@@ -366,10 +366,7 @@
     <string name="grid_saver_title">Pictures</string>
     <string name="grid_weather_group">Weather</string>
     <string name="grid_kind_timed">changes by itself</string>
-    <string name="grid_kind_weather">weather</string>
-    <string name="grid_kind_fixed">fixed</string>
     <string name="grid_single">One picture</string>
-    <string name="grid_info_standard">Salotto’s colours and gradients. Pick the one that stays.</string>
     <string name="grid_info_timed">The pictures change by themselves, in random order. How often is chosen on the Home page.</string>
     <string name="grid_info_timed_saver">The pictures take turns by themselves. How often is chosen on the Screensaver page.</string>
     <string name="grid_info_single">Pick the picture that stays: OK shows it on the whole screen.</string>

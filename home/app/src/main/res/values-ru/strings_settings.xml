@@ -378,10 +378,7 @@
     <string name="grid_saver_title">Изображения</string>
     <string name="grid_weather_group">Погода</string>
     <string name="grid_kind_timed">меняется сама</string>
-    <string name="grid_kind_weather">погода</string>
-    <string name="grid_kind_fixed">фиксированное</string>
     <string name="grid_single">Одно изображение</string>
-    <string name="grid_info_standard">Цвета и градиенты Salotto. Выберите тот, что останется.</string>
     <string name="grid_info_timed">Изображения меняются сами, в случайном порядке. Как часто — выбирается на странице «Главный экран».</string>
     <string name="grid_info_timed_saver">Изображения сменяют друг друга сами. Как часто — выбирается на странице «Заставка».</string>
     <string name="grid_info_single">Выберите изображение, которое останется: OK покажет его на весь экран.</string>

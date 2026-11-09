@@ -390,10 +390,7 @@
     <string name="grid_saver_title">الصور</string>
     <string name="grid_weather_group">الطقس</string>
     <string name="grid_kind_timed">تتغير وحدها</string>
-    <string name="grid_kind_weather">طقس</string>
-    <string name="grid_kind_fixed">ثابتة</string>
     <string name="grid_single">صورة واحدة</string>
-    <string name="grid_info_standard">ألوان Salotto وتدرجاته. اختر ما يبقى.</string>
     <string name="grid_info_timed">تتغير الصور وحدها بترتيب عشوائي. يُختار التكرار في صفحة الشاشة الرئيسية.</string>
     <string name="grid_info_timed_saver">تتناوب الصور وحدها. يُختار التكرار في صفحة شاشة التوقف.</string>
     <string name="grid_info_single">اختر الصورة التي تبقى: يعرضها OK على الشاشة كاملة.</string>

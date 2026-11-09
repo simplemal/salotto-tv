@@ -366,10 +366,7 @@
     <string name="grid_saver_title">Imagens</string>
     <string name="grid_weather_group">Clima</string>
     <string name="grid_kind_timed">muda sozinha</string>
-    <string name="grid_kind_weather">clima</string>
-    <string name="grid_kind_fixed">fixa</string>
     <string name="grid_single">Uma só imagem</string>
-    <string name="grid_info_standard">As cores e degradês do Salotto. Escolha a que fica.</string>
     <string name="grid_info_timed">As imagens mudam sozinhas, em ordem aleatória. A frequência se escolhe na página Home.</string>
     <string name="grid_info_timed_saver">As imagens se alternam sozinhas. A frequência se escolhe na página Protetor de tela.</string>
     <string name="grid_info_single">Escolha a imagem que fica: OK a mostra em tela cheia.</string>

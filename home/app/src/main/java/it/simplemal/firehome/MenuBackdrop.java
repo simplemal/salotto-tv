@@ -1,9 +1,12 @@
 package it.simplemal.firehome;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import java.io.File;
@@ -29,18 +32,42 @@ final class MenuBackdrop {
     private static Bitmap kept;
     private static String making;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    /**
+     * Under this, a Stick with little memory and an old chip: the Sticks of 2020 and the 4K of 2018
+     * have 1 and 1.5 GB, the ones after them 2. Theirs is plain black, with nothing to make.
+     */
+    private static final long ENOUGH_MEMORY = 1700L * 1024 * 1024;
+    private static Boolean wanted;
 
     private MenuBackdrop() {}
 
+    /** False on a weak Fire TV: the menus stay on black. */
+    static boolean wanted(Context context) {
+        if (wanted == null) {
+            ActivityManager manager = context.getSystemService(ActivityManager.class);
+            ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
+            manager.getMemoryInfo(memory);
+            wanted = !Fire.STICK_2020 && !manager.isLowRamDevice() && memory.totalMem >= ENOUGH_MEMORY;
+        }
+        return wanted;
+    }
+
+    /** Where the backdrop goes: black on a weak Fire TV, else the plain one until the blurred one is there. */
+    static Drawable base(Context context) {
+        return wanted(context) ? Look.plainBackdrop() : new ColorDrawable(Color.BLACK);
+    }
+
     /** On the main thread. Nothing to do if the file is already the one of this backdrop. */
     static void prepare(Context context) {
+        if (!wanted(context)) return;
         String name = Look.currentName(context);
         if (name == null || name.equals(savedName(context)) || name.equals(making)) return;
         make(context, picture -> { });
     }
 
-    /** Ready at once, from memory or from the file, or null if it still has to be made. */
+    /** Ready at once, from memory or from the file, or null if it still has to be made or is not wanted. */
     static Bitmap ready(Context context) {
+        if (!wanted(context)) return null;
         String name = Look.currentName(context);
         if (name == null) return null;
         if (name.equals(keptName)) return kept;
@@ -52,6 +79,7 @@ final class MenuBackdrop {
 
     /** On the main thread; `done` too, with the picture made. */
     static void make(Context context, Consumer<Bitmap> done) {
+        if (!wanted(context)) return;
         String name = Look.currentName(context);
         if (name == null) return;
         making = name;
