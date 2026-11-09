@@ -274,6 +274,9 @@ final class ControlPanel extends LinearLayout {
     private boolean cleanLook;
     private static final int CLEAN_UNIT = 48;
     private static final int CLEAN_GAP = 5;
+    /** The frame around the clean Home's tiles: thin, black, half see-through, no line of light. */
+    private static final int CLEAN_FRAME = 8;
+    private static final int CLEAN_FRAME_FILL = Color.argb(128, 0, 0, 0);
     /**
      * With no panel under them the clean Home's tiles carry the dark themselves, opaque: over the
      * apps, with the first row in the middle or at the top, nothing see-through could be read.
@@ -282,6 +285,14 @@ final class ControlPanel extends LinearLayout {
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }
+
+    /** Its corners follow the tiles' own, one frame further out. */
+    private Drawable frame() {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(CLEAN_FRAME_FILL);
+        fill.setCornerRadius(host.dp(RADIUS + CLEAN_FRAME));
+        return fill;
+    }
 
     /**
      * The list over its button, or the tiles under the pill. `clean`: the clean Home's tiles, the
@@ -294,8 +305,8 @@ final class ControlPanel extends LinearLayout {
             unit = clean ? CLEAN_UNIT : UNIT;
             gap = clean ? CLEAN_GAP : GAP;
             tileOff = clean ? CLEAN_TILE_OFF : TILE_OFF;
-            // The clean Home's tiles stand on their own: no panel around them.
-            int room = clean ? 0 : host.dp(PADDING);
+            // The clean Home's tiles keep their size: a thin frame around them, outside.
+            int room = host.dp(clean ? CLEAN_FRAME : PADDING);
             setPadding(room, room, room, room);
             removeAllViews();
             tiles.clear();
@@ -308,7 +319,7 @@ final class ControlPanel extends LinearLayout {
             addRest();
         }
         // The list is one plain colour inside the glass line: no sheen, nothing to blend with what is behind it.
-        setBackground(list ? solid() : clean ? null : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
+        setBackground(list ? solid() : clean ? frame() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
         int across = list ? Gravity.START : clean ? Gravity.CENTER_HORIZONTAL : Gravity.END;
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
         spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | across;
@@ -321,7 +332,7 @@ final class ControlPanel extends LinearLayout {
         FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
         under.gravity = Gravity.TOP | across;
         under.rightMargin = list || clean ? 0 : host.dp(EDGE);
-        int padding = clean ? 0 : PADDING;
+        int padding = clean ? CLEAN_FRAME : PADDING;
         // Two rows on the clean Home, four elsewhere.
         int tall = clean ? 2 * unit + gap : 4 * unit + 3 * gap;
         int wide = clean ? 2 * wide() + 4 * unit + 5 * gap : 2 * wide() + gap;
