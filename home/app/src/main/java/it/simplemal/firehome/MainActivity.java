@@ -1039,8 +1039,11 @@ public final class MainActivity extends CardActivity {
         // The clean Home's time is in its line at the top, or not wanted: never in the buttons.
         boolean clockInView = clean || bigClock && !raised;
         String symbol = raised ? weatherSymbol : null;
-        // The date already on the left is not repeated in the pill: only once it is out of view.
-        boolean withDate = !clockInView && (raised || date.getVisibility() != View.VISIBLE);
+        // Time and date not big stay small in the pill (2026-11-09: the switch is called Large), and
+        // the date on the left is not repeated there: only once it is out of view. Not on the clean
+        // Home, which has its own line at the top.
+        boolean withDate = !clean && (raised || date.getVisibility() != View.VISIBLE);
+        boolean small = !clockInView || withDate;
         // Called at every step of a scroll, and almost every step changes nothing.
         if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
@@ -1050,12 +1053,12 @@ public final class MainActivity extends CardActivity {
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
         clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
-        pillShade.animate().alpha(clockInView ? 0 : 1).setDuration(PILL_MS).start();
+        pillShade.animate().alpha(small ? 1 : 0).setDuration(PILL_MS).start();
         pillDate.setVisibility(withDate ? View.VISIBLE : View.GONE);
         pillTime.setVisibility(time);
         pillWeather.setVisibility(symbol != null ? View.VISIBLE : View.GONE);
         if (symbol != null) pillWeather.setText(WeatherIcon.in(this, symbol));
-        pillRow.setPadding(clockInView ? dp(6) : dp(16), dp(6), dp(6), dp(6));
+        pillRow.setPadding(small ? dp(16) : dp(6), dp(6), dp(6), dp(6));
     }
 
     private void animatePill() {

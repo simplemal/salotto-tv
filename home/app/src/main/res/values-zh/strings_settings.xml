@@ -223,7 +223,8 @@
     <string name="settings_clock">时钟</string>
     <string name="settings_clock_value">%1$s，%2$s</string>
     <string name="settings_show_on_home">显示在主页</string>
-    <string name="settings_clock_show_text">右上角的小标签里始终会显示时间。</string>
+    <string name="settings_big">大字</string>
+    <string name="settings_clock_show_text">关闭后，时间以小字显示在按钮旁边。</string>
     <string name="settings_font">字体</string>
     <string name="settings_font_text">时钟数字的样式。</string>
     <string name="settings_size">大小</string>
@@ -313,7 +314,7 @@
     <string name="settings_wheel_blur">模糊背景</string>
     <string name="settings_wheel_blur_text">转盘后面的背景会被模糊，让应用、时间和天气更醒目。动态天气场景会显示为静止。</string>
     <string name="settings_time_group">时间</string>
-    <string name="settings_date_show_text">在主屏幕上显示日期，即使没有时钟。</string>
+    <string name="settings_date_show_text">关闭后，日期以小字显示在按钮旁边。</string>
     <string name="settings_date_font_text">日期文字的样式。</string>
     <string name="settings_date_size_text">日期的大小。</string>
     <string name="settings_date_long">完整</string>

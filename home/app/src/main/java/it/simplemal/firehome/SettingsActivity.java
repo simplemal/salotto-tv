@@ -2049,7 +2049,7 @@ public final class SettingsActivity extends CardActivity {
         String place = Weather.place(this);
         show(getString(R.string.settings_cat_clock), Arrays.asList(
             groupLabel(R.string.settings_time_group),
-            new Entry(getString(R.string.settings_show_on_home), visible ? YES : NO, null,
+            new Entry(getString(R.string.settings_big), visible ? YES : NO, null,
                 getString(R.string.settings_clock_show_text), false, () -> {
                     Look.setClock(this, !visible);
                     refresh();
@@ -2064,7 +2064,7 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }),
             groupLabel(R.string.settings_date),
-            new Entry(getString(R.string.settings_show_on_home), Look.date(this) ? YES : NO, null,
+            new Entry(getString(R.string.settings_big), Look.date(this) ? YES : NO, null,
                 getString(R.string.settings_date_show_text), false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();

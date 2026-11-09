@@ -222,7 +222,8 @@
     <string name="settings_clock">Uhr</string>
     <string name="settings_clock_value">%1$s, %2$s</string>
     <string name="settings_show_on_home">Auf Home anzeigen</string>
-    <string name="settings_clock_show_text">Die Uhrzeit bleibt trotzdem oben rechts in der Anzeige sichtbar.</string>
+    <string name="settings_big">Groß</string>
+    <string name="settings_clock_show_text">Aus: Die Uhrzeit bleibt klein neben den Tasten.</string>
     <string name="settings_font">Schriftart</string>
     <string name="settings_font_text">Der Stil der Ziffern der Uhr.</string>
     <string name="settings_size">Größe</string>
@@ -317,7 +318,7 @@
     <string name="settings_wheel_blur">Unscharfer Hintergrund</string>
     <string name="settings_wheel_blur_text">Der Hintergrund hinter dem Rad ist unscharf, damit Apps, Uhrzeit und Wetter hervortreten. Animierte Wetterszenen stehen still.</string>
     <string name="settings_time_group">Uhrzeit</string>
-    <string name="settings_date_show_text">Zeigt das Datum auf dem Home, auch ohne Uhr.</string>
+    <string name="settings_date_show_text">Aus: Das Datum bleibt klein neben den Tasten.</string>
     <string name="settings_date_font_text">Der Stil der Buchstaben des Datums.</string>
     <string name="settings_date_size_text">Wie groß das Datum ist.</string>
     <string name="settings_date_long">Ausgeschrieben</string>
