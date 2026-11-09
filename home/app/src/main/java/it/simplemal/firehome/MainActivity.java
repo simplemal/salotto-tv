@@ -80,8 +80,11 @@ public final class MainActivity extends CardActivity {
      */
     private static final float CLEAN_EDGE = 0.75f;
     private static final int CLEAN_EDGE_ALPHA = 128;
-    /** On an icon with a dark background the line is stronger, 70%: the user's choice of 2026-11-09. */
-    private static final int CLEAN_EDGE_DARK_ALPHA = 179;
+    /**
+     * On an icon with a dark background the line is fainter, 70% see-through: the user's choice of
+     * 2026-11-09 (read the other way round at first, as 70% strong).
+     */
+    private static final int CLEAN_EDGE_DARK_ALPHA = 77;
     private static final float CLEAN_DARK = 0.3f;
     /** How far towards white that line goes from the app's colour. */
     private static final float CLEAN_EDGE_LIGHT = 0.45f;
