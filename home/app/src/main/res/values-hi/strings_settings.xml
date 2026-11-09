@@ -389,4 +389,5 @@
     <string name="settings_glow_wide">चौड़ा</string>
     <string name="settings_home_clean">साफ़</string>
     <string name="settings_section_clean">साफ़ होम</string>
+    <string name="settings_first_row">पहली पंक्ति</string>
 </resources>

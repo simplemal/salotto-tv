@@ -389,4 +389,5 @@
     <string name="settings_glow_wide">Large</string>
     <string name="settings_home_clean">Épurée</string>
     <string name="settings_section_clean">Accueil épuré</string>
+    <string name="settings_first_row">Première rangée</string>
 </resources>

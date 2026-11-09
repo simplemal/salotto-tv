@@ -787,6 +787,15 @@ public final class SettingsActivity extends CardActivity {
         }
         if (note != null) rows.addView(note(note), new LinearLayout.LayoutParams(-1, -2));
         shownEntries = entries;
+        // A list of choices opens on the one in use, the user's request of 2026-11-09, not on the first.
+        if (!level.drawn) {
+            for (int index = 0; index < entries.size(); index++) {
+                if (CHECK.equals(entries.get(index).value)) {
+                    level.focus = index;
+                    break;
+                }
+            }
+        }
         level.drawn = true;
         if (level.focus == 0 || inMenu || firstRow(level.focus)) scroll.scrollTo(0, 0);
         if (!inMenu) selectRow(level.focus);
@@ -1059,12 +1068,12 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }));
         } else {
-            // The clean Home has ten apps a row, always.
+            // The clean Home has twelve apps a row, always.
             if (style == Look.HOME_GRID) entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
                 getString(R.string.settings_grid_text), true, () -> enter(this::showColumns)));
             entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
                 getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
-            entries.add(new Entry(getString(R.string.settings_dock),
+            entries.add(new Entry(getString(style == Look.HOME_CLEAN ? R.string.settings_first_row : R.string.settings_dock),
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom), null,
                 getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
             if (style == Look.HOME_CLEAN) {
@@ -1155,8 +1164,11 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showDock() {
-        String[] names = {getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
-        show(getString(R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+        // The clean Home has no dock to see: its first row of apps, at the bottom or at the top.
+        boolean clean = Look.clean(this);
+        String[] names = clean ? new String[]{getString(R.string.settings_dock_bottom), getString(R.string.settings_dock_top)}
+            : new String[]{getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
+        show(getString(clean ? R.string.settings_first_row : R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
                 Look.setAppsOnly(this, index == 1);
                 refresh();

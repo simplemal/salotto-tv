@@ -193,16 +193,16 @@ public final class MainActivity extends CardActivity {
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
     /**
-     * The clean Home: rows of squircles like the grid's cards, ten a row and centred, with the time
+     * The clean Home: rows of squircles like the grid's cards, twelve a row and centred, with the time
      * and the weather in the top corners as on the wheel, the buttons at the top in the middle and
      * the credits at the very bottom.
      */
     private boolean clean;
     private int style = -1;
     private ImageView networkButton;
-    private static final int CLEAN_COLUMNS = 10;
-    private static final int CLEAN_TILE = 64;
-    private static final int CLEAN_GAP = 20;
+    private static final int CLEAN_COLUMNS = 12;
+    private static final int CLEAN_TILE = 56;
+    private static final int CLEAN_GAP = 14;
     /** Where the dock stops once a lower row has the focus: under the time and the weather. */
     private static final int CLEAN_DOCK_TOP = 176;
     private static final int CLEAN_PILL_TOP = 18;
@@ -255,6 +255,13 @@ public final class MainActivity extends CardActivity {
     private boolean loading;
     private boolean looked;
     private static final long LOADING_LIMIT_MS = 10000;
+    /**
+     * A switch between layouts shows its loading at least this long. Back with the Home key the
+     * cover shows the Home of before for a moment, and a quick new one was ready under it: the
+     * loading never showed (2026-11-09).
+     */
+    private static final long LOADING_LEAST_MS = 800;
+    private long loadingUntil;
     private static final long MENU_BACKDROP_DELAY_MS = 4000;
     private final Runnable menuBackdrop = () -> {
         if (!isDestroyed()) MenuBackdrop.prepare(this);
@@ -713,14 +720,14 @@ public final class MainActivity extends CardActivity {
         });
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
         beside.setMarginEnd(dp(PILL_ICON_GAP));
-        pillRow.addView(controlButton, beside);
-        // Only on the clean Home: Rete e Bluetooth, between the control centre and the settings.
+        // Only on the clean Home: Rete e Bluetooth, first, before the control centre.
         networkButton = pillIcon(R.drawable.ic_wifi, getString(R.string.settings_cat_network));
         networkButton.setVisibility(View.GONE);
         networkButton.setOnClickListener(v -> open(new Intent(this, SettingsActivity.class)
             .putExtra(SettingsActivity.SECTION, SettingsActivity.NETWORK)));
         networkButton.setOnKeyListener((view, code, event) -> downToApps(code, event));
         pillRow.addView(networkButton, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
+        pillRow.addView(controlButton, beside);
         pillRow.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillButton = settings;
         // The wheel covers the whole screen, so the arrows would not find it from the buttons by themselves.
@@ -996,7 +1003,25 @@ public final class MainActivity extends CardActivity {
         ticker.post(weatherCheck);
         weatherView.resume();
         root.postDelayed(offerStart, OFFER_START_MS);
+        backToApp();
         homeMaybeReady();
+    }
+
+    /**
+     * Back on the Home from the settings or the control centre: on the app that was selected, not
+     * on the button, in every layout (the user's request of 2026-11-09). On the grid that also
+     * takes the dock where it now belongs, if it has just been moved.
+     */
+    private void backToApp() {
+        View focus = getCurrentFocus();
+        if (focus != controlButton && focus != pillButton && focus != networkButton) return;
+        if (circular) {
+            wheel.requestFocus();
+            return;
+        }
+        View tile = lastApp != null ? page.findViewWithTag(lastApp) : null;
+        if (tile == null) tile = firstCard();
+        if (tile != null) tile.requestFocus();
     }
 
     /** After the backdrop has come in, or the question would open over an empty Home. */
@@ -1196,6 +1221,7 @@ public final class MainActivity extends CardActivity {
             root.addView(loadingMask, new FrameLayout.LayoutParams(-1, -1));
         }
         loadingMiddle.setVisibility(switching ? View.VISIBLE : View.GONE);
+        loadingUntil = switching ? SystemClock.uptimeMillis() + LOADING_LEAST_MS : 0;
         loadingMask.animate().cancel();
         loadingMask.setAlpha(1f);
         loadingMask.setVisibility(View.VISIBLE);
@@ -1226,6 +1252,12 @@ public final class MainActivity extends CardActivity {
 
     private void hideLoading() {
         if (!loading) return;
+        long wait = loadingUntil - SystemClock.uptimeMillis();
+        if (wait > 0) {
+            root.removeCallbacks(endLoading);
+            root.postDelayed(endLoading, wait);
+            return;
+        }
         loading = false;
         root.removeCallbacks(endLoading);
         loadingMask.animate().alpha(0f).setDuration(LOADING_OUT_MS).withEndAction(() -> loadingMask.setVisibility(View.GONE)).start();
@@ -1407,8 +1439,9 @@ public final class MainActivity extends CardActivity {
 
         // The first row rests low: below it only a third of the next row shows.
         int screen = getResources().getDisplayMetrics().heightPixels;
-        int dockPadding = dp(DOCK_HEIGHT_PADDING);
-        int dockHeight = imageHeight + 2 * dockPadding;
+        // The clean Home's first row is a row like the others, names included: no dock around it.
+        int dockPadding = clean ? 0 : dp(DOCK_HEIGHT_PADDING);
+        int dockHeight = clean ? rowHeight : imageHeight + 2 * dockPadding;
         int rowGap = dp(20);
         int top = screen - dockHeight - rowGap - imageHeight / 3;
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
@@ -1426,7 +1459,7 @@ public final class MainActivity extends CardActivity {
             if (index % columns == 0) {
                 row = row(page);
                 row.setPadding(inset, index == 0 ? dockPadding : 0, inset, index == 0 ? dockPadding : 0);
-                // Fewer than ten in a row sit in the middle, not at the start.
+                // Fewer than twelve in a row sit in the middle, not at the start.
                 if (clean) row.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (index == 0) {
                     dock = row;
@@ -1444,7 +1477,7 @@ public final class MainActivity extends CardActivity {
                 around.leftMargin = dp(CLEAN_GAP) / 2;
                 around.rightMargin = dp(CLEAN_GAP) / 2;
             }
-            if (index < columns) ((LinearLayout) tile).getChildAt(1).setVisibility(View.GONE);
+            if (index < columns && !clean) ((LinearLayout) tile).getChildAt(1).setVisibility(View.GONE);
             if (first == null) first = tile;
             if (focus != null && focus.equals(tile.getTag())) target = tile;
         }
@@ -1771,10 +1804,14 @@ public final class MainActivity extends CardActivity {
 
     /** The dock shows only the artwork, as on tvOS. */
     @Override protected boolean showsCaption(View tile) {
-        return tile.getParent() != page.getChildAt(0);
+        return clean || tile.getParent() != page.getChildAt(0);
     }
 
+    /** The app selected last, to come back to after the settings or the control centre. */
+    private String lastApp;
+
     @Override protected void onCardFocus(View tile) {
+        if (tile.getTag() instanceof String) lastApp = (String) tile.getTag();
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
         int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;

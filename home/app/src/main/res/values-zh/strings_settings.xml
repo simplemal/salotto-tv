@@ -384,4 +384,5 @@
     <string name="settings_glow_wide">宽</string>
     <string name="settings_home_clean">简洁</string>
     <string name="settings_section_clean">简洁主屏幕</string>
+    <string name="settings_first_row">第一排</string>
 </resources>

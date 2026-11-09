@@ -401,4 +401,5 @@
     <string name="settings_glow_wide">Широкий</string>
     <string name="settings_home_clean">Чистый</string>
     <string name="settings_section_clean">Чистый главный экран</string>
+    <string name="settings_first_row">Первый ряд</string>
 </resources>

@@ -144,7 +144,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
 
     /** The squircle's corners as a rounded rectangle, for the shadow under it. */
     private static final float SQUIRCLE_CORNER = 0.24f;
-    private static final int SQUARE_CAPTION_ROOM = 20;
+    private static final int SQUARE_CAPTION_ROOM = 14;
     private Drawable squircleRing;
 
     protected void onCardFocus(View tile) { }

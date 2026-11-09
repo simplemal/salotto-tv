@@ -413,4 +413,5 @@
     <string name="settings_glow_wide">واسع</string>
     <string name="settings_home_clean">نظيفة</string>
     <string name="settings_section_clean">الشاشة الرئيسية النظيفة</string>
+    <string name="settings_first_row">الصف الأول</string>
 </resources>

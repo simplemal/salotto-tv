@@ -390,4 +390,5 @@
     <string name="settings_glow_wide">Amplio</string>
     <string name="settings_home_clean">Limpia</string>
     <string name="settings_section_clean">Home limpia</string>
+    <string name="settings_first_row">Primera fila</string>
 </resources>
