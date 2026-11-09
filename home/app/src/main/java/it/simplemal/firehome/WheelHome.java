@@ -435,7 +435,7 @@ final class WheelHome extends FrameLayout {
     /** From now the portal is the circle's background, wide, with the app's circle small in its place. */
     void portalToCircle() {
         Bitmap art = litArt();
-        if (portal != null && art != null) portal.toCircle(CircleArt.rim(art), art);
+        if (portal != null && art != null) portal.toCircle(Color.BLACK, art);
     }
 
     /** The Home all in the app's colour at once, under the window that opens on the app. */
@@ -463,7 +463,7 @@ final class WheelHome extends FrameLayout {
         if (art != null) {
             // The circle's background closing onto the app's circle, on the drawing thread: smooth
             // while the Home is busy coming back.
-            CircleClose circle = new CircleClose(getContext(), CircleArt.rim(art), art, leaving.x, leaving.y, leaving.start);
+            CircleClose circle = new CircleClose(getContext(), litColour(), art, leaving.x, leaving.y, leaving.start);
             addView(circle, new LayoutParams(-1, -1));
             circle.setTranslationZ(dp(20));
             removeView(leaving);
@@ -562,7 +562,7 @@ final class WheelHome extends FrameLayout {
             invalidate();
         }
 
-        /** The closing: the circle's own background shrinks onto the app's circle, which stays small in its place. */
+        /** The closing: black all round the app's circle, which stays small in its place. */
         void toCircle(int background, Bitmap circle) {
             ring.setColor(background);
             art = circle;

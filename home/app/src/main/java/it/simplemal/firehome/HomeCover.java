@@ -95,7 +95,7 @@ final class HomeCover {
 
     static void homeShown(Window window) { home = window; }
 
-    /** The app opened from the wheel: its circle, the colour of its background, and where it sits. */
+    /** The app opened from the wheel: its circle, the colour of its ring, and where it sits. */
     private static final class Closing {
         final Bitmap art;
         final int background;
@@ -134,14 +134,14 @@ final class HomeCover {
     static volatile boolean busy;
 
     /**
-     * The Home key after an app from the wheel, at once over everything: the circle's own background,
-     * as wide as the screen, closes onto the app's circle, small in its place over the Home's picture.
+     * The Home key after an app from the wheel, at once over everything: black with the app's circle,
+     * small in its place, then a ring of its colour closing onto it over the Home's picture.
      */
     private void startClose(Closing where) {
         busy = true;
         view.setImageBitmap(picture);
         if (picture == null) view.setImageDrawable(new ColorDrawable(Color.BLACK));
-        // The whole screen in the circle's own colour at once, the app's circle small in its place.
+        // The whole screen black at once, the app's circle small in its place.
         // It stays still until the Home is there and past Fire OS's animation, so nothing else is
         // being drawn while it closes: started earlier, it stuttered and three dots showed after it.
         layer = new CircleClose(service, where.background, where.art, where.x, where.y, where.radius);
