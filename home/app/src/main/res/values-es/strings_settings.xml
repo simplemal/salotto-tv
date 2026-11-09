@@ -388,4 +388,6 @@
     <string name="settings_glow_off">Apagado</string>
     <string name="settings_glow_normal">Normal</string>
     <string name="settings_glow_wide">Amplio</string>
+    <string name="settings_home_clean">Limpia</string>
+    <string name="settings_section_clean">Home limpia</string>
 </resources>

@@ -297,7 +297,17 @@ final class ControlPanel extends LinearLayout {
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
         int left = at[0] - base[0] + button.getWidth() / 2 - getMeasuredWidth() / 2;
         spot.leftMargin = Math.max(host.dp(16), Math.min(left, parent.getWidth() - getMeasuredWidth() - host.dp(16)));
-        spot.bottomMargin = parent.getHeight() - (at[1] - base[1]) + host.dp(LIST_LIFT);
+        int buttonTop = at[1] - base[1];
+        // Above a button at the bottom, as on the wheel; under one at the top, as on the clean Home.
+        if (buttonTop < parent.getHeight() / 2) {
+            spot.gravity = Gravity.TOP | Gravity.START;
+            spot.topMargin = buttonTop + button.getHeight() + host.dp(LIST_LIFT);
+            spot.bottomMargin = 0;
+        } else {
+            spot.gravity = Gravity.BOTTOM | Gravity.START;
+            spot.topMargin = 0;
+            spot.bottomMargin = parent.getHeight() - buttonTop + host.dp(LIST_LIFT);
+        }
         setLayoutParams(spot);
     }
 

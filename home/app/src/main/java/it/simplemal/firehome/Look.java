@@ -187,8 +187,21 @@ final class Look {
     static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
     static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
     /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
-    static boolean circular(Context context) { return prefs(context).getBoolean("circular", false); }
-    static void setCircular(Context context, boolean value) { prefs(context).edit().putBoolean("circular", value).apply(); }
+    /** The Home's three layouts: cards in a grid, circles on a wheel, or the clean one with squircles. */
+    static final int HOME_GRID = 0;
+    static final int HOME_CIRCLE = 1;
+    static final int HOME_CLEAN = 2;
+
+    /** Until one is chosen here, what the old switch between grid and wheel said. */
+    static int homeStyle(Context context) {
+        return prefs(context).getInt("home_style", prefs(context).getBoolean("circular", false) ? HOME_CIRCLE : HOME_GRID);
+    }
+    static void setHomeStyle(Context context, int style) { prefs(context).edit().putInt("home_style", style).apply(); }
+    static boolean circular(Context context) { return homeStyle(context) == HOME_CIRCLE; }
+    static boolean clean(Context context) { return homeStyle(context) == HOME_CLEAN; }
+    /** The clean Home's own blur, off until chosen: apart from the wheel's. */
+    static boolean cleanBlur(Context context) { return prefs(context).getBoolean("clean_blur", false); }
+    static void setCleanBlur(Context context, boolean on) { prefs(context).edit().putBoolean("clean_blur", on).apply(); }
     /** How many circles of the wheel are in view: the lit one and one or two on each side. */
     static final int[] WHEEL_CHOICES = {3, 5};
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
@@ -546,14 +559,14 @@ final class Look {
     static String signature(Context context) {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
-            + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
+            + "/" + appsOnly(context) + "/" + homeStyle(context) + "/" + cleanBlur(context) + "/" + wheel(context)
             + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
             + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
     static String cardsSignature(Context context) {
-        return columns(context) + "/" + names(context) + "/" + circular(context) + "/" + wheel(context);
+        return columns(context) + "/" + names(context) + "/" + homeStyle(context) + "/" + wheel(context);
     }
 
     /** Where the images of Personale are, sent from a phone or copied before that. */

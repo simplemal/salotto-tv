@@ -387,4 +387,6 @@
     <string name="settings_glow_off">Spento</string>
     <string name="settings_glow_normal">Normale</string>
     <string name="settings_glow_wide">Ampio</string>
+    <string name="settings_home_clean">Pulita</string>
+    <string name="settings_section_clean">Home pulita</string>
 </resources>

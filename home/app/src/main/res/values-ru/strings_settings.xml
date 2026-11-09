@@ -399,4 +399,6 @@
     <string name="settings_glow_off">Выкл.</string>
     <string name="settings_glow_normal">Обычный</string>
     <string name="settings_glow_wide">Широкий</string>
+    <string name="settings_home_clean">Чистый</string>
+    <string name="settings_section_clean">Чистый главный экран</string>
 </resources>

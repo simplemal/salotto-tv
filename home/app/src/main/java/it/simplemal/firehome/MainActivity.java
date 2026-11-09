@@ -192,6 +192,22 @@ public final class MainActivity extends CardActivity {
     private int rowHeight;
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
+    /**
+     * The clean Home: rows of squircles like the grid's cards, ten a row and centred, with the time
+     * and the weather in the top corners as on the wheel, the buttons at the top in the middle and
+     * the credits at the very bottom.
+     */
+    private boolean clean;
+    private int style = -1;
+    private ImageView networkButton;
+    private static final int CLEAN_COLUMNS = 10;
+    private static final int CLEAN_TILE = 64;
+    private static final int CLEAN_GAP = 20;
+    /** Where the dock stops once a lower row has the focus: under the time and the weather. */
+    private static final int CLEAN_DOCK_TOP = 176;
+    private static final int CLEAN_PILL_TOP = 18;
+    private static final int CLEAN_ICON_GAP = 22;
+    private Bitmap squirclePlaceholder;
     private WheelHome wheel;
     private LinearLayout weatherCorner;
     private TextView cornerLine;
@@ -343,7 +359,8 @@ public final class MainActivity extends CardActivity {
         scroll.setClipChildren(false);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setOnScrollChangeListener((view, x, y, oldX, oldY) -> {
-            float alpha = shelf > 0 ? Math.max(0f, 1f - 2f * y / shelf) : 1f;
+            // On the clean Home the time and the weather stay: the dock stops under them.
+            float alpha = clean || shelf <= 0 ? 1f : Math.max(0f, 1f - 2f * y / shelf);
             weatherView.setScroll(shelf > 0 ? Math.min(1f, (float) y / shelf) : 0);
             hero.setAlpha(alpha);
             clockShade.setAlpha(alpha);
@@ -453,62 +470,75 @@ public final class MainActivity extends CardActivity {
         } else {
             root.addView(allAppsCircle, root.indexOfChild(wheel) + 1, allAppsPlace());
         }
-        panel.setListed(circular);
+        boolean corners = cornersOnTop();
+        // The buttons alone, without the pill's glass, on the wheel at the bottom and on the clean Home at the top.
+        panel.setListed(corners);
         // On the wheel the date goes above the time, where the eye starts reading the corner.
         hero.removeView(date);
-        hero.addView(date, circular ? 0 : hero.indexOfChild(clock) + 1);
+        hero.addView(date, corners ? 0 : hero.indexOfChild(clock) + 1);
         hero.post(this::alignDate);
         // The big digits carry room above them for accents they never have: under the date it reads as a gap.
-        clock.setIncludeFontPadding(!circular);
-        panelShade.setBackground(circular ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
-        heroPlace.leftMargin = dp(circular ? 32 : DOCK_MARGIN + DOCK_SIDE);
-        heroPlace.topMargin = dp(circular ? 14 : 40);
+        clock.setIncludeFontPadding(!corners);
+        panelShade.setBackground(corners ? new ColorDrawable(Color.argb(200, 0, 0, 0)) : null);
+        heroPlace.leftMargin = dp(corners ? 32 : DOCK_MARGIN + DOCK_SIDE);
+        heroPlace.topMargin = dp(corners ? 14 : 40);
         hero.setLayoutParams(heroPlace);
         FrameLayout.LayoutParams pillSpot = (FrameLayout.LayoutParams) pillBox.getLayoutParams();
-        pillSpot.gravity = circular ? Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL : Gravity.TOP | Gravity.END;
-        pillSpot.topMargin = circular ? 0 : dp(22);
-        pillSpot.rightMargin = circular ? 0 : dp(DOCK_MARGIN);
+        pillSpot.gravity = circular ? Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
+            : clean ? Gravity.TOP | Gravity.CENTER_HORIZONTAL : Gravity.TOP | Gravity.END;
+        pillSpot.topMargin = circular ? 0 : dp(clean ? CLEAN_PILL_TOP : 22);
+        pillSpot.rightMargin = corners ? 0 : dp(DOCK_MARGIN);
         pillSpot.bottomMargin = circular ? dp(12) : 0;
         pillBox.setLayoutParams(pillSpot);
-        pillBox.setBackground(circular ? null : pillGlass);
-        pillBox.setForeground(circular ? null : pillEdge);
-        int icon = dp(circular ? FREE_ICON : PILL_ICON);
-        for (ImageView button : new ImageView[]{controlButton, pillButton}) {
+        pillBox.setBackground(corners ? null : pillGlass);
+        pillBox.setForeground(corners ? null : pillEdge);
+        networkButton.setVisibility(clean ? View.VISIBLE : View.GONE);
+        if (clean) networkButton.setImageResource(DeviceInfo.wired(this) ? R.drawable.ic_ethernet : R.drawable.ic_wifi);
+        int icon = dp(corners ? FREE_ICON : PILL_ICON);
+        for (ImageView button : new ImageView[]{controlButton, networkButton, pillButton}) {
             LinearLayout.LayoutParams size = (LinearLayout.LayoutParams) button.getLayoutParams();
             size.width = icon;
             size.height = icon;
             button.setLayoutParams(size);
-            int inset = dp(circular ? 2 : 3);
+            int inset = dp(corners ? 2 : 3);
             button.setPadding(inset, inset, inset, inset);
         }
         // Set again as layout params: a margin end changed in place is not applied once the button is
         // on screen, and switching to the wheel left Tutte le app 3 dp from it instead of 22 (2026-11-06).
         LinearLayout.LayoutParams beside = (LinearLayout.LayoutParams) controlButton.getLayoutParams();
-        beside.setMarginEnd(dp(circular ? BESIDE_ALL_APPS : PILL_ICON_GAP));
+        beside.setMarginEnd(dp(circular ? BESIDE_ALL_APPS : clean ? CLEAN_ICON_GAP : PILL_ICON_GAP));
         controlButton.setLayoutParams(beside);
+        LinearLayout.LayoutParams network = (LinearLayout.LayoutParams) networkButton.getLayoutParams();
+        network.setMarginEnd(dp(CLEAN_ICON_GAP));
+        networkButton.setLayoutParams(network);
         FrameLayout.LayoutParams weatherSpot = (FrameLayout.LayoutParams) weatherCorner.getLayoutParams();
         weatherSpot.rightMargin = dp(32);
         weatherSpot.topMargin = dp(WEATHER_TOP);
         weatherCorner.setLayoutParams(weatherSpot);
         footer.setTextSize(circular ? 7 : FOOTER_SP);
+        lightCorner = false;
         tonePill();
     }
 
+    /** Time and weather in the two top corners, the buttons free of glass: the wheel and the clean Home. */
+    private boolean cornersOnTop() { return circular || clean; }
+
     /** White with a small shadow over a medium or dark picture, black over a very light one. */
     private void tonePill() {
-        int ink = circular && lightCorner ? Color.BLACK : Color.WHITE;
+        int ink = cornersOnTop() && lightCorner ? Color.BLACK : Color.WHITE;
         for (TextView text : new TextView[]{pillTime, pillDate, pillWeather}) {
             text.setTextColor(ink);
-            if (circular && !lightCorner) text.setShadowLayer(dp(3), 0, dp(1), Color.argb(170, 0, 0, 0));
+            if (cornersOnTop() && !lightCorner) text.setShadowLayer(dp(3), 0, dp(1), Color.argb(170, 0, 0, 0));
             else text.setShadowLayer(0, 0, 0, 0);
         }
         lightPillIcon(controlButton, controlButton.hasFocus());
+        if (networkButton != null) lightPillIcon(networkButton, networkButton.hasFocus());
         lightPillIcon(pillButton, pillButton.hasFocus());
     }
 
     @Override protected void lightPillIcon(ImageView button, boolean lit) {
         if (!pillRings.containsKey(button)) pillRings.put(button, button.getBackground());
-        if (!circular || lit) {
+        if (!cornersOnTop() || lit) {
             button.setBackground(pillRings.get(button));
             super.lightPillIcon(button, lit);
             return;
@@ -541,15 +571,17 @@ public final class MainActivity extends CardActivity {
     /** How light the picture is around the buttons at the bottom, read again only when it changes. */
     private void readCorner() {
         String name = Look.currentName(this);
-        if (!circular || Objects.equals(name, cornerRead)) return;
+        if (!cornersOnTop() || Objects.equals(name, cornerRead)) return;
         cornerRead = name;
+        // The wheel's buttons are at the bottom in the middle, the clean Home's at the top.
+        boolean top = clean;
         Look.current(this, picture -> {
             int width = picture.getWidth();
             int height = picture.getHeight();
             double sum = 0;
             int count = 0;
             for (int x = width * 3 / 8; x < width * 5 / 8; x += 4) {
-                for (int y = height * 5 / 6; y < height; y += 4) {
+                for (int y = top ? 0 : height * 5 / 6; y < (top ? height / 6 : height); y += 4) {
                     int pixel = picture.getPixel(x, y);
                     sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
                     count++;
@@ -584,7 +616,7 @@ public final class MainActivity extends CardActivity {
     }
 
     private void alignDate() {
-        if (!circular || hero == null || date.getParent() != hero || cornerLine.getVisibility() != View.VISIBLE) {
+        if (!cornersOnTop() || hero == null || date.getParent() != hero || cornerLine.getVisibility() != View.VISIBLE) {
             if (hero != null) hero.setTranslationY(0);
             return;
         }
@@ -672,6 +704,7 @@ public final class MainActivity extends CardActivity {
         });
         controlButton.setOnKeyListener((view, code, event) -> {
             if (outOfRow(code, false)) return backToWheel(code, event);
+            if (clean) return downToApps(code, event);
             int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
             if (code != toPanel) return false;
             // On the wheel Up goes back to the apps: the panel opens with the button itself.
@@ -681,11 +714,19 @@ public final class MainActivity extends CardActivity {
         LinearLayout.LayoutParams beside = new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON));
         beside.setMarginEnd(dp(PILL_ICON_GAP));
         pillRow.addView(controlButton, beside);
+        // Only on the clean Home: Rete e Bluetooth, between the control centre and the settings.
+        networkButton = pillIcon(R.drawable.ic_wifi, getString(R.string.settings_cat_network));
+        networkButton.setVisibility(View.GONE);
+        networkButton.setOnClickListener(v -> open(new Intent(this, SettingsActivity.class)
+            .putExtra(SettingsActivity.SECTION, SettingsActivity.NETWORK)));
+        networkButton.setOnKeyListener((view, code, event) -> downToApps(code, event));
+        pillRow.addView(networkButton, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillRow.addView(settings, new LinearLayout.LayoutParams(dp(PILL_ICON), dp(PILL_ICON)));
         pillButton = settings;
         // The wheel covers the whole screen, so the arrows would not find it from the buttons by themselves.
         settings.setOnKeyListener((view, code, event) -> {
             if (outOfRow(code, true)) return backToWheel(code, event);
+            if (clean) return downToApps(code, event);
             if (!circular || code != KeyEvent.KEYCODE_DPAD_UP) return false;
             if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
             return true;
@@ -706,6 +747,14 @@ public final class MainActivity extends CardActivity {
         return code == (end ? toEnd : toStart);
     }
 
+    /** The clean Home's buttons are at the top: Down goes to the first app, however far below it is. */
+    private boolean downToApps(int code, KeyEvent event) {
+        if (!clean || code != KeyEvent.KEYCODE_DPAD_DOWN) return false;
+        View first = firstCard();
+        if (first != null && event.getAction() == KeyEvent.ACTION_DOWN) first.requestFocus();
+        return true;
+    }
+
     /** Back on the wheel, already on the next app that way. */
     private boolean backToWheel(int code, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -718,7 +767,7 @@ public final class MainActivity extends CardActivity {
     /** Open while the focus is on its button or inside it. Touching clears the focus: that says nothing. */
     private void followFocus(View focus) {
         // On the wheel the panel covers the middle of the screen: it opens only when the button is pressed.
-        if (focus != null) showPanel(focus == controlButton && !circular || isInside(focus, panel));
+        if (focus != null) showPanel(focus == controlButton && !panel.listed() || isInside(focus, panel));
     }
 
     private boolean isInside(View view, View parent) {
@@ -811,7 +860,9 @@ public final class MainActivity extends CardActivity {
         view.setGravity(Gravity.CENTER_VERTICAL);
         int radius = dp(FOOTER_RADIUS);
         view.setOnFocusChangeListener((changed, focused) -> {
-            view.setBackground(focused ? new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}) : null);
+            // No glass on the clean Home: a plain dark fill under the words.
+            view.setBackground(!focused ? null : clean ? plainFill(radius)
+                : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
             view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
             if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
@@ -824,8 +875,16 @@ public final class MainActivity extends CardActivity {
         return view;
     }
 
+    private Drawable plainFill(int radius) {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(Color.argb(140, 0, 0, 0));
+        fill.setCornerRadius(radius);
+        return fill;
+    }
+
     private void showPillClock() {
-        boolean raised = scroll.getScrollY() > shelf / 2;
+        // On the clean Home the big clock is never covered.
+        boolean raised = !clean && scroll.getScrollY() > shelf / 2;
         boolean clockInView = bigClock && !raised;
         String symbol = raised ? weatherSymbol : null;
         // Called at every step of a scroll, and almost every step changes nothing.
@@ -984,7 +1043,7 @@ public final class MainActivity extends CardActivity {
      * old one in one step: the user's request of 2026-11-07, a fade over the blur used to stall.
      */
     private void showBackdrop(boolean chosen) {
-        if (circular) readCorner();
+        if (cornersOnTop()) readCorner();
         String scene = Look.weatherPictures(this) ? Weather.picture(this)
             : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
         // Salotto's colours changing by themselves: the one due now, so that a new one is a change.
@@ -1205,7 +1264,7 @@ public final class MainActivity extends CardActivity {
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
         weatherSymbol = Weather.symbol(this);
-        if (circular) showWeatherCorner();
+        if (cornersOnTop()) showWeatherCorner();
         showPillClock();
     }
 
@@ -1257,16 +1316,19 @@ public final class MainActivity extends CardActivity {
 
     private void applyLook() {
         // Read before the backdrop, which blurs itself only when the wheel is shown and the blur chosen.
-        boolean wasCircular = circular;
-        circular = Look.circular(this);
+        int wasStyle = style;
+        style = Look.homeStyle(this);
+        circular = style == Look.HOME_CIRCLE;
+        clean = style == Look.HOME_CLEAN;
         wheel.setGlow(Look.glow(this));
         // Gone, not hidden: neither the arrows nor the grid's spacing find it.
         footer.setVisibility(Look.credits(this) ? View.VISIBLE : View.GONE);
         // Also when the Home starts, plain: until then only the window's grey would show, the user's
         // report of 2026-11-07. The loading itself only for a switch, the user's request of 2026-11-09.
-        if (!looked || circular != wasCircular) showLoading(looked);
+        if (!looked || style != wasStyle) showLoading(looked);
         looked = true;
-        boolean blur = circular && Look.wheelBlur(this);
+        // Each its own: the clean Home's blur starts off and does not follow the wheel's.
+        boolean blur = circular && Look.wheelBlur(this) || clean && Look.cleanBlur(this);
         boolean blurOn = blur && blurred.getVisibility() != View.VISIBLE;
         if (blurOn) blurReady = false;
         if (blurOn) {
@@ -1280,8 +1342,8 @@ public final class MainActivity extends CardActivity {
         coverScene();
         showBackdrop(true);
         if (blurOn) blurBackdrop();
-        if (dock != null) dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
-        columns = Look.columns(this);
+        if (dock != null) dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
+        columns = clean ? CLEAN_COLUMNS : Look.columns(this);
         clock.setTypeface(Typeface.create(Look.FONT_FAMILIES[Look.font(this)], Typeface.NORMAL));
         clock.setTextSize(Look.SIZES[Look.size(this)]);
         alignInk(clock);
@@ -1290,17 +1352,17 @@ public final class MainActivity extends CardActivity {
         appsOnly = Look.appsOnly(this) && !circular;
         scroll.setVisibility(circular ? View.GONE : View.VISIBLE);
         wheel.setVisibility(circular ? View.VISIBLE : View.GONE);
-        weatherRow.setVisibility(circular ? View.GONE : View.VISIBLE);
-        weatherCorner.setVisibility(circular ? View.VISIBLE : View.GONE);
-        weatherShade.setVisibility(circular ? View.VISIBLE : View.GONE);
-        if (circular) {
-            scroll.scrollTo(0, 0);
+        weatherRow.setVisibility(cornersOnTop() ? View.GONE : View.VISIBLE);
+        weatherCorner.setVisibility(cornersOnTop() ? View.VISIBLE : View.GONE);
+        weatherShade.setVisibility(cornersOnTop() ? View.VISIBLE : View.GONE);
+        if (circular) scroll.scrollTo(0, 0);
+        if (cornersOnTop()) {
             hero.setAlpha(1);
             clockShade.setAlpha(1);
             showWeatherCorner();
         }
         allAppsCircle.setVisibility(circular ? View.VISIBLE : View.GONE);
-        if (circular != wasCircular) {
+        if (style != wasStyle) {
             placeFooter();
             placeCorners();
             cornerRead = null;
@@ -1339,8 +1401,8 @@ public final class MainActivity extends CardActivity {
         shownApps = apps;
         shown = state(apps);
         int inset = dp(DOCK_SIDE);
-        int width = cardWidth(columns, dp(DOCK_MARGIN) + inset);
-        int imageHeight = width * 9 / 16;
+        int width = clean ? dp(CLEAN_TILE) : cardWidth(columns, dp(DOCK_MARGIN) + inset);
+        int imageHeight = clean ? width : width * 9 / 16;
         rowHeight = imageHeight + dp(CAPTION_HEIGHT);
 
         // The first row rests low: below it only a third of the next row shows.
@@ -1349,7 +1411,7 @@ public final class MainActivity extends CardActivity {
         int dockHeight = imageHeight + 2 * dockPadding;
         int rowGap = dp(20);
         int top = screen - dockHeight - rowGap - imageHeight / 3;
-        shelf = top - dp(DOCK_TOP);
+        shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
         ((FrameLayout.LayoutParams) weatherRow.getLayoutParams()).bottomMargin = screen - top + dp(WEATHER_GAP);
@@ -1364,14 +1426,24 @@ public final class MainActivity extends CardActivity {
             if (index % columns == 0) {
                 row = row(page);
                 row.setPadding(inset, index == 0 ? dockPadding : 0, inset, index == 0 ? dockPadding : 0);
+                // Fewer than ten in a row sit in the middle, not at the start.
+                if (clean) row.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (index == 0) {
                     dock = row;
-                    dock.setBackground(dockGlass(dp(26), Look.weatherBackdrop(this)));
+                    // The clean Home's dock is only its row of apps: no glass under it.
+                    dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }
             }
-            View tile = index == apps.size() ? allAppsCard(row, width) : homeCard(row, apps.get(index), width);
+            View tile = clean ? squircleCard(row, index == apps.size() ? ALL_APPS : apps.get(index), width)
+                : index == apps.size() ? allAppsCard(row, width) : homeCard(row, apps.get(index), width);
+            if (clean) {
+                // The same room on both sides: the row's middle is the screen's.
+                LinearLayout.LayoutParams around = (LinearLayout.LayoutParams) tile.getLayoutParams();
+                around.leftMargin = dp(CLEAN_GAP) / 2;
+                around.rightMargin = dp(CLEAN_GAP) / 2;
+            }
             if (index < columns) ((LinearLayout) tile).getChildAt(1).setVisibility(View.GONE);
             if (first == null) first = tile;
             if (focus != null && focus.equals(tile.getTag())) target = tile;
@@ -1639,6 +1711,53 @@ public final class MainActivity extends CardActivity {
                 () -> open(new Intent(this, SettingsActivity.class)), () -> showMenu(pkg));
         }
         return appCard(row, HomeApps.label(this, pkg), pkg, width, () -> showMenu(pkg));
+    }
+
+    @Override protected boolean squareCards() { return clean; }
+
+    /**
+     * An app on the clean Home: its picture as on the wheel, square and cut to a squircle, made away
+     * from the main thread the first time. Salotto's settings and Tutte le app are drawn here too.
+     */
+    private View squircleCard(LinearLayout row, String tag, int size) {
+        String key = circleKey(tag, size) + "/squircle";
+        Bitmap known = CIRCLE_ART.get(key);
+        Runnable action;
+        Runnable hold;
+        if (ALL_APPS.equals(tag)) {
+            action = () -> open(new Intent(this, AppsActivity.class));
+            hold = null;
+        } else if (HomeApps.SETTINGS.equals(tag)) {
+            action = () -> open(new Intent(this, SettingsActivity.class));
+            hold = () -> showMenu(tag);
+        } else {
+            action = () -> openPackage(tag);
+            hold = () -> showMenu(tag);
+        }
+        if (squirclePlaceholder == null || squirclePlaceholder.getWidth() != size) {
+            Bitmap plain = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            plain.eraseColor(CircleArt.PLAIN);
+            squirclePlaceholder = Squircle.cut(plain);
+            plain.recycle();
+        }
+        Bitmap shown = known != null ? known : squirclePlaceholder;
+        View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null, ICON, size, action, hold);
+        if (known == null) {
+            ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
+            artComing++;
+            Background.draw(() -> {
+                Bitmap square = circleArt(tag, size);
+                Bitmap made = Squircle.cut(square);
+                square.recycle();
+                CIRCLE_ART.put(key, made);
+                runOnUiThread(() -> {
+                    image.setImageBitmap(made);
+                    artComing--;
+                    artShown();
+                });
+            });
+        }
+        return tile;
     }
 
     /** Pinned last: it cannot be moved or removed, so every app stays reachable. */

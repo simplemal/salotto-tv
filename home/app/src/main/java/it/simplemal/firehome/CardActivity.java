@@ -139,6 +139,14 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
 
     protected float focusScale() { return 1.08f; }
 
+    /** Square cards, cut to a squircle by their own picture: the clean Home's. */
+    protected boolean squareCards() { return false; }
+
+    /** The squircle's corners as a rounded rectangle, for the shadow under it. */
+    private static final float SQUIRCLE_CORNER = 0.24f;
+    private static final int SQUARE_CAPTION_ROOM = 20;
+    private Drawable squircleRing;
+
     protected void onCardFocus(View tile) { }
 
     protected boolean showsCaption(View tile) { return true; }
@@ -309,21 +317,36 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     /** The artwork is the card: no frame, no fixed caption, focus lifts it like tvOS. */
     protected View card(LinearLayout row, String tag, String name, Drawable drawable, Drawable back,
             int look, int width, Runnable action, Runnable hold) {
-        int radius = dp(10);
+        boolean square = squareCards();
+        int artHeight = square ? width : width * 9 / 16;
+        int radius = square ? Math.round(width * SQUIRCLE_CORNER) : dp(10);
         ImageView image = new ImageView(this);
-        dress(image, drawable, back, look);
-        Drawable restEdge = glassEdge(radius, CARD_REFLECTION, CARD_LIGHT);
-        // Only one card has the focus, so one ring is enough for the whole page.
-        if (focusRing == null) focusRing = focusEdge(radius);
+        Drawable restEdge;
+        Drawable ring;
+        if (square) {
+            // The picture is already cut to the squircle: nothing to clip, and the lines follow it.
+            image.setScaleType(ImageView.ScaleType.FIT_XY);
+            image.setImageDrawable(drawable);
+            // No glass on the clean Home: at rest the picture alone.
+            restEdge = null;
+            if (squircleRing == null) squircleRing = new Squircle.Edge(Color.WHITE, dp(3) / 2f);
+            ring = squircleRing;
+        } else {
+            dress(image, drawable, back, look);
+            restEdge = glassEdge(radius, CARD_REFLECTION, CARD_LIGHT);
+            // Only one card has the focus, so one ring is enough for the whole page.
+            if (focusRing == null) focusRing = focusEdge(radius);
+            ring = focusRing;
+            image.setOutlineProvider(new ViewOutlineProvider() {
+                @Override public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+                }
+            });
+            image.setClipToOutline(true);
+        }
         image.setForeground(restEdge);
-        image.setOutlineProvider(new ViewOutlineProvider() {
-            @Override public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
-            }
-        });
-        image.setClipToOutline(true);
 
-        TextView caption = label(name, 14);
+        TextView caption = label(name, square ? 12 : 14);
         caption.setGravity(Gravity.CENTER);
         caption.setSingleLine(true);
         caption.setEllipsize(TextUtils.TruncateAt.END);
@@ -338,9 +361,10 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         tile.setDefaultFocusHighlightEnabled(false);
         // A marked card zooms as one piece, so the check mark stays in its corner.
         View art = isMarked(tag) ? marked(image) : image;
-        tile.addView(art, new LinearLayout.LayoutParams(-1, width * 9 / 16));
+        tile.addView(art, new LinearLayout.LayoutParams(-1, artHeight));
         // Narrow cards let their caption overflow rather than cut the name short.
-        int captionWidth = Math.max(width, dp(MIN_CAPTION));
+        // A squircle's name has only the room of its column: the next one starts close by.
+        int captionWidth = square ? width + dp(SQUARE_CAPTION_ROOM) : Math.max(width, dp(MIN_CAPTION));
         LinearLayout.LayoutParams captionSize = new LinearLayout.LayoutParams(captionWidth, -2);
         captionSize.leftMargin = (width - captionWidth) / 2;
         tile.addView(caption, captionSize);
@@ -375,8 +399,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             });
         }
         // Glass has no shadow: it would show through as rectangles inside the card.
-        CardShadow shadow = look == GLASS ? null
-            : new CardShadow(width, width * 9 / 16, radius, dp(1), focusScale());
+        CardShadow shadow = look == GLASS && !square ? null
+            : new CardShadow(width, artHeight, radius, dp(1), focusScale());
         tile.setBackground(shadow);
         tile.setOutlineProvider(null);
         tile.setOnFocusChangeListener((view, focused) -> {
@@ -389,7 +413,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
                 zoom.setUpdateListener(step -> shadow.setLift(from + (to - from) * step.getAnimatedFraction()));
             }
             zoom.start();
-            image.setForeground(focused ? focusRing : restEdge);
+            image.setForeground(focused ? ring : restEdge);
             if (cardNames == Look.NAMES_ON_FOCUS && showsCaption(view)) {
                 caption.setVisibility(focused ? View.VISIBLE : View.INVISIBLE);
             }

@@ -387,4 +387,6 @@
     <string name="settings_glow_off">बंद</string>
     <string name="settings_glow_normal">सामान्य</string>
     <string name="settings_glow_wide">चौड़ा</string>
+    <string name="settings_home_clean">साफ़</string>
+    <string name="settings_section_clean">साफ़ होम</string>
 </resources>

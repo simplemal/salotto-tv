@@ -1023,18 +1023,20 @@ public final class SettingsActivity extends CardActivity {
 
 
 
+    private static final int[] HOME_NAMES = {R.string.settings_home_grid, R.string.settings_home_circle, R.string.settings_home_clean};
+    private static final int[] HOME_SECTIONS = {R.string.settings_section_grid, R.string.settings_section_circle, R.string.settings_section_clean};
+
     private void showHome() {
-        boolean circular = Look.circular(this);
+        int style = Look.homeStyle(this);
+        boolean circular = style == Look.HOME_CIRCLE;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_home),
-            getString(circular ? R.string.settings_home_circle : R.string.settings_home_grid), null,
-            getString(circular ? R.string.settings_home_circle_text : R.string.settings_home_grid_text),
+        entries.add(new Entry(getString(R.string.settings_home), getString(HOME_NAMES[style]), null, null,
             true, () -> enter(this::showHomes)));
         entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null,
             getString(R.string.settings_backdrop_text), true, () -> open(new Intent(this, PictureGridActivity.class))));
         // Only for a collection that changes by itself: with one picture or the weather it means nothing.
         if (Look.timedBackdrop(this)) entries.add(paceEntry(false));
-        entries.add(groupLabel(circular ? R.string.settings_section_circle : R.string.settings_section_grid));
+        entries.add(groupLabel(HOME_SECTIONS[style]));
         if (circular) {
             // The wheel has no rows, no dock and no names under the circles.
             entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
@@ -1057,13 +1059,22 @@ public final class SettingsActivity extends CardActivity {
                     refresh();
                 }));
         } else {
-            entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
+            // The clean Home has ten apps a row, always.
+            if (style == Look.HOME_GRID) entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
                 getString(R.string.settings_grid_text), true, () -> enter(this::showColumns)));
             entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
                 getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
             entries.add(new Entry(getString(R.string.settings_dock),
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom), null,
                 getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
+            if (style == Look.HOME_CLEAN) {
+                // Its own switch, off at first: the wheel's is not touched.
+                boolean blur = Look.cleanBlur(this);
+                entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null, null, false, () -> {
+                    Look.setCleanBlur(this, !blur);
+                    refresh();
+                }));
+            }
         }
         boolean credits = Look.credits(this);
         entries.add(new Entry(getString(R.string.settings_credits), credits ? YES : NO, null, null, false, () -> {
@@ -1078,12 +1089,12 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showHomes() {
-        String[] names = {getString(R.string.settings_home_grid), getString(R.string.settings_home_circle)};
-        show(getString(R.string.settings_home), choices(names, Look.circular(this) ? 1 : 0, R.drawable.ic_s_grid,
-            index -> getString(index == 1 ? R.string.settings_home_circle_text : R.string.settings_home_grid_text), index -> {
-                Look.setCircular(this, index == 1);
-                refresh();
-            }));
+        String[] names = new String[HOME_NAMES.length];
+        for (int index = 0; index < names.length; index++) names[index] = getString(HOME_NAMES[index]);
+        show(getString(R.string.settings_home), choices(names, Look.homeStyle(this), R.drawable.ic_s_grid, index -> null, index -> {
+            Look.setHomeStyle(this, index);
+            refresh();
+        }));
     }
 
     private void showWheel() {

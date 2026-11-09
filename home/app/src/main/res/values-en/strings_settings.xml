@@ -387,4 +387,6 @@
     <string name="settings_glow_off">Off</string>
     <string name="settings_glow_normal">Normal</string>
     <string name="settings_glow_wide">Wide</string>
+    <string name="settings_home_clean">Clean</string>
+    <string name="settings_section_clean">Clean Home</string>
 </resources>

@@ -387,4 +387,6 @@
     <string name="settings_glow_off">Desligado</string>
     <string name="settings_glow_normal">Normal</string>
     <string name="settings_glow_wide">Amplo</string>
+    <string name="settings_home_clean">Limpa</string>
+    <string name="settings_section_clean">Home limpa</string>
 </resources>
