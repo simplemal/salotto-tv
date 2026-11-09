@@ -54,9 +54,6 @@
     <string name="settings_task_manager_text">The apps used since you turned the Stick on, to reopen or close.</string>
     <string name="settings_held_keys">Held-down keys</string>
     <string name="settings_held_keys_text">Back opens the task manager, Menu the control center. For closing apps with one click, you also need to confirm once on the TV.</string>
-    <string name="settings_sort_home">Sort the Home A to Z</string>
-    <string name="settings_sort_home_text">Puts the apps on the Home back in alphabetical order.</string>
-    <string name="settings_home_sorted">Home in alphabetical order</string>
     <string name="settings_manage_apps">Manage apps</string>
     <string name="settings_manage_apps_text">Space used, closing and uninstalling for each app.</string>
     <string name="settings_manage_app_text">Space used, closing and uninstalling.</string>
@@ -358,7 +355,6 @@
     <string name="settings_cat_salotto_text">Updates, a copy of your choices and Salotto’s tools.</string>
     <string name="settings_section_circle">Circular Home</string>
     <string name="settings_section_grid">Grid Home</string>
-    <string name="settings_section_home_apps">Apps on the Home</string>
     <string name="settings_section_saver_shows">What it shows</string>
     <string name="settings_section_tv">TV</string>
     <string name="settings_section_device">This Fire TV</string>
@@ -387,4 +383,8 @@
     <string name="grid_downloading_plain">Downloading %1$s…</string>
     <string name="grid_download_room">Not enough room: it needs %1$s, %2$s are left.</string>
     <string name="grid_download_failed">The download did not work. Try again later.</string>
+    <string name="settings_credits">Credits on the Home</string>
+    <string name="settings_glow_off">Off</string>
+    <string name="settings_glow_normal">Normal</string>
+    <string name="settings_glow_wide">Wide</string>
 </resources>

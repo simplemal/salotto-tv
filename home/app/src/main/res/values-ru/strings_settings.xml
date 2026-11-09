@@ -54,9 +54,6 @@
     <string name="settings_task_manager_text">Приложения, которыми пользовались с момента включения Stick: можно открыть снова или закрыть.</string>
     <string name="settings_held_keys">Удержание кнопок</string>
     <string name="settings_held_keys_text">«Назад» открывает диспетчер задач, «Меню» — центр управления. Для закрытия приложений одним нажатием телевизор один раз попросит подтверждение.</string>
-    <string name="settings_sort_home">Главный экран от А до Я</string>
-    <string name="settings_sort_home_text">Расставляет приложения главного экрана по алфавиту.</string>
-    <string name="settings_home_sorted">Приложения расставлены по алфавиту</string>
     <string name="settings_manage_apps">Управление приложениями</string>
     <string name="settings_manage_apps_text">Занятое место, закрытие и удаление каждого приложения.</string>
     <string name="settings_manage_app_text">Занятое место, закрытие и удаление.</string>
@@ -370,7 +367,6 @@
     <string name="settings_cat_salotto_text">Обновления, копия ваших настроек и инструменты Salotto.</string>
     <string name="settings_section_circle">Круглый главный экран</string>
     <string name="settings_section_grid">Главный экран сеткой</string>
-    <string name="settings_section_home_apps">Приложения на главном экране</string>
     <string name="settings_section_saver_shows">Что показывает</string>
     <string name="settings_section_tv">Телевизор</string>
     <string name="settings_section_device">Этот Fire TV</string>
@@ -399,4 +395,8 @@
     <string name="grid_downloading_plain">Скачиваю %1$s…</string>
     <string name="grid_download_room">Не хватает места: нужно %1$s, свободно %2$s.</string>
     <string name="grid_download_failed">Не удалось скачать. Попробуйте позже.</string>
+    <string name="settings_credits">Титры на главном экране</string>
+    <string name="settings_glow_off">Выкл.</string>
+    <string name="settings_glow_normal">Обычный</string>
+    <string name="settings_glow_wide">Широкий</string>
 </resources>

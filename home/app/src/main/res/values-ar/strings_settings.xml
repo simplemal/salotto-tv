@@ -54,9 +54,6 @@
     <string name="settings_task_manager_text">التطبيقات المستخدمة منذ تشغيل جهاز Stick، لإعادة فتحها أو إغلاقها.</string>
     <string name="settings_held_keys">الأزرار المضغوطة مطولًا</string>
     <string name="settings_held_keys_text">رجوع يفتح مدير المهام، والقائمة تفتح مركز التحكم. لإغلاق التطبيقات بنقرة واحدة يلزم أيضًا تأكيد لمرة واحدة على التلفزيون.</string>
-    <string name="settings_sort_home">رتّب الرئيسية من أ إلى ي</string>
-    <string name="settings_sort_home_text">يعيد تطبيقات الرئيسية إلى الترتيب الأبجدي.</string>
-    <string name="settings_home_sorted">الرئيسية مرتبة أبجديًا</string>
     <string name="settings_manage_apps">إدارة التطبيقات</string>
     <string name="settings_manage_apps_text">المساحة المستخدمة، وإغلاق كل تطبيق وإلغاء تثبيته.</string>
     <string name="settings_manage_app_text">المساحة المستخدمة، والإغلاق وإلغاء التثبيت.</string>
@@ -382,7 +379,6 @@
     <string name="settings_cat_salotto_text">التحديثات ونسخة من اختياراتك وأدوات Salotto.</string>
     <string name="settings_section_circle">الشاشة الرئيسية الدائرية</string>
     <string name="settings_section_grid">الشاشة الرئيسية الشبكية</string>
-    <string name="settings_section_home_apps">التطبيقات على الشاشة الرئيسية</string>
     <string name="settings_section_saver_shows">ما تعرضه</string>
     <string name="settings_section_tv">التلفزيون</string>
     <string name="settings_section_device">جهاز Fire TV هذا</string>
@@ -411,4 +407,8 @@
     <string name="grid_downloading_plain">جارٍ تنزيل %1$s…</string>
     <string name="grid_download_room">لا توجد مساحة كافية: المطلوب %1$s، والمتبقي %2$s.</string>
     <string name="grid_download_failed">لم ينجح التنزيل. حاول لاحقاً.</string>
+    <string name="settings_credits">الاعتمادات في الشاشة الرئيسية</string>
+    <string name="settings_glow_off">متوقف</string>
+    <string name="settings_glow_normal">عادي</string>
+    <string name="settings_glow_wide">واسع</string>
 </resources>

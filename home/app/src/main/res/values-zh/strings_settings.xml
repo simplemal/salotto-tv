@@ -55,9 +55,6 @@
     <string name="settings_task_manager_text">开机以来用过的应用，可以重新打开或关闭。</string>
     <string name="settings_held_keys">长按按键</string>
     <string name="settings_held_keys_text">长按返回键打开任务管理器，长按菜单键打开控制中心。一键关闭应用还需要在电视上确认一次。</string>
-    <string name="settings_sort_home">按字母顺序排列主页</string>
-    <string name="settings_sort_home_text">让主页上的应用按字母顺序重新排列。</string>
-    <string name="settings_home_sorted">主页已按字母排序</string>
     <string name="settings_manage_apps">应用管理</string>
     <string name="settings_manage_apps_text">每个应用占用的空间，以及关闭和卸载。</string>
     <string name="settings_manage_app_text">占用的空间、关闭和卸载。</string>
@@ -353,7 +350,6 @@
     <string name="settings_cat_salotto_text">更新、你的设置副本以及 Salotto 的工具。</string>
     <string name="settings_section_circle">圆形主屏幕</string>
     <string name="settings_section_grid">网格主屏幕</string>
-    <string name="settings_section_home_apps">主屏幕上的应用</string>
     <string name="settings_section_saver_shows">显示内容</string>
     <string name="settings_section_tv">电视</string>
     <string name="settings_section_device">这台 Fire TV</string>
@@ -382,4 +378,8 @@
     <string name="grid_downloading_plain">正在下载 %1$s…</string>
     <string name="grid_download_room">空间不足：需要 %1$s，剩余 %2$s。</string>
     <string name="grid_download_failed">下载失败。请稍后再试。</string>
+    <string name="settings_credits">主屏幕上的致谢</string>
+    <string name="settings_glow_off">关闭</string>
+    <string name="settings_glow_normal">普通</string>
+    <string name="settings_glow_wide">宽</string>
 </resources>

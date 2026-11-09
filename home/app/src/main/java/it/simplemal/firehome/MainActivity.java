@@ -235,6 +235,7 @@ public final class MainActivity extends CardActivity {
      * all there: the user's request of 2026-11-07, instead of watching it being built.
      */
     private FrameLayout loadingMask;
+    private View loadingMiddle;
     private boolean loading;
     private boolean looked;
     private static final long LOADING_LIMIT_MS = 10000;
@@ -670,6 +671,7 @@ public final class MainActivity extends CardActivity {
             else panel.opening().requestFocus();
         });
         controlButton.setOnKeyListener((view, code, event) -> {
+            if (outOfRow(code, false)) return backToWheel(code, event);
             int toPanel = circular ? KeyEvent.KEYCODE_DPAD_UP : KeyEvent.KEYCODE_DPAD_DOWN;
             if (code != toPanel) return false;
             // On the wheel Up goes back to the apps: the panel opens with the button itself.
@@ -683,12 +685,34 @@ public final class MainActivity extends CardActivity {
         pillButton = settings;
         // The wheel covers the whole screen, so the arrows would not find it from the buttons by themselves.
         settings.setOnKeyListener((view, code, event) -> {
+            if (outOfRow(code, true)) return backToWheel(code, event);
             if (!circular || code != KeyEvent.KEYCODE_DPAD_UP) return false;
             if (event.getAction() == KeyEvent.ACTION_DOWN) wheel.requestFocus();
             return true;
         });
         pillBox = pillBox(pillRow);
         return pillBox;
+    }
+
+    /**
+     * On the wheel, the arrow that leads out of the row of buttons at its end: past the settings, or
+     * before the control centre. There is nothing more that way on the screen.
+     */
+    private boolean outOfRow(int code, boolean end) {
+        if (!circular) return false;
+        boolean rtl = pillRow.getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+        int toEnd = rtl ? KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT;
+        int toStart = rtl ? KeyEvent.KEYCODE_DPAD_RIGHT : KeyEvent.KEYCODE_DPAD_LEFT;
+        return code == (end ? toEnd : toStart);
+    }
+
+    /** Back on the wheel, already on the next app that way. */
+    private boolean backToWheel(int code, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            wheel.requestFocus();
+            wheel.turnToward(code);
+        }
+        return true;
     }
 
     /** Open while the focus is on its button or inside it. Touching clears the focus: that says nothing. */
@@ -1087,7 +1111,12 @@ public final class MainActivity extends CardActivity {
         weatherView.setCovered(blurred.getVisibility() == View.VISIBLE && blurred.getAlpha() == 1f && blurred.getDrawable() != null);
     }
 
-    private void showLoading() {
+    /**
+     * The mask over a Home being built. With its wheel and words only for a switch between grid and
+     * wheel: when the Home starts again by itself, after Fire OS closed it behind an app, it is plain,
+     * so that coming back from an app never shows a loading.
+     */
+    private void showLoading(boolean switching) {
         if (loadingMask == null) {
             loadingMask = new FrameLayout(this);
             loadingMask.setBackground(Look.plainBackdrop());
@@ -1104,9 +1133,11 @@ public final class MainActivity extends CardActivity {
             LinearLayout.LayoutParams under = new LinearLayout.LayoutParams(-2, -2);
             under.topMargin = dp(16);
             middle.addView(words, under);
+            loadingMiddle = middle;
             loadingMask.addView(middle, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER));
             root.addView(loadingMask, new FrameLayout.LayoutParams(-1, -1));
         }
+        loadingMiddle.setVisibility(switching ? View.VISIBLE : View.GONE);
         loadingMask.animate().cancel();
         loadingMask.setAlpha(1f);
         loadingMask.setVisibility(View.VISIBLE);
@@ -1229,9 +1260,12 @@ public final class MainActivity extends CardActivity {
         // Read before the backdrop, which blurs itself only when the wheel is shown and the blur chosen.
         boolean wasCircular = circular;
         circular = Look.circular(this);
-        wheel.setTinted(Look.tintGlow(this));
-        // Also when the Home starts: until then only the window's grey would show, the user's report of 2026-11-07.
-        if (!looked || circular != wasCircular) showLoading();
+        wheel.setGlow(Look.glow(this));
+        // Gone, not hidden: neither the arrows nor the grid's spacing find it.
+        footer.setVisibility(Look.credits(this) ? View.VISIBLE : View.GONE);
+        // Also when the Home starts, plain: until then only the window's grey would show, the user's
+        // report of 2026-11-07. The loading itself only for a switch, the user's request of 2026-11-09.
+        if (!looked || circular != wasCircular) showLoading(looked);
         looked = true;
         boolean blur = circular && Look.wheelBlur(this);
         boolean blurOn = blur && blurred.getVisibility() != View.VISIBLE;

@@ -33,11 +33,10 @@ final class MenuBackdrop {
     private static String making;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
     /**
-     * Under this, a Stick with little memory and an old chip: the Sticks of 2020 and the 4K of 2018
-     * have 1 and 1.5 GB, the ones after them 2. Theirs is plain black, with nothing to make. Android
-     * counts less than the box says: the 4K of 2023 (AFTKM), sold with 2 GB, has 1670 MB.
+     * Under this, a Fire TV of 1 GB: theirs is plain black, with nothing to make. Android counts less
+     * than the box says: the 4K of 2023 (AFTKM), sold with 2 GB, has 1670 MB.
      */
-    private static final long ENOUGH_MEMORY = 1500L * 1024 * 1024;
+    private static final long ENOUGH_MEMORY = 1000L * 1024 * 1024;
     private static Boolean wanted;
 
     private MenuBackdrop() {}

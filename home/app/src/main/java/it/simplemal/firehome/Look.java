@@ -195,14 +195,25 @@ final class Look {
     static int wheel(Context context) { return prefs(context).getInt("wheel", 5); }
     static void setWheel(Context context, int value) { prefs(context).edit().putInt("wheel", value).apply(); }
     /** The app's own colour around the lit circle. Off, only the circles' dark shadow stays. On unless chosen: the user's default again, 2026-11-04. */
-    static boolean tintGlow(Context context) { return prefs(context).getBoolean("tint_glow", true); }
-    static void setTintGlow(Context context, boolean on) { prefs(context).edit().putBoolean("tint_glow", on).apply(); }
+    /** The glow around the lit circle: off, normal or wide. */
+    static final int GLOW_OFF = 0;
+    static final int GLOW_NORMAL = 1;
+    static final int GLOW_WIDE = 2;
+
+    /** Until it is chosen here, what the old switch said: on was the normal one. */
+    static int glow(Context context) {
+        return prefs(context).getInt("glow", prefs(context).getBoolean("tint_glow", true) ? GLOW_NORMAL : GLOW_OFF);
+    }
+    static void setGlow(Context context, int level) { prefs(context).edit().putInt("glow", level).apply(); }
     /** An app opening from a circle of its colour and closing back into it: on unless chosen, the user's choice of 2026-11-04. */
     static boolean wheelMotion(Context context) { return !Fire.STICK_2020 && prefs(context).getBoolean("wheel_motion", true); }
     static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
     /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
     static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }
     static void setWheelBlur(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_blur", on).apply(); }
+    /** The line of credits on the Home, at the bottom of the grid or at the top of the wheel: whoever wants can take it away. */
+    static boolean credits(Context context) { return prefs(context).getBoolean("credits", true); }
+    static void setCredits(Context context, boolean on) { prefs(context).edit().putBoolean("credits", on).apply(); }
 
     /** The clock pattern chosen in Settings. */
     static String timePattern(Context context) {
@@ -536,7 +547,7 @@ final class Look {
         return columns(context) + "/" + font(context) + "/" + size(context) + "/" + clock(context)
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
             + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
-            + "/" + tintGlow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
+            + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
             + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context);
     }
 

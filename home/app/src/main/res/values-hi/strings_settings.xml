@@ -54,9 +54,6 @@
     <string name="settings_task_manager_text">Stick चालू होने के बाद इस्तेमाल हुए ऐप, दोबारा खोलने या बंद करने के लिए।</string>
     <string name="settings_held_keys">दबाए रखने वाले बटन</string>
     <string name="settings_held_keys_text">वापस से टास्क मैनेजर और मेनू से कंट्रोल सेंटर खुलता है। ऐप को एक क्लिक में बंद करने के लिए टीवी पर एक बार पुष्टि भी करनी होगी।</string>
-    <string name="settings_sort_home">होम को A से Z क्रम में लगाएं</string>
-    <string name="settings_sort_home_text">होम के ऐप को फिर से वर्णमाला क्रम में लगाता है।</string>
-    <string name="settings_home_sorted">होम वर्णमाला क्रम में</string>
     <string name="settings_manage_apps">ऐप मैनेजमेंट</string>
     <string name="settings_manage_apps_text">हर ऐप की जगह, बंद करना और अनइंस्टॉल करना।</string>
     <string name="settings_manage_app_text">जगह, बंद करना और अनइंस्टॉल करना।</string>
@@ -358,7 +355,6 @@
     <string name="settings_cat_salotto_text">अपडेट, आपकी पसंद की कॉपी और Salotto के टूल।</string>
     <string name="settings_section_circle">गोल होम</string>
     <string name="settings_section_grid">ग्रिड होम</string>
-    <string name="settings_section_home_apps">होम पर ऐप</string>
     <string name="settings_section_saver_shows">यह क्या दिखाता है</string>
     <string name="settings_section_tv">TV</string>
     <string name="settings_section_device">यह Fire TV</string>
@@ -387,4 +383,8 @@
     <string name="grid_downloading_plain">%1$s डाउनलोड हो रहा है…</string>
     <string name="grid_download_room">जगह कम है: %1$s चाहिए, %2$s बची है।</string>
     <string name="grid_download_failed">डाउनलोड नहीं हुआ। बाद में फिर कोशिश करें।</string>
+    <string name="settings_credits">होम पर क्रेडिट</string>
+    <string name="settings_glow_off">बंद</string>
+    <string name="settings_glow_normal">सामान्य</string>
+    <string name="settings_glow_wide">चौड़ा</string>
 </resources>

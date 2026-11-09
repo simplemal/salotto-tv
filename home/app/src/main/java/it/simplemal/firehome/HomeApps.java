@@ -102,17 +102,6 @@ final class HomeApps {
         prefs(context).edit().putString(KEY, TextUtils.join(",", apps)).apply();
     }
 
-    /** Alphabetical order for the Home, with Settings kept at the end. */
-    static void sort(Context context, List<String> apps) {
-        Collator order = Collator.getInstance();
-        Collections.sort(apps, (a, b) -> {
-            if (SETTINGS.equals(a)) return 1;
-            if (SETTINGS.equals(b)) return -1;
-            return order.compare(label(context, a), label(context, b));
-        });
-        save(context, apps);
-    }
-
     /** An app the user opens, as opposed to a utility or a part of the system. */
     static boolean isUserApp(Context context, String pkg) {
         if (isHome(context, pkg)) return false;

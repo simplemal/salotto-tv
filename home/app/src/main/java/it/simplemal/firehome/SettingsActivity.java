@@ -1039,12 +1039,8 @@ public final class SettingsActivity extends CardActivity {
             // The wheel has no rows, no dock and no names under the circles.
             entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
                 getString(R.string.settings_wheel_text), true, () -> enter(this::showWheel)));
-            boolean glow = Look.tintGlow(this);
-            entries.add(new Entry(getString(R.string.settings_glow), glow ? YES : NO, null,
-                getString(R.string.settings_glow_text), false, () -> {
-                    Look.setTintGlow(this, !glow);
-                    refresh();
-                }));
+            entries.add(new Entry(getString(R.string.settings_glow), glowNames()[Look.glow(this)], null,
+                getString(R.string.settings_glow_text), true, () -> enter(this::showGlow)));
             boolean motion = Look.wheelMotion(this);
             Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, null,
                 getString(R.string.settings_wheel_motion_text), false, () -> {
@@ -1069,12 +1065,11 @@ public final class SettingsActivity extends CardActivity {
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom), null,
                 getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
         }
-        entries.add(groupLabel(R.string.settings_section_home_apps));
-        entries.add(new Entry(getString(R.string.settings_sort_home), null, null,
-            getString(R.string.settings_sort_home_text), false, () -> {
-                HomeApps.sort(this, HomeApps.load(this));
-                say(getString(R.string.settings_home_sorted));
-            }));
+        boolean credits = Look.credits(this);
+        entries.add(new Entry(getString(R.string.settings_credits), credits ? YES : NO, null, null, false, () -> {
+            Look.setCredits(this, !credits);
+            refresh();
+        }));
         show(getString(R.string.settings_cat_home), entries);
     }
 
@@ -1098,6 +1093,18 @@ public final class SettingsActivity extends CardActivity {
         show(getString(R.string.settings_wheel), choices(names, indexOf(counts, Look.wheel(this)), R.drawable.ic_apps,
             getString(R.string.settings_wheel_text), index -> {
                 Look.setWheel(this, counts[index]);
+                refresh();
+            }));
+    }
+
+    private String[] glowNames() {
+        return new String[]{getString(R.string.settings_glow_off), getString(R.string.settings_glow_normal), getString(R.string.settings_glow_wide)};
+    }
+
+    private void showGlow() {
+        show(getString(R.string.settings_glow), choices(glowNames(), Look.glow(this), R.drawable.ic_apps,
+            getString(R.string.settings_glow_text), index -> {
+                Look.setGlow(this, index);
                 refresh();
             }));
     }

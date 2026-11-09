@@ -54,9 +54,6 @@
     <string name="settings_task_manager_text">Les applis utilisées depuis l’allumage du Stick, à rouvrir ou à fermer.</string>
     <string name="settings_held_keys">Touches maintenues enfoncées</string>
     <string name="settings_held_keys_text">Retour ouvre le gestionnaire de tâches, Menu le centre de contrôle. Pour fermer les applis en un clic, il faut aussi une confirmation unique sur la TV.</string>
-    <string name="settings_sort_home">Trier l’Accueil de A à Z</string>
-    <string name="settings_sort_home_text">Remet les applis de l’Accueil par ordre alphabétique.</string>
-    <string name="settings_home_sorted">Accueil par ordre alphabétique</string>
     <string name="settings_manage_apps">Gestion des applis</string>
     <string name="settings_manage_apps_text">Espace occupé, fermeture et désinstallation de chaque appli.</string>
     <string name="settings_manage_app_text">Espace occupé, fermeture et désinstallation.</string>
@@ -358,7 +355,6 @@
     <string name="settings_cat_salotto_text">Mises à jour, copie de vos choix et outils de Salotto.</string>
     <string name="settings_section_circle">Accueil circulaire</string>
     <string name="settings_section_grid">Accueil en grille</string>
-    <string name="settings_section_home_apps">Applis sur l’accueil</string>
     <string name="settings_section_saver_shows">Ce qu’il affiche</string>
     <string name="settings_section_tv">Téléviseur</string>
     <string name="settings_section_device">Ce Fire TV</string>
@@ -387,4 +383,8 @@
     <string name="grid_downloading_plain">Téléchargement de %1$s…</string>
     <string name="grid_download_room">Pas assez de place : il faut %1$s, il reste %2$s.</string>
     <string name="grid_download_failed">Le téléchargement n’a pas abouti. Réessayez plus tard.</string>
+    <string name="settings_credits">Crédits sur l’Accueil</string>
+    <string name="settings_glow_off">Éteint</string>
+    <string name="settings_glow_normal">Normal</string>
+    <string name="settings_glow_wide">Large</string>
 </resources>

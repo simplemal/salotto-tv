@@ -55,9 +55,6 @@
     <string name="settings_task_manager_text">Las apps usadas desde que encendiste el Stick, para reabrir o cerrar.</string>
     <string name="settings_held_keys">Botones mantenidos</string>
     <string name="settings_held_keys_text">Atrás abre el Administrador de tareas y Menú el Centro de control. Para cerrar apps de un clic hace falta además una confirmación única en la TV.</string>
-    <string name="settings_sort_home">Ordenar Inicio de la A a la Z</string>
-    <string name="settings_sort_home_text">Vuelve a poner las apps de Inicio en orden alfabético.</string>
-    <string name="settings_home_sorted">Inicio en orden alfabético</string>
     <string name="settings_manage_apps">Gestión de apps</string>
     <string name="settings_manage_apps_text">Espacio ocupado, cierre y desinstalación de cada app.</string>
     <string name="settings_manage_app_text">Espacio ocupado, cierre y desinstalación.</string>
@@ -359,7 +356,6 @@
     <string name="settings_cat_salotto_text">Actualizaciones, copia de tus ajustes y herramientas de Salotto.</string>
     <string name="settings_section_circle">Home circular</string>
     <string name="settings_section_grid">Home en cuadrícula</string>
-    <string name="settings_section_home_apps">Apps en el Home</string>
     <string name="settings_section_saver_shows">Qué muestra</string>
     <string name="settings_section_tv">Televisor</string>
     <string name="settings_section_device">Este Fire TV</string>
@@ -388,4 +384,8 @@
     <string name="grid_downloading_plain">Descargando %1$s…</string>
     <string name="grid_download_room">No hay espacio: hacen falta %1$s, quedan %2$s.</string>
     <string name="grid_download_failed">La descarga no ha funcionado. Inténtalo más tarde.</string>
+    <string name="settings_credits">Créditos en la Home</string>
+    <string name="settings_glow_off">Apagado</string>
+    <string name="settings_glow_normal">Normal</string>
+    <string name="settings_glow_wide">Amplio</string>
 </resources>
