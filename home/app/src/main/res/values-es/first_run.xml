@@ -24,6 +24,7 @@
     <string name="first_no_connection">No se ha podido conectar. Inténtalo de nuevo o elige Ahora no.</string>
     <string name="first_place_title">Elige el lugar</string>
     <string name="first_place_text">El tiempo llegará de aquí.</string>
+    <string name="first_home_text">Elige cómo se ve. Podrás cambiarlo en Ajustes.</string>
     <string name="first_remote_title">Mantén pulsado un botón</string>
     <string name="first_remote_text">Son atajos de Salotto: no aparecen escritos en el mando.</string>
     <string name="first_key_back">Atrás</string>

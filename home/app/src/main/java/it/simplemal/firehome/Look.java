@@ -235,6 +235,8 @@ final class Look {
     static int homeStyle(Context context) {
         return prefs(context).getInt("home_style", prefs(context).getBoolean("circular", false) ? HOME_CIRCLE : HOME_GRID);
     }
+    /** A Home picked already, on the welcome pages or in Settings. */
+    static boolean homeChosen(Context context) { return prefs(context).contains("home_style"); }
     static void setHomeStyle(Context context, int style) { prefs(context).edit().putInt("home_style", style).apply(); }
     static boolean circular(Context context) { return homeStyle(context) == HOME_CIRCLE; }
     static boolean clean(Context context) { return homeStyle(context) == HOME_CLEAN; }

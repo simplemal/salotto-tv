@@ -24,6 +24,7 @@
     <string name="first_no_connection">Échec de la connexion. Réessayez ou choisissez Pas maintenant.</string>
     <string name="first_place_title">Choisissez le lieu</string>
     <string name="first_place_text">La météo viendra d’ici.</string>
+    <string name="first_home_text">Choisissez son apparence. Vous pourrez la changer dans les Réglages.</string>
     <string name="first_remote_title">Maintenez une touche enfoncée</string>
     <string name="first_remote_text">Ce sont des raccourcis de Salotto : ils ne figurent pas sur la télécommande.</string>
     <string name="first_key_back">Retour</string>

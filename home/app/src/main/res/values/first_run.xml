@@ -24,6 +24,7 @@
     <string name="first_no_connection">Connessione non riuscita. Riprova, oppure scegli Non ora.</string>
     <string name="first_place_title">Scegli il luogo</string>
     <string name="first_place_text">Il meteo arriverà da qui.</string>
+    <string name="first_home_text">Scegli com’è fatta. Potrai cambiarla nelle Impostazioni.</string>
     <string name="first_remote_title">Tieni premuto un tasto</string>
     <string name="first_remote_text">Sono scorciatoie di Salotto: sul telecomando non le trovi scritte.</string>
     <string name="first_key_back">Indietro</string>
