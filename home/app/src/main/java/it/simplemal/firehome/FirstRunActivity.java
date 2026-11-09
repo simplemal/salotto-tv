@@ -735,7 +735,8 @@ public final class FirstRunActivity extends CardActivity {
         rest.setStroke(dp(1), Color.argb(70, 255, 255, 255));
         GradientDrawable ring = new GradientDrawable();
         ring.setCornerRadius(dp(HOME_CARD_RADIUS));
-        ring.setStroke(dp(3), Color.WHITE);
+        // Thinner than at first: 3 dp was too heavy round a small picture (the user, 2026-11-09).
+        ring.setStroke(dp(2), Color.WHITE);
         frame.setForeground(rest);
         card.addView(frame, new LinearLayout.LayoutParams(dp(HOME_CARD_WIDTH), dp(HOME_CARD_HEIGHT)));
         TextView label = label(name, HOME_NAME_SP);
