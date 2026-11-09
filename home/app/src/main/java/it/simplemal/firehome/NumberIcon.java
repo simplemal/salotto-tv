@@ -1,5 +1,6 @@
 package it.simplemal.firehome;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -47,9 +48,43 @@ final class NumberIcon extends Drawable {
         text.setTextScaleX(Math.min(1, bounds.height() * ROOM_SHARE / text.measureText(number)));
         text.getTextBounds(number, 0, number.length(), ink);
         // On the digits as drawn: tracking and side bearings would push a whole line off centre.
-        canvas.drawText(number, bounds.exactCenterX() - ink.exactCenterX(),
+        // Across, on where their ink weighs: a 1 centred on its box had its stem to the right of the
+        // middle, the box taking in its flag (2026-11-09).
+        canvas.drawText(number, bounds.exactCenterX() - weightX(),
             bounds.top + bounds.height() * center - ink.exactCenterY(), text);
         canvas.restoreToCount(layer);
+    }
+
+    private float weighedSize = -1;
+    private float weighedX;
+
+    /** Where the ink of the number weighs across, from where it is drawn: worked out once per size. */
+    private float weightX() {
+        // Several digits balance each other: their box is centre enough, as the timer's always was.
+        if (number.length() > 1) return ink.exactCenterX();
+        float size = text.getTextSize() * text.getTextScaleX();
+        if (size == weighedSize) return weighedX;
+        weighedSize = size;
+        int width = Math.max(1, ink.width());
+        int height = Math.max(1, ink.height());
+        Bitmap mark = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
+        Paint plain = new Paint(text);
+        plain.setXfermode(null);
+        new Canvas(mark).drawText(number, -ink.left, -ink.top, plain);
+        byte[] alpha = new byte[width * height];
+        mark.copyPixelsToBuffer(java.nio.ByteBuffer.wrap(alpha));
+        mark.recycle();
+        double sum = 0;
+        double weight = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int a = alpha[y * width + x] & 0xff;
+                sum += a * (x + 0.5);
+                weight += a;
+            }
+        }
+        weighedX = ink.left + (weight > 0 ? (float) (sum / weight) : width / 2f);
+        return weighedX;
     }
 
     @Override public int getIntrinsicWidth() { return picture.getIntrinsicWidth(); }
