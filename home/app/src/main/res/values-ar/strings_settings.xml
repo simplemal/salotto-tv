@@ -391,8 +391,8 @@
     <string name="grid_weather_group">الطقس</string>
     <string name="grid_kind_timed">تتغير وحدها</string>
     <string name="grid_single">صورة واحدة</string>
-    <string name="grid_info_timed">تتغير الصور وحدها بترتيب عشوائي. يُختار التكرار في صفحة الشاشة الرئيسية.</string>
-    <string name="grid_info_timed_saver">تتناوب الصور وحدها. يُختار التكرار في صفحة شاشة التوقف.</string>
+    <string name="grid_info_timed">تتغير الصور وحدها بترتيب عشوائي.</string>
+    <string name="grid_info_timed_saver">تتناوب الصور وحدها.</string>
     <string name="grid_info_single">اختر الصورة التي تبقى: يعرضها OK على الشاشة كاملة.</string>
     <string name="grid_info_weather">تتغير مع الطقس ووقت اليوم في %1$s.</string>
     <string name="grid_info_weather_none">تتغير مع الطقس ووقت اليوم في مكانك: اختر المكان أولاً.</string>

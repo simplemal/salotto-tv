@@ -104,6 +104,8 @@ public final class PictureGridActivity extends CardActivity {
     /** The icon inside the circle, as large as the X in its own. */
     private static final int TRASH_INSET = 8;
     private static final int QUIET_SP = 13;
+    private static final int QUIET_ICON = 15;
+    private static final int QUIET_ICON_GAP = 6;
     private static final int QUIET_SIDE = 12;
     private static final int QUIET_TOP = 5;
     private static final int QUIET_RADIUS = 14;
@@ -1297,7 +1299,7 @@ public final class PictureGridActivity extends CardActivity {
             });
     }
 
-    /** Small and pale until it has the focus: it is there for whoever looks for it. */
+    /** Small and pale until it has the focus, with a trash: it is there for whoever looks for it. */
     private TextView quietButton(String text, Runnable run) {
         TextView button = label(text, QUIET_SP);
         button.setSingleLine(true);
@@ -1305,6 +1307,12 @@ public final class PictureGridActivity extends CardActivity {
         button.setClickable(true);
         button.setDefaultFocusHighlightEnabled(false);
         button.setPadding(dp(QUIET_SIDE), dp(QUIET_TOP), dp(QUIET_SIDE), dp(QUIET_TOP));
+        // A trash before the words: it says at a glance what the button does.
+        Drawable bin = getDrawable(R.drawable.ic_s_delete).mutate();
+        bin.setBounds(0, 0, dp(QUIET_ICON), dp(QUIET_ICON));
+        button.setCompoundDrawablesRelative(bin, null, null, null);
+        button.setCompoundDrawablePadding(dp(QUIET_ICON_GAP));
+        button.setGravity(Gravity.CENTER_VERTICAL);
         GradientDrawable fill = new GradientDrawable();
         fill.setCornerRadius(dp(QUIET_RADIUS));
         button.setBackground(fill);
@@ -1312,6 +1320,7 @@ public final class PictureGridActivity extends CardActivity {
             fill.setColor(focused ? Color.WHITE : Color.TRANSPARENT);
             fill.setStroke(dp(1), focused ? Color.WHITE : QUIET_RIM);
             button.setTextColor(focused ? Fire.INK : Color.WHITE);
+            button.setCompoundDrawableTintList(ColorStateList.valueOf(focused ? Fire.INK : Color.WHITE));
             button.setAlpha(focused ? 1f : QUIET_ALPHA);
         };
         look.onFocusChange(button, false);

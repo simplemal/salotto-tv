@@ -367,8 +367,8 @@
     <string name="grid_weather_group">Weather</string>
     <string name="grid_kind_timed">changes by itself</string>
     <string name="grid_single">One picture</string>
-    <string name="grid_info_timed">The pictures change by themselves, in random order. How often is chosen on the Home page.</string>
-    <string name="grid_info_timed_saver">The pictures take turns by themselves. How often is chosen on the Screensaver page.</string>
+    <string name="grid_info_timed">The pictures change by themselves, in random order.</string>
+    <string name="grid_info_timed_saver">The pictures take turns by themselves.</string>
     <string name="grid_info_single">Pick the picture that stays: OK shows it on the whole screen.</string>
     <string name="grid_info_weather">Changes with the weather and the time of day in %1$s.</string>
     <string name="grid_info_weather_none">Changes with the weather and the time of day where you are: choose the place first.</string>

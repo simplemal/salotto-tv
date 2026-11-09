@@ -368,8 +368,8 @@
     <string name="grid_weather_group">Tiempo</string>
     <string name="grid_kind_timed">cambia sola</string>
     <string name="grid_single">Una sola imagen</string>
-    <string name="grid_info_timed">Las imágenes cambian solas, en orden aleatorio. Cada cuánto se elige en la página Home.</string>
-    <string name="grid_info_timed_saver">Las imágenes se alternan solas. Cada cuánto se elige en la página Salvapantallas.</string>
+    <string name="grid_info_timed">Las imágenes cambian solas, en orden aleatorio.</string>
+    <string name="grid_info_timed_saver">Las imágenes se alternan solas.</string>
     <string name="grid_info_single">Elige la imagen que se queda: OK la muestra a pantalla completa.</string>
     <string name="grid_info_weather">Cambia con el tiempo y la hora de %1$s.</string>
     <string name="grid_info_weather_none">Cambia con el tiempo y la hora de tu lugar: primero elige el lugar.</string>

@@ -367,8 +367,8 @@
     <string name="grid_weather_group">मौसम</string>
     <string name="grid_kind_timed">अपने-आप बदलती है</string>
     <string name="grid_single">एक तस्वीर</string>
-    <string name="grid_info_timed">तस्वीरें अपने-आप, किसी भी क्रम में बदलती हैं। कितनी बार, यह होम पेज पर चुना जाता है।</string>
-    <string name="grid_info_timed_saver">तस्वीरें अपने-आप बारी-बारी से आती हैं। कितनी बार, यह स्क्रीनसेवर पेज पर चुना जाता है।</string>
+    <string name="grid_info_timed">तस्वीरें अपने-आप, किसी भी क्रम में बदलती हैं।</string>
+    <string name="grid_info_timed_saver">तस्वीरें अपने-आप बारी-बारी से आती हैं।</string>
     <string name="grid_info_single">वह तस्वीर चुनें जो रहेगी: OK उसे पूरी स्क्रीन पर दिखाता है।</string>
     <string name="grid_info_weather">%1$s के मौसम और दिन के समय के साथ बदलती है।</string>
     <string name="grid_info_weather_none">आपकी जगह के मौसम और समय के साथ बदलती है: पहले जगह चुनें।</string>

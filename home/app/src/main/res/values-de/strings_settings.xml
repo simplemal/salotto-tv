@@ -367,8 +367,8 @@
     <string name="grid_weather_group">Wetter</string>
     <string name="grid_kind_timed">wechselt selbst</string>
     <string name="grid_single">Ein Bild</string>
-    <string name="grid_info_timed">Die Bilder wechseln von selbst, in zufälliger Reihenfolge. Wie oft, wählst du auf der Seite Home.</string>
-    <string name="grid_info_timed_saver">Die Bilder wechseln sich von selbst ab. Wie oft, wählst du auf der Seite Bildschirmschoner.</string>
+    <string name="grid_info_timed">Die Bilder wechseln von selbst, in zufälliger Reihenfolge.</string>
+    <string name="grid_info_timed_saver">Die Bilder wechseln sich von selbst ab.</string>
     <string name="grid_info_single">Wähle das Bild, das bleibt: OK zeigt es auf dem ganzen Bildschirm.</string>
     <string name="grid_info_weather">Wechselt mit dem Wetter und der Tageszeit in %1$s.</string>
     <string name="grid_info_weather_none">Wechselt mit dem Wetter und der Tageszeit deines Orts: wähle zuerst den Ort.</string>

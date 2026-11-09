@@ -367,8 +367,8 @@
     <string name="grid_weather_group">Clima</string>
     <string name="grid_kind_timed">muda sozinha</string>
     <string name="grid_single">Uma só imagem</string>
-    <string name="grid_info_timed">As imagens mudam sozinhas, em ordem aleatória. A frequência se escolhe na página Home.</string>
-    <string name="grid_info_timed_saver">As imagens se alternam sozinhas. A frequência se escolhe na página Protetor de tela.</string>
+    <string name="grid_info_timed">As imagens mudam sozinhas, em ordem aleatória.</string>
+    <string name="grid_info_timed_saver">As imagens se alternam sozinhas.</string>
     <string name="grid_info_single">Escolha a imagem que fica: OK a mostra em tela cheia.</string>
     <string name="grid_info_weather">Muda com o clima e a hora de %1$s.</string>
     <string name="grid_info_weather_none">Muda com o clima e a hora do seu local: primeiro escolha o local.</string>

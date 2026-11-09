@@ -379,8 +379,8 @@
     <string name="grid_weather_group">Погода</string>
     <string name="grid_kind_timed">меняется сама</string>
     <string name="grid_single">Одно изображение</string>
-    <string name="grid_info_timed">Изображения меняются сами, в случайном порядке. Как часто — выбирается на странице «Главный экран».</string>
-    <string name="grid_info_timed_saver">Изображения сменяют друг друга сами. Как часто — выбирается на странице «Заставка».</string>
+    <string name="grid_info_timed">Изображения меняются сами, в случайном порядке.</string>
+    <string name="grid_info_timed_saver">Изображения сменяют друг друга сами.</string>
     <string name="grid_info_single">Выберите изображение, которое останется: OK покажет его на весь экран.</string>
     <string name="grid_info_weather">Меняется с погодой и временем суток в %1$s.</string>
     <string name="grid_info_weather_none">Меняется с погодой и временем суток вашего места: сначала выберите место.</string>
