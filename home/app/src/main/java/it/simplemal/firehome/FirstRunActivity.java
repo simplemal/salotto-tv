@@ -45,6 +45,13 @@ import org.json.JSONException;
 public final class FirstRunActivity extends CardActivity {
     private static final String FILE = "first_run";
     private static final String DONE = "done";
+    /**
+     * Which pages were seen: raised only when the pages themselves change, so that after an update
+     * they come back once, and only then (the user's rule of 2026-11-09). 1: the pages up to the
+     * 1.0.24; 2: the choice of the Home, in the 1.1.0.
+     */
+    private static final String SEEN = "seen";
+    private static final int PAGES_VERSION = 2;
     /** What the guide that came before left behind: a Stick that has seen it needs no introduction. */
     private static final String OLD_FILE = "welcome";
     private static final String OLD_DONE = "greeted";
@@ -155,8 +162,10 @@ public final class FirstRunActivity extends CardActivity {
     private String focusedChoice;
 
     static boolean due(Context context) {
-        return !prefs(context).getBoolean(DONE, false)
-            && !context.getSharedPreferences(OLD_FILE, Context.MODE_PRIVATE).getBoolean(OLD_DONE, false);
+        boolean done = prefs(context).getBoolean(DONE, false)
+            || context.getSharedPreferences(OLD_FILE, Context.MODE_PRIVATE).getBoolean(OLD_DONE, false);
+        // Seen before this number existed: the first pages.
+        return !done || prefs(context).getInt(SEEN, 1) < PAGES_VERSION;
     }
 
     private static SharedPreferences prefs(Context context) {
@@ -238,7 +247,7 @@ public final class FirstRunActivity extends CardActivity {
             go(at + 1);
             return;
         }
-        prefs(this).edit().putBoolean(DONE, true).apply();
+        prefs(this).edit().putBoolean(DONE, true).putInt(SEEN, PAGES_VERSION).apply();
         // Fresh, because seen from the Settings the language may have changed on the way.
         startActivity(new Intent(this, MainActivity.class)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
