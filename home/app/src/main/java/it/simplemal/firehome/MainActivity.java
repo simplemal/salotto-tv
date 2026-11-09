@@ -126,6 +126,11 @@ public final class MainActivity extends CardActivity {
     private final Runnable saver = () -> startActivity(new Intent(this, SaverActivity.class));
     private View panelShade;
     private boolean panelOpen;
+    /**
+     * Clean, first row at the top: where the Home scrolls while the control centre is open, the
+     * first row in the middle, clear of its tiles (2026-11-09). -1 elsewhere.
+     */
+    private int panelRest = -1;
     private TextView footer;
     private boolean reenabledChecked;
     private long timeSeen;
@@ -925,6 +930,8 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
+        // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
+        if (panelRest >= 0) scroll.smoothScrollTo(0, open ? panelRest : shelf);
         panelShade.animate().cancel();
         panel.hideHint();
         if (!open) panel.closed();
@@ -1641,8 +1648,10 @@ public final class MainActivity extends CardActivity {
         int rowGap = dp(20);
         // The clean Home's first row can also rest in the middle: of the room under the line at the top.
         int lineBottom = dp(CLEAN_PILL_TOP) + dp(6) + dp(FREE_ICON);
-        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? lineBottom + (screen - lineBottom - dockHeight) / 2
+        int middle = lineBottom + (screen - lineBottom - dockHeight) / 2;
+        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? middle
             : screen - dockHeight - rowGap - imageHeight / 3;
+        panelRest = clean && appsOnly ? top - middle : -1;
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
