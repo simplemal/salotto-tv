@@ -39,15 +39,17 @@ Salotto connects only to Open-Meteo for the weather and to GitHub for updates. N
 
 ## How it looks
 
+<p align="center"><img src="distro/docs/immagini/home-pulita.webp" alt="Clean Home" width="100%"></p>
+<p align="center"><sub>Clean Home</sub></p>
+
 <p align="center"><img src="distro/docs/immagini/home-circolare.webp" alt="Circular Home" width="100%"></p>
-<p align="center"><sub>Circular Home, chosen in Appearance › Layout</sub></p>
+<p align="center"><sub>Circular Home. Clean, Circular and Glass are chosen in Appearance › Layout</sub></p>
 
 <p align="center">
-  <img src="distro/docs/immagini/centro-di-controllo.webp" alt="Control center" width="32%">
-  <img src="distro/docs/immagini/sfondo.webp" alt="Choosing the backdrop" width="32%">
-  <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="32%">
+  <img src="distro/docs/immagini/sfondo.webp" alt="Choosing the backdrop" width="48%">
+  <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="48%">
 </p>
-<p align="center"><sub>Control center · Choosing the backdrop · Task manager</sub></p>
+<p align="center"><sub>Choosing the backdrop · Task manager</sub></p>
 
 ## How the repository is made
 
