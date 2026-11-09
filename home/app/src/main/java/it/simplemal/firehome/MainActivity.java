@@ -74,6 +74,10 @@ public final class MainActivity extends CardActivity {
     private static final int PILL_MS = 220;
     /** The clean Home's tiles closing before the first row climbs back to the top. */
     private static final int PANEL_QUICK_MS = 90;
+    /** The clean Home's coloured line along each app, in dp: as thin as can still be seen. */
+    private static final float CLEAN_EDGE = 0.75f;
+    /** How far towards white that line goes from the app's colour. */
+    private static final float CLEAN_EDGE_LIGHT = 0.45f;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
 
     /** The Home decides where to scroll: the first row stays low, like tvOS. */
@@ -2033,8 +2037,10 @@ public final class MainActivity extends CardActivity {
             artComing++;
             Background.draw(() -> {
                 Bitmap square = circleArt(tag, size);
+                int colour = glowOf(square);
                 Bitmap made = Squircle.cut(square);
                 square.recycle();
+                colourEdge(made, colour);
                 CIRCLE_ART.put(key, made);
                 runOnUiThread(() -> {
                     image.setImageBitmap(made);
@@ -2044,6 +2050,27 @@ public final class MainActivity extends CardActivity {
             });
         }
         return tile;
+    }
+
+    /**
+     * A very thin line along the squircle in the app's own colour, the one the wheel glows with:
+     * the user's request of 2026-11-09. Drawn into the picture, inside its edge.
+     */
+    private void colourEdge(Bitmap squircle, int colour) {
+        int size = squircle.getWidth();
+        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE;
+        Path edge = Squircle.path(size - line);
+        edge.offset(line / 2, line / 2);
+        Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rim.setStyle(Paint.Style.STROKE);
+        rim.setStrokeWidth(line);
+        // Its own colour exactly vanished on an icon of one colour: a little lighter, the same hue.
+        rim.setColor(Color.rgb(lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
+        new Canvas(squircle).drawPath(edge, rim);
+    }
+
+    private static int lighter(int channel) {
+        return Math.round(channel + (255 - channel) * CLEAN_EDGE_LIGHT);
     }
 
     private Bitmap allAppsSquircle(int size) {
