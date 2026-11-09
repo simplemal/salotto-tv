@@ -416,4 +416,5 @@
     <string name="settings_clean_time">الوقت فقط</string>
     <string name="settings_clean_date">التاريخ فقط</string>
     <string name="settings_clean_none">لا شيء</string>
+    <string name="settings_row_middle">في الوسط</string>
 </resources>

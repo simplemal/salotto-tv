@@ -145,7 +145,10 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     /** The squircle's corners as a rounded rectangle, for the shadow under it. */
     private static final float SQUIRCLE_CORNER = 0.24f;
     private static final int SQUARE_CAPTION_ROOM = 14;
-    private Drawable squircleRing;
+    /** Over a light picture: black words, a little see-through, and a black see-through ring. */
+    protected static final int DARK_TEXT = Color.argb(217, 0, 0, 0);
+    /** The clean Home's apps sit on a light picture: their names and their ring are drawn dark. */
+    protected boolean darkInk;
 
     protected void onCardFocus(View tile) { }
 
@@ -329,8 +332,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             image.setImageDrawable(drawable);
             // No glass on the clean Home: at rest the picture alone.
             restEdge = null;
-            if (squircleRing == null) squircleRing = new Squircle.Edge(Color.WHITE, dp(3) / 2f);
-            ring = squircleRing;
+            // No ring on the clean Home: the selected app grows, see focusScale.
+            ring = null;
         } else {
             dress(image, drawable, back, look);
             restEdge = glassEdge(radius, CARD_REFLECTION, CARD_LIGHT);
@@ -352,6 +355,10 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         caption.setEllipsize(TextUtils.TruncateAt.END);
         caption.setPadding(0, dp(8), 0, dp(10));
         caption.setVisibility(restingCaption());
+        if (square && darkInk) {
+            caption.setTextColor(DARK_TEXT);
+            caption.setShadowLayer(0, 0, 0, 0);
+        }
 
         LinearLayout tile = new LinearLayout(this);
         tile.setOrientation(LinearLayout.VERTICAL);

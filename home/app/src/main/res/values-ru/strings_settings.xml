@@ -404,4 +404,5 @@
     <string name="settings_clean_time">Только время</string>
     <string name="settings_clean_date">Только дата</string>
     <string name="settings_clean_none">Ничего</string>
+    <string name="settings_row_middle">По центру</string>
 </resources>

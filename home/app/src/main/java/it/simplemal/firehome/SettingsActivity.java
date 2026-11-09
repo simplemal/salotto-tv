@@ -1074,7 +1074,8 @@ public final class SettingsActivity extends CardActivity {
             entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
                 getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
             entries.add(new Entry(getString(style == Look.HOME_CLEAN ? R.string.settings_first_row : R.string.settings_dock),
-                getString(Look.appsOnly(this) ? R.string.settings_dock_top : R.string.settings_dock_bottom), null,
+                getString(Look.appsOnly(this) ? R.string.settings_dock_top
+                    : style == Look.HOME_CLEAN && Look.cleanRowMiddle(this) ? R.string.settings_row_middle : R.string.settings_dock_bottom), null,
                 getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
             if (style == Look.HOME_CLEAN) {
                 // Its own switch, off at first: the wheel's is not touched.
@@ -1166,9 +1167,19 @@ public final class SettingsActivity extends CardActivity {
     private void showDock() {
         // The clean Home has no dock to see: its first row of apps, at the bottom or at the top.
         boolean clean = Look.clean(this);
-        String[] names = clean ? new String[]{getString(R.string.settings_dock_bottom), getString(R.string.settings_dock_top)}
-            : new String[]{getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
-        show(getString(clean ? R.string.settings_first_row : R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+        if (clean) {
+            // Only here: in the middle as well, between low and at the top.
+            String[] names = {getString(R.string.settings_dock_bottom), getString(R.string.settings_row_middle), getString(R.string.settings_dock_top)};
+            int chosen = Look.appsOnly(this) ? 2 : Look.cleanRowMiddle(this) ? 1 : 0;
+            show(getString(R.string.settings_first_row), choices(names, chosen, R.drawable.ic_s_grid, index -> null, index -> {
+                Look.setAppsOnly(this, index == 2);
+                Look.setCleanRowMiddle(this, index == 1);
+                refresh();
+            }));
+            return;
+        }
+        String[] names = {getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
+        show(getString(R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
                 Look.setAppsOnly(this, index == 1);
                 refresh();

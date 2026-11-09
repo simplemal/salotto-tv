@@ -236,6 +236,19 @@ public final class MainActivity extends CardActivity {
     private static final int ALL_APPS_CIRCLE = 60;
     private static final int BESIDE_ALL_APPS = 22;
     private static final float LIGHT_CORNER = 0.72f;
+    /**
+     * The clean Home's words are small: past this they read better black than white. On the TV's
+     * cloudy sky, 0.72, the line stayed white and hard to read (2026-11-09).
+     */
+    private static final float LIGHT_LINE = 0.5f;
+    /**
+     * Over a light picture the free buttons and the clean Home's line turn black, a little
+     * see-through: the words hardly, the icons a touch more, as the middle ones are drawn thicker.
+     */
+    private static final int DARK_ICON_ALPHA = 200;
+    /** Over a darker picture one shadow for all of them, words and icons alike. */
+    private static final int SHADOW_DP = 3;
+    private static final int SHADOW_ALPHA = 170;
     private static final int WEATHER_DAY_WIDTH = 50;
     /** One press opens one app: a second one while the first is starting is ignored. */
     private boolean opening;
@@ -544,11 +557,11 @@ public final class MainActivity extends CardActivity {
 
     /** White with a small shadow over a medium or dark picture, black over a very light one. */
     private void tonePill() {
-        int ink = cornersOnTop() && lightCorner ? Color.BLACK : Color.WHITE;
-        for (TextView text : new TextView[]{pillTime, pillDate, pillWeather}) {
-            text.setTextColor(ink);
-            if (cornersOnTop() && !lightCorner) text.setShadowLayer(dp(3), 0, dp(1), Color.argb(170, 0, 0, 0));
-            else text.setShadowLayer(0, 0, 0, 0);
+        boolean dark = cornersOnTop() && lightCorner;
+        for (TextView text : new TextView[]{pillTime, pillDate, pillWeather, cleanTime, cleanDate, cleanWeather}) {
+            text.setTextColor(dark ? DARK_TEXT : Color.WHITE);
+            if (dark || !cornersOnTop()) text.setShadowLayer(0, 0, 0, 0);
+            else text.setShadowLayer(dp(SHADOW_DP), 0, dp(1), Color.argb(SHADOW_ALPHA, 0, 0, 0));
         }
         lightPillIcon(controlButton, controlButton.hasFocus());
         if (networkButton != null) lightPillIcon(networkButton, networkButton.hasFocus());
@@ -559,11 +572,13 @@ public final class MainActivity extends CardActivity {
         if (!pillRings.containsKey(button)) pillRings.put(button, button.getBackground());
         if (!cornersOnTop() || lit) {
             button.setBackground(pillRings.get(button));
+            button.setImageAlpha(255);
             super.lightPillIcon(button, lit);
             return;
         }
         button.setBackground(lightCorner ? null : iconShadow(button));
         button.setColorFilter(lightCorner ? Color.BLACK : Color.WHITE);
+        button.setImageAlpha(lightCorner ? DARK_ICON_ALPHA : 255);
     }
 
     /** A soft dark copy of the icon, a little lower, drawn under it. */
@@ -575,12 +590,12 @@ public final class MainActivity extends CardActivity {
         icon.setBounds(inset, inset, size - inset, size - inset);
         icon.draw(new Canvas(shape));
         Paint blur = new Paint();
-        blur.setMaskFilter(new BlurMaskFilter(dp(2), BlurMaskFilter.Blur.NORMAL));
+        blur.setMaskFilter(new BlurMaskFilter(dp(SHADOW_DP), BlurMaskFilter.Blur.NORMAL));
         int[] offset = new int[2];
         Bitmap alpha = shape.extractAlpha(blur, offset);
         Bitmap shadow = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Paint dark = new Paint();
-        dark.setColor(Color.argb(150, 0, 0, 0));
+        dark.setColor(Color.argb(SHADOW_ALPHA, 0, 0, 0));
         new Canvas(shadow).drawBitmap(alpha, offset[0], offset[1] + dp(1), dark);
         shape.recycle();
         alpha.recycle();
@@ -592,25 +607,48 @@ public final class MainActivity extends CardActivity {
         String name = Look.currentName(this);
         if (!cornersOnTop() || Objects.equals(name, cornerRead)) return;
         cornerRead = name;
-        // The wheel's buttons are at the bottom in the middle, the clean Home's at the top.
-        boolean top = clean;
         Look.current(this, picture -> {
             int width = picture.getWidth();
             int height = picture.getHeight();
-            double sum = 0;
-            int count = 0;
-            for (int x = width * 3 / 8; x < width * 5 / 8; x += 4) {
-                for (int y = top ? 0 : height * 5 / 6; y < (top ? height / 6 : height); y += 4) {
-                    int pixel = picture.getPixel(x, y);
-                    sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
-                    count++;
+            boolean light;
+            if (clean) {
+                // The whole line at the top; and under the first row, for the names and the credits.
+                light = lightness(picture, width / 16, width * 15 / 16, 0, height / 8) > LIGHT_LINE;
+                boolean below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
+                if (below != darkInk) {
+                    darkInk = below;
+                    toneFooter();
+                    render(focusedTag());
                 }
+            } else {
+                // The wheel's buttons, at the bottom in the middle.
+                light = lightness(picture, width * 3 / 8, width * 5 / 8, height * 5 / 6, height) > LIGHT_CORNER;
             }
-            boolean light = count > 0 && sum / count > LIGHT_CORNER;
             if (light == lightCorner) return;
             lightCorner = light;
             tonePill();
         });
+    }
+
+    private static double lightness(Bitmap picture, int left, int right, int top, int bottom) {
+        double sum = 0;
+        int count = 0;
+        for (int x = left; x < right; x += 4) {
+            for (int y = top; y < bottom; y += 4) {
+                int pixel = picture.getPixel(x, y);
+                sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : 0;
+    }
+
+    /** The credits at rest: light grey with a shadow, or black on the clean Home's light picture. */
+    private void toneFooter() {
+        if (footer.hasFocus()) return;
+        footer.setTextColor(clean && darkInk ? DARK_TEXT : FOOTER_INK);
+        if (clean && darkInk) footer.setShadowLayer(0, 0, 0, 0);
+        else footer.setShadowLayer(dp(3), 0, dp(1), Color.argb(200, 0, 0, 0));
     }
 
     /** The circular Home's weather: the line of now, then today and the next days in columns. */
@@ -645,7 +683,7 @@ public final class MainActivity extends CardActivity {
         for (TextView text : new TextView[]{cleanTime, cleanDate, cleanWeather}) {
             text.setTextSize(CLEAN_BAR_SP);
             text.setTextColor(Color.WHITE);
-            text.setShadowLayer(dp(3), 0, dp(1), Color.argb(200, 0, 0, 0));
+            text.setShadowLayer(dp(SHADOW_DP), 0, dp(1), Color.argb(SHADOW_ALPHA, 0, 0, 0));
         }
         cleanBar.addView(cleanTime);
         LinearLayout.LayoutParams after = new LinearLayout.LayoutParams(-2, -2);
@@ -941,7 +979,7 @@ public final class MainActivity extends CardActivity {
             // No glass on the clean Home: the same flat veil as Tutte le app.
             view.setBackground(!focused ? null : clean ? plainFill(radius)
                 : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
-            view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
+            view.setTextColor(focused ? Color.WHITE : clean && darkInk ? DARK_TEXT : FOOTER_INK);
             if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
@@ -1480,6 +1518,11 @@ public final class MainActivity extends CardActivity {
             placeFooter();
             placeCorners();
             cornerRead = null;
+            // Dark names belong to the clean Home only: read again for it, white elsewhere.
+            if (!clean && darkInk) {
+                darkInk = false;
+                toneFooter();
+            }
         }
         readCorner();
         if (appsOnly) restRaised();
@@ -1526,7 +1569,9 @@ public final class MainActivity extends CardActivity {
         int dockPadding = clean ? 0 : dp(DOCK_HEIGHT_PADDING);
         int dockHeight = clean ? rowHeight : imageHeight + 2 * dockPadding;
         int rowGap = dp(20);
-        int top = screen - dockHeight - rowGap - imageHeight / 3;
+        // The clean Home's first row can also rest in the middle of the screen.
+        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? (screen - dockHeight) / 2
+            : screen - dockHeight - rowGap - imageHeight / 3;
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
@@ -2099,7 +2144,13 @@ public final class MainActivity extends CardActivity {
             || key == KeyEvent.KEYCODE_DPAD_DOWN || key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
     }
 
-    @Override protected float focusScale() { return moving != null ? 1.12f : super.focusScale(); }
+    /** The clean Home's selected app has no ring: it grows clearly instead, the user's choice of 2026-11-09. */
+    private static final float CLEAN_FOCUS_SCALE = 1.3f;
+
+    @Override protected float focusScale() {
+        if (clean) return CLEAN_FOCUS_SCALE;
+        return moving != null ? 1.12f : super.focusScale();
+    }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
         // The circle is closing over the Home: the arrows would move the wheel under it.

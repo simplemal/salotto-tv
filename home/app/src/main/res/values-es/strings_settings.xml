@@ -393,4 +393,5 @@
     <string name="settings_clean_time">Solo la hora</string>
     <string name="settings_clean_date">Solo la fecha</string>
     <string name="settings_clean_none">Nada</string>
+    <string name="settings_row_middle">En el centro</string>
 </resources>

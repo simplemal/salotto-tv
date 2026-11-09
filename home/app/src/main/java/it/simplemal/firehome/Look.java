@@ -193,6 +193,9 @@ final class Look {
     static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
     /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
     static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
+    /** The clean Home's first row in the middle of the screen, rather than low: its own choice. */
+    static boolean cleanRowMiddle(Context context) { return prefs(context).getBoolean("clean_row_middle", false); }
+    static void setCleanRowMiddle(Context context, boolean value) { prefs(context).edit().putBoolean("clean_row_middle", value).apply(); }
     static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
     static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
     /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
@@ -577,7 +580,7 @@ final class Look {
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
             + "/" + appsOnly(context) + "/" + homeStyle(context) + "/" + cleanBlur(context) + "/" + wheel(context)
             + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
-            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context) + "/" + cleanShows(context) + "/" + cleanFont(context);
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context) + "/" + cleanShows(context) + "/" + cleanFont(context) + "/" + cleanRowMiddle(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */
