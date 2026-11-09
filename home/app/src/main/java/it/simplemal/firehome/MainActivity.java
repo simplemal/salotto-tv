@@ -74,8 +74,12 @@ public final class MainActivity extends CardActivity {
     private static final int PILL_MS = 220;
     /** The clean Home's tiles closing before the first row climbs back to the top. */
     private static final int PANEL_QUICK_MS = 90;
-    /** The clean Home's coloured line along each app: one pixel of the screen, 0.75 dp was too thick. */
-    private static final float CLEAN_EDGE = 1f;
+    /**
+     * The clean Home's coloured line along each app, in dp, half see-through: one pixel came out
+     * ragged along the curves, and 0.75 dp at full strength was too thick (2026-11-09).
+     */
+    private static final float CLEAN_EDGE = 0.75f;
+    private static final int CLEAN_EDGE_ALPHA = 128;
     /** How far towards white that line goes from the app's colour. */
     private static final float CLEAN_EDGE_LIGHT = 0.45f;
     private static final long WEATHER_CHECK_MS = 60 * 1000L;
@@ -2058,14 +2062,14 @@ public final class MainActivity extends CardActivity {
      */
     private void colourEdge(Bitmap squircle, int colour) {
         int size = squircle.getWidth();
-        float line = CLEAN_EDGE;
+        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE;
         Path edge = Squircle.path(size - line);
         edge.offset(line / 2, line / 2);
         Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
         rim.setStyle(Paint.Style.STROKE);
         rim.setStrokeWidth(line);
         // Its own colour exactly vanished on an icon of one colour: a little lighter, the same hue.
-        rim.setColor(Color.rgb(lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
+        rim.setColor(Color.argb(CLEAN_EDGE_ALPHA, lighter(Color.red(colour)), lighter(Color.green(colour)), lighter(Color.blue(colour))));
         new Canvas(squircle).drawPath(edge, rim);
     }
 
