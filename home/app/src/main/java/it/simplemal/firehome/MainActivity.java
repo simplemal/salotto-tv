@@ -1577,8 +1577,9 @@ public final class MainActivity extends CardActivity {
         int dockPadding = clean ? 0 : dp(DOCK_HEIGHT_PADDING);
         int dockHeight = clean ? rowHeight : imageHeight + 2 * dockPadding;
         int rowGap = dp(20);
-        // The clean Home's first row can also rest in the middle of the screen.
-        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? (screen - dockHeight) / 2
+        // The clean Home's first row can also rest in the middle: of the room under the line at the top.
+        int lineBottom = dp(CLEAN_PILL_TOP) + dp(6) + dp(FREE_ICON);
+        int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? lineBottom + (screen - lineBottom - dockHeight) / 2
             : screen - dockHeight - rowGap - imageHeight / 3;
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
