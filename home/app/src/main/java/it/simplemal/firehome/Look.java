@@ -148,16 +148,16 @@ final class Look {
     /** The weather's first line: like the date unless chosen apart, the first choice offered. */
     static final int LIKE_DATE = -1;
 
-    static int dateFont(Context context) { return prefs(context).getInt("date_font", DATE_FONT); }
-    static void setDateFont(Context context, int value) { prefs(context).edit().putInt("date_font", value).apply(); }
-    static int dateSize(Context context) { return prefs(context).getInt("date_size", 1); }
-    static void setDateSize(Context context, int value) { prefs(context).edit().putInt("date_size", value).apply(); }
-    static boolean dateNumeric(Context context) { return prefs(context).getBoolean("date_numeric", false); }
-    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean("date_numeric", value).apply(); }
-    static int weatherFont(Context context) { return prefs(context).getInt("weather_font", LIKE_DATE); }
-    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt("weather_font", value).apply(); }
-    static int weatherSize(Context context) { return prefs(context).getInt("weather_size", LIKE_DATE); }
-    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt("weather_size", value).apply(); }
+    static int dateFont(Context context) { return ownInt(context, "date_font", DATE_FONT); }
+    static void setDateFont(Context context, int value) { prefs(context).edit().putInt(own(context, "date_font"), value).apply(); }
+    static int dateSize(Context context) { return ownInt(context, "date_size", 1); }
+    static void setDateSize(Context context, int value) { prefs(context).edit().putInt(own(context, "date_size"), value).apply(); }
+    static boolean dateNumeric(Context context) { return ownBoolean(context, "date_numeric", false); }
+    static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "date_numeric"), value).apply(); }
+    static int weatherFont(Context context) { return ownInt(context, "weather_font", LIKE_DATE); }
+    static void setWeatherFont(Context context, int value) { prefs(context).edit().putInt(own(context, "weather_font"), value).apply(); }
+    static int weatherSize(Context context) { return ownInt(context, "weather_size", LIKE_DATE); }
+    static void setWeatherSize(Context context, int value) { prefs(context).edit().putInt(own(context, "weather_size"), value).apply(); }
 
     /** The weather's first line, resolved: its own choice, or the date's. */
     static int weatherFontShown(Context context) { int own = weatherFont(context); return own == LIKE_DATE ? dateFont(context) : own; }
@@ -180,24 +180,24 @@ final class Look {
     static int cleanFont(Context context) { return prefs(context).getInt("clean_font", 2); }
     static void setCleanFont(Context context, int value) { prefs(context).edit().putInt("clean_font", value).apply(); }
 
-    static int font(Context context) { return prefs(context).getInt("font", 2); }
-    static void setFont(Context context, int value) { prefs(context).edit().putInt("font", value).apply(); }
-    static int size(Context context) { return prefs(context).getInt("size", 1); }
-    static void setSize(Context context, int value) { prefs(context).edit().putInt("size", value).apply(); }
-    static boolean clock(Context context) { return prefs(context).getBoolean("clock", true); }
-    static void setClock(Context context, boolean value) { prefs(context).edit().putBoolean("clock", value).apply(); }
+    static int font(Context context) { return ownInt(context, "font", 2); }
+    static void setFont(Context context, int value) { prefs(context).edit().putInt(own(context, "font"), value).apply(); }
+    static int size(Context context) { return ownInt(context, "size", 1); }
+    static void setSize(Context context, int value) { prefs(context).edit().putInt(own(context, "size"), value).apply(); }
+    static boolean clock(Context context) { return ownBoolean(context, "clock", true); }
+    static void setClock(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "clock"), value).apply(); }
     static int names(Context context) { return prefs(context).getInt("names", NAMES_ON_FOCUS); }
     static void setNames(Context context, int value) { prefs(context).edit().putInt("names", value).apply(); }
-    static boolean hours24(Context context) { return prefs(context).getBoolean("hours24", true); }
-    static void setHours24(Context context, boolean value) { prefs(context).edit().putBoolean("hours24", value).apply(); }
-    static boolean date(Context context) { return prefs(context).getBoolean("date", true); }
+    static boolean hours24(Context context) { return ownBoolean(context, "hours24", true); }
+    static void setHours24(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "hours24"), value).apply(); }
+    static boolean date(Context context) { return ownBoolean(context, "date", true); }
     /** The Home without the big clock and weather: it rests with the dock up, as when a lower row has the focus. */
     static boolean appsOnly(Context context) { return prefs(context).getBoolean("appsOnly", false); }
     /** The clean Home's first row in the middle of the screen, rather than low: its own choice. */
     static boolean cleanRowMiddle(Context context) { return prefs(context).getBoolean("clean_row_middle", false); }
     static void setCleanRowMiddle(Context context, boolean value) { prefs(context).edit().putBoolean("clean_row_middle", value).apply(); }
     static void setAppsOnly(Context context, boolean value) { prefs(context).edit().putBoolean("appsOnly", value).apply(); }
-    static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean("date", value).apply(); }
+    static void setDate(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "date"), value).apply(); }
     /** The Home as a wheel of circles instead of rows of cards: the lit one on top, the others down the sides. */
     /** The Home's three layouts: cards in a grid, circles on a wheel, or the clean one with squircles. */
     static final int HOME_GRID = 0;
@@ -205,6 +205,23 @@ final class Look {
     static final int HOME_CLEAN = 2;
 
     /** Until one is chosen here, what the old switch between grid and wheel said. */
+    /**
+     * Time, date and weather are each Home's own: a change on one leaves the others as they are
+     * (the user's rule of 2026-11-09). Every Home writes its own name; until it has, it reads what
+     * all of them shared before.
+     */
+    static String own(Context context, String key) { return key + "_home" + homeStyle(context); }
+
+    private static int ownInt(Context context, String key, int fallback) {
+        SharedPreferences saved = prefs(context);
+        return saved.getInt(own(context, key), saved.getInt(key, fallback));
+    }
+
+    private static boolean ownBoolean(Context context, String key, boolean fallback) {
+        SharedPreferences saved = prefs(context);
+        return saved.getBoolean(own(context, key), saved.getBoolean(key, fallback));
+    }
+
     static int homeStyle(Context context) {
         return prefs(context).getInt("home_style", prefs(context).getBoolean("circular", false) ? HOME_CIRCLE : HOME_GRID);
     }

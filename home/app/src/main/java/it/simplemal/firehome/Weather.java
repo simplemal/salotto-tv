@@ -73,8 +73,12 @@ final class Weather {
         return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
 
-    static boolean enabled(Context context) { return prefs(context).getBoolean("enabled", true); }
-    static void setEnabled(Context context, boolean value) { prefs(context).edit().putBoolean("enabled", value).apply(); }
+    /** Each Home its own, like the time and the date: see Look.own. */
+    static boolean enabled(Context context) {
+        SharedPreferences saved = prefs(context);
+        return saved.getBoolean(Look.own(context, "enabled"), saved.getBoolean("enabled", true));
+    }
+    static void setEnabled(Context context, boolean value) { prefs(context).edit().putBoolean(Look.own(context, "enabled"), value).apply(); }
     static String place(Context context) { return prefs(context).getString("place", null); }
     /** True once, the first time the Home finds no place: it is asked for only that time. */
     static boolean fahrenheit(Context context) { return prefs(context).getBoolean("fahrenheit", false); }
