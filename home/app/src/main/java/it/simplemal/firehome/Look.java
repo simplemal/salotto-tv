@@ -147,9 +147,9 @@ final class Look {
     /** The weather's first line: like the date unless chosen apart, the first choice offered. */
     static final int LIKE_DATE = -1;
 
-    static int dateFont(Context context) { return ownInt(context, "date_font", DATE_FONT); }
+    static int dateFont(Context context) { return ownInt(context, "date_font", glass(context) ? GLASS_DATE_FONT : DATE_FONT); }
     static void setDateFont(Context context, int value) { prefs(context).edit().putInt(own(context, "date_font"), value).apply(); }
-    static int dateSize(Context context) { return ownInt(context, "date_size", 1); }
+    static int dateSize(Context context) { return ownInt(context, "date_size", glass(context) ? GLASS_DATE_SIZE : 1); }
     static void setDateSize(Context context, int value) { prefs(context).edit().putInt(own(context, "date_size"), value).apply(); }
     static boolean dateNumeric(Context context) { return ownBoolean(context, "date_numeric", false); }
     static void setDateNumeric(Context context, boolean value) { prefs(context).edit().putBoolean(own(context, "date_numeric"), value).apply(); }
@@ -179,7 +179,7 @@ final class Look {
     static int cleanFont(Context context) { return prefs(context).getInt("clean_font", 2); }
     static void setCleanFont(Context context, int value) { prefs(context).edit().putInt("clean_font", value).apply(); }
 
-    static int font(Context context) { return ownInt(context, "font", 2); }
+    static int font(Context context) { return ownInt(context, "font", glass(context) ? GLASS_FONT : 2); }
     static void setFont(Context context, int value) { prefs(context).edit().putInt(own(context, "font"), value).apply(); }
     static int size(Context context) { return ownInt(context, "size", 1); }
     static void setSize(Context context, int value) { prefs(context).edit().putInt(own(context, "size"), value).apply(); }
@@ -210,6 +210,17 @@ final class Look {
      * all of them shared before.
      */
     static String own(Context context, String key) { return key + "_home" + homeStyle(context); }
+
+    /**
+     * The glass Home's own start, the user's of 2026-11-09: the time thin, the date light and small.
+     * The rest is as on the other Homes: time and date large, 24 hours, the long date, the weather
+     * large and like the date.
+     */
+    private static final int GLASS_FONT = 0;
+    private static final int GLASS_DATE_FONT = 1;
+    private static final int GLASS_DATE_SIZE = 0;
+
+    private static boolean glass(Context context) { return homeStyle(context) == HOME_GRID; }
 
     private static int ownInt(Context context, String key, int fallback) {
         SharedPreferences saved = prefs(context);
