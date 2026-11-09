@@ -104,7 +104,6 @@ final class ControlPanel extends LinearLayout {
             });
             tiles.add(this);
             fill.setCornerRadius(host.dp(RADIUS));
-            if (cleanLook) fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
             view.setBackground(fill);
             paint();
         }
@@ -274,15 +273,25 @@ final class ControlPanel extends LinearLayout {
     private int gap = GAP;
     private boolean cleanLook;
     private static final int CLEAN_UNIT = 48;
-    private static final int CLEAN_GAP = 5;
-    /** A very faint light grey line along each tile of the clean Home's. */
-    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
     /**
-     * With no panel under them the clean Home's tiles carry the dark themselves, black and a little
-     * see-through: the user's choice of 2026-11-09, with no frame around them. With the first row at
-     * the top the row moves to the middle while they are open, so they are never over the apps.
+     * The clean Home's tiles are one block, the user's trial of 2026-11-09: no room between them, one
+     * margin round them all, black and a little see-through with a very faint light grey line. Each
+     * lights up as before; at rest it is the block itself. With the first row at the top the row
+     * moves to the middle while it is open, so it is never over the apps.
      */
-    private static final int CLEAN_TILE_OFF = Color.argb(200, 0, 0, 0);
+    private static final int CLEAN_GAP = 0;
+    private static final int CLEAN_PAD = 6;
+    private static final int CLEAN_BLOCK = Color.argb(200, 0, 0, 0);
+    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
+    private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
+
+    private Drawable block() {
+        GradientDrawable fill = new GradientDrawable();
+        fill.setColor(CLEAN_BLOCK);
+        fill.setCornerRadius(host.dp(RADIUS + CLEAN_PAD));
+        fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
+        return fill;
+    }
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }
@@ -298,8 +307,8 @@ final class ControlPanel extends LinearLayout {
             unit = clean ? CLEAN_UNIT : UNIT;
             gap = clean ? CLEAN_GAP : GAP;
             tileOff = clean ? CLEAN_TILE_OFF : TILE_OFF;
-            // The clean Home's tiles stand on their own: no panel around them.
-            int room = clean ? 0 : host.dp(PADDING);
+            // The clean Home's tiles are one block: one margin round them all.
+            int room = host.dp(clean ? CLEAN_PAD : PADDING);
             setPadding(room, room, room, room);
             removeAllViews();
             tiles.clear();
@@ -312,7 +321,7 @@ final class ControlPanel extends LinearLayout {
             addRest();
         }
         // The list is one plain colour inside the glass line: no sheen, nothing to blend with what is behind it.
-        setBackground(list ? solid() : clean ? null : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
+        setBackground(list ? solid() : clean ? block() : GlassRim.panel(host.dp(PANEL_RADIUS), host.dp(1)));
         int across = list ? Gravity.START : clean ? Gravity.CENTER_HORIZONTAL : Gravity.END;
         FrameLayout.LayoutParams spot = (FrameLayout.LayoutParams) getLayoutParams();
         spot.gravity = list ? Gravity.BOTTOM | Gravity.START : Gravity.TOP | across;
@@ -325,7 +334,7 @@ final class ControlPanel extends LinearLayout {
         FrameLayout.LayoutParams under = (FrameLayout.LayoutParams) line.getLayoutParams();
         under.gravity = Gravity.TOP | across;
         under.rightMargin = list || clean ? 0 : host.dp(EDGE);
-        int padding = clean ? 0 : PADDING;
+        int padding = clean ? CLEAN_PAD : PADDING;
         // Two rows on the clean Home, four elsewhere.
         int tall = clean ? 2 * unit + gap : 4 * unit + 3 * gap;
         int wide = clean ? 2 * wide() + 4 * unit + 5 * gap : 2 * wide() + gap;
