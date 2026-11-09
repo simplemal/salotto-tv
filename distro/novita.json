@@ -1,68 +1,77 @@
 {
-  "versionName": "1.0.24-beta.1",
+  "versionName": "1.1.0-beta.1",
   "changes": {
     "en": [
-      "New settings: the sections on the left, the choices on the right",
-      "Backdrops and screensaver in one page, with the pictures of each collection",
-      "The screensaver can keep one picture and has its own time",
-      "Salotto’s colours can change by themselves, like the collections",
-      "A collection you removed comes back with Download"
+      "New Clean Home, with squircle apps and its own control center",
+      "The grid Home is now called Glass",
+      "On first start you choose the Home: Clean, Circular or Glass",
+      "Time, date and weather set for each Home, large or small next to the buttons",
+      "Circular Home: glow Off, Normal or Wide, and a new way out of apps",
+      "On less powerful Fire TVs the menus have a black background"
     ],
     "es": [
-      "Ajustes nuevos: las secciones a la izquierda, las opciones a la derecha",
-      "Fondos y salvapantallas en una sola página, con las imágenes de cada colección",
-      "El salvapantallas puede mostrar una sola imagen y tiene su propio tiempo",
-      "Los colores de Salotto pueden cambiar solos, como las colecciones",
-      "Una colección que quitaste vuelve con Descargar"
+      "Nuevo Home Limpia, con apps en squircle y su propio centro de control",
+      "El Home en cuadrícula ahora se llama Cristal",
+      "En el primer inicio eliges el Home: Limpia, Circular o Cristal",
+      "Hora, fecha y tiempo propios de cada Home, grandes o pequeños junto a los botones",
+      "Home circular: brillo Apagado, Normal o Amplio, y una nueva salida de las apps",
+      "En los Fire TV menos potentes los menús tienen fondo negro"
     ],
     "fr": [
-      "Nouveaux réglages : les sections à gauche, les choix à droite",
-      "Fonds et économiseur d’écran sur une seule page, avec les images de chaque collection",
-      "L’économiseur peut garder une seule image et a son propre rythme",
-      "Les couleurs de Salotto peuvent changer toutes seules, comme les collections",
-      "Une collection supprimée revient avec Télécharger"
+      "Nouvel accueil Épurée, avec des applis en squircle et son propre centre de contrôle",
+      "L’accueil en grille s’appelle désormais Verre",
+      "Au premier démarrage, vous choisissez l’accueil : Épurée, Circulaire ou Verre",
+      "Heure, date et météo propres à chaque accueil, en grand ou en petit à côté des boutons",
+      "Accueil circulaire : halo Désactivé, Normal ou Large, et une nouvelle sortie des applis",
+      "Sur les Fire TV moins puissants, les menus ont un fond noir"
     ],
     "de": [
-      "Neue Einstellungen: die Bereiche links, die Auswahl rechts",
-      "Hintergründe und Bildschirmschoner auf einer Seite, mit den Bildern jeder Sammlung",
-      "Der Bildschirmschoner kann ein Bild behalten und hat seine eigene Zeit",
-      "Die Farben von Salotto können von selbst wechseln, wie die Sammlungen",
-      "Eine entfernte Sammlung kommt mit Herunterladen zurück"
+      "Neuer Home Schlicht, mit Squircle-Apps und eigenem Kontrollzentrum",
+      "Der Raster-Home heißt jetzt Glas",
+      "Beim ersten Start wählst du den Home: Schlicht, Kreis oder Glas",
+      "Uhrzeit, Datum und Wetter für jeden Home einzeln, groß oder klein neben den Tasten",
+      "Kreis-Home: Leuchten Aus, Normal oder Weit, und ein neuer Ausgang aus Apps",
+      "Auf schwächeren Fire TVs haben die Menüs einen schwarzen Hintergrund"
     ],
     "pt": [
-      "Configurações novas: as seções à esquerda, as escolhas à direita",
-      "Fundos e protetor de tela em uma só página, com as imagens de cada coleção",
-      "O protetor de tela pode manter uma só imagem e tem seu próprio tempo",
-      "As cores do Salotto podem mudar sozinhas, como as coleções",
-      "Uma coleção removida volta com Baixar"
+      "Novo Home Limpa, com apps em squircle e seu próprio centro de controle",
+      "O Home em grade agora se chama Vidro",
+      "No primeiro início você escolhe o Home: Limpa, Circular ou Vidro",
+      "Hora, data e tempo próprios de cada Home, grandes ou pequenos ao lado dos botões",
+      "Home circular: brilho Desligado, Normal ou Amplo, e uma nova saída dos apps",
+      "Nos Fire TV menos potentes os menus têm fundo preto"
     ],
     "ru": [
-      "Новые настройки: разделы слева, выбор справа",
-      "Фоны и заставка на одной странице, с изображениями каждой коллекции",
-      "Заставка может показывать одно изображение и имеет своё время",
-      "Цвета Salotto могут меняться сами, как коллекции",
-      "Удалённая коллекция возвращается кнопкой «Скачать»"
+      "Новый главный экран «Чистый»: приложения в форме сквиркла и свой центр управления",
+      "Главный экран сеткой теперь называется «Стекло»",
+      "При первом запуске выбирается главный экран: «Чистый», «Круг» или «Стекло»",
+      "Время, дата и погода настраиваются для каждого главного экрана: крупно или мелко рядом с кнопками",
+      "Экран «Круг»: свечение «Выкл.», «Обычное» или «Широкое» и новый выход из приложений",
+      "На менее мощных Fire TV у меню чёрный фон"
     ],
     "ar": [
-      "إعدادات جديدة: الأقسام على اليسار والخيارات على اليمين",
-      "الخلفيات وشاشة التوقف في صفحة واحدة، مع صور كل مجموعة",
-      "يمكن لشاشة التوقف إبقاء صورة واحدة ولها وقتها الخاص",
-      "يمكن أن تتغير ألوان Salotto وحدها، مثل المجموعات",
-      "المجموعة التي حذفتها تعود بزر تنزيل"
+      "شاشة رئيسية جديدة «نظيفة»، بتطبيقات على شكل squircle ومركز تحكم خاص بها",
+      "الشاشة الرئيسية الشبكية أصبح اسمها «زجاج»",
+      "عند أول تشغيل تختار الشاشة الرئيسية: نظيفة أو دائري أو زجاج",
+      "الوقت والتاريخ والطقس خاصة بكل شاشة رئيسية، كبيرة أو صغيرة بجانب الأزرار",
+      "الشاشة الدائرية: توهج متوقف أو عادي أو واسع، وطريقة جديدة للخروج من التطبيقات",
+      "في أجهزة Fire TV الأقل قوة تكون خلفية القوائم سوداء"
     ],
     "hi": [
-      "नई सेटिंग: बाईं ओर हिस्से, दाईं ओर विकल्प",
-      "बैकग्राउंड और स्क्रीनसेवर एक ही पेज पर, हर संग्रह की तस्वीरों के साथ",
-      "स्क्रीनसेवर एक ही तस्वीर रख सकता है और उसका अपना समय है",
-      "Salotto के रंग संग्रहों की तरह अपने-आप बदल सकते हैं",
-      "हटाया गया संग्रह डाउनलोड करें से वापस आता है"
+      "नया साफ़ होम, squircle ऐप्स और अपने कंट्रोल सेंटर के साथ",
+      "ग्रिड होम का नाम अब ग्लास है",
+      "पहली बार शुरू करते समय होम चुनें: साफ़, गोल या ग्लास",
+      "हर होम के लिए अलग समय, तारीख और मौसम, बड़े या बटनों के पास छोटे",
+      "गोल होम: चमक बंद, सामान्य या चौड़ी, और ऐप्स से बाहर आने का नया तरीका",
+      "कम ताकत वाले Fire TV पर मेनू की पृष्ठभूमि काली है"
     ],
     "zh": [
-      "全新设置：左侧是分区，右侧是选项",
-      "背景和屏保合为一页，显示每个图片集的图片",
-      "屏保可以只显示一张图片，并有自己的更换时间",
-      "Salotto 的颜色可以像图片集一样自动更换",
-      "删除的图片集可以用“下载”找回"
+      "全新简洁主屏幕，应用为圆角方形，并有自己的控制中心",
+      "网格主屏幕现在叫玻璃",
+      "首次启动时选择主屏幕：简洁、圆形或玻璃",
+      "每个主屏幕都有自己的时间、日期和天气设置，可大可小，小时显示在按钮旁",
+      "圆形主屏幕：光晕可选关闭、普通或宽阔，退出应用有新的动画",
+      "在性能较弱的 Fire TV 上，菜单使用黑色背景"
     ]
   }
 }
