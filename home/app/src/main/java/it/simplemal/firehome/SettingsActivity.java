@@ -1173,21 +1173,21 @@ public final class SettingsActivity extends CardActivity {
         // The clean Home has no dock to see: its first row of apps, at the bottom or at the top.
         boolean clean = Look.clean(this);
         if (clean) {
-            // Only here: in the middle as well, between low and at the top.
-            String[] names = {getString(R.string.settings_dock_bottom), getString(R.string.settings_row_middle), getString(R.string.settings_dock_top)};
-            int chosen = Look.appsOnly(this) ? 2 : Look.cleanRowMiddle(this) ? 1 : 0;
+            // Only here: in the middle as well. Listed as on the screen, the top first (2026-11-09).
+            String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_row_middle), getString(R.string.settings_dock_bottom)};
+            int chosen = Look.appsOnly(this) ? 0 : Look.cleanRowMiddle(this) ? 1 : 2;
             show(getString(R.string.settings_first_row), choices(names, chosen, R.drawable.ic_s_grid, index -> null, index -> {
-                Look.setAppsOnly(this, index == 2);
+                Look.setAppsOnly(this, index == 0);
                 Look.setCleanRowMiddle(this, index == 1);
                 refresh();
             }));
             return;
         }
         // The glass Home calls it the first row too (2026-11-09): the word dock is gone.
-        String[] names = {getString(R.string.settings_dock_bottom), getString(R.string.settings_dock_top)};
-        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+        String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_dock_bottom)};
+        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 0 : 1, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
-                Look.setAppsOnly(this, index == 1);
+                Look.setAppsOnly(this, index == 0);
                 refresh();
             }));
     }
