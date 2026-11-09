@@ -1076,7 +1076,7 @@ public final class MainActivity extends CardActivity {
         // Dock up, the Home stays where it is and the panel opens over it: no slide down and back.
         if (!appsOnly) scroll.smoothScrollTo(0, 0);
         showPanel(true);
-        panel.openEmpty(onCards ? from : firstCard());
+        panel.openEmpty(onCards ? from : lastAppView());
     }
 
     /** The cover needs the Home as it is now, and a press leaves no time to take it. */
@@ -2283,8 +2283,14 @@ public final class MainActivity extends CardActivity {
 
     /** Back leaves a move or returns to the first row; the Home itself has nothing behind it. */
     @Override public void onBackPressed() {
+        View focus = getCurrentFocus();
+        boolean onButtons = focus == controlButton || focus == pillButton || focus == networkButton || isInside(focus, panel);
         if (moving != null) stopMoving();
-        else if (circular) {
+        // From the buttons or the control centre: back on the app selected last, not the first (2026-11-09).
+        else if (onButtons && lastAppView() != null) {
+            lastAppView().requestFocus();
+            showPanel(false);
+        } else if (circular) {
             wheel.requestFocus();
             wheel.turnToFirst();
         } else if (firstCard() != null) firstCard().requestFocus();
