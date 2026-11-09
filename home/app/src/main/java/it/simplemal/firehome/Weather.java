@@ -234,7 +234,14 @@ final class Weather {
         }
     }
 
-    static boolean active(Context context) { return enabled(context) && place(context) != null; }
+    /**
+     * Read from the network with a place, when the Home writes it or a weather backdrop follows it.
+     * With the weather off the Home, its backdrop gave way to another one and the place was asked
+     * for again at every press (2026-11-09); off, with any other backdrop, nothing is asked.
+     */
+    static boolean active(Context context) {
+        return place(context) != null && (enabled(context) || Look.weatherChosen(context));
+    }
 
     /** Never two readings at once, and offline a failure waits a while before the next try. */
     static boolean due(Context context) {

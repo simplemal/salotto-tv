@@ -436,7 +436,8 @@ public final class PictureGridActivity extends CardActivity {
             return;
         }
         if (collection.kind == WEATHER) {
-            if (Weather.active(this)) putInUse(collection);
+            // Only without a place: with the weather off the Home it was asked for at every press.
+            if (Weather.place(this) != null) putInUse(collection);
             else askPlace();
             return;
         }

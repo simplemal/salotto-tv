@@ -217,8 +217,6 @@ public final class MainActivity extends CardActivity {
     private TextClock cleanDate;
     private TextView cleanWeather;
     private static final int CLEAN_BAR_SP = 17;
-    /** The clean Home's flat selection: white, a little see-through. */
-    private static final int CLEAN_SELECTED = 215;
     private static final int CLEAN_BAR_GAP = 14;
     private static final int ALL_APPS_FILL = Color.argb(28, 255, 255, 255);
     private WheelHome wheel;
@@ -689,7 +687,7 @@ public final class MainActivity extends CardActivity {
 
     /** Only today, as it is now: the days after it are for the other Homes. */
     private void showCleanWeather() {
-        String line = Weather.line(this);
+        String line = Weather.enabled(this) ? Weather.line(this) : null;
         cleanWeather.setVisibility(line != null ? View.VISIBLE : View.GONE);
         if (line != null && !line.contentEquals(cleanWeather.getText())) cleanWeather.setText(WeatherIcon.in(this, line));
     }
@@ -724,11 +722,12 @@ public final class MainActivity extends CardActivity {
     }
 
     private void showWeatherCorner() {
-        String line = Weather.line(this);
+        boolean shown = Weather.enabled(this);
+        String line = shown ? Weather.line(this) : null;
         cornerLine.setVisibility(line != null ? View.VISIBLE : View.GONE);
         if (line != null && !line.contentEquals(cornerLine.getText())) cornerLine.setText(WeatherIcon.in(this, line));
         cornerDays.removeAllViews();
-        for (Weather.Day day : Weather.days(this)) {
+        for (Weather.Day day : shown ? Weather.days(this) : new ArrayList<Weather.Day>()) {
             LinearLayout column = new LinearLayout(this);
             column.setOrientation(LinearLayout.VERTICAL);
             column.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -939,11 +938,10 @@ public final class MainActivity extends CardActivity {
         view.setGravity(Gravity.CENTER_VERTICAL);
         int radius = dp(FOOTER_RADIUS);
         view.setOnFocusChangeListener((changed, focused) -> {
-            // No glass on the clean Home: flat white, a little see-through, with dark words.
+            // No glass on the clean Home: the same flat veil as Tutte le app.
             view.setBackground(!focused ? null : clean ? plainFill(radius)
                 : new LayerDrawable(new Drawable[]{glass(radius), glassEdge(radius)}));
-            view.setTextColor(!focused ? FOOTER_INK : clean ? Fire.INK : Color.WHITE);
-            view.setShadowLayer(focused && clean ? 0 : dp(3), 0, focused && clean ? 0 : dp(1), Color.argb(200, 0, 0, 0));
+            view.setTextColor(focused ? Color.WHITE : FOOTER_INK);
             if (focused && !circular) scroll.smoothScrollTo(0, page.getHeight() - scroll.getHeight());
         });
         view.setOnClickListener(clicked -> open(new Intent(this, AboutActivity.class)));
@@ -957,7 +955,7 @@ public final class MainActivity extends CardActivity {
 
     private Drawable plainFill(int radius) {
         GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.argb(CLEAN_SELECTED, 255, 255, 255));
+        fill.setColor(ALL_APPS_FILL);
         fill.setCornerRadius(radius);
         return fill;
     }
@@ -1362,14 +1360,16 @@ public final class MainActivity extends CardActivity {
         ticker.postDelayed(weatherCheck, WEATHER_CHECK_MS);
     }
 
+    /** The weather written on the Home only if it is wanted there: read it is all the same, for the backdrops. */
     private void showWeather() {
-        String line = Weather.line(this);
+        boolean shown = Weather.enabled(this);
+        String line = shown ? Weather.line(this) : null;
         weather.setVisibility(line != null ? View.VISIBLE : View.GONE);
         if (line != null && !line.contentEquals(weather.getText())) weather.setText(WeatherIcon.in(this, line));
-        String tomorrow = Weather.tomorrow(this);
+        String tomorrow = shown ? Weather.tomorrow(this) : null;
         forecast.setVisibility(tomorrow != null ? View.VISIBLE : View.GONE);
         if (tomorrow != null && !tomorrow.contentEquals(forecast.getText())) forecast.setText(WeatherIcon.in(this, tomorrow));
-        weatherSymbol = Weather.symbol(this);
+        weatherSymbol = shown ? Weather.symbol(this) : null;
         if (cornersOnTop()) showWeatherCorner();
         if (clean) showCleanWeather();
         showPillClock();
@@ -2092,6 +2092,12 @@ public final class MainActivity extends CardActivity {
             if (event.getAction() == KeyEvent.ACTION_DOWN) controlButton.requestFocus();
             return true;
         }
+        // Down from the last row reaches the credits at once: off the screen, a first press only scrolled.
+        if (moving == null && !circular && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN && lastRowHas(getCurrentFocus())
+                && footer.getVisibility() == View.VISIBLE && footer.getParent() == page) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) footer.requestFocus();
+            return true;
+        }
         if (moving == null) return super.dispatchKeyEvent(event);
         boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         if (circular && (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN)) {
@@ -2108,6 +2114,12 @@ public final class MainActivity extends CardActivity {
                 return true;
             default: return super.dispatchKeyEvent(event);
         }
+    }
+
+    private boolean lastRowHas(View focus) {
+        if (focus == null || !(focus.getParent() instanceof View)) return false;
+        int row = page.indexOfChild((View) focus.getParent());
+        return row >= 0 && row == page.indexOfChild(footer) - 1;
     }
 
     /** Back leaves a move or returns to the first row; the Home itself has nothing behind it. */
