@@ -5,7 +5,7 @@
          (the user's request of 2026-11-09): the person is at 8.5 in the drawing, the sound reaches 24.
          Then a touch further left, and the person larger, over the first line of the sound. -->
     <group android:translateX="6.5" android:translateY="3.5">
-        <group android:pivotX="8.5" android:pivotY="13" android:scaleX="1.15" android:scaleY="1.15">
+        <group android:pivotX="8.5" android:pivotY="13" android:scaleX="1.25" android:scaleY="1.25">
             <path android:fillColor="#FFFFFFFF" android:pathData="M8.5,4.4 a4.3,4.3 0 1 0 0,8.6 a4.3,4.3 0 1 0 0,-8.6 Z" />
             <path android:fillColor="#FFFFFFFF" android:pathData="M1.2,21.6 C1.2,17.4 4.4,14.6 8.5,14.6 C12.6,14.6 15.8,17.4 15.8,21.6 Z" />
         </group>
