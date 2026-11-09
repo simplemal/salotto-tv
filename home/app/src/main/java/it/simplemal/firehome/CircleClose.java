@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -90,9 +91,10 @@ final class CircleClose extends FrameLayout {
         post(() -> {
             if (!isAttachedToWindow()) return;
             float far = (float) Math.hypot(Math.max(x, getWidth() - x), Math.max(y, getHeight() - y)) * FROM;
-            Animator inner = reveal(black, far, BLACK_MS, BLACK_SETTLE);
-            Animator outer = reveal(ring, far, MS - COLOUR_DELAY_MS, SETTLE);
-            outer.setStartDelay(COLOUR_DELAY_MS);
+            // Both last the whole closing and end together: a reveal that ends lets go of its
+            // circle, and the black, ended first, came back over the whole Home (2026-11-09).
+            Animator inner = reveal(black, far, between(0, BLACK_MS, BLACK_SETTLE));
+            Animator outer = reveal(ring, far, between(COLOUR_DELAY_MS, MS, SETTLE));
             outer.addListener(new AnimatorListenerAdapter() {
                 @Override public void onAnimationEnd(Animator animation) { done.run(); }
             });
@@ -101,10 +103,18 @@ final class CircleClose extends FrameLayout {
         });
     }
 
-    private Animator reveal(View layer, float from, long ms, float settle) {
+    private Animator reveal(View layer, float from, TimeInterpolator pace) {
         Animator shrink = ViewAnimationUtils.createCircularReveal(layer, Math.round(x), Math.round(y), from, radius);
-        shrink.setDuration(ms);
-        shrink.setInterpolator(new DecelerateInterpolator(settle));
+        shrink.setDuration(MS);
+        shrink.setInterpolator(pace);
         return shrink;
+    }
+
+    /** Still before `startMs`, closing from there, slowing down, and closed from `endMs` to the end. */
+    private static TimeInterpolator between(long startMs, long endMs, float settle) {
+        DecelerateInterpolator slowing = new DecelerateInterpolator(settle);
+        float start = startMs / (float) MS;
+        float end = endMs / (float) MS;
+        return time -> time <= start ? 0f : time >= end ? 1f : slowing.getInterpolation((time - start) / (end - start));
     }
 }

@@ -905,10 +905,9 @@ public final class MainActivity extends CardActivity {
             if (TaskService.closeOverAll()) {
                 // The Home key or Back: the cover closes the circle over everything.
                 wheel.dropPortal();
-                TaskService.afterHomeCover(() -> {
-                    HomeCover.disarm();
-                    fadeCorners(true, null);
-                });
+                // Back at once, under the cover: outside the ring the Home is already whole.
+                cornersNow();
+                TaskService.afterHomeCover(HomeCover::disarm);
             } else {
                 // Back: the app has gone by itself; the same closing, drawn here.
                 wheel.portalToCircle();
@@ -1606,10 +1605,17 @@ public final class MainActivity extends CardActivity {
     }
 
     private void closePortal() {
-        wheel.closePortal(() -> {
-            HomeCover.disarm();
-            fadeCorners(true, null);
-        });
+        wheel.closePortal(HomeCover::disarm);
+        // Under the closing, which is over the whole Home: nothing comes in after it.
+        cornersNow();
+    }
+
+    /** Time, weather and the buttons there at once, where something covers the Home. */
+    private void cornersNow() {
+        for (View corner : new View[]{hero, clockShade, weatherCorner, weatherShade, pillBox, footer}) {
+            corner.animate().cancel();
+            corner.setAlpha(1f);
+        }
     }
 
     /** Dock up: every Home starts there, without a slide. A page not laid out yet cannot scroll, so it waits. */

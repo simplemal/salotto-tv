@@ -40,8 +40,7 @@ final class HomeCover {
     /** The Home just started needs this long to take over from Amazon's. */
     private static final long AMAZON_SETTLE_MS = Fire.ANDROID_9 ? 1500 : 600;
     private static final long CLOSING_SETTLE_MS = 2000;
-    private static final long FADE_IN_MS = 220;
-    /** A frame or two after the fade, before the circle starts to close. */
+    /** A frame or two after the cover is up, before the circle starts to close. */
     private static final long FADE_SETTLE_MS = 50;
     /** The circle waits for the Home; should nothing say it has come, it closes all the same after this. */
     private static final long CLOSE_LIMIT_MS = 2500;
@@ -146,12 +145,11 @@ final class HomeCover {
         // being drawn while it closes: started earlier, it stuttered and three dots showed after it.
         layer = new CircleClose(service, where.background, where.art, where.x, where.y, where.radius);
         frame.addView(layer, new FrameLayout.LayoutParams(-1, -1));
-        // It comes in softly, the user's wish: a cut to the colour was abrupt.
+        // At once, the user's wish of 2026-11-09: the app's circle must not fade in.
         frame.animate().cancel();
-        frame.setAlpha(0f);
+        frame.setAlpha(1f);
         frame.setVisibility(View.VISIBLE);
-        frame.animate().alpha(1f).setDuration(FADE_IN_MS).setInterpolator(new android.view.animation.DecelerateInterpolator()).start();
-        fadedAt = SystemClock.uptimeMillis() + FADE_IN_MS;
+        fadedAt = SystemClock.uptimeMillis();
         shrinking = true;
         main.removeCallbacks(shrink);
         shrunk = false;
@@ -181,7 +179,9 @@ final class HomeCover {
         main.removeCallbacks(shrink);
         main.removeCallbacks(hide);
         main.removeCallbacks(quiet);
-        // Around the closing circle, the Home's last picture: the Home under it looks the same.
+        // Around the closing ring, the Home itself once it is there: its last picture, taken as an
+        // app opened, has no clock nor buttons, and they would come back after the ring.
+        if (homeBackAt > 0) view.setImageDrawable(null);
         layer.close(this::hide);
         // Should the circle never get to its end, the cover goes all the same.
         main.postDelayed(hide, CircleClose.MS + AFTER_HOME_MS);

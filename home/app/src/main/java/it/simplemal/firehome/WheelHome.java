@@ -19,6 +19,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -463,12 +464,15 @@ final class WheelHome extends FrameLayout {
         if (art != null) {
             // The circle's background closing onto the app's circle, on the drawing thread: smooth
             // while the Home is busy coming back.
+            // Over the whole Home, the clock and the buttons too: they are back under it already,
+            // and the Home outside the ring is the finished one.
             CircleClose circle = new CircleClose(getContext(), litColour(), art, leaving.x, leaving.y, leaving.start);
-            addView(circle, new LayoutParams(-1, -1));
+            ViewGroup home = (ViewGroup) getParent();
+            home.addView(circle, new LayoutParams(-1, -1));
             circle.setTranslationZ(dp(20));
             removeView(leaving);
             circle.close(() -> {
-                removeView(circle);
+                home.removeView(circle);
                 if (portal == leaving) portal = null;
                 closing = false;
                 done.run();
