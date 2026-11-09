@@ -920,7 +920,12 @@ public final class SettingsActivity extends CardActivity {
                 int index = rows.indexOfChild(view);
                 levels.peek().focus = index;
                 // The title scrolls with the rows: back on the first row it comes back into view.
-                if (firstRow(index)) scroll.smoothScrollTo(0, 0);
+                // Rows just built go there at once: a glide still running would pull the page back
+                // up after the focus has moved on to the row it was left on (2026-11-09).
+                if (firstRow(index)) {
+                    if (view.isLaidOut()) scroll.smoothScrollTo(0, 0);
+                    else scroll.scrollTo(0, 0);
+                }
             }
         });
     }
