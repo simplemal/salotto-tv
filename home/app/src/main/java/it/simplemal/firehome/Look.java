@@ -206,7 +206,7 @@ final class Look {
     }
     static void setGlow(Context context, int level) { prefs(context).edit().putInt("glow", level).apply(); }
     /** An app opening from a circle of its colour and closing back into it: on unless chosen, the user's choice of 2026-11-04. */
-    static boolean wheelMotion(Context context) { return !Fire.STICK_2020 && prefs(context).getBoolean("wheel_motion", true); }
+    static boolean wheelMotion(Context context) { return Features.CIRCLE_ANIMATION && prefs(context).getBoolean("wheel_motion", true); }
     static void setWheelMotion(Context context, boolean on) { prefs(context).edit().putBoolean("wheel_motion", on).apply(); }
     /** The backdrop blurred behind the wheel, so the circles, time and weather stand out. */
     static boolean wheelBlur(Context context) { return prefs(context).getBoolean("wheel_blur", true); }
@@ -548,7 +548,7 @@ final class Look {
             + "/" + backdrop(context) + "/" + names(context) + "/" + timePattern(context) + "/" + date(context)
             + "/" + appsOnly(context) + "/" + circular(context) + "/" + wheel(context)
             + "/" + glow(context) + "/" + wheelBlur(context) + "/" + dateFont(context) + "/" + dateSize(context)
-            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context);
+            + "/" + dateNumeric(context) + "/" + weatherFont(context) + "/" + weatherSize(context) + "/" + credits(context);
     }
 
     /** The part of it the Home's cards are built from: the rest changes without touching them. */

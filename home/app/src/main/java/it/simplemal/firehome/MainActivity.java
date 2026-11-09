@@ -254,7 +254,7 @@ public final class MainActivity extends CardActivity {
     private static final long CLOSE_LATEST_MS = 450;
     /** The weather's corner on the wheel: a little lower than the top, the date lined up with it. */
     private static final int WEATHER_TOP = 34;
-    private static final int CIRCLE_ART_BYTES = (Fire.STICK_2020 ? 6 : 12) * 1024 * 1024;
+    private static final int CIRCLE_ART_BYTES = (Features.LARGE_PICTURE_MEMORY ? 12 : 6) * 1024 * 1024;
     private static final LruCache<String, Bitmap> CIRCLE_ART = new LruCache<String, Bitmap>(CIRCLE_ART_BYTES) {
         @Override protected int sizeOf(String key, Bitmap art) { return art.getAllocationByteCount(); }
     };
@@ -991,7 +991,7 @@ public final class MainActivity extends CardActivity {
         String plain = scene == null ? Look.shownBackdrop(this) : null;
         String before = plainBackdrop;
         plainBackdrop = plain;
-        boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || Fire.STICK_2020;
+        boolean oneStep = chosen || blurred.getVisibility() == View.VISIBLE || !Features.BACKDROP_FADE;
         if (plain != null && !plain.equals(before)) {
             backdropsComing++;
             Look.show(this, picture -> {

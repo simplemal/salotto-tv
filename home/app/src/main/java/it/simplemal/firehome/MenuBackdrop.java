@@ -1,6 +1,5 @@
 package it.simplemal.firehome;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,25 +31,11 @@ final class MenuBackdrop {
     private static Bitmap kept;
     private static String making;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
-    /**
-     * Under this, a Fire TV of 1 GB: theirs is plain black, with nothing to make. Android counts less
-     * than the box says: the 4K of 2023 (AFTKM), sold with 2 GB, has 1670 MB.
-     */
-    private static final long ENOUGH_MEMORY = 1000L * 1024 * 1024;
-    private static Boolean wanted;
 
     private MenuBackdrop() {}
 
-    /** False on a weak Fire TV: the menus stay on black. */
-    static boolean wanted(Context context) {
-        if (wanted == null) {
-            ActivityManager manager = context.getSystemService(ActivityManager.class);
-            ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
-            manager.getMemoryInfo(memory);
-            wanted = !Fire.STICK_2020 && !manager.isLowRamDevice() && memory.totalMem >= ENOUGH_MEMORY;
-        }
-        return wanted;
-    }
+    /** False where Features says so: the menus stay on black. */
+    static boolean wanted(Context context) { return Features.MENU_BACKDROP; }
 
     /** Where the backdrop goes: black on a weak Fire TV, else the plain one until the blurred one is there. */
     static Drawable base(Context context) {

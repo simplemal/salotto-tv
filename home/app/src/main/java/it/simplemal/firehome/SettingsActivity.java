@@ -1047,8 +1047,8 @@ public final class SettingsActivity extends CardActivity {
                     Look.setWheelMotion(this, !motion);
                     refresh();
                 });
-            // The Sticks of 2020 cannot draw it smoothly: shown, always off, not to be chosen.
-            opening.off = Fire.STICK_2020;
+            // Where it cannot be drawn smoothly: shown, always off, not to be chosen.
+            opening.off = !Features.CIRCLE_ANIMATION;
             entries.add(opening);
             boolean blur = Look.wheelBlur(this);
             entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null,
@@ -1230,7 +1230,7 @@ public final class SettingsActivity extends CardActivity {
         }
         entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
             () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-        if (Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+        if (!Features.CLEAR_DATA_HERE) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
             false, () -> open(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)))));
         else entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
             false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
@@ -1425,8 +1425,8 @@ public final class SettingsActivity extends CardActivity {
     private void showResolutions(String current) {
         List<String> values = new ArrayList<>(Arrays.asList(RESOLUTIONS));
         List<String> names = new ArrayList<>(Arrays.asList(strings(RESOLUTION_NAMES)));
-        // The Stick of 2020 stops at 1080p: the two 4K lines, after Auto, would only give a black screen.
-        if (Fire.STICK_2020) {
+        // Without 4K the two 4K lines, after Auto, would only give a black screen.
+        if (!Features.RESOLUTION_4K) {
             values.subList(1, 3).clear();
             names.subList(1, 3).clear();
         }
@@ -1628,7 +1628,7 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, null,
                 getString(R.string.settings_usage_data_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), USAGE_METRICS, metrics ? 0 : 1)))));
-        if (!Fire.ANDROID_9) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, null,
+        if (Features.NOTIFICATION_COUNT) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, null,
             getString(R.string.settings_notification_count_text), false,
             () -> changeCounter(counted)));
         return entries;
@@ -1691,7 +1691,7 @@ public final class SettingsActivity extends CardActivity {
         if (DeviceInfo.wired(this)) return wiredRows();
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();
-        if (Fire.ANDROID_9) {
+        if (!Features.WIFI_NETWORKS) {
             entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_on_fire),
                 false, () -> open(new Intent(Settings.ACTION_WIFI_SETTINGS))));
         } else {
@@ -1699,7 +1699,7 @@ public final class SettingsActivity extends CardActivity {
                 () -> setWifi(!on)));
         }
         if (on) {
-            if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_networks_text),
+            if (Features.WIFI_NETWORKS) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_networks_text),
                 true, () -> enter(this::showWifi)));
             entries.addAll(infoRows(DeviceInfo.network(this), null, getString(R.string.settings_connection_state)));
         }
@@ -1846,7 +1846,7 @@ public final class SettingsActivity extends CardActivity {
 
     private List<Entry> deviceRows() {
         List<Entry> entries = infoRows(DeviceInfo.system(this), null, getString(R.string.settings_device_info_text));
-        if (!Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_usb), null, null, getString(R.string.settings_usb_text),
+        if (Features.USB_SETTINGS) entries.add(new Entry(getString(R.string.settings_usb), null, null, getString(R.string.settings_usb_text),
             true, () -> enter(this::showUsb)));
         entries.add(new Entry(getString(R.string.settings_standby), null, null, getString(R.string.settings_standby_text), false,
             TaskService::standby));
@@ -2166,7 +2166,7 @@ public final class SettingsActivity extends CardActivity {
             entries.add(new Entry(getString(R.string.settings_saver_choose), null, null,
                 getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
-        if (own || !Fire.ANDROID_9) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
+        if (own || Features.FIRE_SAVER_NOW) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         if (own) {
             entries.add(groupLabel(R.string.settings_section_saver_shows));

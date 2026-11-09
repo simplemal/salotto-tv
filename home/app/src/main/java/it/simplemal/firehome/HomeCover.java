@@ -274,7 +274,7 @@ final class HomeCover {
 
     private void lookForAmazon() {
         if (leftOnAmazon || holding) return;
-        if (!Fire.STICK_2020) {
+        if (Features.QUICK_WINDOW_LOOKUP) {
             answered(amazonActive());
             return;
         }
