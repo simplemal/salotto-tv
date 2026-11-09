@@ -71,7 +71,7 @@ final class ControlPanel extends LinearLayout {
     private static final int LIST_VALUE = 110;
     private static final int LIST_LIFT = 12;
     private static final int LIST_FILL = Color.rgb(28, 29, 32);
-    private static final int FLAT_FILL = Color.argb(225, 28, 29, 32);
+    private static final int FLAT_FILL = Color.argb(140, 28, 29, 32);
     /** As bright as the line of the glass panel. */
     private static final int RIM_LIGHT = 235;
     private static final Pattern WIFI_NAME = Pattern.compile("connected to \"(.*)\"");
