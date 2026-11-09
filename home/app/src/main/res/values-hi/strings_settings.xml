@@ -3,7 +3,6 @@
     <string name="settings_language_text">Salotto की भाषा। Fire OS की भाषा नहीं बदलती।</string>
     <string name="settings_title">सेटिंग</string>
     <string name="settings_look">रूप-रंग</string>
-    <string name="settings_look_text">बैकग्राउंड, ग्रिड, होम पर ऐप के नाम और स्क्रीनसेवर।</string>
     <string name="settings_clock_and_date">घड़ी और तारीख</string>
     <string name="settings_clock_and_date_text">फ़ॉन्ट, आकार, समय का फ़ॉर्मैट, और घड़ी के नीचे तारीख।</string>
     <string name="settings_weather">मौसम</string>
@@ -36,18 +35,11 @@
     <string name="settings_hidden">छिपा हुआ</string>
     <string name="settings_backdrop">बैकग्राउंड</string>
     <string name="settings_backdrop_text">होम का बैकग्राउंड। जो आप चुनते हैं वही रहता है; सिर्फ़ मौसम वाले बैकग्राउंड मौसम और समय के साथ अपने आप बदलते हैं।</string>
-    <string name="settings_grid">ग्रिड</string>
-    <string name="settings_grid_text">हर पंक्ति में कितने ऐप आएं। पहली पंक्ति डॉक है।</string>
-    <string name="settings_grid_six">Apple TV जैसा: ज़्यादा ऐप दिखते हैं, कार्ड थोड़े छोटे।</string>
-    <string name="settings_grid_five">बड़े कार्ड, हर पंक्ति में कम ऐप।</string>
-    <string name="settings_dock">डॉक</string>
     <string name="settings_dock_bottom">नीचे</string>
     <string name="settings_dock_top">ऊपर</string>
-    <string name="settings_dock_bottom_choice">डॉक नीचे</string>
-    <string name="settings_dock_top_choice">डॉक ऊपर</string>
-    <string name="settings_dock_text">हर बार होम दबाने पर होम कहाँ से शुरू हो। नीचे: डॉक के ऊपर बड़ी घड़ी और मौसम। ऊपर: सीधे ऐप, समय और मौसम छोटे बॉक्स में।</string>
+    <string name="settings_dock_text">हर बार होम दबाने पर होम कहाँ से शुरू हो। नीचे: पहली पंक्ति के ऊपर बड़ी घड़ी और मौसम। ऊपर: सीधे ऐप, समय और मौसम छोटे बॉक्स में।</string>
     <string name="settings_app_names">ऐप के नाम</string>
-    <string name="settings_app_names_text">कार्ड के नीचे नाम कब दिखाएं। डॉक में कभी नहीं दिखता।</string>
+    <string name="settings_app_names_text">कार्ड के नीचे नाम कब दिखाएं। पहली पंक्ति में कभी नहीं दिखता।</string>
     <string name="settings_all_apps">सभी ऐप</string>
     <string name="settings_all_apps_text">किसी ऐप पर OK दबाए रखने से आप उसे होम में जोड़ सकते हैं, उसकी जानकारी देख सकते हैं या अनइंस्टॉल कर सकते हैं।</string>
     <string name="settings_task_manager">टास्क मैनेजर</string>
@@ -234,7 +226,7 @@
     <string name="settings_font">फ़ॉन्ट</string>
     <string name="settings_font_text">घड़ी के अंकों की शैली।</string>
     <string name="settings_size">आकार</string>
-    <string name="settings_size_text">होम पर डॉक के ऊपर घड़ी कितनी जगह लेती है।</string>
+    <string name="settings_size_text">होम पर पहली पंक्ति के ऊपर घड़ी कितनी जगह लेती है।</string>
     <string name="settings_hours">फ़ॉर्मैट</string>
     <string name="settings_hours_24">24 घंटे</string>
     <string name="settings_hours_12">12 घंटे</string>
@@ -290,10 +282,6 @@
         <item quantity="one">%1$d मिनट</item>
         <item quantity="other">%1$d मिनट</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="one">हर पंक्ति में %1$d ऐप</item>
-        <item quantity="other">हर पंक्ति में %1$d ऐप</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="one">अगर तस्वीर गायब हो जाए, तो %1$d सेकंड के अंदर Salotto अपने आप पिछली सेटिंग पर लौट आएगा।</item>
         <item quantity="other">अगर तस्वीर गायब हो जाए, तो %1$d सेकंड के अंदर Salotto अपने आप पिछली सेटिंग पर लौट आएगा।</item>
@@ -315,9 +303,8 @@
     <string name="settings_backdrop_abstract3d_text">गहरे बैकग्राउंड पर अमूर्त 3D मूर्तियां, जो अपने आप बदलती हैं, किसी भी क्रम में।</string>
     <string name="settings_saver_set_text">इसकी तस्वीरें बारी-बारी से बदलती हैं, साथ में सिर्फ़ समय और तारीख़।</string>
     <string name="settings_home">व्यवस्था</string>
-    <string name="settings_home_grid">ग्रिड</string>
+    <string name="settings_home_grid">ग्लास</string>
     <string name="settings_home_circle">गोल</string>
-    <string name="settings_home_grid_text">ऐप कार्ड की पंक्तियों में। पहली पंक्ति डॉक है।</string>
     <string name="settings_home_circle_text">ऐप गोलों के एक पहिये पर: चुना हुआ ऊपर, बड़ा, अपने रंग की चमक के साथ। समय और मौसम ऊपर, दोनों कोनों में।</string>
     <string name="settings_wheel">अर्धवृत्त</string>
     <string name="settings_wheel_three">3 ऐप</string>
@@ -352,7 +339,7 @@
     <string name="settings_cat_system_text">भाषा, सूचनाएँ, प्राइवेसी और इस Fire TV की जानकारी।</string>
     <string name="settings_cat_salotto_text">अपडेट, आपकी पसंद की कॉपी और Salotto के टूल।</string>
     <string name="settings_section_circle">गोल होम</string>
-    <string name="settings_section_grid">ग्रिड होम</string>
+    <string name="settings_section_grid">ग्लास होम</string>
     <string name="settings_section_saver_shows">यह क्या दिखाता है</string>
     <string name="settings_section_tv">TV</string>
     <string name="settings_section_device">यह Fire TV</string>

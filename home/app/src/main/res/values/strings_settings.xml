@@ -3,7 +3,6 @@
     <string name="settings_language_text">La lingua di Salotto. Quella di Fire OS non cambia.</string>
     <string name="settings_title">Impostazioni</string>
     <string name="settings_look">Aspetto</string>
-    <string name="settings_look_text">Sfondo, griglia, nomi delle app sulla Home e salvaschermo.</string>
     <string name="settings_clock_and_date">Orologio e data</string>
     <string name="settings_clock_and_date_text">Carattere, dimensione e formato dell’ora, e la data sotto l’orologio.</string>
     <string name="settings_weather">Meteo</string>
@@ -36,18 +35,11 @@
     <string name="settings_hidden">Nascosto</string>
     <string name="settings_backdrop">Sfondo</string>
     <string name="settings_backdrop_text">Lo sfondo della Home. Resta quello che scegli tu; solo gli sfondi meteo cambiano da soli, con il tempo e l’ora.</string>
-    <string name="settings_grid">Griglia</string>
-    <string name="settings_grid_text">Quante app stanno in ogni fila. La prima fila è il dock.</string>
-    <string name="settings_grid_six">Come su Apple TV: più app in vista, card un po’ più piccole.</string>
-    <string name="settings_grid_five">Card più grandi, meno app in ogni fila.</string>
-    <string name="settings_dock">Dock</string>
     <string name="settings_dock_bottom">In basso</string>
     <string name="settings_dock_top">In alto</string>
-    <string name="settings_dock_bottom_choice">Dock in basso</string>
-    <string name="settings_dock_top_choice">Dock in alto</string>
-    <string name="settings_dock_text">Dove parte la Home a ogni pressione di Home. In basso: orologio e meteo in grande sopra il dock. In alto: le app subito, con ora e meteo nella pillola.</string>
+    <string name="settings_dock_text">Dove parte la Home a ogni pressione di Home. In basso: orologio e meteo in grande sopra la prima fila. In alto: le app subito, con ora e meteo nella pillola.</string>
     <string name="settings_app_names">Nomi delle app</string>
-    <string name="settings_app_names_text">Quando mostrare il nome sotto le card. Nel dock non compare mai.</string>
+    <string name="settings_app_names_text">Quando mostrare il nome sotto le card. Nella prima fila non compare mai.</string>
     <string name="settings_all_apps">Tutte le app</string>
     <string name="settings_all_apps_text">Tenendo premuto OK su un’app puoi aggiungerla alla Home, vederne i dettagli o disinstallarla.</string>
     <string name="settings_task_manager">Task manager</string>
@@ -234,7 +226,7 @@
     <string name="settings_font">Carattere</string>
     <string name="settings_font_text">Lo stile delle cifre dell’orologio.</string>
     <string name="settings_size">Dimensione</string>
-    <string name="settings_size_text">Quanto spazio occupa l’orologio sopra il dock.</string>
+    <string name="settings_size_text">Quanto spazio occupa l’orologio sopra la prima fila.</string>
     <string name="settings_hours">Formato</string>
     <string name="settings_hours_24">24 ore</string>
     <string name="settings_hours_12">12 ore</string>
@@ -290,10 +282,6 @@
         <item quantity="one">%1$d minuto</item>
         <item quantity="other">%1$d minuti</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="one">%1$d app per fila</item>
-        <item quantity="other">%1$d app per fila</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="one">Se l’immagine sparisce, entro %1$d secondo Salotto torna da sola alla precedente.</item>
         <item quantity="other">Se l’immagine sparisce, entro %1$d secondi Salotto torna da sola alla precedente.</item>
@@ -315,9 +303,8 @@
     <string name="settings_backdrop_abstract3d_text">Sculture astratte in 3D su fondo scuro, che cambiano da sole, in ordine casuale.</string>
     <string name="settings_saver_set_text">Le sue immagini si alternano a tempo, con solo orario e data.</string>
     <string name="settings_home">Disposizione</string>
-    <string name="settings_home_grid">A griglia</string>
+    <string name="settings_home_grid">Vetro</string>
     <string name="settings_home_circle">Circolare</string>
-    <string name="settings_home_grid_text">Le app in file di card. La prima fila è il dock.</string>
     <string name="settings_home_circle_text">Le app su una ruota di cerchi: quella accesa sta in alto, più grande, con un bagliore del suo colore. Ora e meteo stanno in alto, ai due angoli.</string>
     <string name="settings_wheel">Semicerchio</string>
     <string name="settings_wheel_three">3 app</string>
@@ -352,7 +339,7 @@
     <string name="settings_cat_system_text">Lingua, notifiche, privacy e informazioni su questa Fire TV.</string>
     <string name="settings_cat_salotto_text">Aggiornamenti, copia delle scelte e strumenti di Salotto.</string>
     <string name="settings_section_circle">Home circolare</string>
-    <string name="settings_section_grid">Home a griglia</string>
+    <string name="settings_section_grid">Home Vetro</string>
     <string name="settings_section_saver_shows">Cosa mostra</string>
     <string name="settings_section_tv">TV</string>
     <string name="settings_section_device">Questa Fire TV</string>

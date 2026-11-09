@@ -3,7 +3,6 @@
     <string name="settings_language_text">لغة Salotto. لغة Fire OS لا تتغير.</string>
     <string name="settings_title">الإعدادات</string>
     <string name="settings_look">المظهر</string>
-    <string name="settings_look_text">الخلفية والتخطيط وأسماء التطبيقات في الرئيسية وشاشة التوقف.</string>
     <string name="settings_clock_and_date">الساعة والتاريخ</string>
     <string name="settings_clock_and_date_text">خط الساعة وحجمها وصيغة الوقت، والتاريخ تحت الساعة.</string>
     <string name="settings_weather">الطقس</string>
@@ -36,18 +35,11 @@
     <string name="settings_hidden">مخفي</string>
     <string name="settings_backdrop">الخلفية</string>
     <string name="settings_backdrop_text">خلفية الرئيسية. تبقى كما تختارها؛ وحدها خلفيات الطقس تتغير تلقائيًا مع الجو والوقت.</string>
-    <string name="settings_grid">التخطيط</string>
-    <string name="settings_grid_text">كم تطبيقًا في كل صف. الصف الأول هو الدوك.</string>
-    <string name="settings_grid_six">مثل Apple TV: تطبيقات أكثر في الشاشة، وبطاقات أصغر قليلًا.</string>
-    <string name="settings_grid_five">بطاقات أكبر، وتطبيقات أقل في كل صف.</string>
-    <string name="settings_dock">الدوك</string>
     <string name="settings_dock_bottom">في الأسفل</string>
     <string name="settings_dock_top">في الأعلى</string>
-    <string name="settings_dock_bottom_choice">الدوك في الأسفل</string>
-    <string name="settings_dock_top_choice">الدوك في الأعلى</string>
-    <string name="settings_dock_text">من أين تبدأ الرئيسية عند كل ضغطة على زر الرئيسية. في الأسفل: ساعة وطقس كبيران فوق الدوك. في الأعلى: التطبيقات مباشرة، والوقت والطقس في الشارة.</string>
+    <string name="settings_dock_text">من أين تبدأ الرئيسية عند كل ضغطة على زر الرئيسية. في الأسفل: ساعة وطقس كبيران فوق الصف الأول. في الأعلى: التطبيقات مباشرة، والوقت والطقس في الشارة.</string>
     <string name="settings_app_names">أسماء التطبيقات</string>
-    <string name="settings_app_names_text">متى يظهر الاسم تحت البطاقات. لا يظهر أبدًا في الدوك.</string>
+    <string name="settings_app_names_text">متى يظهر الاسم تحت البطاقات. لا يظهر أبدًا في الصف الأول.</string>
     <string name="settings_all_apps">كل التطبيقات</string>
     <string name="settings_all_apps_text">اضغط مطولًا على OK فوق تطبيق لإضافته إلى الرئيسية أو عرض تفاصيله أو إلغاء تثبيته.</string>
     <string name="settings_task_manager">مدير المهام</string>
@@ -234,7 +226,7 @@
     <string name="settings_font">الخط</string>
     <string name="settings_font_text">شكل أرقام الساعة.</string>
     <string name="settings_size">الحجم</string>
-    <string name="settings_size_text">المساحة التي تشغلها الساعة فوق الدوك.</string>
+    <string name="settings_size_text">المساحة التي تشغلها الساعة فوق الصف الأول.</string>
     <string name="settings_hours">الصيغة</string>
     <string name="settings_hours_24">24 ساعة</string>
     <string name="settings_hours_12">12 ساعة</string>
@@ -294,14 +286,6 @@
         <item quantity="many">%1$d دقيقة</item>
         <item quantity="other">%1$d دقيقة</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="zero">%1$d تطبيق في كل صف</item>
-        <item quantity="one">تطبيق واحد في كل صف</item>
-        <item quantity="two">تطبيقان في كل صف</item>
-        <item quantity="few">%1$d تطبيقات في كل صف</item>
-        <item quantity="many">%1$d تطبيقًا في كل صف</item>
-        <item quantity="other">%1$d تطبيق في كل صف</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="zero">إذا اختفت الصورة، يعود Salotto تلقائيًا إلى الدقة السابقة خلال %1$d ثانية.</item>
         <item quantity="one">إذا اختفت الصورة، يعود Salotto تلقائيًا إلى الدقة السابقة خلال ثانية واحدة.</item>
@@ -339,9 +323,8 @@
     <string name="settings_backdrop_abstract3d_text">منحوتات تجريدية ثلاثية الأبعاد على خلفية داكنة، تتغير تلقائيًا بترتيب عشوائي.</string>
     <string name="settings_saver_set_text">تتناوب صوره مع عرض الوقت والتاريخ فقط.</string>
     <string name="settings_home">الترتيب</string>
-    <string name="settings_home_grid">شبكة</string>
+    <string name="settings_home_grid">زجاج</string>
     <string name="settings_home_circle">دائري</string>
-    <string name="settings_home_grid_text">التطبيقات في صفوف من البطاقات. الصف الأول هو الدوك.</string>
     <string name="settings_home_circle_text">التطبيقات على عجلة من الدوائر: المحدد في الأعلى، أكبر، مع توهج بلونه. الوقت والطقس في الأعلى، في الزاويتين.</string>
     <string name="settings_wheel">نصف دائرة</string>
     <string name="settings_wheel_three">3 تطبيقات</string>
@@ -376,7 +359,7 @@
     <string name="settings_cat_system_text">اللغة والإشعارات والخصوصية ومعلومات عن جهاز Fire TV هذا.</string>
     <string name="settings_cat_salotto_text">التحديثات ونسخة من اختياراتك وأدوات Salotto.</string>
     <string name="settings_section_circle">الشاشة الرئيسية الدائرية</string>
-    <string name="settings_section_grid">الشاشة الرئيسية الشبكية</string>
+    <string name="settings_section_grid">الشاشة الرئيسية الزجاجية</string>
     <string name="settings_section_saver_shows">ما تعرضه</string>
     <string name="settings_section_tv">التلفزيون</string>
     <string name="settings_section_device">جهاز Fire TV هذا</string>

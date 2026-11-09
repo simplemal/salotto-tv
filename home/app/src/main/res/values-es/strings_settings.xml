@@ -4,7 +4,6 @@
     <string name="settings_language_text">El idioma de Salotto. El de Fire OS no cambia.</string>
     <string name="settings_title">Ajustes</string>
     <string name="settings_look">Aspecto</string>
-    <string name="settings_look_text">Fondo, cuadrícula, nombres de las apps en Inicio y salvapantallas.</string>
     <string name="settings_clock_and_date">Reloj y fecha</string>
     <string name="settings_clock_and_date_text">Tipo de letra, tamaño y formato de la hora, y la fecha bajo el reloj.</string>
     <string name="settings_weather">Tiempo</string>
@@ -37,18 +36,11 @@
     <string name="settings_hidden">Oculto</string>
     <string name="settings_backdrop">Fondo</string>
     <string name="settings_backdrop_text">El fondo de Inicio. Se queda el que elijas; solo los fondos del tiempo cambian solos, con el tiempo y la hora.</string>
-    <string name="settings_grid">Cuadrícula</string>
-    <string name="settings_grid_text">Cuántas apps caben en cada fila. La primera fila es el dock.</string>
-    <string name="settings_grid_six">Como en Apple TV: más apps a la vista, tarjetas algo más pequeñas.</string>
-    <string name="settings_grid_five">Tarjetas más grandes, menos apps en cada fila.</string>
-    <string name="settings_dock">Dock</string>
     <string name="settings_dock_bottom">Abajo</string>
     <string name="settings_dock_top">Arriba</string>
-    <string name="settings_dock_bottom_choice">Dock abajo</string>
-    <string name="settings_dock_top_choice">Dock arriba</string>
-    <string name="settings_dock_text">Dónde empieza Inicio cada vez que pulsas Inicio. Abajo: reloj y tiempo en grande sobre el dock. Arriba: las apps enseguida, con hora y tiempo en la píldora.</string>
+    <string name="settings_dock_text">Dónde empieza Inicio cada vez que pulsas Inicio. Abajo: reloj y tiempo en grande sobre la primera fila. Arriba: las apps enseguida, con hora y tiempo en la píldora.</string>
     <string name="settings_app_names">Nombres de las apps</string>
-    <string name="settings_app_names_text">Cuándo mostrar el nombre bajo las tarjetas. En el dock nunca aparece.</string>
+    <string name="settings_app_names_text">Cuándo mostrar el nombre bajo las tarjetas. En la primera fila nunca aparece.</string>
     <string name="settings_all_apps">Todas las apps</string>
     <string name="settings_all_apps_text">Si mantienes pulsado OK sobre una app, puedes añadirla a Inicio, ver sus detalles o desinstalarla.</string>
     <string name="settings_task_manager">Administrador de tareas</string>
@@ -235,7 +227,7 @@
     <string name="settings_font">Tipo de letra</string>
     <string name="settings_font_text">El estilo de las cifras del reloj.</string>
     <string name="settings_size">Tamaño</string>
-    <string name="settings_size_text">Cuánto espacio ocupa el reloj sobre el dock.</string>
+    <string name="settings_size_text">Cuánto espacio ocupa el reloj sobre la primera fila.</string>
     <string name="settings_hours">Formato</string>
     <string name="settings_hours_24">24 horas</string>
     <string name="settings_hours_12">12 horas</string>
@@ -291,10 +283,6 @@
         <item quantity="one">%1$d minuto</item>
         <item quantity="other">%1$d minutos</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="one">%1$d app por fila</item>
-        <item quantity="other">%1$d apps por fila</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="one">Si desaparece la imagen, en %1$d segundo Salotto vuelve sola a la anterior.</item>
         <item quantity="other">Si desaparece la imagen, en %1$d segundos Salotto vuelve sola a la anterior.</item>
@@ -316,9 +304,8 @@
     <string name="settings_backdrop_abstract3d_text">Esculturas abstractas en 3D sobre fondo oscuro, que cambian solas, en orden aleatorio.</string>
     <string name="settings_saver_set_text">Sus imágenes se van alternando, solo con la hora y la fecha.</string>
     <string name="settings_home">Disposición</string>
-    <string name="settings_home_grid">Cuadrícula</string>
+    <string name="settings_home_grid">Cristal</string>
     <string name="settings_home_circle">Circular</string>
-    <string name="settings_home_grid_text">Las apps en filas de tarjetas. La primera fila es el dock.</string>
     <string name="settings_home_circle_text">Las apps en una rueda de círculos: la seleccionada arriba, más grande, con un brillo de su color. Hora y tiempo arriba, en las dos esquinas.</string>
     <string name="settings_wheel">Semicírculo</string>
     <string name="settings_wheel_three">3 apps</string>
@@ -353,7 +340,7 @@
     <string name="settings_cat_system_text">Idioma, notificaciones, privacidad e información sobre este Fire TV.</string>
     <string name="settings_cat_salotto_text">Actualizaciones, copia de tus ajustes y herramientas de Salotto.</string>
     <string name="settings_section_circle">Home circular</string>
-    <string name="settings_section_grid">Home en cuadrícula</string>
+    <string name="settings_section_grid">Home Cristal</string>
     <string name="settings_section_saver_shows">Qué muestra</string>
     <string name="settings_section_tv">Televisor</string>
     <string name="settings_section_device">Este Fire TV</string>

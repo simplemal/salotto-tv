@@ -31,7 +31,6 @@ final class Look {
     private static final int SMALL_SAMPLE = 4;
     private static final int SMALL_WIDTH = 480;
     private static final int SMALL_HEIGHT = 270;
-    static final int[] COLUMN_CHOICES = {5, 6};
     private static final int[] FONT_LABELS = {R.string.look_font_thin, R.string.look_font_light, R.string.look_font_normal,
         R.string.look_font_medium, R.string.look_font_serif, R.string.look_font_mono, R.string.look_font_cursive};
     static final String[] FONT_FAMILIES = {"sans-serif-thin", "sans-serif-light", "sans-serif",
@@ -139,8 +138,8 @@ final class Look {
         return words.isEmpty() ? path : words.substring(0, 1).toUpperCase(Locale.getDefault()) + words.substring(1);
     }
 
-    static int columns(Context context) { return prefs(context).getInt("columns", 6); }
-    static void setColumns(Context context, int value) { prefs(context).edit().putInt("columns", value).apply(); }
+    /** Six apps in each row: the choice of five is gone (2026-11-09), and one saved before is not read. */
+    static int columns(Context context) { return 6; }
     /** The date's sizes, small to large; the middle one is what it always had. */
     static final int[] DATE_SIZES = {16, 20, 26};
     /** The date's letters: the medium sans it always had. */

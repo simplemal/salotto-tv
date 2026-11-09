@@ -3,7 +3,6 @@
     <string name="settings_language_text">Die Sprache von Salotto. Die von Fire OS ändert sich nicht.</string>
     <string name="settings_title">Einstellungen</string>
     <string name="settings_look">Aussehen</string>
-    <string name="settings_look_text">Hintergrund, Raster, App-Namen auf Home und Bildschirmschoner.</string>
     <string name="settings_clock_and_date">Uhr und Datum</string>
     <string name="settings_clock_and_date_text">Schriftart, Größe und Format der Uhrzeit sowie das Datum unter der Uhr.</string>
     <string name="settings_weather">Wetter</string>
@@ -36,18 +35,11 @@
     <string name="settings_hidden">Ausgeblendet</string>
     <string name="settings_backdrop">Hintergrund</string>
     <string name="settings_backdrop_text">Der Hintergrund von Home. Er bleibt, wie du ihn wählst; nur die Wetter-Hintergründe ändern sich von selbst, mit Wetter und Uhrzeit.</string>
-    <string name="settings_grid">Raster</string>
-    <string name="settings_grid_text">Wie viele Apps in eine Reihe passen. Die erste Reihe ist das Dock.</string>
-    <string name="settings_grid_six">Wie bei Apple TV: mehr Apps im Bild, etwas kleinere Kacheln.</string>
-    <string name="settings_grid_five">Größere Kacheln, weniger Apps pro Reihe.</string>
-    <string name="settings_dock">Dock</string>
     <string name="settings_dock_bottom">Unten</string>
     <string name="settings_dock_top">Oben</string>
-    <string name="settings_dock_bottom_choice">Dock unten</string>
-    <string name="settings_dock_top_choice">Dock oben</string>
-    <string name="settings_dock_text">Wo Home bei jedem Druck auf Home beginnt. Unten: große Uhr und Wetter über dem Dock. Oben: sofort die Apps, Uhrzeit und Wetter in der Anzeige.</string>
+    <string name="settings_dock_text">Wo Home bei jedem Druck auf Home beginnt. Unten: große Uhr und Wetter über der ersten Reihe. Oben: sofort die Apps, Uhrzeit und Wetter in der Anzeige.</string>
     <string name="settings_app_names">App-Namen</string>
-    <string name="settings_app_names_text">Wann der Name unter den Kacheln erscheint. Im Dock nie.</string>
+    <string name="settings_app_names_text">Wann der Name unter den Kacheln erscheint. In der ersten Reihe nie.</string>
     <string name="settings_all_apps">Alle Apps</string>
     <string name="settings_all_apps_text">Hältst du OK auf einer App gedrückt, kannst du sie zu Home hinzufügen, ihre Details ansehen oder sie deinstallieren.</string>
     <string name="settings_task_manager">Task-Manager</string>
@@ -234,7 +226,7 @@
     <string name="settings_font">Schriftart</string>
     <string name="settings_font_text">Der Stil der Ziffern der Uhr.</string>
     <string name="settings_size">Größe</string>
-    <string name="settings_size_text">Wie viel Platz die Uhr über dem Dock einnimmt.</string>
+    <string name="settings_size_text">Wie viel Platz die Uhr über der ersten Reihe einnimmt.</string>
     <string name="settings_hours">Format</string>
     <string name="settings_hours_24">24 Stunden</string>
     <string name="settings_hours_12">12 Stunden</string>
@@ -290,10 +282,6 @@
         <item quantity="one">%1$d Minute</item>
         <item quantity="other">%1$d Minuten</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="one">%1$d App pro Reihe</item>
-        <item quantity="other">%1$d Apps pro Reihe</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="one">Verschwindet das Bild, kehrt Salotto innerhalb von %1$d Sekunde von selbst zur vorherigen Auflösung zurück.</item>
         <item quantity="other">Verschwindet das Bild, kehrt Salotto innerhalb von %1$d Sekunden von selbst zur vorherigen Auflösung zurück.</item>
@@ -315,9 +303,8 @@
     <string name="settings_backdrop_abstract3d_text">Abstrakte 3D-Skulpturen auf dunklem Grund, die von selbst wechseln, in zufälliger Reihenfolge.</string>
     <string name="settings_saver_set_text">Die Bilder wechseln sich ab, nur mit Uhrzeit und Datum.</string>
     <string name="settings_home">Anordnung</string>
-    <string name="settings_home_grid">Raster</string>
+    <string name="settings_home_grid">Glas</string>
     <string name="settings_home_circle">Kreis</string>
-    <string name="settings_home_grid_text">Die Apps in Reihen von Karten. Die erste Reihe ist das Dock.</string>
     <string name="settings_home_circle_text">Die Apps auf einem Rad aus Kreisen: die ausgewählte oben, größer, mit einem Leuchten in ihrer Farbe. Uhrzeit und Wetter oben, in den beiden Ecken.</string>
     <string name="settings_wheel">Halbkreis</string>
     <string name="settings_wheel_three">3 Apps</string>
@@ -352,7 +339,7 @@
     <string name="settings_cat_system_text">Sprache, Benachrichtigungen, Datenschutz und Infos zu diesem Fire TV.</string>
     <string name="settings_cat_salotto_text">Updates, eine Kopie deiner Einstellungen und die Werkzeuge von Salotto.</string>
     <string name="settings_section_circle">Kreis-Home</string>
-    <string name="settings_section_grid">Raster-Home</string>
+    <string name="settings_section_grid">Glas-Home</string>
     <string name="settings_section_saver_shows">Was er zeigt</string>
     <string name="settings_section_tv">Fernseher</string>
     <string name="settings_section_device">Dieser Fire TV</string>

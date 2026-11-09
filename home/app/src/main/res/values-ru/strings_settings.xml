@@ -3,7 +3,6 @@
     <string name="settings_language_text">Язык Salotto. Язык Fire OS не меняется.</string>
     <string name="settings_title">Настройки</string>
     <string name="settings_look">Внешний вид</string>
-    <string name="settings_look_text">Фон, сетка, названия приложений на главном экране и заставка.</string>
     <string name="settings_clock_and_date">Часы и дата</string>
     <string name="settings_clock_and_date_text">Шрифт, размер и формат времени, а также дата под часами.</string>
     <string name="settings_weather">Погода</string>
@@ -36,18 +35,11 @@
     <string name="settings_hidden">Скрыто</string>
     <string name="settings_backdrop">Фон</string>
     <string name="settings_backdrop_text">Фон главного экрана. Остаётся таким, как вы выбрали; сами меняются только фоны с погодой, вместе с погодой и временем.</string>
-    <string name="settings_grid">Сетка</string>
-    <string name="settings_grid_text">Сколько приложений в одном ряду. Первый ряд — это док.</string>
-    <string name="settings_grid_six">Как на Apple TV: больше приложений на виду, карточки чуть меньше.</string>
-    <string name="settings_grid_five">Карточки крупнее, приложений в ряду меньше.</string>
-    <string name="settings_dock">Док</string>
     <string name="settings_dock_bottom">Внизу</string>
     <string name="settings_dock_top">Вверху</string>
-    <string name="settings_dock_bottom_choice">Док внизу</string>
-    <string name="settings_dock_top_choice">Док вверху</string>
-    <string name="settings_dock_text">С чего начинается главный экран при каждом нажатии «Домой». Внизу: большие часы и погода над доком. Вверху: сразу приложения, время и погода на плашке.</string>
+    <string name="settings_dock_text">С чего начинается главный экран при каждом нажатии «Домой». Внизу: большие часы и погода над первым рядом. Вверху: сразу приложения, время и погода на плашке.</string>
     <string name="settings_app_names">Названия приложений</string>
-    <string name="settings_app_names_text">Когда показывать название под карточкой. В доке его нет никогда.</string>
+    <string name="settings_app_names_text">Когда показывать название под карточкой. В первом ряду его нет никогда.</string>
     <string name="settings_all_apps">Все приложения</string>
     <string name="settings_all_apps_text">Если удерживать OK на приложении, его можно добавить на главный экран, посмотреть сведения о нём или удалить.</string>
     <string name="settings_task_manager">Диспетчер задач</string>
@@ -234,7 +226,7 @@
     <string name="settings_font">Шрифт</string>
     <string name="settings_font_text">Стиль цифр на часах.</string>
     <string name="settings_size">Размер</string>
-    <string name="settings_size_text">Сколько места занимают часы над доком.</string>
+    <string name="settings_size_text">Сколько места занимают часы над первым рядом.</string>
     <string name="settings_hours">Формат</string>
     <string name="settings_hours_24">24 часа</string>
     <string name="settings_hours_12">12 часов</string>
@@ -292,12 +284,6 @@
         <item quantity="many">%1$d минут</item>
         <item quantity="other">%1$d минуты</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="one">%1$d приложение в ряду</item>
-        <item quantity="few">%1$d приложения в ряду</item>
-        <item quantity="many">%1$d приложений в ряду</item>
-        <item quantity="other">%1$d приложения в ряду</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="one">Если изображение пропадёт, через %1$d секунду прежнее разрешение вернётся само.</item>
         <item quantity="few">Если изображение пропадёт, через %1$d секунды прежнее разрешение вернётся само.</item>
@@ -327,9 +313,8 @@
     <string name="settings_backdrop_abstract3d_text">Абстрактные 3D-скульптуры на тёмном фоне, которые сами меняются в случайном порядке.</string>
     <string name="settings_saver_set_text">Изображения сменяют друг друга, на экране только время и дата.</string>
     <string name="settings_home">Расположение</string>
-    <string name="settings_home_grid">Сетка</string>
+    <string name="settings_home_grid">Стекло</string>
     <string name="settings_home_circle">Круг</string>
-    <string name="settings_home_grid_text">Приложения рядами карточек. Первый ряд — док.</string>
     <string name="settings_home_circle_text">Приложения на колесе из кругов: выбранное наверху, крупнее, с сиянием своего цвета. Время и погода наверху, в двух углах.</string>
     <string name="settings_wheel">Полукруг</string>
     <string name="settings_wheel_three">3 приложения</string>
@@ -364,7 +349,7 @@
     <string name="settings_cat_system_text">Язык, уведомления, конфиденциальность и сведения об этом Fire TV.</string>
     <string name="settings_cat_salotto_text">Обновления, копия ваших настроек и инструменты Salotto.</string>
     <string name="settings_section_circle">Круглый главный экран</string>
-    <string name="settings_section_grid">Главный экран сеткой</string>
+    <string name="settings_section_grid">Главный экран «Стекло»</string>
     <string name="settings_section_saver_shows">Что показывает</string>
     <string name="settings_section_tv">Телевизор</string>
     <string name="settings_section_device">Этот Fire TV</string>

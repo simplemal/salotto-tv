@@ -1069,11 +1069,9 @@ public final class SettingsActivity extends CardActivity {
                 }));
         } else {
             // The clean Home has twelve apps a row, always.
-            if (style == Look.HOME_GRID) entries.add(new Entry(getString(R.string.settings_grid), appsPerRow(Look.columns(this)), null,
-                getString(R.string.settings_grid_text), true, () -> enter(this::showColumns)));
             entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
                 getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
-            entries.add(new Entry(getString(style == Look.HOME_CLEAN ? R.string.settings_first_row : R.string.settings_dock),
+            entries.add(new Entry(getString(R.string.settings_first_row),
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top
                     : style == Look.HOME_CLEAN && Look.cleanRowMiddle(this) ? R.string.settings_row_middle : R.string.settings_dock_bottom), null,
                 getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
@@ -1098,11 +1096,14 @@ public final class SettingsActivity extends CardActivity {
         return getString(count == 5 ? R.string.settings_wheel_five : R.string.settings_wheel_three);
     }
 
+    /** The order they are offered in, the user's of 2026-11-09: Clean first, Glass last. */
+    private static final int[] HOME_ORDER = {Look.HOME_CLEAN, Look.HOME_CIRCLE, Look.HOME_GRID};
+
     private void showHomes() {
-        String[] names = new String[HOME_NAMES.length];
-        for (int index = 0; index < names.length; index++) names[index] = getString(HOME_NAMES[index]);
-        show(getString(R.string.settings_home), choices(names, Look.homeStyle(this), R.drawable.ic_s_grid, index -> null, index -> {
-            Look.setHomeStyle(this, index);
+        String[] names = new String[HOME_ORDER.length];
+        for (int index = 0; index < names.length; index++) names[index] = getString(HOME_NAMES[HOME_ORDER[index]]);
+        show(getString(R.string.settings_home), choices(names, indexOf(HOME_ORDER, Look.homeStyle(this)), R.drawable.ic_s_grid, index -> null, index -> {
+            Look.setHomeStyle(this, HOME_ORDER[index]);
             refresh();
         }));
     }
@@ -1149,7 +1150,6 @@ public final class SettingsActivity extends CardActivity {
 
     private String minutes(int count) { return getResources().getQuantityString(R.plurals.settings_minutes, count, count); }
 
-    private String appsPerRow(int count) { return getResources().getQuantityString(R.plurals.settings_apps_per_row, count, count); }
 
     private String[] minuteNames(int[] minutes) {
         String[] names = new String[minutes.length];
@@ -1178,8 +1178,9 @@ public final class SettingsActivity extends CardActivity {
             }));
             return;
         }
-        String[] names = {getString(R.string.settings_dock_bottom_choice), getString(R.string.settings_dock_top_choice)};
-        show(getString(R.string.settings_dock), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
+        // The glass Home calls it the first row too (2026-11-09): the word dock is gone.
+        String[] names = {getString(R.string.settings_dock_bottom), getString(R.string.settings_dock_top)};
+        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 1 : 0, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
                 Look.setAppsOnly(this, index == 1);
                 refresh();
@@ -2346,17 +2347,6 @@ public final class SettingsActivity extends CardActivity {
         show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.size(this), R.drawable.ic_clock,
             getString(R.string.settings_size_text), index -> {
                 Look.setSize(this, index);
-                refresh();
-            }));
-    }
-
-    private void showColumns() {
-        int[] columns = Look.COLUMN_CHOICES;
-        String[] names = new String[columns.length];
-        for (int index = 0; index < columns.length; index++) names[index] = appsPerRow(columns[index]);
-        show(getString(R.string.settings_grid), choices(names, indexOf(columns, Look.columns(this)), R.drawable.ic_apps,
-            index -> getString(columns[index] == 6 ? R.string.settings_grid_six : R.string.settings_grid_five), index -> {
-                Look.setColumns(this, columns[index]);
                 refresh();
             }));
     }

@@ -4,7 +4,6 @@
     <string name="settings_language_text">Salotto 使用的语言，Fire OS 的语言不会改变。</string>
     <string name="settings_title">设置</string>
     <string name="settings_look">外观</string>
-    <string name="settings_look_text">背景、网格、主页上的应用名称和屏保。</string>
     <string name="settings_clock_and_date">时钟和日期</string>
     <string name="settings_clock_and_date_text">时间的字体、大小和格式，以及时钟下方的日期。</string>
     <string name="settings_weather">天气</string>
@@ -37,18 +36,11 @@
     <string name="settings_hidden">已隐藏</string>
     <string name="settings_backdrop">背景</string>
     <string name="settings_backdrop_text">主页的背景。选定后就保持不变；只有天气背景会随天气和时间自动变化。</string>
-    <string name="settings_grid">网格</string>
-    <string name="settings_grid_text">每行放多少个应用。第一行是程序坞。</string>
-    <string name="settings_grid_six">和 Apple TV 一样：能看到更多应用，卡片稍小。</string>
-    <string name="settings_grid_five">卡片更大，每行应用更少。</string>
-    <string name="settings_dock">程序坞</string>
     <string name="settings_dock_bottom">底部</string>
     <string name="settings_dock_top">顶部</string>
-    <string name="settings_dock_bottom_choice">程序坞在底部</string>
-    <string name="settings_dock_top_choice">程序坞在顶部</string>
-    <string name="settings_dock_text">每次按主页键时主屏幕的起始位置。底部：程序坞上方显示大时钟和天气。顶部：直接显示应用，时间和天气在小标签里。</string>
+    <string name="settings_dock_text">每次按主页键时主屏幕的起始位置。底部：第一排上方显示大时钟和天气。顶部：直接显示应用，时间和天气在小标签里。</string>
     <string name="settings_app_names">应用名称</string>
-    <string name="settings_app_names_text">何时在卡片下方显示名称。程序坞里从不显示。</string>
+    <string name="settings_app_names_text">何时在卡片下方显示名称。第一排里从不显示。</string>
     <string name="settings_all_apps">所有应用</string>
     <string name="settings_all_apps_text">在应用上长按 OK 键，可以把它加入主页、查看详情或卸载。</string>
     <string name="settings_task_manager">任务管理器</string>
@@ -235,7 +227,7 @@
     <string name="settings_font">字体</string>
     <string name="settings_font_text">时钟数字的样式。</string>
     <string name="settings_size">大小</string>
-    <string name="settings_size_text">时钟在程序坞上方占多大空间。</string>
+    <string name="settings_size_text">时钟在第一排上方占多大空间。</string>
     <string name="settings_hours">格式</string>
     <string name="settings_hours_24">24 小时制</string>
     <string name="settings_hours_12">12 小时制</string>
@@ -290,9 +282,6 @@
     <plurals name="settings_minutes">
         <item quantity="other">%1$d 分钟</item>
     </plurals>
-    <plurals name="settings_apps_per_row">
-        <item quantity="other">每行 %1$d 个应用</item>
-    </plurals>
     <plurals name="settings_resolution_text">
         <item quantity="other">如果画面消失，%1$d 秒内 Salotto 会自动切回之前的设置。</item>
     </plurals>
@@ -310,9 +299,8 @@
     <string name="settings_backdrop_abstract3d_text">深色背景上的抽象 3D 雕塑，自动更换，顺序随机。</string>
     <string name="settings_saver_set_text">图片轮流显示，只显示时间和日期。</string>
     <string name="settings_home">布局</string>
-    <string name="settings_home_grid">网格</string>
+    <string name="settings_home_grid">玻璃</string>
     <string name="settings_home_circle">圆形</string>
-    <string name="settings_home_grid_text">应用排成一行行卡片。第一行是程序坞。</string>
     <string name="settings_home_circle_text">应用排在一圈圆形上：选中的在顶部，更大，带有它自己颜色的光晕。时间和天气在顶部的两个角。</string>
     <string name="settings_wheel">半圆</string>
     <string name="settings_wheel_three">3 个应用</string>
@@ -347,7 +335,7 @@
     <string name="settings_cat_system_text">语言、通知、隐私以及这台 Fire TV 的信息。</string>
     <string name="settings_cat_salotto_text">更新、你的设置副本以及 Salotto 的工具。</string>
     <string name="settings_section_circle">圆形主屏幕</string>
-    <string name="settings_section_grid">网格主屏幕</string>
+    <string name="settings_section_grid">玻璃主屏幕</string>
     <string name="settings_section_saver_shows">显示内容</string>
     <string name="settings_section_tv">电视</string>
     <string name="settings_section_device">这台 Fire TV</string>
