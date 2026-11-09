@@ -1506,6 +1506,7 @@ public final class MainActivity extends CardActivity {
 
     private void render(String focus, List<String> apps) {
         stopJiggle();
+        focus = neighbourOf(focus, apps);
         if (circular) {
             renderWheel(focus, apps);
             return;
@@ -1574,6 +1575,22 @@ public final class MainActivity extends CardActivity {
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
         if (moving != null && target != null) startJiggle(target);
+    }
+
+    /**
+     * An app taken off the Home, or uninstalled, leaves the selection to the one before it, or with
+     * none before to the one after: the user's request of 2026-11-09, instead of the first app.
+     */
+    private String neighbourOf(String focus, List<String> apps) {
+        if (focus == null || apps.contains(focus) || !shownApps.contains(focus)) return focus;
+        int gone = shownApps.indexOf(focus);
+        for (int index = gone - 1; index >= 0; index--) {
+            if (apps.contains(shownApps.get(index))) return shownApps.get(index);
+        }
+        for (int index = gone + 1; index < shownApps.size(); index++) {
+            if (apps.contains(shownApps.get(index))) return shownApps.get(index);
+        }
+        return null;
     }
 
     /** The grid keeps the credits after its last row; the wheel has them small, at the top edge, in the middle. */
@@ -1970,7 +1987,8 @@ public final class MainActivity extends CardActivity {
                     home.remove(pkg);
                     if (!app) HomeApps.setSettingsOff(this, true);
                     HomeApps.save(this, home);
-                    render(null);
+                    // Its neighbour takes the selection, not the first app: see neighbourOf.
+                    render(pkg);
                 } else if (choice == 2) {
                     appInfo(pkg);
                 } else {
