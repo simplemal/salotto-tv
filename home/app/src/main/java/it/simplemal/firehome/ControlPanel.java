@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -103,8 +104,10 @@ final class ControlPanel extends LinearLayout {
                 paint();
             });
             tiles.add(this);
-            fill.setCornerRadius(host.dp(RADIUS));
-            view.setBackground(fill);
+            fill.setCornerRadius(host.dp(cleanLook ? CLEAN_LIT_RADIUS : RADIUS));
+            // In the clean Home's single block the tiles touch: lit, each keeps a little room
+            // round it, or two lit side by side read as one (2026-11-09).
+            view.setBackground(cleanLook ? new InsetDrawable(fill, host.dp(CLEAN_LIT_INSET)) : fill);
             paint();
         }
 
@@ -281,6 +284,9 @@ final class ControlPanel extends LinearLayout {
      */
     private static final int CLEAN_GAP = 0;
     private static final int CLEAN_PAD = 6;
+    /** How far a lit tile stays inside its place in the block, and its smaller corners. */
+    private static final int CLEAN_LIT_INSET = 3;
+    private static final int CLEAN_LIT_RADIUS = 8;
     private static final int CLEAN_BLOCK = Color.argb(200, 0, 0, 0);
     private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
     private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
