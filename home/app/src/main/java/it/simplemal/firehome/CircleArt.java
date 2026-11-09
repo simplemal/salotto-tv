@@ -1,9 +1,11 @@
 package it.simplemal.firehome;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -78,7 +80,13 @@ final class CircleArt {
 
     private CircleArt() {}
 
-    static Bitmap make(Drawable image, Drawable back, boolean wide, int size, String pkg) {
+    /**
+     * `square` for the clean Home's squircle, which shows far more of its corners than a circle: there
+     * the background is the picture without its logo at the picture's own place and size, carried on
+     * past its edges, so the picture melts into itself. Behind HBO Max's the background was the
+     * same picture larger, and its darker edges drew a box across the squircle (2026-11-09).
+     */
+    static Bitmap make(Drawable image, Drawable back, boolean wide, int size, String pkg, boolean square) {
         Card card = CARDS.get(pkg);
         int width = SAMPLE;
         int height = wide ? SAMPLE * 9 / 16 : SAMPLE;
@@ -140,6 +148,17 @@ final class CircleArt {
             GradientDrawable fill = new GradientDrawable(card.way, new int[]{card.from, card.to});
             fill.setBounds(0, 0, size, size);
             fill.draw(canvas);
+        } else if (square) {
+            Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);
+            BitmapShader carried = new BitmapShader(soft, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            Matrix place = new Matrix();
+            place.setScale(drawnWidth / (float) width, drawnHeight / (float) height);
+            place.postTranslate(drawnLeft, drawnTop);
+            carried.setLocalMatrix(place);
+            Paint fill = new Paint(Paint.FILTER_BITMAP_FLAG);
+            fill.setShader(carried);
+            canvas.drawRect(0, 0, size, size, fill);
+            soft.recycle();
         } else {
             int coverWidth = Math.max(size, size * width / height);
             Bitmap soft = Bitmap.createBitmap(withoutLogo(pixels, mark, width, height), width, height, Bitmap.Config.ARGB_8888);

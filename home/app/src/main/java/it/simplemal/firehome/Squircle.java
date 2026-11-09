@@ -6,6 +6,8 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
@@ -59,13 +61,19 @@ final class Squircle {
         return path;
     }
 
-    /** A square picture cut to the squircle; the corners are left clear. */
+    /**
+     * A square picture cut to the squircle; the corners are left clear. The shape is drawn smooth
+     * first and the picture only where it is: a clip has no half pixels, and its steps showed along
+     * the curves once the focus made the icon larger (2026-11-09).
+     */
     static Bitmap cut(Bitmap square) {
         int side = Math.min(square.getWidth(), square.getHeight());
         Bitmap made = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
-        canvas.clipPath(path(side));
-        canvas.drawBitmap(square, 0, 0, new Paint(Paint.FILTER_BITMAP_FLAG));
+        canvas.drawPath(path(side), new Paint(Paint.ANTI_ALIAS_FLAG));
+        Paint picture = new Paint(Paint.FILTER_BITMAP_FLAG);
+        picture.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(square, 0, 0, picture);
         return made;
     }
 

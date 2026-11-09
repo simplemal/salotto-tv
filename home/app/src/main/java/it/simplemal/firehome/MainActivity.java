@@ -1783,7 +1783,7 @@ public final class MainActivity extends CardActivity {
                 circle.setBackgroundColor(Color.rgb(60, 64, 72));
                 artComing++;
                 Background.draw(() -> {
-                    Bitmap made = circleArt(tag, size);
+                    Bitmap made = circleArt(tag, size, false);
                     int glow = glowOf(made);
                     CIRCLE_ART.put(key, made);
                     synchronized (CIRCLE_GLOW) { CIRCLE_GLOW.put(key, glow); }
@@ -1829,7 +1829,7 @@ public final class MainActivity extends CardActivity {
     }
 
     /** Salotto's own two circles are drawn here; an app's comes from its artwork, see CircleArt. */
-    private Bitmap circleArt(String tag, int size) {
+    private Bitmap circleArt(String tag, int size, boolean square) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         if (ALL_APPS.equals(tag) || HomeApps.SETTINGS.equals(tag)) {
@@ -1851,7 +1851,7 @@ public final class MainActivity extends CardActivity {
             return made;
         }
         made.recycle();
-        return CircleArt.make(art.image, art.back, art.look == BANNER, size, tag);
+        return CircleArt.make(art.image, art.back, art.look == BANNER, size, tag, square);
     }
 
     /**
@@ -2025,7 +2025,10 @@ public final class MainActivity extends CardActivity {
      */
     private View squircleCard(LinearLayout row, String tag, int size) {
         boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag);
-        String key = circleKey(tag, size) + "/squircle" + (edged ? "/edge" : "");
+        // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
+        // size, the picture was soft and its curves came out in steps (2026-11-09).
+        int grown = Math.round(size * CLEAN_FOCUS_SCALE);
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2047,7 +2050,7 @@ public final class MainActivity extends CardActivity {
         }
         // Tutte le app: a light veil and the icon, drawn at once, with no shadow under it.
         if (ALL_APPS.equals(tag) && known == null) {
-            known = allAppsSquircle(size);
+            known = allAppsSquircle(grown);
             CIRCLE_ART.put(key, known);
         }
         Bitmap shown = known != null ? known : squirclePlaceholder;
@@ -2057,7 +2060,7 @@ public final class MainActivity extends CardActivity {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
             Background.draw(() -> {
-                Bitmap square = circleArt(tag, size);
+                Bitmap square = circleArt(tag, grown, true);
                 int colour = glowOf(square);
                 // The icon's own background, along its edge, where the line is drawn.
                 boolean dark = brightness(CircleArt.rim(square)) < CLEAN_DARK;
@@ -2081,7 +2084,8 @@ public final class MainActivity extends CardActivity {
      */
     private void colourEdge(Bitmap squircle, int colour, boolean dark) {
         int size = squircle.getWidth();
-        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE;
+        // The picture is drawn at its focused size: at rest the line is as thin as asked.
+        float line = getResources().getDisplayMetrics().density * CLEAN_EDGE * CLEAN_FOCUS_SCALE;
         Path edge = Squircle.path(size - line);
         edge.offset(line / 2, line / 2);
         Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -2108,7 +2112,8 @@ public final class MainActivity extends CardActivity {
         fill.setColor(ALL_APPS_FILL);
         canvas.drawPath(Squircle.path(size), fill);
         // A light line along its edge: so faint a veil would be lost among the apps' own colours.
-        float line = dp(1);
+        // Drawn at the focused size, it is one dp at rest.
+        float line = dp(1) * CLEAN_FOCUS_SCALE;
         Path edge = Squircle.path(size - line);
         edge.offset(line / 2, line / 2);
         Paint rim = new Paint(Paint.ANTI_ALIAS_FLAG);
