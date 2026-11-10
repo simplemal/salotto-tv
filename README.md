@@ -48,7 +48,7 @@ Salotto connects only to Open-Meteo for the weather and to GitHub for updates. N
 <p align="center"><sub>Circular Home. Clean, Circular and Glass are chosen in Appearance › Layout</sub></p>
 
 <p align="center">
-  <img src="distro/docs/immagini/sfondo.webp" alt="Choosing the backdrop" width="48%">
+  <img src="distro/docs/immagini/impostazioni.webp" alt="Settings" width="48%">
   <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="48%">
 </p>
 <p align="center"><sub>Choosing the backdrop · Task manager</sub></p>
