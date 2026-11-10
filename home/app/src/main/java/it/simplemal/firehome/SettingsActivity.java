@@ -112,6 +112,13 @@ public final class SettingsActivity extends CardActivity {
         R.string.settings_color_depth_12};
     private static final String SURROUND = "aq_surround_sound";
     private static final String[] SURROUNDS = {"BEST_AVAILABLE", "STEREO", "DD_PLUS_ALWAYS", "DD_ALWAYS"};
+    /**
+     * What the audio service takes, in the same order: it compares the action with these, not with
+     * the names above, and answered «unrecognized actionId STEREO» (Stick 4K, 2026-11-10; read in
+     * SurroundSoundHandler$SurroundSoundSetting of com.amazon.tv.settings.v2).
+     */
+    private static final String[] SURROUND_ACTIONS = {"audio_dd_best_available", "audio_dd_stereo",
+        "audio_dd_plus_always", "audio_dd_always"};
     /** In the order of encoded_surround_output: 0 to 3. */
     private static final String SURROUND_MODE = "encoded_surround_output";
     static final String LEVELER = "aq_volume_leveler";
@@ -1442,7 +1449,8 @@ public final class SettingsActivity extends CardActivity {
         return Arrays.asList(
             new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
                 getString(R.string.settings_surround_text), true,
-                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
+                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUND_ACTIONS,
+                    surroundNames(), SURROUND_ACTIONS[Arrays.asList(SURROUNDS).indexOf(surround)]))),
             new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null,
                 getString(R.string.settings_dialogue_text), false,
                 () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
