@@ -83,9 +83,8 @@ public final class SettingsActivity extends CardActivity {
     private static final int MENU_GAP = 28;
     private static final int MENU_ROW = 40;
     private static final int ROWS_TOP = 14;
-    private static final int ROW_HEIGHT = 48;
-    /** In the window everything is a size smaller. */
-    private static final int SMALL_ROW_HEIGHT = 40;
+    /** Page and window alike, 2026-11-10: before, the page had 48. */
+    private static final int ROW_HEIGHT = 40;
     /** The outer columns of pictures stay whole beside it, see PictureMosaic. */
     private static final int POPUP_WIDTH = 440;
     private static final int POPUP_HEIGHT = 390;
@@ -400,7 +399,8 @@ public final class SettingsActivity extends CardActivity {
         card.setPadding(dp(8), 0, dp(8), 0);
         card.setClipToOutline(true);
         GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.rgb(30, 33, 40));
+        // Almost black: the glass rows stand out on it (2026-11-10).
+        fill.setColor(Color.rgb(12, 13, 16));
         fill.setCornerRadius(dp(22));
         fill.setStroke(Math.max(1, dp(1)), Color.argb(46, 255, 255, 255));
         card.setBackground(fill);
@@ -849,8 +849,9 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private LinearLayout.LayoutParams rowSize() {
-        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(small ? SMALL_ROW_HEIGHT : ROW_HEIGHT));
-        size.bottomMargin = dp(small ? 6 : 8);
+        // The page's rows as low as the window's, the user's choice of 2026-11-10.
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
+        size.bottomMargin = dp(6);
         return size;
     }
 
@@ -942,7 +943,7 @@ public final class SettingsActivity extends CardActivity {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(small ? 16 : 20), 0, dp(small ? 12 : 16), 0);
-        TextView title = label(entry.title, small ? 17 : 20);
+        TextView title = label(entry.title, 17);
         if (entry.family != null) title.setTypeface(Typeface.create(entry.family, Typeface.NORMAL));
         title.setSingleLine(true);
         if (entry.mark != NO_MARK) {
@@ -955,7 +956,7 @@ public final class SettingsActivity extends CardActivity {
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         boolean onOff = YES.equals(entry.value) || NO.equals(entry.value);
         ToggleView toggle = onOff ? new ToggleView(this, YES.equals(entry.value)) : null;
-        TextView value = label(onOff || entry.value == null ? "" : entry.value, small ? 15 : 18);
+        TextView value = label(onOff || entry.value == null ? "" : entry.value, 15);
         value.setSingleLine(true);
         value.setEllipsize(TextUtils.TruncateAt.END);
         value.setMaxWidth(dp(small ? 170 : 230));

@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
+import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +26,8 @@ final class MenuBackdrop {
     private static final int BLUR_RADIUS = 6;
     /** Lighter than behind the task manager: here the backdrop is meant to be seen. */
     private static final int SCRIM = Color.argb(150, 8, 10, 14);
+    /** The measure of 2026-11-10: does the menu find it ready, and how long it takes when not. */
+    private static final String TAG = "Salotto";
     private static final String PICTURE = "menu-backdrop.jpg";
     private static final String NAME = "menu-backdrop.name";
     private static final int QUALITY = 88;
@@ -53,12 +57,21 @@ final class MenuBackdrop {
     /** Ready at once, from memory or from the file, or null if it still has to be made or is not wanted. */
     static Bitmap ready(Context context) {
         if (!wanted(context)) return null;
+        long start = SystemClock.uptimeMillis();
         String name = Look.currentName(context);
         if (name == null) return null;
-        if (name.equals(keptName)) return kept;
-        if (!name.equals(savedName(context))) return null;
+        if (name.equals(keptName)) {
+            Log.i(TAG, "Menu backdrop: in memory, " + name);
+            return kept;
+        }
+        String saved = savedName(context);
+        if (!name.equals(saved)) {
+            Log.i(TAG, "Menu backdrop: missing, " + name + " (memory " + keptName + ", file " + saved + ")");
+            return null;
+        }
         Bitmap read = BitmapFactory.decodeFile(new File(context.getCacheDir(), PICTURE).getPath());
         if (read != null) keep(name, read);
+        Log.i(TAG, "Menu backdrop: from the file in " + (SystemClock.uptimeMillis() - start) + " ms, " + name);
         return read;
     }
 
@@ -69,10 +82,12 @@ final class MenuBackdrop {
         if (name == null) return;
         making = name;
         Context app = context.getApplicationContext();
+        long start = SystemClock.uptimeMillis();
         Look.current(context, picture -> Background.draw(() -> {
             Bitmap made = Blur.veiled(picture, BLUR_RADIUS, SCRIM);
             save(app, name, made);
             MAIN.post(() -> {
+                Log.i(TAG, "Menu backdrop: made in " + (SystemClock.uptimeMillis() - start) + " ms, " + name);
                 if (name.equals(making)) making = null;
                 keep(name, made);
                 done.accept(made);

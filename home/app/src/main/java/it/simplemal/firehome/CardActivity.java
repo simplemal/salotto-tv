@@ -62,8 +62,6 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
     protected static final int PILL_ICON_GAP = 3;
     private static final int PILL_ICON_OFF = Color.argb(20, 0, 0, 0);
     private static final int PILL_RADIUS = 21;
-    private static final int SOFT_LIGHT = 110;
-    private static final int SOFT_DEPTH = 3;
     private static final int BUTTON_RADIUS = 12;
     private static final int BUTTON_PADDING = 10;
     /** Quieter than the pill: on artwork the glass must stay a hint. */
@@ -492,12 +490,9 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         button.setColorFilter(lit ? Color.BLACK : Color.WHITE);
     }
 
-    /** For rows and buttons: flat under the words, the light stays in a few pixels along the edge. */
+    /** For rows and buttons: the flat monochrome glass of the apps, see GlassRow. */
     protected Drawable softGlass(int radius) {
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(Color.argb(42, 255, 255, 255));
-        fill.setCornerRadius(radius);
-        return new LayerDrawable(new Drawable[]{fill, GlassRim.soft(radius, SOFT_LIGHT, dp(SOFT_DEPTH))});
+        return new GlassRow(radius, getResources().getDisplayMetrics().density);
     }
 
     /** What a row or a button becomes under the focus. */

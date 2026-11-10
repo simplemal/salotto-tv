@@ -19,7 +19,6 @@ import android.graphics.drawable.LayerDrawable;
  */
 final class GlassRim extends Drawable {
     private static final float SIDE_SHARE = 0.12f;
-    private static final float ROUND_SHARE = 0.5f;
     private static final float BOTTOM_SHARE = 0.48f;
     private static final float MAX_FADE = 0.45f;
     private static final float CORNER_REACH = 1.3f;
@@ -46,11 +45,6 @@ final class GlassRim extends Drawable {
             new int[]{Color.argb(54, 255, 255, 255), Color.TRANSPARENT, Color.TRANSPARENT});
         sheen.setCornerRadius(radius);
         return new LayerDrawable(new Drawable[]{glass, sheen, new GlassRim(radius, thickness, 235)});
-    }
-
-    /** All round, and sinking `depth` pixels into the glass as it dies out: past that, nothing. */
-    static GlassRim soft(int radius, int light, int depth) {
-        return new GlassRim(radius, 1, light, ROUND_SHARE, depth);
     }
 
     private GlassRim(int radius, int thickness, int light, float sides, int depth) {
