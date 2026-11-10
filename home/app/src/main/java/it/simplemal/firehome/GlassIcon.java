@@ -80,6 +80,12 @@ final class GlassIcon {
     private static final float LIGHT_X = -0.55f;
     private static final float LIGHT_Y = -0.83f;
     private static final float[] NEUTRAL = {0.85f, 0.85f, 0.88f};
+    /**
+     * No veil lighter than RaiPlay's, its banner's deep blue: a dark veil barely lightens what is behind
+     * and reads as smoked glass, the look the user liked best on 2026-11-10. A lighter colour keeps its
+     * hue and goes down to this, as the eye weighs the three colours.
+     */
+    private static final float VEIL_LIGHTNESS = 0.21f;
 
     private GlassIcon() {}
 
@@ -115,7 +121,7 @@ final class GlassIcon {
         int top = found.top;
         int right = found.right;
         int bottom = found.bottom;
-        float[] colour = colour(pixels, edge, distance, start);
+        float[] colour = darkened(colour(pixels, edge, distance, start));
         layer(pixels, alpha, found.mark, width, height, left, top, right, bottom);
 
         // The logo, white, fitted in the middle.
@@ -725,6 +731,13 @@ final class GlassIcon {
         for (int hue = 1; hue < hues; hue++) if (votes[hue] > votes[top]) top = hue;
         if (votes[top] <= 20) return NEUTRAL.clone();
         return new float[]{sums[top][0] / votes[top] / 255f, sums[top][1] / votes[top] / 255f, sums[top][2] / votes[top] / 255f};
+    }
+
+    private static float[] darkened(float[] colour) {
+        float lightness = 0.299f * colour[0] + 0.587f * colour[1] + 0.114f * colour[2];
+        if (lightness <= VEIL_LIGHTNESS) return colour;
+        float down = VEIL_LIGHTNESS / lightness;
+        return new float[]{colour[0] * down, colour[1] * down, colour[2] * down};
     }
 
     private static float[] rgb(int colour) {
