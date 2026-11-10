@@ -296,9 +296,9 @@ final class ControlPanel extends LinearLayout {
      * moves to the middle while it is open, so it is never over the apps.
      */
     private static final int CLEAN_GAP = 0;
-    private static final int CLEAN_PAD = 6;
+    private static final int CLEAN_PAD = 3;
     /** How far a lit tile stays inside its place in the block, and its smaller corners. */
-    private static final int CLEAN_LIT_INSET = 3;
+    private static final int CLEAN_LIT_INSET = 6;
     private static final float ON_FRAME = 0.68f;
     private static final float ON_MIDDLE = 0.68f;
     private static final int CLEAN_LIT_RADIUS = 8;
@@ -309,8 +309,9 @@ final class ControlPanel extends LinearLayout {
      * but black and a little darker: «deve essere nero, ma più nero al bordo».
      */
     private Drawable block() {
-        return new GlassRow(host.dp(RADIUS + CLEAN_PAD), getResources().getDisplayMetrics().density, BLOCK_FRAME, BLOCK_MIDDLE, 0);
+        return new GlassRow(host.dp(BLOCK_RADIUS), getResources().getDisplayMetrics().density, BLOCK_FRAME, BLOCK_MIDDLE, 0);
     }
+    private static final int BLOCK_RADIUS = 16;
     private static final float BLOCK_FRAME = 0.65f;
     private static final float BLOCK_MIDDLE = 0.40f;
     private int tileOff = TILE_OFF;
