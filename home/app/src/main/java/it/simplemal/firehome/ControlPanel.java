@@ -108,9 +108,10 @@ final class ControlPanel extends LinearLayout {
             // In the clean Home's single block the tiles touch: lit, each keeps a little room
             // round it, or two lit side by side read as one (2026-11-09).
             view.setBackground(cleanLook ? new InsetDrawable(fill, host.dp(CLEAN_LIT_INSET)) : fill);
-            // The clean Home's tile of a control that is on is glass, as its apps (the user, 2026-11-10).
+            // The clean Home's tile of a control that is on: white as before, but glass: a little clear
+            // all over, with the line of light (the user, 2026-11-10).
             glass = cleanLook ? new InsetDrawable(new GlassRow(host.dp(CLEAN_LIT_RADIUS),
-                getResources().getDisplayMetrics().density), host.dp(CLEAN_LIT_INSET)) : null;
+                getResources().getDisplayMetrics().density, ON_FRAME, ON_MIDDLE, 1), host.dp(CLEAN_LIT_INSET)) : null;
             paint();
         }
 
@@ -127,13 +128,13 @@ final class ControlPanel extends LinearLayout {
                 value.setTextColor(selected ? Color.argb(170, 0, 0, 0) : Color.argb(170, 255, 255, 255));
                 return;
             }
-            // On but not selected: glass and white, as the apps; the selected one stays white.
+            // On but not selected: white glass, dark words; the selected one stays solid white.
             boolean onGlass = !selected && active && glass != null;
             if (glass != null) {
                 if (rest == null) rest = view.getBackground();
                 view.setBackground(onGlass ? glass : rest);
             }
-            boolean lit = !onGlass && (selected || active);
+            boolean lit = selected || active;
             fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : tileOff);
             int ink = lit ? Color.BLACK : Color.WHITE;
             icon.setColorFilter(!lit && linked ? LINKED : ink);
@@ -298,6 +299,8 @@ final class ControlPanel extends LinearLayout {
     private static final int CLEAN_PAD = 6;
     /** How far a lit tile stays inside its place in the block, and its smaller corners. */
     private static final int CLEAN_LIT_INSET = 3;
+    private static final float ON_FRAME = 0.68f;
+    private static final float ON_MIDDLE = 0.68f;
     private static final int CLEAN_LIT_RADIUS = 8;
     private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
 
