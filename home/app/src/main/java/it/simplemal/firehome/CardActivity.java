@@ -137,6 +137,9 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
 
     protected float focusScale() { return 1.08f; }
 
+    /** How dark the cards' shadow is, 1 as it was made. */
+    protected float shadowStrength() { return 1f; }
+
     /** Square cards, cut to a squircle by their own picture: the clean Home's. */
     protected boolean squareCards() { return false; }
 
@@ -409,7 +412,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         }
         // Glass has no shadow: it would show through as rectangles inside the card.
         CardShadow shadow = look == GLASS ? null
-            : new CardShadow(width, artHeight, radius, dp(1), focusScale());
+            : new CardShadow(width, artHeight, radius, dp(1), focusScale(), shadowStrength());
         tile.setBackground(shadow);
         tile.setOutlineProvider(null);
         tile.setOnFocusChangeListener((view, focused) -> {
