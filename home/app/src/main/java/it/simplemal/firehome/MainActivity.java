@@ -975,6 +975,10 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
+        // Fading out, its tiles were still there for the arrows: Right pressed quickly past the settings
+        // went into them and opened it again, slowly it went down to the apps (2026-11-10). Only on the
+        // clean Home, where it was seen.
+        if (clean) panel.setDescendantFocusability(open ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
         // Closing, the tiles go quickly first and the row climbs only then: together they met on the
         // way (2026-11-09).
