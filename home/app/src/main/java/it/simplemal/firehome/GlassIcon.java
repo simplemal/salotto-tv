@@ -83,7 +83,8 @@ final class GlassIcon {
     /**
      * No veil lighter than RaiPlay's, its banner's deep blue: a dark veil barely lightens what is behind
      * and reads as smoked glass, the look the user liked best on 2026-11-10. A lighter colour keeps its
-     * hue and goes down to this, as the eye weighs the three colours.
+     * hue and goes halfway down to this, as the eye weighs the three colours: all the way, the apps
+     * looked too alike.
      */
     private static final float VEIL_LIGHTNESS = 0.21f;
 
@@ -736,7 +737,8 @@ final class GlassIcon {
     private static float[] darkened(float[] colour) {
         float lightness = 0.299f * colour[0] + 0.587f * colour[1] + 0.114f * colour[2];
         if (lightness <= VEIL_LIGHTNESS) return colour;
-        float down = VEIL_LIGHTNESS / lightness;
+        // Halfway down, the user's choice after seeing them all as dark: the apps stay apart.
+        float down = (1 + VEIL_LIGHTNESS / lightness) / 2;
         return new float[]{colour[0] * down, colour[1] * down, colour[2] * down};
     }
 
