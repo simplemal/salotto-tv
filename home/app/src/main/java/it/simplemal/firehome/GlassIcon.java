@@ -42,6 +42,17 @@ final class GlassIcon {
      */
     private static final Set<String> GLOW = new HashSet<>(Arrays.asList("com.nowtv.it"));
     private static final int GLOW_RAMP = 20;
+    /**
+     * A logo of more colours keeps them as layers, the user's request of 2026-11-10: each colour group
+     * a different white, the lightest whole, the others clearer, so Aurora's A stays on its basket and
+     * Plex's X apart from its letters. A logo of one colour stays one white.
+     */
+    private static final float[] LAYERS = {1f, 0.65f, 0.44f, 0.32f};
+    /** A colour group smaller than this share of the logo is not a layer. */
+    private static final float LAYER_SHARE = 0.06f;
+    /** Groups closer than this are one colour. */
+    private static final int LAYER_APART = 70;
+    private static final int LAYER_SAMPLES = 6000;
 
     /**
      * The app's colour as a frame, the user's design of 2026-11-10: strongest just inside the edge,
@@ -98,6 +109,7 @@ final class GlassIcon {
         int right = found.right;
         int bottom = found.bottom;
         float[] colour = colour(pixels, edge, distance, start);
+        layer(pixels, alpha, found.mark, width, height, left, top, right, bottom);
 
         // The logo, white, fitted in the middle.
         int cutWidth = right - left;
@@ -187,6 +199,7 @@ final class GlassIcon {
         int bottom;
         /** The share of the logo whose pixels and their four neighbours are whole: low for a bare rim. */
         float core;
+        boolean[] mark;
     }
 
     /** Null for no logo, or a scene. `dropEdges`: logo touching the picture's edges is background. */
@@ -228,6 +241,7 @@ final class GlassIcon {
         }
         if (found.right < 0 || logo > SCENE * width * height) return null;
         found.core = core / (float) logo;
+        found.mark = mark;
         return found;
     }
 
@@ -341,6 +355,102 @@ final class GlassIcon {
         int db = Color.blue(a) - Color.blue(b);
         return dr * dr + dg * dg + db * db;
     }
+
+    /**
+     * Gives each colour group of the logo its own whiteness. The groups are found only inside the
+     * strokes: along their soft rims the colours are mixed with the background, and made false groups.
+     */
+    private static void layer(int[] pixels, float[] alpha, boolean[] mark, int width, int height,
+            int left, int top, int right, int bottom) {
+        int[] inner = new int[pixels.length];
+        int count = 0;
+        for (int y = Math.max(1, top); y < Math.min(height - 1, bottom); y++) {
+            for (int x = Math.max(1, left); x < Math.min(width - 1, right); x++) {
+                int index = y * width + x;
+                if (mark[index] && whole(alpha, index) && whole(alpha, index - 1) && whole(alpha, index + 1)
+                    && whole(alpha, index - width) && whole(alpha, index + width)) inner[count++] = pixels[index];
+            }
+        }
+        if (count < LAYERS.length) return;
+        int step = Math.max(1, count / LAYER_SAMPLES);
+        int used = 0;
+        for (int at = 0; at < count; at += step) inner[used++] = inner[at];
+        // Four starting colours, from dark to light, then a few rounds of k-means.
+        Integer[] order = new Integer[used];
+        for (int at = 0; at < used; at++) order[at] = at;
+        final int[] picked = inner;
+        Arrays.sort(order, (a, b) -> Float.compare(luminance(picked[a]), luminance(picked[b])));
+        float[][] centre = new float[LAYERS.length][];
+        float[] quantile = {0.1f, 0.4f, 0.7f, 0.95f};
+        for (int k = 0; k < centre.length; k++) centre[k] = rgbOf(inner[order[Math.round(quantile[k] * (used - 1))]]);
+        int[] group = new int[used];
+        for (int round = 0; round < 10; round++) {
+            float[][] sum = new float[centre.length][3];
+            int[] size = new int[centre.length];
+            for (int at = 0; at < used; at++) {
+                group[at] = closest(centre, inner[at]);
+                float[] c = rgbOf(inner[at]);
+                for (int channel = 0; channel < 3; channel++) sum[group[at]][channel] += c[channel];
+                size[group[at]]++;
+            }
+            for (int k = 0; k < centre.length; k++) {
+                if (size[k] == 0) continue;
+                for (int channel = 0; channel < 3; channel++) centre[k][channel] = sum[k][channel] / size[k];
+            }
+        }
+        int[] size = new int[centre.length];
+        for (int at = 0; at < used; at++) size[group[at]]++;
+        // Close groups are one colour, tiny ones are not layers; the rest, lightest first.
+        java.util.List<float[]> kept = new java.util.ArrayList<>();
+        for (int k = 0; k < centre.length; k++) {
+            if (size[k] < LAYER_SHARE * used) continue;
+            boolean merged = false;
+            for (float[] other : kept) {
+                if (apart(other, centre[k]) < LAYER_APART * LAYER_APART) {
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged) kept.add(centre[k]);
+        }
+        if (kept.size() < 2) return;
+        kept.sort((a, b) -> Float.compare(luminance(b), luminance(a)));
+        float[][] layers = kept.toArray(new float[0][]);
+        for (int y = top; y < bottom; y++) {
+            for (int x = left; x < right; x++) {
+                int index = y * width + x;
+                if (alpha[index] <= 0) continue;
+                alpha[index] *= LAYERS[Math.min(LAYERS.length - 1, closest(layers, pixels[index]))];
+            }
+        }
+    }
+
+    private static int closest(float[][] centres, int pixel) {
+        float[] c = rgbOf(pixel);
+        int best = 0;
+        float bestApart = Float.MAX_VALUE;
+        for (int k = 0; k < centres.length; k++) {
+            float away = apart(centres[k], c);
+            if (away < bestApart) {
+                bestApart = away;
+                best = k;
+            }
+        }
+        return best;
+    }
+
+    private static float apart(float[] a, float[] b) {
+        float dr = a[0] - b[0];
+        float dg = a[1] - b[1];
+        float db = a[2] - b[2];
+        return dr * dr + dg * dg + db * db;
+    }
+
+    private static float[] rgbOf(int pixel) { return new float[]{Color.red(pixel), Color.green(pixel), Color.blue(pixel)}; }
+
+    private static float luminance(int pixel) { return luminance(rgbOf(pixel)); }
+
+    private static float luminance(float[] c) { return 0.299f * c[0] + 0.587f * c[1] + 0.114f * c[2]; }
 
     /** One layer over what is there, with the colours not premultiplied. */
     private static void over(float[] pixel, float red, float green, float blue, float alpha) {
