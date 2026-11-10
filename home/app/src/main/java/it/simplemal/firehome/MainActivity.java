@@ -216,8 +216,10 @@ public final class MainActivity extends CardActivity {
     private int columns;
     private int shelf;
     private int rowHeight;
-    /** From one row to the next when scrolling: a row, and on the clean Home resting low its gap too. */
+    /** From one row to the next when scrolling past the raised page: a row, and its gap on the clean Home. */
     private int rowStep;
+    /** Rows whole on the page once the first row has climbed: past them the page scrolls row by row. */
+    private int rowsUp = 2;
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
     /**
@@ -1696,7 +1698,14 @@ public final class MainActivity extends CardActivity {
         // Tutte le app, cut by the screen's edge. Every row keeps that same distance from the one above.
         boolean cleanLow = clean && !appsOnly && !Look.cleanRowMiddle(this);
         int cleanGap = rowGap + imageHeight / 3 + dp(CLEAN_ROW_CLEAR);
-        rowStep = rowHeight + (cleanLow ? cleanGap : 0);
+        // Past the second row the rows are closer, so that with the first row climbed three more fit
+        // whole under it, and a fifth starts past the screen's edge: the user's request of 2026-11-10,
+        // after a fourth row showed cut at the bottom. Between half and a third of the room left over:
+        // at half the fourth row's name ends at the edge, at a third the fifth row starts on it.
+        int spare = screen - dp(CLEAN_DOCK_TOP) - 4 * rowHeight - cleanGap;
+        int laterGap = Math.max(0, spare * 2 / 5);
+        rowStep = rowHeight + (cleanLow ? laterGap : 0);
+        rowsUp = cleanLow ? 4 : 2;
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
@@ -1719,7 +1728,7 @@ public final class MainActivity extends CardActivity {
                     // The clean Home's dock is only its row of apps: no glass under it.
                     dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
                 } else if (cleanLow) {
-                    ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = cleanGap;
+                    ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = index == columns ? cleanGap : laterGap;
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }
@@ -1738,7 +1747,7 @@ public final class MainActivity extends CardActivity {
         }
         // At the bottom of the screen under the raised shelves; with many rows, past the last one.
         int rows = (count + columns - 1) / columns;
-        int cards = top + dockHeight + (rows <= 1 ? 0 : cleanLow ? (rows - 1) * rowStep : rowGap + (rows - 1) * rowHeight);
+        int cards = top + dockHeight + (rows <= 1 ? 0 : cleanLow ? cleanGap + rowHeight + (rows - 2) * rowStep : rowGap + (rows - 1) * rowHeight);
         LinearLayout.LayoutParams foot = new LinearLayout.LayoutParams(-2, -2);
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
@@ -2180,8 +2189,7 @@ public final class MainActivity extends CardActivity {
     @Override protected void onCardFocus(View tile) {
         if (tile.getTag() instanceof String) lastApp = (String) tile.getTag();
         int index = page.indexOfChild((View) tile.getParent());
-        int rowsOnScreen = 2;
-        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowStep;
+        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsUp) * rowStep;
         // Back on the first row from the clean Home's control centre: the row climbs only once its
         // tiles are gone, from showPanel. Climbing now, it went up through them (2026-11-09).
         if (index == 0 && panelRest >= 0 && (panelOpen || SystemClock.uptimeMillis() < climbAt)) return;
