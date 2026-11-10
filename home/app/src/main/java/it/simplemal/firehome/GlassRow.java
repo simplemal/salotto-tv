@@ -31,12 +31,23 @@ final class GlassRow extends Drawable {
 
     private final float radius;
     private final float density;
+    private final float frameVeil;
+    private final float middleVeil;
+    private final float grey;
     private final Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
     private Bitmap shown;
 
     GlassRow(float radius, float density) {
+        this(radius, density, VEIL_FRAME, VEIL_MIDDLE, GREY);
+    }
+
+    /** With its own veil, along the frame and in the middle, and its grey: the clean control centre's is black. */
+    GlassRow(float radius, float density, float frameVeil, float middleVeil, float grey) {
         this.radius = radius;
         this.density = density;
+        this.frameVeil = frameVeil;
+        this.middleVeil = middleVeil;
+        this.grey = grey;
     }
 
     /** Rows of one size share one picture. */
@@ -44,7 +55,7 @@ final class GlassRow extends Drawable {
         int width = bounds.width();
         int height = bounds.height();
         if (width <= 0 || height <= 0) return;
-        String key = width + "x" + height + "/" + radius;
+        String key = width + "x" + height + "/" + radius + "/" + frameVeil + "/" + middleVeil + "/" + grey;
         synchronized (MADE) {
             shown = MADE.get(key);
             if (shown == null) {
@@ -67,10 +78,10 @@ final class GlassRow extends Drawable {
                 float cover = clamp(0.5f - d);
                 if (cover <= 0) continue;
                 float toMiddle = smoothstep(0, frame, -d);
-                pixel[0] = GREY;
-                pixel[1] = GREY;
-                pixel[2] = GREY;
-                pixel[3] = VEIL_FRAME + (VEIL_MIDDLE - VEIL_FRAME) * toMiddle;
+                pixel[0] = grey;
+                pixel[1] = grey;
+                pixel[2] = grey;
+                pixel[3] = frameVeil + (middleVeil - frameVeil) * toMiddle;
                 // The distance grows outward: its slope is the way the edge faces.
                 float gx = distance(px + 1, py, width, height) - distance(px - 1, py, width, height);
                 float gy = distance(px, py + 1, width, height) - distance(px, py - 1, width, height);

@@ -287,17 +287,17 @@ final class ControlPanel extends LinearLayout {
     /** How far a lit tile stays inside its place in the block, and its smaller corners. */
     private static final int CLEAN_LIT_INSET = 3;
     private static final int CLEAN_LIT_RADIUS = 8;
-    private static final int CLEAN_BLOCK = Color.argb(200, 0, 0, 0);
-    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
     private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
 
+    /**
+     * The monochrome glass of the clean Home's apps, as the user asked on 2026-11-10 (see GlassRow),
+     * but black and a little darker: «deve essere nero, ma più nero al bordo».
+     */
     private Drawable block() {
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(CLEAN_BLOCK);
-        fill.setCornerRadius(host.dp(RADIUS + CLEAN_PAD));
-        fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
-        return fill;
+        return new GlassRow(host.dp(RADIUS + CLEAN_PAD), getResources().getDisplayMetrics().density, BLOCK_FRAME, BLOCK_MIDDLE, 0);
     }
+    private static final float BLOCK_FRAME = 0.65f;
+    private static final float BLOCK_MIDDLE = 0.40f;
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }
