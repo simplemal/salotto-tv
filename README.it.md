@@ -48,7 +48,7 @@ Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamen
 <p align="center"><sub>Home circolare. Pulita, Circolare e Vetro si scelgono in Aspetto › Disposizione</sub></p>
 
 <p align="center">
-  <img src="distro/docs/immagini/sfondo.webp" alt="Scelta dello sfondo" width="48%">
+  <img src="distro/docs/immagini/impostazioni.webp" alt="Impostazioni" width="48%">
   <img src="distro/docs/immagini/task-manager.webp" alt="Task manager" width="48%">
 </p>
 <p align="center"><sub>Scelta dello sfondo · Task manager</sub></p>
