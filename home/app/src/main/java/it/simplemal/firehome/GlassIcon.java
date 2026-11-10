@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import java.util.Arrays;
@@ -13,8 +14,9 @@ import java.util.Set;
 /**
  * An app as glass on the clean Home, the user's option of 2026-11-10, tried first as a picture on the
  * Mac with the real banners and backdrops. The logo, found in the app's own picture, becomes a white
- * silhouette with a soft shadow, on a clear veil of the app's colour; the edge catches the light from
- * the top left, and a weaker light where it faces the bottom right.
+ * silhouette with a soft shadow on clear glass, the app's colour only as a frame of a few dp inside
+ * the edge; a faint line along the edge catches the light from the top left, and a weaker light where
+ * it faces the bottom right.
  *
  * Only transparency: nothing here depends on the backdrop behind, which shows through as it is, so a
  * backdrop fading into the next needs nothing made again. Drawn once, away from the main thread.
@@ -36,26 +38,25 @@ final class GlassIcon {
     private static final Set<String> GLOW = new HashSet<>(Arrays.asList("com.nowtv.it"));
     private static final int GLOW_RAMP = 20;
 
-    /** How much of the app's colour the glass holds, at the top; lower down a little less. */
-    private static final float VEIL = 0.30f;
-    private static final float VEIL_BOTTOM = 0.75f;
-    /** A few dp from the edge the veil thins out and darkens: the user's request of 2026-11-10. */
-    private static final float EDGE_CLEAR = 0.35f;
-    private static final float EDGE_DARK = 0.55f;
-    private static final float EDGE_DEPTH_DP = 4.5f;
+    /**
+     * The app's colour as a frame, the user's design of 2026-11-10: strongest just inside the edge,
+     * then quickly clearer towards the middle, so it shows only for a few dp round the glass.
+     */
+    private static final float VEIL_FRAME = 0.55f;
+    private static final float VEIL_MIDDLE = 0.12f;
+    private static final float FRAME_DP = 5f;
     /** A faint light over the upper half. */
     private static final float SHEEN = 0.10f;
     private static final float LOGO_WIDTH = 0.66f;
     private static final float LOGO_HEIGHT = 0.42f;
     private static final float WHITE = 0.95f;
     private static final float SHADOW = 0.35f;
-    /** The bright line along the edge, and inside it the softer band that gives the glass its thickness. */
-    private static final float LINE_DP = 0.5f;
-    private static final float BAND_DP = 2f;
-    private static final float BAND_SOFT_DP = 0.75f;
-    /** The outer line as bright as it goes, the inner band left soft: the user's request of 2026-11-10. */
-    private static final float LINE_LIGHT = 1f;
-    private static final float BAND_LIGHT = 55 / 255f;
+    /**
+     * The light along the edge: thin, drawn as a smooth stroke so its inner side has no steps, and
+     * only just visible, the user's request of 2026-11-10.
+     */
+    private static final float LINE_DP = 0.75f;
+    private static final float LINE_LIGHT = 0.45f;
     /** The light comes from the top left. */
     private static final float LIGHT_X = -0.55f;
     private static final float LIGHT_Y = -0.83f;
@@ -132,26 +133,30 @@ final class GlassIcon {
         float[] inside = insideDistance(cover, side);
         float[] smooth = cover.clone();
         blur(smooth, side, Math.max(1, Math.round(1.5f * density)));
-
-        float line = LINE_DP * density;
-        float band = BAND_DP * density;
-        float bandSoft = BAND_SOFT_DP * density;
-        float depthReach = EDGE_DEPTH_DP * density;
+        float lineWidth = LINE_DP * density;
+        float[] stroke = alphaOf(side, canvas -> {
+            Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
+            line.setStyle(Paint.Style.STROKE);
+            line.setStrokeWidth(lineWidth);
+            line.setColor(Color.WHITE);
+            Path edgePath = Squircle.path(side - lineWidth);
+            edgePath.offset(lineWidth / 2, lineWidth / 2);
+            canvas.drawPath(edgePath, line);
+        });
+        float frame = FRAME_DP * density;
         int[] made = new int[side * side];
         float[] pixel = new float[4];
         for (int y = 0; y < side; y++) {
-            float fall = 1 - (1 - VEIL_BOTTOM) * y / (side - 1f);
+            float fall = 1 - 0.15f * y / (side - 1f);
             float sheen = Math.max(0, SHEEN * (1 - 2f * y / side));
             for (int x = 0; x < side; x++) {
                 int index = y * side + x;
                 if (cover[index] <= 0) continue;
-                float d = inside[index];
-                float depth = smoothstep(0, depthReach, d);
-                float shade = EDGE_DARK + (1 - EDGE_DARK) * depth;
-                pixel[0] = colour[0] * shade;
-                pixel[1] = colour[1] * shade;
-                pixel[2] = colour[2] * shade;
-                pixel[3] = VEIL * fall * (EDGE_CLEAR + (1 - EDGE_CLEAR) * depth);
+                float toMiddle = smoothstep(0, frame, inside[index]);
+                pixel[0] = colour[0];
+                pixel[1] = colour[1];
+                pixel[2] = colour[2];
+                pixel[3] = (VEIL_FRAME + (VEIL_MIDDLE - VEIL_FRAME) * toMiddle) * fall;
                 over(pixel, 1, 1, 1, sheen);
                 over(pixel, 0, 0, 0, shadow[index] * SHADOW);
                 over(pixel, 1, 1, 1, silhouette[index] * WHITE);
@@ -162,10 +167,7 @@ final class GlassIcon {
                 float facing = (-gx / length) * LIGHT_X + (-gy / length) * LIGHT_Y;
                 float lit = (float) Math.pow(Math.max(0, facing), 1.6);
                 float away = (float) Math.pow(Math.max(0, -facing), 2.2);
-                float edgeLine = clamp(1 + line - d);
-                float edgeBand = 1 - smoothstep(band - bandSoft, band + bandSoft, d);
-                float light = edgeLine * LINE_LIGHT * (0.10f + 0.90f * lit + 0.45f * away) + edgeBand * BAND_LIGHT * (lit + 0.5f * away);
-                over(pixel, 1, 1, 1, clamp(light));
+                over(pixel, 1, 1, 1, clamp(stroke[index] * LINE_LIGHT * (0.10f + 0.90f * lit + 0.45f * away)));
                 float a = pixel[3] * cover[index];
                 made[index] = Math.round(a * 255) << 24 | Math.round(clamp(pixel[0]) * 255) << 16
                     | Math.round(clamp(pixel[1]) * 255) << 8 | Math.round(clamp(pixel[2]) * 255);
