@@ -207,11 +207,11 @@
     <string name="av_yes">Sì</string>
     <string name="av_no">No</string>
     <!-- TV column: the TV says it can do this -->
-    <string name="av_declared">Annuncia</string>
+    <string name="av_declared">Sì</string>
     <!-- TV column: the TV does not say it can do this -->
     <string name="av_not_declared">No</string>
     <!-- TV column: nobody can tell -->
-    <string name="av_unknown">Non si sa</string>
+    <string name="av_unknown">Non verificato</string>
     <!-- In-use column: this format can go out now -->
     <string name="av_available">Disponibile</string>
     <!-- In-use column: this format is the fixed choice -->

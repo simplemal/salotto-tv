@@ -112,6 +112,13 @@ public final class SettingsActivity extends CardActivity {
         R.string.settings_color_depth_12};
     private static final String SURROUND = "aq_surround_sound";
     private static final String[] SURROUNDS = {"BEST_AVAILABLE", "STEREO", "DD_PLUS_ALWAYS", "DD_ALWAYS"};
+    /**
+     * What the audio service takes, in the same order: it compares the action with these, not with
+     * the names above, and answered «unrecognized actionId STEREO» (Stick 4K, 2026-11-10; read in
+     * SurroundSoundHandler$SurroundSoundSetting of com.amazon.tv.settings.v2).
+     */
+    private static final String[] SURROUND_ACTIONS = {"audio_dd_best_available", "audio_dd_stereo",
+        "audio_dd_plus_always", "audio_dd_always"};
     /** In the order of encoded_surround_output: 0 to 3. */
     private static final String SURROUND_MODE = "encoded_surround_output";
     static final String LEVELER = "aq_volume_leveler";
@@ -884,20 +891,24 @@ public final class SettingsActivity extends CardActivity {
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         TextView[] cells = addColumns(row, entry.columns, 13);
         for (TextView cell : cells) cell.setAlpha(0.8f);
-        selectable(row, entry, focused -> {
-            int text = focused ? Fire.INK : Color.WHITE;
-            title.setTextColor(text);
-            for (TextView cell : cells) cell.setTextColor(text);
-        });
+        // Not buttons, the user's remark of 2026-11-10: plain words, and the glass only on the row
+        // the focus is on, which shows its explanation.
+        selectable(row, entry, focused -> { }, true);
         return row;
     }
 
     /** What every row does on a click and with the focus; `paint` recolours what is inside it. */
     private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint) {
+        selectable(row, entry, paint, false);
+    }
+
+    /** `plain`: nothing at rest and glass, not white, under the focus: a line to read, not a button. */
+    private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint, boolean plain) {
         row.setFocusable(true);
         row.setClickable(true);
         row.setDefaultFocusHighlightEnabled(false);
-        Drawable rest = softGlass(dp(12));
+        Drawable rest = plain ? null : softGlass(dp(12));
+        Drawable lit = plain ? softGlass(dp(12)) : focusFill();
         row.setBackground(rest);
         row.setOnClickListener(v -> {
             // A click, with a mouse or on a preview of the screen, reaches the page without the
@@ -914,7 +925,7 @@ public final class SettingsActivity extends CardActivity {
         });
         row.setOnFocusChangeListener((view, focused) -> {
             paint.accept(focused);
-            view.setBackground(focused ? focusFill() : rest);
+            view.setBackground(focused ? lit : rest);
             float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
             if (focused) {
@@ -1203,7 +1214,7 @@ public final class SettingsActivity extends CardActivity {
     /** In the order of Look.ICONS_PLAIN, ICONS_GLASS, ICONS_GLASS_MONO. */
     private String[] iconsNames() {
         return new String[]{getString(R.string.settings_icons_plain), getString(R.string.settings_icons_glass),
-            getString(R.string.settings_icons_glass_mono)};
+            getString(R.string.settings_icons_glass_mono), getString(R.string.settings_icons_logo)};
     }
 
     private void showIcons() {
@@ -1438,7 +1449,8 @@ public final class SettingsActivity extends CardActivity {
         return Arrays.asList(
             new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
                 getString(R.string.settings_surround_text), true,
-                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUNDS, surroundNames(), surround))),
+                () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUND_ACTIONS,
+                    surroundNames(), SURROUND_ACTIONS[Arrays.asList(SURROUNDS).indexOf(surround)]))),
             new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null,
                 getString(R.string.settings_dialogue_text), false,
                 () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
@@ -1461,9 +1473,17 @@ public final class SettingsActivity extends CardActivity {
                 avStale = true;
                 if (!written) sayLong(getString(R.string.settings_fire_refused));
                 done.run();
+                // A new surround choice makes Fire OS turn the clearer dialogue and the even volume
+                // off and on again within half a second: read at once, they showed No (2026-11-10).
+                if (written && SURROUND.equals(id)) rows.postDelayed(() -> {
+                    if (isDestroyed()) return;
+                    avStale = true;
+                    refresh();
+                }, SURROUND_SETTLE_MS);
             });
         });
     }
+    private static final long SURROUND_SETTLE_MS = 2000;
 
     /** The choices close as soon as one is pressed; the page shows it once Fire OS has taken it. */
     private void showChoices(String title, String provider, String id, String[] actions, String[] names, String current) {

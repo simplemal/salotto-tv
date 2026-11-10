@@ -332,6 +332,7 @@
     <string name="settings_icons_plain">Обычные</string>
     <string name="settings_icons_glass">Цветное стекло</string>
     <string name="settings_icons_glass_mono">Монохромное стекло</string>
+    <string name="settings_icons_logo">Только логотип</string>
     <string name="settings_icons_text">Как выглядят приложения на главном экране: со своими картинками или как стекло с белым логотипом.</string>
     <string name="settings_wheel_blur">Размытый фон</string>
     <string name="settings_wheel_blur_text">Фон за колесом размыт, чтобы приложения, время и погода выделялись. Анимированные сцены погоды показываются неподвижными.</string>

@@ -253,6 +253,8 @@ final class Look {
     static final int ICONS_PLAIN = 0;
     static final int ICONS_GLASS = 1;
     static final int ICONS_GLASS_MONO = 2;
+    /** Only the white logo, and the glass tile on the selected app: the user's idea of 2026-11-10. */
+    static final int ICONS_LOGO = 3;
     static int cleanIcons(Context context) {
         SharedPreferences saved = prefs(context);
         return saved.getInt("clean_icons", saved.getBoolean("clean_glass", false) ? ICONS_GLASS : ICONS_PLAIN);

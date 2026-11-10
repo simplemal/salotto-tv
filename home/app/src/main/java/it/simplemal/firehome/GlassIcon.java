@@ -98,6 +98,12 @@ final class GlassIcon {
 
     /** Null when the picture has no logo to take, a scene: the app keeps its usual squircle. */
     static Bitmap make(Drawable image, Drawable back, boolean wide, int side, float density, String pkg, boolean mono) {
+        return make(image, back, wide, side, density, pkg, mono, false);
+    }
+
+    /** Bare: only the white logo and its shadow, with no glass around it (Logo only). */
+    static Bitmap make(Drawable image, Drawable back, boolean wide, int side, float density, String pkg, boolean mono,
+            boolean bare) {
         int width = SAMPLE;
         int height = wide ? SAMPLE * 9 / 16 : SAMPLE;
         Bitmap sample = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -181,6 +187,17 @@ final class GlassIcon {
             float sheen = Math.max(0, SHEEN * (1 - 2f * y / side));
             for (int x = 0; x < side; x++) {
                 int index = y * side + x;
+                if (bare) {
+                    pixel[0] = 1;
+                    pixel[1] = 1;
+                    pixel[2] = 1;
+                    pixel[3] = 0;
+                    over(pixel, 0, 0, 0, shadow[index] * SHADOW);
+                    over(pixel, 1, 1, 1, silhouette[index] * WHITE);
+                    made[index] = Math.round(pixel[3] * 255) << 24 | Math.round(clamp(pixel[0]) * 255) << 16
+                        | Math.round(clamp(pixel[1]) * 255) << 8 | Math.round(clamp(pixel[2]) * 255);
+                    continue;
+                }
                 if (cover[index] <= 0) continue;
                 float toMiddle = smoothstep(0, frame, inside[index]);
                 pixel[0] = colour[0];

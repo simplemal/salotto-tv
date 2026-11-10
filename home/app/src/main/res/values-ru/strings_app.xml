@@ -163,9 +163,9 @@
 
     <string name="av_yes">Да</string>
     <string name="av_no">Нет</string>
-    <string name="av_declared">Заявляет</string>
+    <string name="av_declared">Да</string>
     <string name="av_not_declared">Нет</string>
-    <string name="av_unknown">Неизвестно</string>
+    <string name="av_unknown">Не проверено</string>
     <string name="av_available">Доступно</string>
     <string name="av_selected">Выбрано</string>
     <string name="av_no_decoder">На Stick нет декодера.</string>

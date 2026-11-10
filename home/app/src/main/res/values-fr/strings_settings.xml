@@ -322,6 +322,7 @@
     <string name="settings_icons_plain">Normales</string>
     <string name="settings_icons_glass">Verre coloré</string>
     <string name="settings_icons_glass_mono">Verre monochrome</string>
+    <string name="settings_icons_logo">Logo seul</string>
     <string name="settings_icons_text">L’aspect des applis sur la Home : avec leurs images, ou en verre avec le logo en blanc.</string>
     <string name="settings_wheel_blur">Fond flou</string>
     <string name="settings_wheel_blur_text">Le fond derrière la roue est flou, pour que les apps, l’heure et la météo ressortent. Les scènes météo animées restent figées.</string>

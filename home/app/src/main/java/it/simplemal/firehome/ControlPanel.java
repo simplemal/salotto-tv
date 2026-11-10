@@ -108,8 +108,15 @@ final class ControlPanel extends LinearLayout {
             // In the clean Home's single block the tiles touch: lit, each keeps a little room
             // round it, or two lit side by side read as one (2026-11-09).
             view.setBackground(cleanLook ? new InsetDrawable(fill, host.dp(CLEAN_LIT_INSET)) : fill);
+            // The clean Home's tile of a control that is on: white as before, but glass: a little clear
+            // all over, with the line of light (the user, 2026-11-10).
+            glass = cleanLook ? new InsetDrawable(new GlassRow(host.dp(CLEAN_LIT_RADIUS),
+                getResources().getDisplayMetrics().density, ON_FRAME, ON_MIDDLE, 1), host.dp(CLEAN_LIT_INSET)) : null;
             paint();
         }
+
+        private Drawable rest;
+        private Drawable glass;
 
         void paint() {
             boolean selected = view.isFocused() || view == chosen;
@@ -120,6 +127,12 @@ final class ControlPanel extends LinearLayout {
                 title.setTextColor(selected ? Color.BLACK : Color.WHITE);
                 value.setTextColor(selected ? Color.argb(170, 0, 0, 0) : Color.argb(170, 255, 255, 255));
                 return;
+            }
+            // On but not selected: white glass, dark words; the selected one stays solid white.
+            boolean onGlass = !selected && active && glass != null;
+            if (glass != null) {
+                if (rest == null) rest = view.getBackground();
+                view.setBackground(onGlass ? glass : rest);
             }
             boolean lit = selected || active;
             fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : tileOff);
@@ -283,21 +296,24 @@ final class ControlPanel extends LinearLayout {
      * moves to the middle while it is open, so it is never over the apps.
      */
     private static final int CLEAN_GAP = 0;
-    private static final int CLEAN_PAD = 6;
+    private static final int CLEAN_PAD = 3;
     /** How far a lit tile stays inside its place in the block, and its smaller corners. */
-    private static final int CLEAN_LIT_INSET = 3;
+    private static final int CLEAN_LIT_INSET = 6;
+    private static final float ON_FRAME = 0.68f;
+    private static final float ON_MIDDLE = 0.68f;
     private static final int CLEAN_LIT_RADIUS = 8;
-    private static final int CLEAN_BLOCK = Color.argb(200, 0, 0, 0);
-    private static final int CLEAN_TILE_EDGE = Color.argb(55, 210, 210, 210);
     private static final int CLEAN_TILE_OFF = Color.TRANSPARENT;
 
+    /**
+     * The monochrome glass of the clean Home's apps, as the user asked on 2026-11-10 (see GlassRow),
+     * but black and a little darker: «deve essere nero, ma più nero al bordo».
+     */
     private Drawable block() {
-        GradientDrawable fill = new GradientDrawable();
-        fill.setColor(CLEAN_BLOCK);
-        fill.setCornerRadius(host.dp(RADIUS + CLEAN_PAD));
-        fill.setStroke(host.dp(1), CLEAN_TILE_EDGE);
-        return fill;
+        return new GlassRow(host.dp(BLOCK_RADIUS), getResources().getDisplayMetrics().density, BLOCK_FRAME, BLOCK_MIDDLE, 0);
     }
+    private static final int BLOCK_RADIUS = 16;
+    private static final float BLOCK_FRAME = 0.65f;
+    private static final float BLOCK_MIDDLE = 0.40f;
     private int tileOff = TILE_OFF;
 
     private int wide() { return 2 * unit + gap; }

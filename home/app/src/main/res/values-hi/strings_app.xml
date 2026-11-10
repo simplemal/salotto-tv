@@ -157,9 +157,9 @@
 
     <string name="av_yes">हाँ</string>
     <string name="av_no">नहीं</string>
-    <string name="av_declared">बताता है</string>
+    <string name="av_declared">हाँ</string>
     <string name="av_not_declared">नहीं</string>
-    <string name="av_unknown">पता नहीं</string>
+    <string name="av_unknown">सत्यापित नहीं</string>
     <string name="av_available">उपलब्ध</string>
     <string name="av_selected">चुना हुआ</string>
     <string name="av_no_decoder">Stick में डिकोडर नहीं है।</string>

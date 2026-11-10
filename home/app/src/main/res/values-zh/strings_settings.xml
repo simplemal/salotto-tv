@@ -318,6 +318,7 @@
     <string name="settings_icons_plain">普通</string>
     <string name="settings_icons_glass">彩色玻璃</string>
     <string name="settings_icons_glass_mono">单色玻璃</string>
+    <string name="settings_icons_logo">仅标志</string>
     <string name="settings_icons_text">应用在主屏幕上的样子：使用自己的图片，或显示为白色标志的玻璃。</string>
     <string name="settings_wheel_blur">模糊背景</string>
     <string name="settings_wheel_blur_text">转盘后面的背景会被模糊，让应用、时间和天气更醒目。动态天气场景会显示为静止。</string>
