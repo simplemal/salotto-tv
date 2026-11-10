@@ -108,8 +108,14 @@ final class ControlPanel extends LinearLayout {
             // In the clean Home's single block the tiles touch: lit, each keeps a little room
             // round it, or two lit side by side read as one (2026-11-09).
             view.setBackground(cleanLook ? new InsetDrawable(fill, host.dp(CLEAN_LIT_INSET)) : fill);
+            // The clean Home's tile of a control that is on is glass, as its apps (the user, 2026-11-10).
+            glass = cleanLook ? new InsetDrawable(new GlassRow(host.dp(CLEAN_LIT_RADIUS),
+                getResources().getDisplayMetrics().density), host.dp(CLEAN_LIT_INSET)) : null;
             paint();
         }
+
+        private Drawable rest;
+        private Drawable glass;
 
         void paint() {
             boolean selected = view.isFocused() || view == chosen;
@@ -121,7 +127,13 @@ final class ControlPanel extends LinearLayout {
                 value.setTextColor(selected ? Color.argb(170, 0, 0, 0) : Color.argb(170, 255, 255, 255));
                 return;
             }
-            boolean lit = selected || active;
+            // On but not selected: glass and white, as the apps; the selected one stays white.
+            boolean onGlass = !selected && active && glass != null;
+            if (glass != null) {
+                if (rest == null) rest = view.getBackground();
+                view.setBackground(onGlass ? glass : rest);
+            }
+            boolean lit = !onGlass && (selected || active);
             fill.setColor(selected ? Color.WHITE : active ? TILE_ACTIVE : tileOff);
             int ink = lit ? Color.BLACK : Color.WHITE;
             icon.setColorFilter(!lit && linked ? LINKED : ink);
