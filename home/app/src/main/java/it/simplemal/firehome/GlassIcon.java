@@ -43,18 +43,19 @@ final class GlassIcon {
     private static final Set<String> GLOW = new HashSet<>(Arrays.asList("com.nowtv.it"));
     private static final int GLOW_RAMP = 20;
     /**
-     * A logo of more colours keeps them as layers, the user's request of 2026-11-10: each colour group
-     * a different white, the lightest whole, the others clearer, so Aurora's A stays on its basket and
-     * Plex's X apart from its letters. A logo of one colour stays one white.
+     * A logo with white or grey parts and coloured parts keeps them as two layers, the user's request
+     * of 2026-11-10: the white whole, the coloured clearer, so Aurora's A stays on its basket and
+     * Plex's X apart from its letters. Each connected part of the logo is one layer, the one most of its
+     * inside has: split by every colour, Apple TV's rainbow apple came out in patches. A part is split
+     * only where a coloured area sits in it with a crisp edge, as the A, never along a gradient.
      */
-    private static final float[] LAYERS = {1f, 0.65f, 0.44f, 0.32f};
-    /** A colour group smaller than this share of the logo is not a layer. */
-    private static final float LAYER_SHARE = 0.06f;
-    /** Groups closer than this are one colour. */
-    private static final int LAYER_APART = 70;
-    private static final int LAYER_SAMPLES = 6000;
-    /** Below this saturation a colour group is a grey. */
+    private static final float COLOURED_LAYER = 0.6f;
+    /** Below this saturation a colour is white or grey. */
     private static final float GREY = 0.25f;
+    /** A part is split only when the smaller class has this share of its inside... */
+    private static final float SPLIT_SHARE = 0.10f;
+    /** ...and fewer than this share of half-coloured pixels, as a gradient has. */
+    private static final float GRADUAL = 0.10f;
 
     /**
      * The app's colour as a frame, the user's design of 2026-11-10: strongest just inside the edge,
@@ -94,15 +95,19 @@ final class GlassIcon {
 
         int[] edge = edgeColours(pixels, width, height);
         boolean glow = GLOW.contains(pkg);
-        Found found = find(pixels, width, height, edge, glow, false);
+        Found found = find(pixels, width, height, edge, glow, false, false);
+        if (found == null) return null;
         // Only the rim of a logo found: a colour of the logo is also along the edges, as the white band
         // under Amazon miniTV's pink (2026-11-10). Then only the colour most of the edge has is
         // background, and what that leaves touching the edges, the band, goes with it.
-        if (found != null && found.core < SOLID) {
-            edge = mostOfEdge(edge);
-            found = find(pixels, width, height, edge, glow, true);
+        // A scene: the logo sits on a block of colour inside the picture, as Amazon Games' robot on its
+        // green grid. Then the colour most of the picture has is background, and thin lines go too.
+        if (found.scene || found.core < SOLID) {
+            boolean scene = found.scene;
+            edge = scene ? mostOf(sampled(pixels)) : mostOf(edge);
+            found = find(pixels, width, height, edge, glow, true, scene);
         }
-        if (found == null || found.core < SOLID) return null;
+        if (found == null || found.scene || found.core < SOLID) return null;
         float[] alpha = found.alpha;
         float[] distance = found.distance;
         float start = found.start;
@@ -202,10 +207,13 @@ final class GlassIcon {
         /** The share of the logo whose pixels and their four neighbours are whole: low for a bare rim. */
         float core;
         boolean[] mark;
+        /** So much of the picture is logo that it is a scene, or a block of colour the logo sits on. */
+        boolean scene;
     }
 
-    /** Null for no logo, or a scene. `dropEdges`: logo touching the picture's edges is background. */
-    private static Found find(int[] pixels, int width, int height, int[] edge, boolean glow, boolean dropEdges) {
+    /** Null for no logo. `dropEdges`: logo touching the picture's edges is background. */
+    private static Found find(int[] pixels, int width, int height, int[] edge, boolean glow, boolean dropEdges,
+            boolean dropThin) {
         Found found = new Found();
         found.distance = new float[pixels.length];
         for (int index = 0; index < pixels.length; index++) found.distance[index] = nearest(pixels[index], edge);
@@ -219,6 +227,7 @@ final class GlassIcon {
         }
         if (dropEdges) {
             dropTouchingEdges(found, mark, width, height);
+            if (dropThin) dropThinLines(found, mark, width, height);
             dropCrumbs(found, mark, width, height);
         }
         found.left = width;
@@ -241,7 +250,8 @@ final class GlassIcon {
                     && whole(found.alpha, index - width) && whole(found.alpha, index + width)) core++;
             }
         }
-        if (found.right < 0 || logo > SCENE * width * height) return null;
+        if (found.right < 0) return null;
+        found.scene = logo > SCENE * width * height;
         found.core = core / (float) logo;
         found.mark = mark;
         return found;
@@ -282,6 +292,48 @@ final class GlassIcon {
                 }
             }
         }
+    }
+
+    /**
+     * Clears lines a pixel or two wide, as the grid behind Amazon Games' robot: what does not survive
+     * shrinking the logo by a pixel and growing it back. Its soft rim stays with what remains.
+     */
+    private static void dropThinLines(Found found, boolean[] mark, int width, int height) {
+        boolean[] solid = new boolean[mark.length];
+        for (int index = 0; index < mark.length; index++) solid[index] = found.alpha[index] >= 0.5f;
+        boolean[] shrunk = new boolean[mark.length];
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
+                boolean all = true;
+                for (int dy = -1; dy <= 1 && all; dy++) {
+                    for (int dx = -1; dx <= 1 && all; dx++) all = solid[(y + dy) * width + x + dx];
+                }
+                shrunk[y * width + x] = all;
+            }
+        }
+        boolean[] kept = grow(shrunk, width, height);
+        boolean[] rim = grow(kept, width, height);
+        for (int index = 0; index < mark.length; index++) {
+            if (!kept[index]) mark[index] = false;
+            if (!rim[index]) found.alpha[index] = 0;
+        }
+    }
+
+    private static boolean[] grow(boolean[] from, int width, int height) {
+        boolean[] grown = new boolean[from.length];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if (!from[y * width + x]) continue;
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (nx >= 0 && ny >= 0 && nx < width && ny < height) grown[ny * width + nx] = true;
+                    }
+                }
+            }
+        }
+        return grown;
     }
 
     /**
@@ -333,8 +385,16 @@ final class GlassIcon {
         return tail + 1;
     }
 
-    /** The edge colours near the one most of the edge is close to. */
-    private static int[] mostOfEdge(int[] edge) {
+    /** About a thousand pixels from all over the picture. */
+    private static int[] sampled(int[] pixels) {
+        int step = Math.max(1, pixels.length / 1000);
+        int[] some = new int[(pixels.length + step - 1) / step];
+        for (int at = 0; at < some.length; at++) some[at] = pixels[at * step] | 0xFF000000;
+        return some;
+    }
+
+    /** The colours near the one most of them are close to. */
+    private static int[] mostOf(int[] edge) {
         int best = 0;
         int bestCount = -1;
         for (int i = 0; i < edge.length; i++) {
@@ -358,97 +418,103 @@ final class GlassIcon {
         return dr * dr + dg * dg + db * db;
     }
 
-    /**
-     * Gives each colour group of the logo its own whiteness. The groups are found only inside the
-     * strokes: along their soft rims the colours are mixed with the background, and made false groups.
-     */
+    /** Gives the coloured parts of a logo that also has white or grey parts a clearer white. */
     private static void layer(int[] pixels, float[] alpha, boolean[] mark, int width, int height,
             int left, int top, int right, int bottom) {
-        int[] inner = new int[pixels.length];
-        int count = 0;
-        for (int y = Math.max(1, top); y < Math.min(height - 1, bottom); y++) {
-            for (int x = Math.max(1, left); x < Math.min(width - 1, right); x++) {
+        int count = pixels.length;
+        float[] saturation = new float[count];
+        boolean[] whole = new boolean[count];
+        for (int index = 0; index < count; index++) {
+            saturation[index] = saturation(rgbOf(pixels[index]));
+            whole[index] = mark[index] && alpha[index] >= 0.95f;
+        }
+        // Inside: whole with its four neighbours whole, away from the soft rim, where colours mix.
+        boolean[] inside = new boolean[count];
+        boolean[] colouredInside = new boolean[count];
+        for (int y = 1; y < height - 1; y++) {
+            for (int x = 1; x < width - 1; x++) {
                 int index = y * width + x;
-                if (mark[index] && whole(alpha, index) && whole(alpha, index - 1) && whole(alpha, index + 1)
-                    && whole(alpha, index - width) && whole(alpha, index + width)) inner[count++] = pixels[index];
+                inside[index] = whole[index] && whole[index - 1] && whole[index + 1] && whole[index - width] && whole[index + width];
+                colouredInside[index] = inside[index] && saturation[index] >= GREY;
             }
         }
-        if (count < LAYERS.length) return;
-        int step = Math.max(1, count / LAYER_SAMPLES);
-        int used = 0;
-        for (int at = 0; at < count; at += step) inner[used++] = inner[at];
-        // Four starting colours, from dark to light, then a few rounds of k-means.
-        Integer[] order = new Integer[used];
-        for (int at = 0; at < used; at++) order[at] = at;
-        final int[] picked = inner;
-        Arrays.sort(order, (a, b) -> Float.compare(luminance(picked[a]), luminance(picked[b])));
-        float[][] centre = new float[LAYERS.length][];
-        float[] quantile = {0.1f, 0.4f, 0.7f, 0.95f};
-        for (int k = 0; k < centre.length; k++) centre[k] = rgbOf(inner[order[Math.round(quantile[k] * (used - 1))]]);
-        int[] group = new int[used];
-        for (int round = 0; round < 10; round++) {
-            float[][] sum = new float[centre.length][3];
-            int[] size = new int[centre.length];
-            for (int at = 0; at < used; at++) {
-                group[at] = closest(centre, inner[at]);
-                float[] c = rgbOf(inner[at]);
-                for (int channel = 0; channel < 3; channel++) sum[group[at]][channel] += c[channel];
-                size[group[at]]++;
-            }
-            for (int k = 0; k < centre.length; k++) {
-                if (size[k] == 0) continue;
-                for (int channel = 0; channel < 3; channel++) centre[k][channel] = sum[k][channel] / size[k];
-            }
-        }
-        int[] size = new int[centre.length];
-        for (int at = 0; at < used; at++) size[group[at]]++;
-        // Close groups are one colour, tiny ones are not layers; the rest, lightest first.
-        java.util.List<float[]> kept = new java.util.ArrayList<>();
-        for (int k = 0; k < centre.length; k++) {
-            if (size[k] < LAYER_SHARE * used) continue;
-            boolean merged = false;
-            for (float[] other : kept) {
-                // Greys are one layer however far apart: HBO Max's letters shade from white to grey,
-                // and split in two they came out patchy on the TV (2026-11-10).
-                if (apart(other, centre[k]) < LAYER_APART * LAYER_APART
-                    || saturation(other) < GREY && saturation(centre[k]) < GREY) {
-                    merged = true;
-                    break;
+        boolean[] coloured = new boolean[count];
+        boolean[] seen = new boolean[count];
+        int[] queue = new int[count];
+        for (int first = 0; first < count; first++) {
+            if (!mark[first] || seen[first]) continue;
+            int tail = 0;
+            seen[first] = true;
+            queue[tail++] = first;
+            for (int head = 0; head < tail; head++) {
+                int index = queue[head];
+                int x = index % width;
+                int y = index / width;
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+                        int next = ny * width + nx;
+                        if (!mark[next] || seen[next]) continue;
+                        seen[next] = true;
+                        queue[tail++] = next;
+                    }
                 }
             }
-            if (!merged) kept.add(centre[k]);
+            int in = 0;
+            int colour = 0;
+            int gradual = 0;
+            int colourCore = 0;
+            for (int at = 0; at < tail; at++) {
+                int index = queue[at];
+                if (!inside[index]) continue;
+                in++;
+                float s = saturation[index];
+                if (s >= GREY) colour++;
+                if (s > 0.12f && s < 0.38f) gradual++;
+                int x = index % width;
+                int y = index / width;
+                if (s >= GREY && x > 0 && y > 0 && x < width - 1 && y < height - 1 && colouredInside[index - 1]
+                    && colouredInside[index + 1] && colouredInside[index - width] && colouredInside[index + width]) colourCore++;
+            }
+            if (in == 0) continue;
+            float share = colour / (float) in;
+            boolean split = Math.min(share, 1 - share) >= SPLIT_SHARE && gradual < GRADUAL * in
+                && colourCore >= 0.5f * colour;
+            for (int at = 0; at < tail; at++) {
+                int index = queue[at];
+                coloured[index] = split ? saturation[index] >= GREY : share >= 0.5f;
+            }
         }
-        if (kept.size() < 2) return;
-        kept.sort((a, b) -> Float.compare(luminance(b), luminance(a)));
-        float[][] layers = kept.toArray(new float[0][]);
+        boolean anyColoured = false;
+        boolean anyWhite = false;
+        for (int index = 0; index < count; index++) {
+            if (!mark[index]) continue;
+            if (coloured[index]) anyColoured = true;
+            else anyWhite = true;
+        }
+        if (!anyColoured || !anyWhite) return;
         for (int y = top; y < bottom; y++) {
             for (int x = left; x < right; x++) {
                 int index = y * width + x;
                 if (alpha[index] <= 0) continue;
-                alpha[index] *= LAYERS[Math.min(LAYERS.length - 1, closest(layers, pixels[index]))];
+                boolean clearer = coloured[index];
+                // The soft rim takes the layer of the logo it borders.
+                if (!mark[index]) {
+                    for (int dy = -1; dy <= 1 && !clearer; dy++) {
+                        for (int dx = -1; dx <= 1 && !clearer; dx++) {
+                            int nx = x + dx;
+                            int ny = y + dy;
+                            if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+                            int next = ny * width + nx;
+                            clearer = mark[next] && coloured[next];
+                        }
+                    }
+                }
+                if (clearer) alpha[index] *= COLOURED_LAYER;
             }
         }
-    }
-
-    private static int closest(float[][] centres, int pixel) {
-        float[] c = rgbOf(pixel);
-        int best = 0;
-        float bestApart = Float.MAX_VALUE;
-        for (int k = 0; k < centres.length; k++) {
-            float away = apart(centres[k], c);
-            if (away < bestApart) {
-                bestApart = away;
-                best = k;
-            }
-        }
-        return best;
-    }
-
-    private static float apart(float[] a, float[] b) {
-        float dr = a[0] - b[0];
-        float dg = a[1] - b[1];
-        float db = a[2] - b[2];
-        return dr * dr + dg * dg + db * db;
     }
 
     private static float saturation(float[] c) {
@@ -458,10 +524,6 @@ final class GlassIcon {
     }
 
     private static float[] rgbOf(int pixel) { return new float[]{Color.red(pixel), Color.green(pixel), Color.blue(pixel)}; }
-
-    private static float luminance(int pixel) { return luminance(rgbOf(pixel)); }
-
-    private static float luminance(float[] c) { return 0.299f * c[0] + 0.587f * c[1] + 0.114f * c[2]; }
 
     /** One layer over what is there, with the colours not premultiplied. */
     private static void over(float[] pixel, float red, float green, float blue, float alpha) {
