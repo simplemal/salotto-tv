@@ -156,6 +156,9 @@ public final class MainActivity extends CardActivity {
     private View pillShade;
     private static final int CORNER_RADIUS = 460;
     private static final int CORNER_ALPHA = 105;
+    private static final int TOP_SHADE_ALPHA = 80;
+    private static final int TOP_SHADE_DP = 120;
+    private View topShade;
     /** Long enough for the Home to be drawn, weather scene included. */
     private static final long FIRST_PICTURE_MS = 4000;
     private static final long FRESH_PICTURE_MS = 400;
@@ -401,6 +404,7 @@ public final class MainActivity extends CardActivity {
         pillShade.setAlpha(0);
         weatherShade = cornerShade(1);
         weatherShade.setVisibility(View.GONE);
+        topShade = topShade();
 
         hero = new LinearLayout(this);
         hero.setOrientation(LinearLayout.VERTICAL);
@@ -614,6 +618,7 @@ public final class MainActivity extends CardActivity {
     /** White with a small shadow over a medium or dark picture, black over a very light one. */
     private void tonePill() {
         boolean dark = cornersOnTop() && lightCorner;
+        toneTopShade();
         for (TextView text : new TextView[]{pillTime, pillDate, pillWeather, cleanTime, cleanDate, cleanWeather}) {
             text.setTextColor(dark ? DARK_TEXT : Color.WHITE);
             if (dark || !cornersOnTop()) text.setShadowLayer(0, 0, 0, 0);
@@ -1028,6 +1033,25 @@ public final class MainActivity extends CardActivity {
         }
     }
 
+    /**
+     * The clean Home's line at the top in white: a soft dark from the top edge down a few dp, so that
+     * it reads on any picture. The user's request of 2026-11-10, instead of the big clock's corner.
+     */
+    private View topShade() {
+        GradientDrawable fill = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{
+            Color.argb(TOP_SHADE_ALPHA, 0, 0, 0), Color.argb(TOP_SHADE_ALPHA / 3, 0, 0, 0), Color.TRANSPARENT});
+        View shade = new View(this);
+        shade.setBackground(fill);
+        shade.setVisibility(View.GONE);
+        root.addView(shade, new FrameLayout.LayoutParams(-1, dp(TOP_SHADE_DP), Gravity.TOP));
+        return shade;
+    }
+
+    /** Only under white words: dark ones stand on a light picture and need no help. */
+    private void toneTopShade() {
+        topShade.setVisibility(clean && !lightCorner ? View.VISIBLE : View.GONE);
+    }
+
     /** Time and date move to the pill only while the big clock cannot be seen: never both. */
     /** A soft dark corner under the time, so that it stands out on any picture. `x` is 0 or 1. */
     private View cornerShade(float x) {
@@ -1111,6 +1135,10 @@ public final class MainActivity extends CardActivity {
         // Home, which has its own line at the top.
         boolean withDate = !clean && !circular && (raised || date.getVisibility() != View.VISIBLE);
         boolean small = !clockInView || withDate || symbol != null;
+        // Before the return below: a switch to the clean Home with the pill as it was left the dark
+        // corner of the big clock on (seen by the user on the TV, 2026-11-10).
+        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
+        toneTopShade();
         // Called at every step of a scroll, and almost every step changes nothing.
         if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
@@ -1119,7 +1147,6 @@ public final class MainActivity extends CardActivity {
         pillSymbol = symbol;
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
-        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
         pillShade.animate().alpha(small ? 1 : 0).setDuration(PILL_MS).start();
         pillDate.setVisibility(withDate ? View.VISIBLE : View.GONE);
         pillTime.setVisibility(time);
@@ -2395,6 +2422,13 @@ public final class MainActivity extends CardActivity {
 
     /** The clean Home's selected app has no ring: it grows clearly instead, the user's choice of 2026-11-09. */
     private static final float CLEAN_FOCUS_SCALE = 1.3f;
+    private static final float CLEAN_SHADOW = 0.5f;
+
+    /**
+     * The clean Home's shadow at half: on a light picture it was too strong, and through the glass
+     * icons it darkens the whole card (the user's report of 2026-11-10).
+     */
+    @Override protected float shadowStrength() { return clean ? CLEAN_SHADOW : 1f; }
 
     @Override protected float focusScale() {
         if (clean) return CLEAN_FOCUS_SCALE;

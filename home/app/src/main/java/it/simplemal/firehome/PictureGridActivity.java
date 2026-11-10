@@ -1341,6 +1341,12 @@ public final class PictureGridActivity extends CardActivity {
 
     private boolean inList(View view) { return view != null && view.getParent() == list; }
 
+    /** A picture with no other under it in its column. */
+    private boolean lastInColumn(View view) {
+        int index = cells.indexOf(view);
+        return index >= 0 && index + COLUMNS >= cells.size();
+    }
+
     /** Right from the list: the switch, else the chosen picture, else the button under them. */
     private void enterRight() {
         Collection collection = collections.get(current);
@@ -1390,6 +1396,12 @@ public final class PictureGridActivity extends CardActivity {
                 }
                 return true;
             }
+        } else if (focused != null && code == KeyEvent.KEYCODE_DPAD_DOWN && lastInColumn(focused)) {
+            // Down from the last picture of a column: only the third reaches the delete button under
+            // it, the first two stay. Android found the list for them (the user's report of 2026-11-10).
+            boolean third = cells.indexOf(focused) % COLUMNS == COLUMNS - 1;
+            if (down && third && deleteSet.getVisibility() == View.VISIBLE) deleteSet.requestFocus();
+            return true;
         } else if (focused != null && code == towardList && down) {
             // Toward the list from the edge of the right side: back to the collection shown.
             View next = FocusFinder.getInstance().findNextFocus(root, focused, rtl ? View.FOCUS_RIGHT : View.FOCUS_LEFT);

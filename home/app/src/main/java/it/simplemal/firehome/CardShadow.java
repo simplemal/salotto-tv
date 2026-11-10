@@ -34,8 +34,11 @@ final class CardShadow extends Drawable {
     private final float raisedY;
     private final float scale;
     private float lift;
+    /** How dark, 1 as it was made: the clean Home asks for less. */
+    private final float strength;
 
-    CardShadow(int cardWidth, int cardHeight, int radius, float unit, float scale) {
+    CardShadow(int cardWidth, int cardHeight, int radius, float unit, float scale, float strength) {
+        this.strength = strength;
         this.cardWidth = cardWidth;
         this.cardHeight = cardHeight;
         this.scale = scale;
@@ -84,8 +87,8 @@ final class CardShadow extends Drawable {
     }
 
     @Override public void draw(Canvas canvas) {
-        drawOne(canvas, rest, restBlur, restX, restY, 1, 0.5f * (1 - lift));
-        drawOne(canvas, raised, raisedBlur, raisedX, raisedY, 1 + (scale - 1) * lift, 0.55f * lift);
+        drawOne(canvas, rest, restBlur, restX, restY, 1, 0.5f * strength * (1 - lift));
+        drawOne(canvas, raised, raisedBlur, raisedX, raisedY, 1 + (scale - 1) * lift, 0.55f * strength * lift);
     }
 
     @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); }
