@@ -1473,9 +1473,17 @@ public final class SettingsActivity extends CardActivity {
                 avStale = true;
                 if (!written) sayLong(getString(R.string.settings_fire_refused));
                 done.run();
+                // A new surround choice makes Fire OS turn the clearer dialogue and the even volume
+                // off and on again within half a second: read at once, they showed No (2026-11-10).
+                if (written && SURROUND.equals(id)) rows.postDelayed(() -> {
+                    if (isDestroyed()) return;
+                    avStale = true;
+                    refresh();
+                }, SURROUND_SETTLE_MS);
             });
         });
     }
+    private static final long SURROUND_SETTLE_MS = 2000;
 
     /** The choices close as soon as one is pressed; the page shows it once Fire OS has taken it. */
     private void showChoices(String title, String provider, String id, String[] actions, String[] names, String current) {
