@@ -318,6 +318,11 @@
     <string name="settings_wheel_motion">Ouverture et fermeture animées</string>
     <string name="settings_wheel_motion_text">L’app s’ouvre depuis un cercle de sa couleur qui s’agrandit, et au retour sur l’Accueil la couleur se referme dans le cercle. Encore à l’essai.</string>
     <string name="settings_app_edge">Contour des applis</string>
+    <string name="settings_icons">Icônes</string>
+    <string name="settings_icons_plain">Normales</string>
+    <string name="settings_icons_glass">Verre coloré</string>
+    <string name="settings_icons_glass_mono">Verre monochrome</string>
+    <string name="settings_icons_text">L’aspect des applis sur la Home : avec leurs images, ou en verre avec le logo en blanc.</string>
     <string name="settings_wheel_blur">Fond flou</string>
     <string name="settings_wheel_blur_text">Le fond derrière la roue est flou, pour que les apps, l’heure et la météo ressortent. Les scènes météo animées restent figées.</string>
     <string name="settings_time_group">Heure</string>

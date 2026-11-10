@@ -318,6 +318,11 @@
     <string name="settings_wheel_motion">Abertura e fechamento animados</string>
     <string name="settings_wheel_motion_text">O app abre a partir de um círculo da cor dele que cresce, e ao voltar para o Início a cor se fecha no círculo. Ainda em teste.</string>
     <string name="settings_app_edge">Borda nos apps</string>
+    <string name="settings_icons">Ícones</string>
+    <string name="settings_icons_plain">Normais</string>
+    <string name="settings_icons_glass">Vidro colorido</string>
+    <string name="settings_icons_glass_mono">Vidro monocromático</string>
+    <string name="settings_icons_text">Como os apps aparecem na Home: com as suas imagens, ou de vidro com o logo em branco.</string>
     <string name="settings_wheel_blur">Fundo desfocado</string>
     <string name="settings_wheel_blur_text">O fundo atrás da roda fica desfocado, assim os apps, a hora e o tempo se destacam. As cenas animadas do tempo ficam paradas.</string>
     <string name="settings_time_group">Hora</string>

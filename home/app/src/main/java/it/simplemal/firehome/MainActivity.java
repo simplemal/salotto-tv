@@ -216,6 +216,10 @@ public final class MainActivity extends CardActivity {
     private int columns;
     private int shelf;
     private int rowHeight;
+    /** From one row to the next when scrolling past the raised page: a row, and its gap on the clean Home. */
+    private int rowStep;
+    /** Rows whole on the page once the first row has climbed: past them the page scrolls row by row. */
+    private int rowsUp = 2;
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
     /**
@@ -227,6 +231,14 @@ public final class MainActivity extends CardActivity {
     private int style = -1;
     private ImageView networkButton;
     private static final int CLEAN_COLUMNS = 12;
+    /** Past the screen's edge by this much, the clean Home's next row, so not even its shadow shows. */
+    private static final int CLEAN_ROW_CLEAR = 8;
+    /**
+     * The clean Home resting low draws no row in the screen's last dp: with the first row climbed the
+     * fourth row's name keeps its distance from the edge, and the fifth row, starting there, stays
+     * out of sight (2026-11-10).
+     */
+    private static final int CLEAN_BOTTOM_CLEAR = 20;
     private static final int CLEAN_TILE = 56;
     private static final int CLEAN_GAP = 14;
     /** Where the first row stops once a lower one has the focus: under the line at the top. */
@@ -344,6 +356,21 @@ public final class MainActivity extends CardActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        // Opened by name, as the cover does after an update or the welcome when it ends, the Home was an
+        // ordinary page in a task of its own: Home pressed later from the settings made Android start a
+        // second one from nothing, two seconds of black with no loading on it (2026-11-10). Opened as
+        // the Home, it is the Home, and one already open is only brought back.
+        Intent asked = getIntent();
+        if (asked != null && !asked.hasCategory(Intent.CATEGORY_HOME)) {
+            // By package, not by name: named by Salotto itself the Home is an ordinary page again.
+            Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setPackage(getPackageName())
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | (asked.getFlags() & Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            if (asked.getExtras() != null) home.putExtras(asked.getExtras());
+            // Closing first: still open, this page was the one Android handed the Home back to.
+            finish();
+            startActivity(home);
+            return;
+        }
         // A backdrop that arrives while the Home is on screen shows at once.
         Packs.arrived = this::backdropArrived;
         TaskService.keysByDefault(this);
@@ -948,6 +975,10 @@ public final class MainActivity extends CardActivity {
     private void showPanel(boolean open) {
         if (open == panelOpen) return;
         panelOpen = open;
+        // Fading out, its tiles were still there for the arrows: Right pressed quickly past the settings
+        // went into them and opened it again, slowly it went down to the apps (2026-11-10). Only on the
+        // clean Home, where it was seen.
+        if (clean) panel.setDescendantFocusability(open ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
         // Closing, the tiles go quickly first and the row climbs only then: together they met on the
         // way (2026-11-09).
@@ -1687,6 +1718,19 @@ public final class MainActivity extends CardActivity {
         int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? middle
             : screen - dockHeight - rowGap - imageHeight / 3;
         panelRest = clean && appsOnly ? top - middle : -1;
+        // The clean Home with its first row low: the next rows wait on the next page, the user's choice of
+        // 2026-11-10. A third of the next row showed under the first, and with twelve apps that was only
+        // Tutte le app, cut by the screen's edge. Every row keeps that same distance from the one above.
+        boolean cleanLow = clean && !appsOnly && !Look.cleanRowMiddle(this);
+        int cleanGap = rowGap + imageHeight / 3 + dp(CLEAN_ROW_CLEAR);
+        // Past the second row the rows are as close as rows are, so that with the first row climbed
+        // three more fit whole under it: the user's request of 2026-11-10, after a fourth row showed cut
+        // at the bottom. With a gap there too, the fourth row's name, selected, reached the edge.
+        int laterGap = 0;
+        rowStep = rowHeight;
+        rowsUp = cleanLow ? 4 : 2;
+        int bottomClear = cleanLow ? dp(CLEAN_BOTTOM_CLEAR) : 0;
+        scroll.setPadding(0, 0, 0, bottomClear);
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
@@ -1708,6 +1752,8 @@ public final class MainActivity extends CardActivity {
                     dock = row;
                     // The clean Home's dock is only its row of apps: no glass under it.
                     dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
+                } else if (cleanLow) {
+                    ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = index == columns ? cleanGap : laterGap;
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }
@@ -1726,11 +1772,11 @@ public final class MainActivity extends CardActivity {
         }
         // At the bottom of the screen under the raised shelves; with many rows, past the last one.
         int rows = (count + columns - 1) / columns;
-        int cards = top + dockHeight + (rows > 1 ? rowGap + (rows - 1) * rowHeight : 0);
+        int cards = top + dockHeight + (rows <= 1 ? 0 : cleanLow ? cleanGap + rowHeight + (rows - 2) * rowStep : rowGap + (rows - 1) * rowHeight);
         LinearLayout.LayoutParams foot = new LinearLayout.LayoutParams(-2, -2);
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
-        foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
+        foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - bottomClear - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
         if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
@@ -2024,11 +2070,14 @@ public final class MainActivity extends CardActivity {
      * from the main thread the first time. Salotto's settings and Tutte le app are drawn here too.
      */
     private View squircleCard(LinearLayout row, String tag, int size) {
-        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag);
+        // As glass, the user's option: Salotto's own two keep their picture, they have no logo to take.
+        boolean glassy = Look.cleanGlass(this) && !ALL_APPS.equals(tag) && !HomeApps.SETTINGS.equals(tag);
+        boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO;
+        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
         int grown = Math.round(size * CLEAN_FOCUS_SCALE);
-        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "");
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2060,6 +2109,16 @@ public final class MainActivity extends CardActivity {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
             Background.draw(() -> {
+                Bitmap glass = glassy ? glassArt(tag, grown, mono) : null;
+                if (glass != null) {
+                    CIRCLE_ART.put(key, glass);
+                    runOnUiThread(() -> {
+                        image.setImageBitmap(glass);
+                        artComing--;
+                        artShown();
+                    });
+                    return;
+                }
                 Bitmap square = circleArt(tag, grown, true);
                 int colour = glowOf(square);
                 // The icon's own background, along its edge, where the line is drawn.
@@ -2076,6 +2135,13 @@ public final class MainActivity extends CardActivity {
             });
         }
         return tile;
+    }
+
+    /** The app as glass, see GlassIcon; null when its picture is a scene with no logo to take. */
+    private Bitmap glassArt(String tag, int size, boolean mono) {
+        Art art = art(tag);
+        if (art.image == null) return null;
+        return GlassIcon.make(art.image, art.back, art.look == BANNER, size, getResources().getDisplayMetrics().density, tag, mono);
     }
 
     /**
@@ -2149,8 +2215,7 @@ public final class MainActivity extends CardActivity {
     @Override protected void onCardFocus(View tile) {
         if (tile.getTag() instanceof String) lastApp = (String) tile.getTag();
         int index = page.indexOfChild((View) tile.getParent());
-        int rowsOnScreen = 2;
-        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsUp) * rowStep;
         // Back on the first row from the clean Home's control centre: the row climbs only once its
         // tiles are gone, from showPanel. Climbing now, it went up through them (2026-11-09).
         if (index == 0 && panelRest >= 0 && (panelOpen || SystemClock.uptimeMillis() < climbAt)) return;

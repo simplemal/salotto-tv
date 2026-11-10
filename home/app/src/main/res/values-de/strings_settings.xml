@@ -318,6 +318,11 @@
     <string name="settings_wheel_motion">Animiertes Öffnen und Schließen</string>
     <string name="settings_wheel_motion_text">Die App öffnet sich aus einem Kreis in ihrer Farbe, der wächst, und zurück auf Home schließt sich die Farbe wieder im Kreis. Noch im Test.</string>
     <string name="settings_app_edge">Rand um die Apps</string>
+    <string name="settings_icons">Symbole</string>
+    <string name="settings_icons_plain">Normal</string>
+    <string name="settings_icons_glass">Farbiges Glas</string>
+    <string name="settings_icons_glass_mono">Einfarbiges Glas</string>
+    <string name="settings_icons_text">Wie Apps auf der Home aussehen: mit ihren eigenen Bildern oder als Glas mit weißem Logo.</string>
     <string name="settings_wheel_blur">Unscharfer Hintergrund</string>
     <string name="settings_wheel_blur_text">Der Hintergrund hinter dem Rad ist unscharf, damit Apps, Uhrzeit und Wetter hervortreten. Animierte Wetterszenen stehen still.</string>
     <string name="settings_time_group">Uhrzeit</string>

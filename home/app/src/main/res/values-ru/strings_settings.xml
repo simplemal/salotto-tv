@@ -328,6 +328,11 @@
     <string name="settings_wheel_motion">Анимация открытия и закрытия</string>
     <string name="settings_wheel_motion_text">Приложение открывается из круга своего цвета, который расширяется, а при возврате на главный экран цвет снова сжимается в круг. Пока в тестировании.</string>
     <string name="settings_app_edge">Обводка приложений</string>
+    <string name="settings_icons">Значки</string>
+    <string name="settings_icons_plain">Обычные</string>
+    <string name="settings_icons_glass">Цветное стекло</string>
+    <string name="settings_icons_glass_mono">Монохромное стекло</string>
+    <string name="settings_icons_text">Как выглядят приложения на главном экране: со своими картинками или как стекло с белым логотипом.</string>
     <string name="settings_wheel_blur">Размытый фон</string>
     <string name="settings_wheel_blur_text">Фон за колесом размыт, чтобы приложения, время и погода выделялись. Анимированные сцены погоды показываются неподвижными.</string>
     <string name="settings_time_group">Время</string>
