@@ -318,6 +318,8 @@
     <string name="settings_wheel_motion">खोलने और बंद करने का एनिमेशन</string>
     <string name="settings_wheel_motion_text">ऐप अपने रंग के फैलते गोले से खुलता है, और होम पर लौटने पर रंग वापस गोले में सिमट जाता है। अभी परीक्षण में।</string>
     <string name="settings_app_edge">ऐप्स पर बॉर्डर</string>
+    <string name="settings_glass_apps">कांच जैसे ऐप्स</string>
+    <string name="settings_glass_apps_text">ऐप्स पारदर्शी कांच जैसे, सफ़ेद लोगो के साथ।</string>
     <string name="settings_wheel_blur">धुंधली पृष्ठभूमि</string>
     <string name="settings_wheel_blur_text">पहिए के पीछे की पृष्ठभूमि धुंधली होती है, ताकि ऐप, समय और मौसम उभरकर दिखें। मौसम के एनिमेटेड दृश्य स्थिर दिखते हैं।</string>
     <string name="settings_time_group">समय</string>

@@ -1092,6 +1092,12 @@ public final class SettingsActivity extends CardActivity {
                     Look.setCleanEdge(this, !edge);
                     refresh();
                 }));
+                boolean glass = Look.cleanGlass(this);
+                entries.add(new Entry(getString(R.string.settings_glass_apps), glass ? YES : NO, null,
+                    getString(R.string.settings_glass_apps_text), false, () -> {
+                        Look.setCleanGlass(this, !glass);
+                        refresh();
+                    }));
             }
         }
         boolean credits = Look.credits(this);

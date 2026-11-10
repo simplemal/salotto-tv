@@ -292,7 +292,7 @@ final class CircleArt {
     }
 
     /** A see-through picture is seen on the plain grey, as on the grid. */
-    private static void paint(Canvas canvas, Drawable image, Drawable back, int width, int height) {
+    static void paint(Canvas canvas, Drawable image, Drawable back, int width, int height) {
         canvas.drawColor(PLAIN);
         if (back != null) {
             back.setBounds(0, 0, width, height);

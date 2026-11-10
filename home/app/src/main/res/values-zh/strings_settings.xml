@@ -314,6 +314,8 @@
     <string name="settings_wheel_motion">打开和关闭动画</string>
     <string name="settings_wheel_motion_text">应用从一个自己颜色的圆圈扩展打开，回到主屏幕时颜色收回到圆圈里。仍在测试中。</string>
     <string name="settings_app_edge">应用边框</string>
+    <string name="settings_glass_apps">玻璃应用</string>
+    <string name="settings_glass_apps_text">应用显示为透明玻璃，标志为白色。</string>
     <string name="settings_wheel_blur">模糊背景</string>
     <string name="settings_wheel_blur_text">转盘后面的背景会被模糊，让应用、时间和天气更醒目。动态天气场景会显示为静止。</string>
     <string name="settings_time_group">时间</string>

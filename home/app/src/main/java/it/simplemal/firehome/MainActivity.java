@@ -2024,11 +2024,13 @@ public final class MainActivity extends CardActivity {
      * from the main thread the first time. Salotto's settings and Tutte le app are drawn here too.
      */
     private View squircleCard(LinearLayout row, String tag, int size) {
-        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag);
+        // As glass, the user's option: Salotto's own two keep their picture, they have no logo to take.
+        boolean glassy = Look.cleanGlass(this) && !ALL_APPS.equals(tag) && !HomeApps.SETTINGS.equals(tag);
+        boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
         int grown = Math.round(size * CLEAN_FOCUS_SCALE);
-        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "");
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? "/glass" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2060,6 +2062,16 @@ public final class MainActivity extends CardActivity {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
             Background.draw(() -> {
+                Bitmap glass = glassy ? glassArt(tag, grown) : null;
+                if (glass != null) {
+                    CIRCLE_ART.put(key, glass);
+                    runOnUiThread(() -> {
+                        image.setImageBitmap(glass);
+                        artComing--;
+                        artShown();
+                    });
+                    return;
+                }
                 Bitmap square = circleArt(tag, grown, true);
                 int colour = glowOf(square);
                 // The icon's own background, along its edge, where the line is drawn.
@@ -2076,6 +2088,13 @@ public final class MainActivity extends CardActivity {
             });
         }
         return tile;
+    }
+
+    /** The app as glass, see GlassIcon; null when its picture is a scene with no logo to take. */
+    private Bitmap glassArt(String tag, int size) {
+        Art art = art(tag);
+        if (art.image == null) return null;
+        return GlassIcon.make(art.image, art.back, art.look == BANNER, size, getResources().getDisplayMetrics().density, tag);
     }
 
     /**

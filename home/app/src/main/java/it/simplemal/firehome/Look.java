@@ -246,6 +246,9 @@ final class Look {
     /** The thin line in each app's colour along the clean Home's squircles: a choice, off at first (2026-11-09). */
     static boolean cleanEdge(Context context) { return prefs(context).getBoolean("clean_edge", false); }
     static void setCleanEdge(Context context, boolean on) { prefs(context).edit().putBoolean("clean_edge", on).apply(); }
+    /** The clean Home's apps as glass, off until chosen: the user's option of 2026-11-10. */
+    static boolean cleanGlass(Context context) { return prefs(context).getBoolean("clean_glass", false); }
+    static void setCleanGlass(Context context, boolean on) { prefs(context).edit().putBoolean("clean_glass", on).apply(); }
     /** How many circles of the wheel are in view: the lit one and one or two on each side. */
     static final int[] WHEEL_CHOICES = {3, 5};
     /** Five unless the user chose three: the user's choice of default, 2026-11-04. */
@@ -622,7 +625,7 @@ final class Look {
     static String cardsSignature(Context context) {
         // Where the clean Home's first row rests changes where its cards are built.
         return columns(context) + "/" + names(context) + "/" + homeStyle(context) + "/" + wheel(context)
-            + "/" + appsOnly(context) + "/" + cleanRowMiddle(context) + "/" + cleanEdge(context);
+            + "/" + appsOnly(context) + "/" + cleanRowMiddle(context) + "/" + cleanEdge(context) + "/" + cleanGlass(context);
     }
 
     /** Where the images of Personale are, sent from a phone or copied before that. */
