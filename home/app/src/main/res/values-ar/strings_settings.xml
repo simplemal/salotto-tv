@@ -342,6 +342,7 @@
     <string name="settings_icons_plain">عادية</string>
     <string name="settings_icons_glass">زجاج ملوّن</string>
     <string name="settings_icons_glass_mono">زجاج أحادي اللون</string>
+    <string name="settings_icons_logo">الشعار فقط</string>
     <string name="settings_icons_text">كيف تظهر التطبيقات على الشاشة الرئيسية: بصورها الخاصة أو كزجاج مع شعار أبيض.</string>
     <string name="settings_wheel_blur">خلفية ضبابية</string>
     <string name="settings_wheel_blur_text">تصبح الخلفية خلف العجلة ضبابية فتبرز التطبيقات والوقت والطقس. تظهر مشاهد الطقس المتحركة ثابتة.</string>

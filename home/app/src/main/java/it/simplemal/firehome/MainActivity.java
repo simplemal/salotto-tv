@@ -2132,7 +2132,10 @@ public final class MainActivity extends CardActivity {
         Bitmap shown = known != null ? known : squirclePlaceholder;
         View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null,
             ALL_APPS.equals(tag) ? GLASS : ICON, size, action, hold);
-        if (known == null) {
+        // Logo only: the white logo at rest, the glass tile on the selected app. Tutte le app too.
+        boolean bare = Look.cleanIcons(this) == Look.ICONS_LOGO && (glassy || ALL_APPS.equals(tag));
+        if (bare) bareTile(tile, tag, key, grown, mono);
+        else if (known == null) {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
             Background.draw(() -> {
@@ -2162,6 +2165,58 @@ public final class MainActivity extends CardActivity {
             });
         }
         return tile;
+    }
+
+    /** Logo only: the logo alone at rest, its glass tile and the shadow only while it has the focus. */
+    private void bareTile(View tile, String tag, String key, int grown, boolean mono) {
+        ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
+        Drawable shadow = tile.getBackground();
+        View.OnFocusChangeListener before = tile.getOnFocusChangeListener();
+        Bitmap[] both = {CIRCLE_ART.get(key), CIRCLE_ART.get(key + "/bare")};
+        if (ALL_APPS.equals(tag) && both[1] == null) {
+            both[1] = allAppsLogo(grown);
+            CIRCLE_ART.put(key + "/bare", both[1]);
+        }
+        Runnable show = () -> {
+            boolean focused = tile.hasFocus();
+            if (both[0] == null || both[1] == null) return;
+            image.setImageBitmap(focused ? both[0] : both[1]);
+            tile.setBackground(focused ? shadow : null);
+        };
+        tile.setOnFocusChangeListener((view, focused) -> {
+            if (before != null) before.onFocusChange(view, focused);
+            show.run();
+        });
+        if (both[0] != null && both[1] != null) {
+            show.run();
+            return;
+        }
+        image.setImageDrawable(null);
+        tile.setBackground(null);
+        artComing++;
+        Background.draw(() -> {
+            Art art = art(tag);
+            float density = getResources().getDisplayMetrics().density;
+            Bitmap glass = art.image == null ? null
+                : GlassIcon.make(art.image, art.back, art.look == BANNER, grown, density, tag, mono, false);
+            Bitmap logo = art.image == null ? null
+                : GlassIcon.make(art.image, art.back, art.look == BANNER, grown, density, tag, mono, true);
+            if (glass == null || logo == null) {
+                Bitmap square = circleArt(tag, grown, true);
+                glass = Squircle.cut(square);
+                square.recycle();
+                logo = glass;
+            }
+            both[0] = glass;
+            both[1] = logo;
+            CIRCLE_ART.put(key, glass);
+            CIRCLE_ART.put(key + "/bare", logo);
+            runOnUiThread(() -> {
+                show.run();
+                artComing--;
+                artShown();
+            });
+        });
     }
 
     /** The app as glass, see GlassIcon; null when its picture is a scene with no logo to take. */
@@ -2217,6 +2272,23 @@ public final class MainActivity extends CardActivity {
         Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
         icon.setTint(Color.WHITE);
         int inset = size * 3 / 10;
+        icon.setBounds(inset, inset, size - inset, size - inset);
+        icon.draw(canvas);
+        return made;
+    }
+
+    /** Tutte le app with the logo only: its icon in white over a soft shadow, as the apps' logos. */
+    private Bitmap allAppsLogo(int size) {
+        Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(made);
+        int inset = size * 3 / 10;
+        int drop = Math.max(1, Math.round(0.75f * getResources().getDisplayMetrics().density));
+        Drawable shade = getDrawable(R.drawable.ic_apps).mutate();
+        shade.setTint(Color.argb(90, 0, 0, 0));
+        shade.setBounds(inset, inset + drop, size - inset, size - inset + drop);
+        shade.draw(canvas);
+        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        icon.setTint(Color.WHITE);
         icon.setBounds(inset, inset, size - inset, size - inset);
         icon.draw(canvas);
         return made;

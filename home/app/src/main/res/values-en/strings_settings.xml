@@ -322,6 +322,7 @@
     <string name="settings_icons_plain">Normal</string>
     <string name="settings_icons_glass">Coloured glass</string>
     <string name="settings_icons_glass_mono">Monochrome glass</string>
+    <string name="settings_icons_logo">Logo only</string>
     <string name="settings_icons_text">How apps look on the Home: with their own pictures, or as glass with the logo in white.</string>
     <string name="settings_wheel_blur">Blurred backdrop</string>
     <string name="settings_wheel_blur_text">The backdrop behind the wheel is blurred, so apps, time and weather stand out. Animated weather scenes look still.</string>

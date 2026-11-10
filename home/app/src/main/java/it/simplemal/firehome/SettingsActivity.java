@@ -1203,7 +1203,7 @@ public final class SettingsActivity extends CardActivity {
     /** In the order of Look.ICONS_PLAIN, ICONS_GLASS, ICONS_GLASS_MONO. */
     private String[] iconsNames() {
         return new String[]{getString(R.string.settings_icons_plain), getString(R.string.settings_icons_glass),
-            getString(R.string.settings_icons_glass_mono)};
+            getString(R.string.settings_icons_glass_mono), getString(R.string.settings_icons_logo)};
     }
 
     private void showIcons() {

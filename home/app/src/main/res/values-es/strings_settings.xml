@@ -323,6 +323,7 @@
     <string name="settings_icons_plain">Normales</string>
     <string name="settings_icons_glass">Cristal de color</string>
     <string name="settings_icons_glass_mono">Cristal monocromo</string>
+    <string name="settings_icons_logo">Solo logo</string>
     <string name="settings_icons_text">Cómo se ven las apps en la Home: con sus imágenes o de cristal con el logo en blanco.</string>
     <string name="settings_wheel_blur">Fondo desenfocado</string>
     <string name="settings_wheel_blur_text">El fondo detrás de la rueda se desenfoca, así las apps, la hora y el tiempo resaltan. Las escenas animadas del tiempo se ven quietas.</string>
