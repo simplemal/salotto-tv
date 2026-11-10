@@ -53,6 +53,8 @@ final class GlassIcon {
     /** Groups closer than this are one colour. */
     private static final int LAYER_APART = 70;
     private static final int LAYER_SAMPLES = 6000;
+    /** Below this saturation a colour group is a grey. */
+    private static final float GREY = 0.25f;
 
     /**
      * The app's colour as a frame, the user's design of 2026-11-10: strongest just inside the edge,
@@ -406,7 +408,10 @@ final class GlassIcon {
             if (size[k] < LAYER_SHARE * used) continue;
             boolean merged = false;
             for (float[] other : kept) {
-                if (apart(other, centre[k]) < LAYER_APART * LAYER_APART) {
+                // Greys are one layer however far apart: HBO Max's letters shade from white to grey,
+                // and split in two they came out patchy on the TV (2026-11-10).
+                if (apart(other, centre[k]) < LAYER_APART * LAYER_APART
+                    || saturation(other) < GREY && saturation(centre[k]) < GREY) {
                     merged = true;
                     break;
                 }
@@ -444,6 +449,12 @@ final class GlassIcon {
         float dg = a[1] - b[1];
         float db = a[2] - b[2];
         return dr * dr + dg * dg + db * db;
+    }
+
+    private static float saturation(float[] c) {
+        float high = Math.max(c[0], Math.max(c[1], c[2]));
+        float low = Math.min(c[0], Math.min(c[1], c[2]));
+        return high <= 0 ? 0 : (high - low) / high;
     }
 
     private static float[] rgbOf(int pixel) { return new float[]{Color.red(pixel), Color.green(pixel), Color.blue(pixel)}; }
