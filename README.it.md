@@ -8,11 +8,13 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 
 ## Fire TV supportate
 
-- Fire TV Stick 4K 2ª generazione (2023)
-- Fire TV Stick 4K Max 2ª generazione (2023)
-- Fire TV Stick 4K Max 1ª generazione (2021), con alcune funzioni limitate
-- Fire TV Stick 3ª generazione (2020), con alcune funzioni limitate
-- Fire TV Stick Lite 1ª generazione (2020), con alcune funzioni limitate
+| Codice | Modello | Generazione | Anno | Funzioni |
+|---|---|---|---|---|
+| `AFTKM` | Fire TV Stick 4K | 2ª | 2023 | Tutte |
+| `AFTKRT` | Fire TV Stick 4K Max | 2ª | 2023 | Tutte |
+| `AFTKA` | Fire TV Stick 4K Max | 1ª | 2021 | Alcune limitate |
+| `AFTSSS` | Fire TV Stick | 3ª | 2020 | Alcune limitate |
+| `AFTSS` | Fire TV Stick Lite | 1ª | 2020 | Alcune limitate |
 
 ## Installazione
 
