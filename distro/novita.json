@@ -1,59 +1,59 @@
 {
-  "versionName": "1.1.1",
+  "versionName": "1.1.2",
   "changes": {
     "en": [
-      "Clean Home: normal or glass icons, coloured or monochrome",
-      "Clean Home: the rows after the first wait on the page below",
-      "The control center no longer reopens when pressing right quickly",
-      "No more black screen when pressing Home after an update or a language change"
+      "Settings with glass rows, more compact",
+      "Clean Home: dark veil at the top under time and weather, lighter app shadows",
+      "Clean Home: removed the dark corner at the top left",
+      "Backdrops: the down arrow no longer jumps to the list of collections"
     ],
     "es": [
-      "Home Limpia: iconos normales o de cristal, en color o monocromos",
-      "Home Limpia: las filas después de la primera esperan en la página de abajo",
-      "El centro de control ya no se vuelve a abrir al pulsar rápido a la derecha",
-      "Se acabó la pantalla negra al pulsar Home tras una actualización o un cambio de idioma"
+      "Ajustes con filas de cristal, más compactas",
+      "Home Limpia: velo oscuro arriba bajo la hora y el tiempo, sombras de las apps más suaves",
+      "Home Limpia: quitada la esquina oscura arriba a la izquierda",
+      "Fondos: la flecha abajo ya no salta a la lista de colecciones"
     ],
     "fr": [
-      "Accueil Épurée : icônes normales ou en verre, colorées ou monochromes",
-      "Accueil Épurée : les rangées après la première attendent sur la page suivante",
-      "Le centre de contrôle ne se rouvre plus en appuyant vite à droite",
-      "Plus d’écran noir en appuyant sur Accueil après une mise à jour ou un changement de langue"
+      "Réglages avec des rangées en verre, plus compactes",
+      "Accueil Épurée : voile sombre en haut sous l’heure et la météo, ombres des applis plus légères",
+      "Accueil Épurée : coin sombre en haut à gauche supprimé",
+      "Fonds : la flèche bas ne saute plus à la liste des collections"
     ],
     "de": [
-      "Home Schlicht: normale oder Glas-Symbole, farbig oder einfarbig",
-      "Home Schlicht: die Reihen nach der ersten warten auf der Seite darunter",
-      "Das Kontrollzentrum öffnet sich nicht mehr erneut, wenn man schnell nach rechts drückt",
-      "Kein schwarzer Bildschirm mehr beim Drücken von Home nach einem Update oder Sprachwechsel"
+      "Einstellungen mit Glaszeilen, kompakter",
+      "Home Schlicht: dunkler Schleier oben unter Uhrzeit und Wetter, leichtere Schatten der Apps",
+      "Home Schlicht: dunkle Ecke oben links entfernt",
+      "Hintergründe: Pfeil nach unten springt nicht mehr zur Liste der Sammlungen"
     ],
     "pt": [
-      "Home Limpa: ícones normais ou de vidro, coloridos ou monocromáticos",
-      "Home Limpa: as fileiras depois da primeira esperam na página de baixo",
-      "O centro de controle não reabre mais ao apertar rápido para a direita",
-      "Chega de tela preta ao apertar Home depois de uma atualização ou troca de idioma"
+      "Configurações com linhas de vidro, mais compactas",
+      "Home Limpa: véu escuro no topo sob a hora e o tempo, sombras dos apps mais leves",
+      "Home Limpa: removido o canto escuro no alto à esquerda",
+      "Fundos: a seta para baixo não pula mais para a lista de coleções"
     ],
     "ru": [
-      "Экран «Чистый»: обычные или стеклянные значки, цветные или монохромные",
-      "Экран «Чистый»: ряды после первого ждут на странице ниже",
-      "Центр управления больше не открывается снова при быстром нажатии вправо",
-      "Больше нет чёрного экрана при нажатии «Домой» после обновления или смены языка"
+      "Настройки со стеклянными строками, компактнее",
+      "Экран «Чистый»: тёмная вуаль сверху под временем и погодой, более лёгкие тени приложений",
+      "Экран «Чистый»: убран тёмный угол слева вверху",
+      "Фоны: стрелка вниз больше не перескакивает к списку коллекций"
     ],
     "ar": [
-      "الشاشة «نظيفة»: أيقونات عادية أو زجاجية، ملونة أو أحادية اللون",
-      "الشاشة «نظيفة»: الصفوف بعد الأول تنتظر في الصفحة التالية",
-      "مركز التحكم لم يعد يُفتح من جديد عند الضغط بسرعة إلى اليمين",
-      "لا شاشة سوداء بعد الآن عند الضغط على الرئيسية بعد تحديث أو تغيير اللغة"
+      "إعدادات بصفوف زجاجية وأكثر إحكامًا",
+      "الشاشة «نظيفة»: طبقة داكنة في الأعلى تحت الوقت والطقس، وظلال أخف للتطبيقات",
+      "الشاشة «نظيفة»: أُزيلت الزاوية الداكنة أعلى اليسار",
+      "الخلفيات: سهم الأسفل لم يعد يقفز إلى قائمة المجموعات"
     ],
     "hi": [
-      "साफ़ होम: सामान्य या ग्लास आइकन, रंगीन या एकरंगी",
-      "साफ़ होम: पहली पंक्ति के बाद की पंक्तियाँ नीचे वाले पेज पर रहती हैं",
-      "तेज़ी से दाईं ओर दबाने पर कंट्रोल सेंटर अब दोबारा नहीं खुलता",
-      "अपडेट या भाषा बदलने के बाद होम दबाने पर अब काली स्क्रीन नहीं"
+      "ग्लास पंक्तियों वाली, ज़्यादा सघन सेटिंग्स",
+      "साफ़ होम: ऊपर समय और मौसम के नीचे गहरी परत, ऐप्स की हल्की छाया",
+      "साफ़ होम: ऊपर बाईं ओर का गहरा कोना हटाया गया",
+      "बैकड्रॉप: नीचे वाला तीर अब संग्रहों की सूची पर नहीं जाता"
     ],
     "zh": [
-      "简洁主屏幕：普通或玻璃图标，彩色或单色",
-      "简洁主屏幕：第一排之后的应用排在下一页",
-      "快速向右按时，控制中心不再重新打开",
-      "更新或更改语言后按主页键不再出现黑屏"
+      "设置采用玻璃行，更紧凑",
+      "简洁主屏幕：顶部时间和天气下方有深色渐变，应用阴影更轻",
+      "简洁主屏幕：去掉了左上角的暗角",
+      "背景：向下键不再跳到合集列表"
     ]
   }
 }
