@@ -53,8 +53,9 @@ final class GlassIcon {
     private static final float LINE_DP = 0.5f;
     private static final float BAND_DP = 2f;
     private static final float BAND_SOFT_DP = 0.75f;
-    private static final float LINE_LIGHT = 235 / 255f;
-    private static final float BAND_LIGHT = 70 / 255f;
+    /** A little clearer than at first, the user's request of 2026-11-10. */
+    private static final float LINE_LIGHT = 190 / 255f;
+    private static final float BAND_LIGHT = 55 / 255f;
     /** The light comes from the top left. */
     private static final float LIGHT_X = -0.55f;
     private static final float LIGHT_Y = -0.83f;
