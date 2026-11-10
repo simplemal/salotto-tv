@@ -42,6 +42,9 @@ final class GlassIcon {
      */
     private static final Set<String> GLOW = new HashSet<>(Arrays.asList("com.nowtv.it"));
     private static final int GLOW_RAMP = 20;
+    /** Thin lines kept as a faint layer, and from how far from the background a pixel counts as line. */
+    private static final float FAINT_LINES = 0.22f;
+    private static final float LINE_FROM = 8;
     /**
      * A logo with white or grey parts and coloured parts keeps them as two layers, the user's request
      * of 2026-11-10: the white whole, the coloured clearer, so Aurora's A stays on its basket and
@@ -136,10 +139,10 @@ final class GlassIcon {
                 cut[y * cutWidth + x] = Math.round(alpha[(top + y) * width + left + x] * 255) << 24 | 0xFFFFFF;
             }
         }
-        Bitmap mark = Bitmap.createBitmap(cut, cutWidth, cutHeight, Bitmap.Config.ARGB_8888);
         float scale = Math.min(side * LOGO_WIDTH / cutWidth, side * LOGO_HEIGHT / cutHeight);
         int drawnWidth = Math.max(1, Math.round(cutWidth * scale));
         int drawnHeight = Math.max(1, Math.round(cutHeight * scale));
+        Bitmap mark = shrink(Bitmap.createBitmap(cut, cutWidth, cutHeight, Bitmap.Config.ARGB_8888), drawnWidth, drawnHeight);
         int drawnLeft = (side - drawnWidth) / 2;
         int drawnTop = (side - drawnHeight) / 2;
         float[] silhouette = alphaOf(side, canvas -> canvas.drawBitmap(mark, null,
@@ -289,6 +292,8 @@ final class GlassIcon {
         while (head < tail) {
             int index = queue[head++];
             found.alpha[index] = 0;
+            // Gone as background: no later step may take it back as a faint line.
+            found.distance[index] = 0;
             mark[index] = false;
             int x = index % width;
             int y = index / width;
@@ -304,8 +309,11 @@ final class GlassIcon {
     }
 
     /**
-     * Clears lines a pixel or two wide, as the grid behind Amazon Games' robot: what does not survive
-     * shrinking the logo by a pixel and growing it back. Its soft rim stays with what remains.
+     * Lines a pixel or two wide, as the grid behind Amazon Games' robot, become one faint even layer:
+     * what does not survive shrinking the logo by a pixel and growing it back. Cleared, they left nicks
+     * where they met the robot; kept whole, the robot shrank inside the grid and the nicks were hidden,
+     * the user's choice of 2026-11-10. Their clearness follows how much of each pixel is line, so
+     * every line weighs the same: by the logo's own rule some came out whole and some nearly gone.
      */
     private static void dropThinLines(Found found, boolean[] mark, int width, int height) {
         boolean[] solid = new boolean[mark.length];
@@ -321,10 +329,55 @@ final class GlassIcon {
             }
         }
         boolean[] kept = grow(shrunk, width, height);
+        // The lines' crossings are thick enough to stay: tiny bits apart are line too.
+        dropSmall(kept, width, height);
         boolean[] rim = grow(kept, width, height);
+        // How far from the background a pixel wholly line is: most line pixels are below it.
+        float[] lineFar = new float[mark.length];
+        int lines = 0;
         for (int index = 0; index < mark.length; index++) {
-            if (!kept[index]) mark[index] = false;
-            if (!rim[index]) found.alpha[index] = 0;
+            if (!rim[index] && found.distance[index] > CUT_CLEAR) lineFar[lines++] = found.distance[index];
+        }
+        if (lines == 0) return;
+        Arrays.sort(lineFar, 0, lines);
+        float line = Math.max(1, lineFar[Math.min(lines - 1, Math.round(lines * 0.9f))]);
+        for (int index = 0; index < mark.length; index++) {
+            if (rim[index]) continue;
+            float far = found.distance[index];
+            found.alpha[index] = far > LINE_FROM ? FAINT_LINES * clamp(far / line) : 0;
+        }
+    }
+
+    /** Clears the bits of `kept` smaller than CRUMB of all of it. */
+    private static void dropSmall(boolean[] kept, int width, int height) {
+        int total = 0;
+        for (boolean on : kept) if (on) total++;
+        int smallest = Math.max(1, Math.round(total * CRUMB));
+        boolean[] seen = new boolean[kept.length];
+        int[] queue = new int[kept.length];
+        for (int first = 0; first < kept.length; first++) {
+            if (!kept[first] || seen[first]) continue;
+            int tail = 0;
+            seen[first] = true;
+            queue[tail++] = first;
+            for (int head = 0; head < tail; head++) {
+                int index = queue[head];
+                int x = index % width;
+                int y = index / width;
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+                        int next = ny * width + nx;
+                        if (!kept[next] || seen[next]) continue;
+                        seen[next] = true;
+                        queue[tail++] = next;
+                    }
+                }
+            }
+            if (tail >= smallest) continue;
+            for (int at = 0; at < tail; at++) kept[queue[at]] = false;
         }
     }
 
@@ -533,6 +586,22 @@ final class GlassIcon {
     }
 
     private static float[] rgbOf(int pixel) { return new float[]{Color.red(pixel), Color.green(pixel), Color.blue(pixel)}; }
+
+    /**
+     * Made smaller by halves first, each an average of four pixels, then to the size: in one step the
+     * filter skips pixels, and thin lines of the same width came out of different strength.
+     */
+    private static Bitmap shrink(Bitmap picture, int width, int height) {
+        while (picture.getWidth() / 2 >= width && picture.getHeight() / 2 >= height) {
+            Bitmap half = Bitmap.createScaledBitmap(picture, picture.getWidth() / 2, picture.getHeight() / 2, true);
+            picture.recycle();
+            picture = half;
+        }
+        if (picture.getWidth() == width && picture.getHeight() == height) return picture;
+        Bitmap sized = Bitmap.createScaledBitmap(picture, width, height, true);
+        picture.recycle();
+        return sized;
+    }
 
     /** One layer over what is there, with the colours not premultiplied. */
     private static void over(float[] pixel, float red, float green, float blue, float alpha) {
