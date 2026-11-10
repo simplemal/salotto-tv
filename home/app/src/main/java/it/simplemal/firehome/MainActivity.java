@@ -1111,6 +1111,9 @@ public final class MainActivity extends CardActivity {
         // Home, which has its own line at the top.
         boolean withDate = !clean && !circular && (raised || date.getVisibility() != View.VISIBLE);
         boolean small = !clockInView || withDate || symbol != null;
+        // Before the return below: a switch to the clean Home with the pill as it was left the dark
+        // corner of the big clock on (seen by the user on the TV, 2026-11-10).
+        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
         // Called at every step of a scroll, and almost every step changes nothing.
         if (pillDrawn && clockInView == pillClock && withDate == pillWithDate && Objects.equals(symbol, pillSymbol)) return;
         pillDrawn = true;
@@ -1119,7 +1122,6 @@ public final class MainActivity extends CardActivity {
         pillSymbol = symbol;
         animatePill();
         int time = clockInView ? View.GONE : View.VISIBLE;
-        clockShade.setVisibility(bigClock && !clean ? View.VISIBLE : View.GONE);
         pillShade.animate().alpha(small ? 1 : 0).setDuration(PILL_MS).start();
         pillDate.setVisibility(withDate ? View.VISIBLE : View.GONE);
         pillTime.setVisibility(time);
