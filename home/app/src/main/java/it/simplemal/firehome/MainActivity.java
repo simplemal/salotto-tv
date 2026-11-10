@@ -2099,7 +2099,8 @@ public final class MainActivity extends CardActivity {
     private View squircleCard(LinearLayout row, String tag, int size) {
         // As glass, the user's option: Salotto's own two keep their picture, they have no logo to take.
         boolean glassy = Look.cleanGlass(this) && !ALL_APPS.equals(tag) && !HomeApps.SETTINGS.equals(tag);
-        boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO;
+        // Logo only shows the monochrome tile on the selected app, never its colour (the user, 2026-11-10).
+        boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO || Look.cleanIcons(this) == Look.ICONS_LOGO;
         boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
