@@ -356,6 +356,21 @@ public final class MainActivity extends CardActivity {
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
+        // Opened by name, as the cover does after an update or the welcome when it ends, the Home was an
+        // ordinary page in a task of its own: Home pressed later from the settings made Android start a
+        // second one from nothing, two seconds of black with no loading on it (2026-11-10). Opened as
+        // the Home, it is the Home, and one already open is only brought back.
+        Intent asked = getIntent();
+        if (asked != null && !asked.hasCategory(Intent.CATEGORY_HOME)) {
+            // By package, not by name: named by Salotto itself the Home is an ordinary page again.
+            Intent home = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).setPackage(getPackageName())
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | (asked.getFlags() & Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            if (asked.getExtras() != null) home.putExtras(asked.getExtras());
+            // Closing first: still open, this page was the one Android handed the Home back to.
+            finish();
+            startActivity(home);
+            return;
+        }
         // A backdrop that arrives while the Home is on screen shows at once.
         Packs.arrived = this::backdropArrived;
         TaskService.keysByDefault(this);
