@@ -2053,11 +2053,12 @@ public final class MainActivity extends CardActivity {
     private View squircleCard(LinearLayout row, String tag, int size) {
         // As glass, the user's option: Salotto's own two keep their picture, they have no logo to take.
         boolean glassy = Look.cleanGlass(this) && !ALL_APPS.equals(tag) && !HomeApps.SETTINGS.equals(tag);
+        boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO;
         boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
         int grown = Math.round(size * CLEAN_FOCUS_SCALE);
-        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? "/glass" : "");
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2089,7 +2090,7 @@ public final class MainActivity extends CardActivity {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
             artComing++;
             Background.draw(() -> {
-                Bitmap glass = glassy ? glassArt(tag, grown) : null;
+                Bitmap glass = glassy ? glassArt(tag, grown, mono) : null;
                 if (glass != null) {
                     CIRCLE_ART.put(key, glass);
                     runOnUiThread(() -> {
@@ -2118,10 +2119,10 @@ public final class MainActivity extends CardActivity {
     }
 
     /** The app as glass, see GlassIcon; null when its picture is a scene with no logo to take. */
-    private Bitmap glassArt(String tag, int size) {
+    private Bitmap glassArt(String tag, int size, boolean mono) {
         Art art = art(tag);
         if (art.image == null) return null;
-        return GlassIcon.make(art.image, art.back, art.look == BANNER, size, getResources().getDisplayMetrics().density, tag);
+        return GlassIcon.make(art.image, art.back, art.look == BANNER, size, getResources().getDisplayMetrics().density, tag, mono);
     }
 
     /**

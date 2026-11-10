@@ -1092,12 +1092,8 @@ public final class SettingsActivity extends CardActivity {
                     Look.setCleanEdge(this, !edge);
                     refresh();
                 }));
-                boolean glass = Look.cleanGlass(this);
-                entries.add(new Entry(getString(R.string.settings_glass_apps), glass ? YES : NO, null,
-                    getString(R.string.settings_glass_apps_text), false, () -> {
-                        Look.setCleanGlass(this, !glass);
-                        refresh();
-                    }));
+                entries.add(new Entry(getString(R.string.settings_icons), iconsNames()[Look.cleanIcons(this)], null, null, true,
+                    () -> enter(this::showIcons)));
             }
         }
         boolean credits = Look.credits(this);
@@ -1199,6 +1195,20 @@ public final class SettingsActivity extends CardActivity {
         show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 0 : 1, R.drawable.ic_s_grid,
             getString(R.string.settings_dock_text), index -> {
                 Look.setAppsOnly(this, index == 0);
+                refresh();
+            }));
+    }
+
+    /** In the order of Look.ICONS_PLAIN, ICONS_GLASS, ICONS_GLASS_MONO. */
+    private String[] iconsNames() {
+        return new String[]{getString(R.string.settings_icons_plain), getString(R.string.settings_icons_glass),
+            getString(R.string.settings_icons_glass_mono)};
+    }
+
+    private void showIcons() {
+        show(getString(R.string.settings_icons), choices(iconsNames(), Look.cleanIcons(this), R.drawable.ic_apps,
+            getString(R.string.settings_icons_text), index -> {
+                Look.setCleanIcons(this, index);
                 refresh();
             }));
     }

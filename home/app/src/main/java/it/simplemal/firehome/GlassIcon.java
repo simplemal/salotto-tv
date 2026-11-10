@@ -87,11 +87,13 @@ final class GlassIcon {
      * looked too alike.
      */
     private static final float VEIL_LIGHTNESS = 0.21f;
+    /** Monochrome glass, the user's third choice of 2026-11-10: no colour at all, as dark as RaiPlay's. */
+    private static final float[] MONO = {VEIL_LIGHTNESS, VEIL_LIGHTNESS, VEIL_LIGHTNESS};
 
     private GlassIcon() {}
 
     /** Null when the picture has no logo to take, a scene: the app keeps its usual squircle. */
-    static Bitmap make(Drawable image, Drawable back, boolean wide, int side, float density, String pkg) {
+    static Bitmap make(Drawable image, Drawable back, boolean wide, int side, float density, String pkg, boolean mono) {
         int width = SAMPLE;
         int height = wide ? SAMPLE * 9 / 16 : SAMPLE;
         Bitmap sample = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -122,7 +124,7 @@ final class GlassIcon {
         int top = found.top;
         int right = found.right;
         int bottom = found.bottom;
-        float[] colour = darkened(colour(pixels, edge, distance, start));
+        float[] colour = mono ? MONO.clone() : darkened(colour(pixels, edge, distance, start));
         layer(pixels, alpha, found.mark, width, height, left, top, right, bottom);
 
         // The logo, white, fitted in the middle.

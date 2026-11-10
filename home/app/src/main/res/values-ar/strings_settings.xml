@@ -338,8 +338,11 @@
     <string name="settings_wheel_motion">حركة الفتح والإغلاق</string>
     <string name="settings_wheel_motion_text">يُفتح التطبيق من دائرة بلونه تتسع، وعند العودة إلى الرئيسية ينغلق اللون في الدائرة. ما زالت قيد التجربة.</string>
     <string name="settings_app_edge">إطار حول التطبيقات</string>
-    <string name="settings_glass_apps">تطبيقات زجاجية</string>
-    <string name="settings_glass_apps_text">التطبيقات كزجاج شفاف، مع الشعار باللون الأبيض.</string>
+    <string name="settings_icons">الأيقونات</string>
+    <string name="settings_icons_plain">عادية</string>
+    <string name="settings_icons_glass">زجاج ملوّن</string>
+    <string name="settings_icons_glass_mono">زجاج أحادي اللون</string>
+    <string name="settings_icons_text">كيف تظهر التطبيقات على الشاشة الرئيسية: بصورها الخاصة أو كزجاج مع شعار أبيض.</string>
     <string name="settings_wheel_blur">خلفية ضبابية</string>
     <string name="settings_wheel_blur_text">تصبح الخلفية خلف العجلة ضبابية فتبرز التطبيقات والوقت والطقس. تظهر مشاهد الطقس المتحركة ثابتة.</string>
     <string name="settings_time_group">الوقت</string>
