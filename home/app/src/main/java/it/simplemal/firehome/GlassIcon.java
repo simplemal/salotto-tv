@@ -32,6 +32,11 @@ final class GlassIcon {
     /** Past this share of logo the picture is a scene: there is no silhouette to take. */
     private static final float SCENE = 0.6f;
     /**
+     * A logo found whole has most of its pixels inside its strokes: every app tried has 70% or more.
+     * Below this only its rim was found.
+     */
+    private static final float SOLID = 0.3f;
+    /**
      * Apps whose picture has a glow around the logo, as NOW's O: only the brightest part is the logo,
      * found by Otsu's split. Not a rule for all: it cut HBO Max's and Apple TV's shaded letters.
      */
@@ -75,30 +80,23 @@ final class GlassIcon {
         sample.recycle();
 
         int[] edge = edgeColours(pixels, width, height);
-        float[] distance = new float[pixels.length];
-        for (int index = 0; index < pixels.length; index++) distance[index] = nearest(pixels[index], edge);
         boolean glow = GLOW.contains(pkg);
-        float start = glow ? otsu(distance, NEAR) : NEAR;
-        float[] alpha = new float[pixels.length];
-        int left = width;
-        int top = height;
-        int right = -1;
-        int bottom = -1;
-        int logo = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int index = y * width + x;
-                float far = distance[index];
-                alpha[index] = glow ? clamp((far - start) / GLOW_RAMP) : clamp((far - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR));
-                if (far <= start) continue;
-                logo++;
-                left = Math.min(left, x);
-                right = Math.max(right, x + 1);
-                top = Math.min(top, y);
-                bottom = Math.max(bottom, y + 1);
-            }
+        Found found = find(pixels, width, height, edge, glow, false);
+        // Only the rim of a logo found: a colour of the logo is also along the edges, as the white band
+        // under Amazon miniTV's pink (2026-11-10). Then only the colour most of the edge has is
+        // background, and what that leaves touching the edges, the band, goes with it.
+        if (found != null && found.core < SOLID) {
+            edge = mostOfEdge(edge);
+            found = find(pixels, width, height, edge, glow, true);
         }
-        if (right < 0 || logo > SCENE * width * height) return null;
+        if (found == null || found.core < SOLID) return null;
+        float[] alpha = found.alpha;
+        float[] distance = found.distance;
+        float start = found.start;
+        int left = found.left;
+        int top = found.top;
+        int right = found.right;
+        int bottom = found.bottom;
         float[] colour = colour(pixels, edge, distance, start);
 
         // The logo, white, fitted in the middle.
@@ -176,6 +174,117 @@ final class GlassIcon {
         Bitmap glass = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888);
         glass.setPixels(made, 0, side, 0, 0, side, side);
         return glass;
+    }
+
+    /** The logo found in a picture: how much of each pixel is logo, where it is, how solid. */
+    private static final class Found {
+        float[] alpha;
+        float[] distance;
+        float start;
+        int left;
+        int top;
+        int right;
+        int bottom;
+        /** The share of the logo whose pixels and their four neighbours are whole: low for a bare rim. */
+        float core;
+    }
+
+    /** Null for no logo, or a scene. `dropEdges`: logo touching the picture's edges is background. */
+    private static Found find(int[] pixels, int width, int height, int[] edge, boolean glow, boolean dropEdges) {
+        Found found = new Found();
+        found.distance = new float[pixels.length];
+        for (int index = 0; index < pixels.length; index++) found.distance[index] = nearest(pixels[index], edge);
+        found.start = glow ? otsu(found.distance, NEAR) : NEAR;
+        found.alpha = new float[pixels.length];
+        boolean[] mark = new boolean[pixels.length];
+        for (int index = 0; index < pixels.length; index++) {
+            float far = found.distance[index];
+            found.alpha[index] = glow ? clamp((far - found.start) / GLOW_RAMP) : clamp((far - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR));
+            mark[index] = far > found.start;
+        }
+        if (dropEdges) dropTouchingEdges(found, mark, width, height);
+        found.left = width;
+        found.top = height;
+        found.right = -1;
+        found.bottom = -1;
+        int logo = 0;
+        int core = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int index = y * width + x;
+                if (!mark[index]) continue;
+                logo++;
+                found.left = Math.min(found.left, x);
+                found.right = Math.max(found.right, x + 1);
+                found.top = Math.min(found.top, y);
+                found.bottom = Math.max(found.bottom, y + 1);
+                if (x > 0 && y > 0 && x < width - 1 && y < height - 1 && whole(found.alpha, index)
+                    && whole(found.alpha, index - 1) && whole(found.alpha, index + 1)
+                    && whole(found.alpha, index - width) && whole(found.alpha, index + width)) core++;
+            }
+        }
+        if (found.right < 0 || logo > SCENE * width * height) return null;
+        found.core = core / (float) logo;
+        return found;
+    }
+
+    private static boolean whole(float[] alpha, int index) { return alpha[index] >= 0.95f; }
+
+    /** Clears the logo found touching the picture's edges, and all of it joined to them. */
+    private static void dropTouchingEdges(Found found, boolean[] mark, int width, int height) {
+        int[] queue = new int[mark.length];
+        int head = 0;
+        int tail = 0;
+        for (int x = 0; x < width; x++) {
+            tail = seed(mark, x, queue, tail);
+            tail = seed(mark, (height - 1) * width + x, queue, tail);
+        }
+        for (int y = 0; y < height; y++) {
+            tail = seed(mark, y * width, queue, tail);
+            tail = seed(mark, y * width + width - 1, queue, tail);
+        }
+        while (head < tail) {
+            int index = queue[head++];
+            found.alpha[index] = 0;
+            int x = index % width;
+            int y = index / width;
+            if (x > 0) tail = seed(mark, index - 1, queue, tail);
+            if (x < width - 1) tail = seed(mark, index + 1, queue, tail);
+            if (y > 0) tail = seed(mark, index - width, queue, tail);
+            if (y < height - 1) tail = seed(mark, index + width, queue, tail);
+        }
+    }
+
+    private static int seed(boolean[] mark, int index, int[] queue, int tail) {
+        if (!mark[index]) return tail;
+        mark[index] = false;
+        queue[tail] = index;
+        return tail + 1;
+    }
+
+    /** The edge colours near the one most of the edge is close to. */
+    private static int[] mostOfEdge(int[] edge) {
+        int best = 0;
+        int bestCount = -1;
+        for (int i = 0; i < edge.length; i++) {
+            int count = 0;
+            for (int other : edge) if (squared(edge[i], other) <= NEAR * NEAR) count++;
+            if (count > bestCount) {
+                bestCount = count;
+                best = i;
+            }
+        }
+        int[] kept = new int[bestCount];
+        int at = 0;
+        for (int colour : edge) if (squared(edge[best], colour) <= NEAR * NEAR) kept[at++] = colour;
+        return kept;
+    }
+
+    private static int squared(int a, int b) {
+        int dr = Color.red(a) - Color.red(b);
+        int dg = Color.green(a) - Color.green(b);
+        int db = Color.blue(a) - Color.blue(b);
+        return dr * dr + dg * dg + db * db;
     }
 
     /** One layer over what is there, with the colours not premultiplied. */
