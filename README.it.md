@@ -3,7 +3,7 @@
 <p align="center"><a href="README.md">English</a> · <b>Italiano</b></p>
 
 <p align="center"><br><img src="distro/docs/immagini/home-pulita-logo.webp" alt="Home Pulita" width="100%"></p>
-<p align="center"><sub>Home Pulita: le app in una fila, con l'orario e il meteo in alto. Qui con Icone › Solo logo.</sub></p>
+<p align="center"><sub>Home Pulita con Icone › Solo logo: le app sono loghi bianchi e quella selezionata ha la sua tile di vetro. Orario, data, Centro di controllo e meteo stanno in una riga in alto.</sub></p>
 
 Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. Niente pubblicità, niente contenuti consigliati e niente video automatici.
 
@@ -43,10 +43,10 @@ Salotto si collega solo a Open-Meteo per il meteo e a GitHub per gli aggiornamen
 ## Com'è
 
 <p align="center"><img src="distro/docs/immagini/home-circolare.webp" alt="Home Circolare" width="100%"></p>
-<p align="center"><sub>Home Circolare: le app su una ruota che gira con le frecce.</sub></p>
+<p align="center"><sub>Home Circolare con Semicerchio › 5 app e Sfocatura dello sfondo: le app su una ruota che gira con le frecce, quella accesa più grande in alto, con l'orario grande e le previsioni dei prossimi giorni.</sub></p>
 
 <p align="center"><img src="distro/docs/immagini/home.webp" alt="Home Vetro" width="100%"></p>
-<p align="center"><sub>Home Vetro: le app in una griglia, sotto l'orario grande e il meteo.</sub></p>
+<p align="center"><sub>Home Vetro: le app in una griglia di vetro, la prima fila sotto l'orario grande e il meteo di oggi e di domani.</sub></p>
 
 <p align="center"><img src="distro/docs/immagini/impostazioni-home.webp" alt="Impostazioni" width="100%"></p>
 <p align="center"><sub>Impostazioni › Home: qui si sceglie la disposizione, Pulita, Circolare o Vetro, insieme a sfondo e icone.</sub></p>

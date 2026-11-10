@@ -3,7 +3,7 @@
 <p align="center"><b>English</b> · <a href="README.it.md">Italiano</a></p>
 
 <p align="center"><br><img src="distro/docs/immagini/home-pulita-logo.webp" alt="Clean Home" width="100%"></p>
-<p align="center"><sub>Clean Home: the apps in one row, with the time and the weather at the top. Here with Icons › Logo only.</sub></p>
+<p align="center"><sub>Clean Home with Icons › Logo only: the apps are white logos, and the selected one has its glass tile. Time, date, control center and weather sit in one line at the top.</sub></p>
 
 A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weather. No ads, no recommended content and no autoplaying videos.
 
@@ -43,10 +43,10 @@ Salotto connects only to Open-Meteo for the weather and to GitHub for updates. N
 ## How it looks
 
 <p align="center"><img src="distro/docs/immagini/home-circolare.webp" alt="Circular Home" width="100%"></p>
-<p align="center"><sub>Circular Home: the apps on a wheel that turns with the arrows.</sub></p>
+<p align="center"><sub>Circular Home with Half circle › 5 apps and Blurred backdrop: the apps on a wheel that turns with the arrows, the lit one bigger at the top, with the large time and the next days' forecast.</sub></p>
 
 <p align="center"><img src="distro/docs/immagini/home.webp" alt="Glass Home" width="100%"></p>
-<p align="center"><sub>Glass Home: the apps in a grid, under the large time and the weather.</sub></p>
+<p align="center"><sub>Glass Home: the apps in a grid of glass, the first row under the large time and the weather for today and tomorrow.</sub></p>
 
 <p align="center"><img src="distro/docs/immagini/impostazioni-home.webp" alt="Settings" width="100%"></p>
 <p align="center"><sub>Settings › Home: here you choose the layout, Clean, Circular or Glass, together with the backdrop and the icons.</sub></p>
