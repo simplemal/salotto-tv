@@ -216,6 +216,8 @@ public final class MainActivity extends CardActivity {
     private int columns;
     private int shelf;
     private int rowHeight;
+    /** From one row to the next when scrolling: a row, and on the clean Home resting low its gap too. */
+    private int rowStep;
     /** The Home as a wheel of circles: ora e meteo in the top corners, the credits at the bottom. */
     private boolean circular;
     /**
@@ -227,6 +229,8 @@ public final class MainActivity extends CardActivity {
     private int style = -1;
     private ImageView networkButton;
     private static final int CLEAN_COLUMNS = 12;
+    /** Past the screen's edge by this much, the clean Home's next row, so not even its shadow shows. */
+    private static final int CLEAN_ROW_CLEAR = 8;
     private static final int CLEAN_TILE = 56;
     private static final int CLEAN_GAP = 14;
     /** Where the first row stops once a lower one has the focus: under the line at the top. */
@@ -1687,6 +1691,12 @@ public final class MainActivity extends CardActivity {
         int top = clean && Look.cleanRowMiddle(this) && !appsOnly ? middle
             : screen - dockHeight - rowGap - imageHeight / 3;
         panelRest = clean && appsOnly ? top - middle : -1;
+        // The clean Home with its first row low: the next rows wait on the next page, the user's choice of
+        // 2026-11-10. A third of the next row showed under the first, and with twelve apps that was only
+        // Tutte le app, cut by the screen's edge. Every row keeps that same distance from the one above.
+        boolean cleanLow = clean && !appsOnly && !Look.cleanRowMiddle(this);
+        int cleanGap = rowGap + imageHeight / 3 + dp(CLEAN_ROW_CLEAR);
+        rowStep = rowHeight + (cleanLow ? cleanGap : 0);
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
@@ -1708,6 +1718,8 @@ public final class MainActivity extends CardActivity {
                     dock = row;
                     // The clean Home's dock is only its row of apps: no glass under it.
                     dock.setBackground(clean ? null : dockGlass(dp(26), Look.weatherBackdrop(this)));
+                } else if (cleanLow) {
+                    ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = cleanGap;
                 } else if (index == columns) {
                     ((LinearLayout.LayoutParams) row.getLayoutParams()).topMargin = rowGap;
                 }
@@ -1726,7 +1738,7 @@ public final class MainActivity extends CardActivity {
         }
         // At the bottom of the screen under the raised shelves; with many rows, past the last one.
         int rows = (count + columns - 1) / columns;
-        int cards = top + dockHeight + (rows > 1 ? rowGap + (rows - 1) * rowHeight : 0);
+        int cards = top + dockHeight + (rows <= 1 ? 0 : cleanLow ? (rows - 1) * rowStep : rowGap + (rows - 1) * rowHeight);
         LinearLayout.LayoutParams foot = new LinearLayout.LayoutParams(-2, -2);
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
@@ -2169,7 +2181,7 @@ public final class MainActivity extends CardActivity {
         if (tile.getTag() instanceof String) lastApp = (String) tile.getTag();
         int index = page.indexOfChild((View) tile.getParent());
         int rowsOnScreen = 2;
-        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowHeight;
+        int target = index == 0 ? (appsOnly ? shelf : 0) : shelf + Math.max(0, index - rowsOnScreen) * rowStep;
         // Back on the first row from the clean Home's control centre: the row climbs only once its
         // tiles are gone, from showPanel. Climbing now, it went up through them (2026-11-09).
         if (index == 0 && panelRest >= 0 && (panelOpen || SystemClock.uptimeMillis() < climbAt)) return;
