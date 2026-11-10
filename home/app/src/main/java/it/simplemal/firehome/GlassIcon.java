@@ -45,6 +45,7 @@ final class GlassIcon {
     /** Thin lines kept as a faint layer, and from how far from the background a pixel counts as line. */
     private static final float FAINT_LINES = 0.22f;
     private static final float LINE_FROM = 8;
+    private static final float FAINT_IN_BOX = 0.05f;
     /**
      * A logo with white or grey parts and coloured parts keeps them as two layers, the user's request
      * of 2026-11-10: the white whole, the coloured clearer, so Aurora's A stays on its basket and
@@ -251,7 +252,16 @@ final class GlassIcon {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int index = y * width + x;
-                if (!mark[index]) continue;
+                if (!mark[index]) {
+                    // The faint lines kept as a layer are inside the box, or they would be cut.
+                    if (dropThin && found.alpha[index] >= FAINT_IN_BOX) {
+                        found.left = Math.min(found.left, x);
+                        found.right = Math.max(found.right, x + 1);
+                        found.top = Math.min(found.top, y);
+                        found.bottom = Math.max(found.bottom, y + 1);
+                    }
+                    continue;
+                }
                 logo++;
                 found.left = Math.min(found.left, x);
                 found.right = Math.max(found.right, x + 1);
@@ -262,7 +272,7 @@ final class GlassIcon {
                     && whole(found.alpha, index - width) && whole(found.alpha, index + width)) core++;
             }
         }
-        if (found.right < 0) return null;
+        if (found.right < 0 || logo == 0) return null;
         found.scene = logo > SCENE * width * height;
         found.core = core / (float) logo;
         found.mark = mark;
@@ -345,6 +355,9 @@ final class GlassIcon {
             if (rim[index]) continue;
             float far = found.distance[index];
             found.alpha[index] = far > LINE_FROM ? FAINT_LINES * clamp(far / line) : 0;
+            // A layer, not logo: the crumbs step would clear its bits, and it is no part of the logo's
+            // solidity. The logo's box takes it in all the same, see find.
+            mark[index] = false;
         }
     }
 
