@@ -884,20 +884,24 @@ public final class SettingsActivity extends CardActivity {
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         TextView[] cells = addColumns(row, entry.columns, 13);
         for (TextView cell : cells) cell.setAlpha(0.8f);
-        selectable(row, entry, focused -> {
-            int text = focused ? Fire.INK : Color.WHITE;
-            title.setTextColor(text);
-            for (TextView cell : cells) cell.setTextColor(text);
-        });
+        // Not buttons, the user's remark of 2026-11-10: plain words, and the glass only on the row
+        // the focus is on, which shows its explanation.
+        selectable(row, entry, focused -> { }, true);
         return row;
     }
 
     /** What every row does on a click and with the focus; `paint` recolours what is inside it. */
     private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint) {
+        selectable(row, entry, paint, false);
+    }
+
+    /** `plain`: nothing at rest and glass, not white, under the focus: a line to read, not a button. */
+    private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint, boolean plain) {
         row.setFocusable(true);
         row.setClickable(true);
         row.setDefaultFocusHighlightEnabled(false);
-        Drawable rest = softGlass(dp(12));
+        Drawable rest = plain ? null : softGlass(dp(12));
+        Drawable lit = plain ? softGlass(dp(12)) : focusFill();
         row.setBackground(rest);
         row.setOnClickListener(v -> {
             // A click, with a mouse or on a preview of the screen, reaches the page without the
@@ -914,7 +918,7 @@ public final class SettingsActivity extends CardActivity {
         });
         row.setOnFocusChangeListener((view, focused) -> {
             paint.accept(focused);
-            view.setBackground(focused ? focusFill() : rest);
+            view.setBackground(focused ? lit : rest);
             float scale = focused ? 1.02f : 1f;
             view.animate().scaleX(scale).scaleY(scale).setDuration(120).start();
             if (focused) {
