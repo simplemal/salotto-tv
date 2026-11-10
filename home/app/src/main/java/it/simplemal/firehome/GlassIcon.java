@@ -43,7 +43,7 @@ final class GlassIcon {
      * then quickly clearer towards the middle, so it shows only for a few dp round the glass.
      */
     private static final float VEIL_FRAME = 0.55f;
-    private static final float VEIL_MIDDLE = 0.12f;
+    private static final float VEIL_MIDDLE = 0.24f;
     private static final float FRAME_DP = 5f;
     /** A faint light over the upper half. */
     private static final float SHEEN = 0.10f;
