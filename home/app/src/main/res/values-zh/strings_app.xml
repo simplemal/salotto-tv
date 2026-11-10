@@ -154,9 +154,9 @@
 
     <string name="av_yes">是</string>
     <string name="av_no">否</string>
-    <string name="av_declared">声明支持</string>
+    <string name="av_declared">是</string>
     <string name="av_not_declared">否</string>
-    <string name="av_unknown">未知</string>
+    <string name="av_unknown">未验证</string>
     <string name="av_available">可用</string>
     <string name="av_selected">已选</string>
     <string name="av_no_decoder">Stick 上没有解码器。</string>

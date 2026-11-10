@@ -157,9 +157,9 @@
 
     <string name="av_yes">Oui</string>
     <string name="av_no">Non</string>
-    <string name="av_declared">Annoncé</string>
+    <string name="av_declared">Oui</string>
     <string name="av_not_declared">Non</string>
-    <string name="av_unknown">Inconnu</string>
+    <string name="av_unknown">Non vérifié</string>
     <string name="av_available">Disponible</string>
     <string name="av_selected">Choisi</string>
     <string name="av_no_decoder">Le Stick n’a pas de décodeur.</string>

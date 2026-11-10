@@ -157,9 +157,9 @@
 
     <string name="av_yes">Sim</string>
     <string name="av_no">Não</string>
-    <string name="av_declared">Anuncia</string>
+    <string name="av_declared">Sim</string>
     <string name="av_not_declared">Não</string>
-    <string name="av_unknown">Não se sabe</string>
+    <string name="av_unknown">Não verificado</string>
     <string name="av_available">Disponível</string>
     <string name="av_selected">Escolhido</string>
     <string name="av_no_decoder">O Stick não tem decodificador.</string>

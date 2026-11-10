@@ -169,9 +169,9 @@
 
     <string name="av_yes">نعم</string>
     <string name="av_no">لا</string>
-    <string name="av_declared">يعلن</string>
+    <string name="av_declared">نعم</string>
     <string name="av_not_declared">لا</string>
-    <string name="av_unknown">غير معروف</string>
+    <string name="av_unknown">لم يتم التحقق</string>
     <string name="av_available">متاح</string>
     <string name="av_selected">مختار</string>
     <string name="av_no_decoder">لا يملك جهاز Stick وحدة فك ترميز لهذا.</string>
