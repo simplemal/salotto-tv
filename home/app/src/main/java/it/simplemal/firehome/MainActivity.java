@@ -233,6 +233,12 @@ public final class MainActivity extends CardActivity {
     private static final int CLEAN_COLUMNS = 12;
     /** Past the screen's edge by this much, the clean Home's next row, so not even its shadow shows. */
     private static final int CLEAN_ROW_CLEAR = 8;
+    /**
+     * The clean Home resting low draws no row in the screen's last dp: with the first row climbed the
+     * fourth row's name keeps its distance from the edge, and the fifth row, starting there, stays
+     * out of sight (2026-11-10).
+     */
+    private static final int CLEAN_BOTTOM_CLEAR = 20;
     private static final int CLEAN_TILE = 56;
     private static final int CLEAN_GAP = 14;
     /** Where the first row stops once a lower one has the focus: under the line at the top. */
@@ -1698,14 +1704,14 @@ public final class MainActivity extends CardActivity {
         // Tutte le app, cut by the screen's edge. Every row keeps that same distance from the one above.
         boolean cleanLow = clean && !appsOnly && !Look.cleanRowMiddle(this);
         int cleanGap = rowGap + imageHeight / 3 + dp(CLEAN_ROW_CLEAR);
-        // Past the second row the rows are closer, so that with the first row climbed three more fit
-        // whole under it, and a fifth starts past the screen's edge: the user's request of 2026-11-10,
-        // after a fourth row showed cut at the bottom. Between half and a third of the room left over:
-        // at half the fourth row's name ends at the edge, at a third the fifth row starts on it.
-        int spare = screen - dp(CLEAN_DOCK_TOP) - 4 * rowHeight - cleanGap;
-        int laterGap = Math.max(0, spare * 2 / 5);
-        rowStep = rowHeight + (cleanLow ? laterGap : 0);
+        // Past the second row the rows are as close as rows are, so that with the first row climbed
+        // three more fit whole under it: the user's request of 2026-11-10, after a fourth row showed cut
+        // at the bottom. With a gap there too, the fourth row's name, selected, reached the edge.
+        int laterGap = 0;
+        rowStep = rowHeight;
         rowsUp = cleanLow ? 4 : 2;
+        int bottomClear = cleanLow ? dp(CLEAN_BOTTOM_CLEAR) : 0;
+        scroll.setPadding(0, 0, 0, bottomClear);
         shelf = top - dp(clean ? CLEAN_DOCK_TOP : DOCK_TOP);
         ((ShelfScroll) scroll).setShelf(shelf);
         page.setPadding(dp(DOCK_MARGIN), top, dp(DOCK_MARGIN), 0);
@@ -1751,7 +1757,7 @@ public final class MainActivity extends CardActivity {
         LinearLayout.LayoutParams foot = new LinearLayout.LayoutParams(-2, -2);
         foot.gravity = Gravity.CENTER_HORIZONTAL;
         foot.bottomMargin = dp(FOOTER_MARGIN);
-        foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
+        foot.topMargin = Math.max(dp(FOOTER_GAP), shelf + screen - bottomClear - cards - dp(FOOTER_HEIGHT) - dp(FOOTER_MARGIN));
         if (footer.getParent() != null) ((ViewGroup) footer.getParent()).removeView(footer);
         page.addView(footer, foot);
         (target != null ? target : first).requestFocus();
