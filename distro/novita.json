@@ -1,59 +1,59 @@
 {
-  "versionName": "1.1.2",
+  "versionName": "1.1.3",
   "changes": {
     "en": [
-      "Settings with glass rows, more compact",
-      "Clean Home: dark veil at the top under time and weather, lighter app shadows",
-      "Clean Home: removed the dark corner at the top left",
-      "Backdrops: the down arrow no longer jumps to the list of collections"
+      "Clean Home: new Icons › Logo only choice, with the tile only on the selected app",
+      "Clean Home: glass control center",
+      "Surround sound: the choice is now accepted by Fire OS",
+      "Clearer, easier to read audio and video standards"
     ],
     "es": [
-      "Ajustes con filas de cristal, más compactas",
-      "Home Limpia: velo oscuro arriba bajo la hora y el tiempo, sombras de las apps más suaves",
-      "Home Limpia: quitada la esquina oscura arriba a la izquierda",
-      "Fondos: la flecha abajo ya no salta a la lista de colecciones"
+      "Home Limpia: nueva opción Iconos › Solo logo, con la ficha solo en la app seleccionada",
+      "Home Limpia: centro de control de cristal",
+      "Sonido envolvente: ahora Fire OS acepta la opción elegida",
+      "Estándares de audio y vídeo más claros y legibles"
     ],
     "fr": [
-      "Réglages avec des rangées en verre, plus compactes",
-      "Accueil Épurée : voile sombre en haut sous l’heure et la météo, ombres des applis plus légères",
-      "Accueil Épurée : coin sombre en haut à gauche supprimé",
-      "Fonds : la flèche bas ne saute plus à la liste des collections"
+      "Accueil Épurée : nouveau choix Icônes › Logo seul, avec la tuile seulement sur l’appli sélectionnée",
+      "Accueil Épurée : centre de contrôle en verre",
+      "Son surround : le choix est désormais accepté par Fire OS",
+      "Normes audio et vidéo plus claires et lisibles"
     ],
     "de": [
-      "Einstellungen mit Glaszeilen, kompakter",
-      "Home Schlicht: dunkler Schleier oben unter Uhrzeit und Wetter, leichtere Schatten der Apps",
-      "Home Schlicht: dunkle Ecke oben links entfernt",
-      "Hintergründe: Pfeil nach unten springt nicht mehr zur Liste der Sammlungen"
+      "Home Schlicht: neue Auswahl Symbole › Nur Logo, mit Kachel nur auf der ausgewählten App",
+      "Home Schlicht: Kontrollzentrum aus Glas",
+      "Surround-Sound: Die Auswahl wird jetzt von Fire OS übernommen",
+      "Audio- und Videostandards klarer und besser lesbar"
     ],
     "pt": [
-      "Configurações com linhas de vidro, mais compactas",
-      "Home Limpa: véu escuro no topo sob a hora e o tempo, sombras dos apps mais leves",
-      "Home Limpa: removido o canto escuro no alto à esquerda",
-      "Fundos: a seta para baixo não pula mais para a lista de coleções"
+      "Home Limpa: nova opção Ícones › Só logo, com o bloco só no app selecionado",
+      "Home Limpa: central de controle de vidro",
+      "Som surround: agora a escolha é aceita pelo Fire OS",
+      "Padrões de áudio e vídeo mais claros e legíveis"
     ],
     "ru": [
-      "Настройки со стеклянными строками, компактнее",
-      "Экран «Чистый»: тёмная вуаль сверху под временем и погодой, более лёгкие тени приложений",
-      "Экран «Чистый»: убран тёмный угол слева вверху",
-      "Фоны: стрелка вниз больше не перескакивает к списку коллекций"
+      "Экран «Чистый»: новый вариант «Значки › Только логотип», плитка только у выбранного приложения",
+      "Экран «Чистый»: стеклянный центр управления",
+      "Объёмный звук: теперь Fire OS принимает выбор",
+      "Стандарты аудио и видео понятнее и читабельнее"
     ],
     "ar": [
-      "إعدادات بصفوف زجاجية وأكثر إحكامًا",
-      "الشاشة «نظيفة»: طبقة داكنة في الأعلى تحت الوقت والطقس، وظلال أخف للتطبيقات",
-      "الشاشة «نظيفة»: أُزيلت الزاوية الداكنة أعلى اليسار",
-      "الخلفيات: سهم الأسفل لم يعد يقفز إلى قائمة المجموعات"
+      "الشاشة «نظيفة»: خيار جديد الأيقونات › الشعار فقط، مع البلاطة على التطبيق المحدد فقط",
+      "الشاشة «نظيفة»: مركز تحكم زجاجي",
+      "الصوت المحيطي: أصبح Fire OS يقبل الاختيار",
+      "معايير الصوت والفيديو أوضح وأسهل قراءة"
     ],
     "hi": [
-      "ग्लास पंक्तियों वाली, ज़्यादा सघन सेटिंग्स",
-      "साफ़ होम: ऊपर समय और मौसम के नीचे गहरी परत, ऐप्स की हल्की छाया",
-      "साफ़ होम: ऊपर बाईं ओर का गहरा कोना हटाया गया",
-      "बैकड्रॉप: नीचे वाला तीर अब संग्रहों की सूची पर नहीं जाता"
+      "साफ़ होम: नया विकल्प आइकन › केवल लोगो, टाइल सिर्फ़ चुने गए ऐप पर",
+      "साफ़ होम: ग्लास कंट्रोल सेंटर",
+      "सराउंड साउंड: अब Fire OS चुना गया विकल्प स्वीकार करता है",
+      "ऑडियो और वीडियो मानक ज़्यादा साफ़ और पढ़ने में आसान"
     ],
     "zh": [
-      "设置采用玻璃行，更紧凑",
-      "简洁主屏幕：顶部时间和天气下方有深色渐变，应用阴影更轻",
-      "简洁主屏幕：去掉了左上角的暗角",
-      "背景：向下键不再跳到合集列表"
+      "简洁主屏幕：新增 图标 › 仅标志，只有选中的应用显示方块",
+      "简洁主屏幕：玻璃控制中心",
+      "环绕声：现在 Fire OS 会接受所选设置",
+      "音视频标准更清楚易读"
     ]
   }
 }
