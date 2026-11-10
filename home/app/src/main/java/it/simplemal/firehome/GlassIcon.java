@@ -202,7 +202,10 @@ final class GlassIcon {
             found.alpha[index] = glow ? clamp((far - found.start) / GLOW_RAMP) : clamp((far - CUT_CLEAR) / (CUT_WHOLE - CUT_CLEAR));
             mark[index] = far > found.start;
         }
-        if (dropEdges) dropTouchingEdges(found, mark, width, height);
+        if (dropEdges) {
+            dropTouchingEdges(found, mark, width, height);
+            dropCrumbs(found, mark, width, height);
+        }
         found.left = width;
         found.top = height;
         found.right = -1;
@@ -230,34 +233,86 @@ final class GlassIcon {
 
     private static boolean whole(float[] alpha, int index) { return alpha[index] >= 0.95f; }
 
-    /** Clears the logo found touching the picture's edges, and all of it joined to them. */
+    /**
+     * Clears what touches the picture's edges and all joined to it, its soft rim too, in all eight
+     * directions: through hard pixels only, bits of the band's lettering (miniTV's FREE) stayed as dots.
+     */
     private static void dropTouchingEdges(Found found, boolean[] mark, int width, int height) {
+        boolean[] open = new boolean[mark.length];
+        for (int index = 0; index < open.length; index++) open[index] = found.alpha[index] > 0;
         int[] queue = new int[mark.length];
-        int head = 0;
         int tail = 0;
         for (int x = 0; x < width; x++) {
-            tail = seed(mark, x, queue, tail);
-            tail = seed(mark, (height - 1) * width + x, queue, tail);
+            tail = seed(open, x, queue, tail);
+            tail = seed(open, (height - 1) * width + x, queue, tail);
         }
         for (int y = 0; y < height; y++) {
-            tail = seed(mark, y * width, queue, tail);
-            tail = seed(mark, y * width + width - 1, queue, tail);
+            tail = seed(open, y * width, queue, tail);
+            tail = seed(open, y * width + width - 1, queue, tail);
         }
+        int head = 0;
         while (head < tail) {
             int index = queue[head++];
             found.alpha[index] = 0;
+            mark[index] = false;
             int x = index % width;
             int y = index / width;
-            if (x > 0) tail = seed(mark, index - 1, queue, tail);
-            if (x < width - 1) tail = seed(mark, index + 1, queue, tail);
-            if (y > 0) tail = seed(mark, index - width, queue, tail);
-            if (y < height - 1) tail = seed(mark, index + width, queue, tail);
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+                    tail = seed(open, ny * width + nx, queue, tail);
+                }
+            }
         }
     }
 
-    private static int seed(boolean[] mark, int index, int[] queue, int tail) {
-        if (!mark[index]) return tail;
-        mark[index] = false;
+    /**
+     * Below this share of the logo, a separate bit is a crumb left by what went, not a part of it.
+     * Measured on miniTV at the sample's size: the crumb 45 pixels, each i's dot 94, the logo 7317.
+     */
+    private static final float CRUMB = 0.01f;
+
+    /** Clears the tiny separate bits: a dot of miniTV's FREE stayed under the logo. An i's dot is far larger. */
+    private static void dropCrumbs(Found found, boolean[] mark, int width, int height) {
+        int total = 0;
+        for (boolean marked : mark) if (marked) total++;
+        int smallest = Math.max(1, Math.round(total * CRUMB));
+        boolean[] seen = new boolean[mark.length];
+        int[] queue = new int[mark.length];
+        for (int first = 0; first < mark.length; first++) {
+            if (!mark[first] || seen[first]) continue;
+            int tail = 0;
+            seen[first] = true;
+            queue[tail++] = first;
+            for (int head = 0; head < tail; head++) {
+                int index = queue[head];
+                int x = index % width;
+                int y = index / width;
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dx = -1; dx <= 1; dx++) {
+                        int nx = x + dx;
+                        int ny = y + dy;
+                        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+                        int next = ny * width + nx;
+                        if (!mark[next] || seen[next]) continue;
+                        seen[next] = true;
+                        queue[tail++] = next;
+                    }
+                }
+            }
+            if (tail >= smallest) continue;
+            for (int at = 0; at < tail; at++) {
+                mark[queue[at]] = false;
+                found.alpha[queue[at]] = 0;
+            }
+        }
+    }
+
+    private static int seed(boolean[] open, int index, int[] queue, int tail) {
+        if (!open[index]) return tail;
+        open[index] = false;
         queue[tail] = index;
         return tail + 1;
     }
