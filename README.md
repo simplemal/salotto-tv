@@ -8,11 +8,13 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 
 ## Supported Fire TVs
 
-- Fire TV Stick 4K 2nd generation (2023)
-- Fire TV Stick 4K Max 2nd generation (2023)
-- Fire TV Stick 4K Max 1st generation (2021), with some features limited
-- Fire TV Stick 3rd generation (2020), with some features limited
-- Fire TV Stick Lite 1st generation (2020), with some features limited
+| Code | Model | Generation | Year | Features |
+|---|---|---|---|---|
+| `AFTKM` | Fire TV Stick 4K | 2nd | 2023 | All |
+| `AFTKRT` | Fire TV Stick 4K Max | 2nd | 2023 | All |
+| `AFTKA` | Fire TV Stick 4K Max | 1st | 2021 | Some limited |
+| `AFTSSS` | Fire TV Stick | 3rd | 2020 | Some limited |
+| `AFTSS` | Fire TV Stick Lite | 1st | 2020 | Some limited |
 
 ## Installation
 
