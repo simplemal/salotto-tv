@@ -7,8 +7,6 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.SystemClock;
-import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +48,7 @@ final class GlassRow extends Drawable {
         synchronized (MADE) {
             shown = MADE.get(key);
             if (shown == null) {
-                long start = SystemClock.uptimeMillis();
                 shown = make(width, height);
-                Log.i("Salotto", "Glass row " + key + " made in " + (SystemClock.uptimeMillis() - start) + " ms");
                 MADE.put(key, shown);
             }
         }
