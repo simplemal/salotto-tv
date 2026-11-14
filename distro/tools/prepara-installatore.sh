@@ -36,8 +36,10 @@ if [ -f "$DIST/latest.yml" ] && [ "$(version "$DIST/latest.yml")" = "$(version "
 else
   echo "Senza Windows: in installatore/dist manca, o è di un'altra versione."
 fi
-# Only one AppImage: the AppImage catalog takes it from the release, and it should find this name.
-one 'Salotto-TV-Setup-*.AppImage' Salotto-TV-Setup.AppImage || true
+if one 'Salotto-TV-Setup-*.AppImage' Salotto-TV-Setup.AppImage; then
+  # The old name too, so a link saved before the new name still downloads it.
+  cp "$TARGET/Salotto-TV-Setup.AppImage" "$TARGET/Installa-Salotto-Linux.AppImage"
+fi
 for image in "$TARGET"/*.dmg; do
   xcrun stapler validate "$image" > /dev/null || { echo "Fermo: $(basename "$image") non è notarizzato."; exit 1; }
 done
