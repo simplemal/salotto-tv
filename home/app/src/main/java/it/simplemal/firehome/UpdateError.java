@@ -21,7 +21,7 @@ enum UpdateError {
     F105("Nessuna versione più recente", "La versione proposta non è più nuova di quella installata.",
         "Non serve fare nulla."),
     F106("Spazio insufficiente", "Sulla Stick non c'è spazio per scaricare e installare la nuova versione.",
-        "Salotto non è stata toccata. Libera spazio togliendo le app che non usi, poi riprova, oppure aggiorna dal computer con Installa Salotto."),
+        "Salotto non è stata toccata. Libera spazio togliendo le app che non usi, poi riprova, oppure aggiorna dal computer con Salotto TV Setup."),
     F107("Download interrotto", "Il file non è stato scaricato completamente.",
         "Controlla la connessione e riprova."),
     F108("File danneggiato", "L'impronta del file scaricato non corrisponde a quella attesa.",
@@ -60,8 +60,8 @@ enum UpdateError {
         "Dal Mac lancia install.sh della distro: reinstalla Salotto senza perdere le scelte. Poi segnala il problema."),
     R303("Stato finale sconosciuto", "L'aggiornamento non ha lasciato un esito leggibile.",
         "Controlla che Salotto funzioni, poi segnala il problema."),
-    R304("Serve Installa Salotto sul computer", "Su questa TV Salotto non può tornare da sola alla versione precedente.",
-        "Apri Installa Salotto sul computer e scegli «Torna alla versione precedente».");
+    R304("Serve Salotto TV Setup sul computer", "Su questa TV Salotto non può tornare da sola alla versione precedente.",
+        "Apri Salotto TV Setup sul computer e scegli «Torna alla versione precedente».");
 
     final String title;
     final String cause;

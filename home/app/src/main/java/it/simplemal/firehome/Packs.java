@@ -26,7 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * The collections of backdrops. Installa Salotto writes which ones were chosen in `sfondi/scelte`,
+ * The collections of backdrops. Salotto TV Setup writes which ones were chosen in `sfondi/scelte`,
  * in the folder Salotto shares with the computer; Salotto downloads them from the release "sfondi"
  * on GitHub, each into a folder of the same name, which counts only once `.completo` is written in
  * it after its last file. A collection not on the TV is read from inside the app, while it carries it.

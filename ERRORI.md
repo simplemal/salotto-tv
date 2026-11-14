@@ -64,11 +64,11 @@ What to do: Nothing to do.
 
 **Not enough space.** There is not enough space on the Stick to download and install the new version.
 
-What to do: Salotto has not been touched. Free up space by removing apps you do not use, then try again, or update from a computer with Installa Salotto.
+What to do: Salotto has not been touched. Free up space by removing apps you do not use, then try again, or update from a computer with Salotto TV Setup.
 
 *Spazio insufficiente. Sulla Stick non c'è spazio per scaricare e installare la nuova versione.*
 
-*Cosa fare: Salotto non è stata toccata. Libera spazio togliendo le app che non usi, poi riprova, oppure aggiorna dal computer con Installa Salotto.*
+*Cosa fare: Salotto non è stata toccata. Libera spazio togliendo le app che non usi, poi riprova, oppure aggiorna dal computer con Salotto TV Setup.*
 
 ### SAL-F107
 
@@ -206,9 +206,9 @@ What to do: Salotto stayed on the previous version. Restart the Stick and try ag
 
 *Cosa fare: Salotto è rimasta alla versione precedente. Riavvia la Stick e riprova.*
 
-With a Salotto version older than 1.0.18 this error most likely means there is not enough space on the Fire TV for the update. It is usually solved by uninstalling some apps you no longer use, or by downloading the new version directly from a computer with [Installa Salotto](https://github.com/simplemal/salotto-tv#installation). From 1.0.18 Salotto checks the space before starting and, if it is not enough, says so with SAL-F106.
+With a Salotto version older than 1.0.18 this error most likely means there is not enough space on the Fire TV for the update. It is usually solved by uninstalling some apps you no longer use, or by downloading the new version directly from a computer with [Salotto TV Setup](https://github.com/simplemal/salotto-tv#installation). From 1.0.18 Salotto checks the space before starting and, if it is not enough, says so with SAL-F106.
 
-*Con una versione di Salotto precedente alla 1.0.18 questo errore indica probabilmente che sulla Fire TV non c'è spazio sufficiente per l'aggiornamento. Di solito si risolve disinstallando qualche app non più in uso, oppure scaricando direttamente la nuova versione dal computer con [Installa Salotto](https://github.com/simplemal/salotto-tv/blob/main/README.it.md#installazione). Dalla 1.0.18 Salotto controlla lo spazio prima di iniziare e, se non basta, lo dice con SAL-F106.*
+*Con una versione di Salotto precedente alla 1.0.18 questo errore indica probabilmente che sulla Fire TV non c'è spazio sufficiente per l'aggiornamento. Di solito si risolve disinstallando qualche app non più in uso, oppure scaricando direttamente la nuova versione dal computer con [Salotto TV Setup](https://github.com/simplemal/salotto-tv/blob/main/README.it.md#installazione). Dalla 1.0.18 Salotto controlla lo spazio prima di iniziare e, se non basta, lo dice con SAL-F106.*
 
 ### SAL-C203
 
@@ -278,20 +278,20 @@ What to do: Check that Salotto works, then report the problem.
 
 ### SAL-R304
 
-**Install Salotto is needed on a computer.** On this TV Salotto cannot go back to the previous version by itself.
+**Salotto TV Setup is needed on a computer.** On this TV Salotto cannot go back to the previous version by itself.
 
-What to do: Open Installa Salotto on the computer and choose “Go back to the previous version”.
+What to do: Open Salotto TV Setup on the computer and choose “Go back to the previous version”.
 
-*Serve Installa Salotto sul computer. Su questa TV Salotto non può tornare da sola alla versione precedente.*
+*Serve Salotto TV Setup sul computer. Su questa TV Salotto non può tornare da sola alla versione precedente.*
 
-*Cosa fare: Apri Installa Salotto sul computer e scegli «Torna alla versione precedente».*
+*Cosa fare: Apri Salotto TV Setup sul computer e scegli «Torna alla versione precedente».*
 
 ## If the problem persists
 
-Update Salotto from a computer with [Installa Salotto](https://github.com/simplemal/salotto-tv#installation), for Mac and Windows: it installs the latest version without going through the TV's update, and your choices stay.
+Update Salotto from a computer with [Salotto TV Setup](https://github.com/simplemal/salotto-tv#installation), for Mac and Windows: it installs the latest version without going through the TV's update, and your choices stay.
 
 If that is not enough, [open an issue](https://github.com/simplemal/salotto-tv/issues/new) with the code and the versions of Salotto and Fire OS.
 
-*Se il problema resta, aggiorna Salotto dal computer con [Installa Salotto](https://github.com/simplemal/salotto-tv/blob/main/README.it.md#installazione), per Mac e Windows: installa l'ultima versione senza passare dall'aggiornamento della TV, e le tue scelte restano.*
+*Se il problema resta, aggiorna Salotto dal computer con [Salotto TV Setup](https://github.com/simplemal/salotto-tv/blob/main/README.it.md#installazione), per Mac e Windows: installa l'ultima versione senza passare dall'aggiornamento della TV, e le tue scelte restano.*
 
 *Se non basta, [apri una segnalazione](https://github.com/simplemal/salotto-tv/issues/new) indicando codice, versione di Salotto e di Fire OS.*

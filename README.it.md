@@ -19,13 +19,13 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 
 ## Installazione
 
-Installa Salotto guida ogni passo dal computer, e con Togli Salotto rimette tutto com'era.
+Salotto TV Setup guida ogni passo dal computer, e con Togli Salotto rimette tutto com'era.
 
 | Computer | Installer |
 |---|---|
-| Mac Apple Silicon | **[Scarica Installa Salotto per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
-| Windows | **[Scarica Installa Salotto per Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
-| Linux | **[Scarica Installa Salotto per Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Linux.AppImage)** (AppImage: rendilo eseguibile, poi aprilo) |
+| Mac Apple Silicon | **[Scarica Salotto TV Setup per Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.dmg)** |
+| Windows | **[Scarica Salotto TV Setup per Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.exe)** |
+| Linux | **[Scarica Salotto TV Setup per Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.AppImage)** (AppImage: rendilo eseguibile, poi aprilo) |
 
 ## Cosa fa
 
@@ -69,7 +69,7 @@ Se sulla TV compare un codice, cercalo in [ERRORI.md](ERRORI.md). Per tutto il r
 
 Per segnalare un problema o proporre una funzione nuova, apri una [segnalazione su GitHub](https://github.com/simplemal/salotto-tv/issues/new): serve solo un account GitHub gratuito. Prima guarda tra le [segnalazioni già aperte](https://github.com/simplemal/salotto-tv/issues): se c'è già, aggiungi un commento o un 👍.
 
-- **Problema:** indica il modello della Fire TV e la versione di Salotto (in Impostazioni → Informazioni su Salotto), cosa hai fatto e cosa è successo. Se c'è un codice di errore, scrivilo o allega una foto dello schermo. Per i problemi d'installazione, in Installa Salotto premi «Segnala un problema»: salva sulla Scrivania un file da allegare.
+- **Problema:** indica il modello della Fire TV e la versione di Salotto (in Impostazioni → Informazioni su Salotto), cosa hai fatto e cosa è successo. Se c'è un codice di errore, scrivilo o allega una foto dello schermo. Per i problemi d'installazione, in Salotto TV Setup premi «Segnala un problema»: salva sulla Scrivania un file da allegare.
 - **Nuova funzione:** descrivi cosa ti servirebbe e quando lo useresti.
 
 ## Sostieni Salotto

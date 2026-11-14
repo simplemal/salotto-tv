@@ -39,4 +39,4 @@ body:
     id: report
     attributes:
       label: File di «Segnala un problema» · “Report a problem” file
-      description: "Solo per i problemi d'installazione. In Installa Salotto premi «Segnala un problema»: salva sulla Scrivania un file da trascinare qui · Only for installation problems. In Installa Salotto press “Report a problem”: it saves a file on the Desktop to drag here"
+      description: "Solo per i problemi d'installazione. In Salotto TV Setup premi «Segnala un problema»: salva sulla Scrivania un file da trascinare qui · Only for installation problems. In Salotto TV Setup press “Report a problem”: it saves a file on the Desktop to drag here"

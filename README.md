@@ -19,13 +19,13 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 
 ## Installation
 
-Installa Salotto guides every step from the computer, and with Remove Salotto it puts everything back as it was.
+Salotto TV Setup guides every step from the computer, and with Remove Salotto it puts everything back as it was.
 
 | Computer | Installer |
 |---|---|
-| Mac Apple Silicon | **[Download Installa Salotto for Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Mac.dmg)** |
-| Windows | **[Download Installa Salotto for Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Windows.exe)** |
-| Linux | **[Download Installa Salotto for Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Installa-Salotto-Linux.AppImage)** (AppImage: make it executable, then open it) |
+| Mac Apple Silicon | **[Download Salotto TV Setup for Mac](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.dmg)** |
+| Windows | **[Download Salotto TV Setup for Windows](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.exe)** |
+| Linux | **[Download Salotto TV Setup for Linux](https://github.com/simplemal/salotto-tv/releases/latest/download/Salotto-TV-Setup.AppImage)** (AppImage: make it executable, then open it) |
 
 ## What it does
 
@@ -69,7 +69,7 @@ If a code appears on the TV, look for it in [ERRORI.md](ERRORI.md). For anything
 
 To report a problem or suggest a new feature, [open an issue on GitHub](https://github.com/simplemal/salotto-tv/issues/new): all you need is a free GitHub account. First look through the [open issues](https://github.com/simplemal/salotto-tv/issues): if yours is already there, add a comment or a 👍.
 
-- **Problem:** give the Fire TV model and the Salotto version (in Settings → About Salotto), what you did and what happened. If there is an error code, write it down or attach a photo of the screen. For installation problems, press “Report a problem” in Installa Salotto: it saves a file on the Desktop to attach.
+- **Problem:** give the Fire TV model and the Salotto version (in Settings → About Salotto), what you did and what happened. If there is an error code, write it down or attach a photo of the screen. For installation problems, press “Report a problem” in Salotto TV Setup: it saves a file on the Desktop to attach.
 - **New feature:** describe what you would need and when you would use it.
 
 ## Support Salotto
