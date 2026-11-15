@@ -26,7 +26,7 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 | `AFTM` | Fire TV Stick (1ª) | 2014 | Non compatibile ⁴ |
 | `AFTB` | Fire TV (1ª) | 2014 | Non compatibile ⁴ |
 
-<sub>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; il salvaschermo di Fire OS non si avvia dalle Impostazioni.<br>
+<sub>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; il salvaschermo di Fire OS non si avvia dalle Impostazioni; il salvaschermo di Salotto parte solo dalla Home.<br>
 ² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
 ³ Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
 ⁴ Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>

@@ -26,7 +26,7 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 | `AFTM` | Fire TV Stick (1st) | 2014 | Not compatible ⁴ |
 | `AFTB` | Fire TV (1st) | 2014 | Not compatible ⁴ |
 
-<sub>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; Fire OS's screensaver cannot be started from the Settings.<br>
+<sub>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; Fire OS's screensaver cannot be started from the Settings; Salotto's screensaver starts only from the Home.<br>
 ² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
 ³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
 ⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
