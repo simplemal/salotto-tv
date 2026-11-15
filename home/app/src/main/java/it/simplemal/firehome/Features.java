@@ -18,6 +18,8 @@ final class Features {
     static final String STICK_4K_MAX_2021 = "AFTKA";
     static final String STICK_2020 = "AFTSSS";
     static final String STICK_LITE_2020 = "AFTSS";
+    /** Fire OS 6, Android 7, 1.5 GB: like the Sticks of 2020, with what Android 7 lacks left to Fire.ANDROID_7. */
+    static final String STICK_4K_2018 = "AFTMM";
 
     /** The emulator stands for the Stick 4K of 2023, the one everything is tried on. */
     static final String MODEL = Build.MODEL.startsWith("sdk_") ? STICK_4K_2023 : Build.MODEL;

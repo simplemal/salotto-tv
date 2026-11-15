@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 /**
  * The small separate app that keeps the update page on screen while Android replaces Salotto, so
@@ -60,7 +58,7 @@ final class Cover {
         if (installed(context)) return;
         File apk = new File(context.getCacheDir(), APK);
         try (InputStream input = context.getAssets().open(APK)) {
-            Files.copy(input, apk.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Bytes.copy(input, apk);
             SelfInstall.start(context, apk, PACKAGE);
             long limit = System.currentTimeMillis() + INSTALL_LIMIT_MS;
             while (!installed(context) && System.currentTimeMillis() < limit) Thread.sleep(POLL_MS);

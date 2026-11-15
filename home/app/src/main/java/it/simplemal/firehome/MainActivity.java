@@ -517,7 +517,7 @@ public final class MainActivity extends CardActivity {
         allAppsCircle.setPadding(inset, inset, inset, inset);
         allAppsCircle.setFocusable(true);
         allAppsCircle.setClickable(true);
-        allAppsCircle.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(allAppsCircle);
         allAppsCircle.setContentDescription(getString(R.string.main_all_apps));
         allAppsCircle.setVisibility(View.GONE);
         int radius = dp(ALL_APPS_CIRCLE) / 2;
@@ -1077,7 +1077,7 @@ public final class MainActivity extends CardActivity {
         view.setPadding(dp(12), dp(4), dp(12), dp(4));
         view.setFocusable(true);
         view.setClickable(true);
-        view.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(view);
         Drawable logo = getDrawable(R.drawable.ic_salotto);
         logo.setBounds(0, 0, dp(FOOTER_LOGO), dp(FOOTER_LOGO));
         view.setCompoundDrawablesRelative(logo, null, null, null);

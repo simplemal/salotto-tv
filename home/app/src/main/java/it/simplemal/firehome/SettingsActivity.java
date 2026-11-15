@@ -4,6 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.content.res.ColorStateList;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.usage.StorageStats;
@@ -24,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Bundle;
@@ -517,7 +519,7 @@ public final class SettingsActivity extends CardActivity {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(14), 0, dp(12), 0);
-        row.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(row);
         row.setClickable(true);
         ImageView icon = new ImageView(this);
         icon.setImageResource(sections[index].icon);
@@ -906,7 +908,7 @@ public final class SettingsActivity extends CardActivity {
     private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint, boolean plain) {
         row.setFocusable(true);
         row.setClickable(true);
-        row.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(row);
         Drawable rest = plain ? null : softGlass(dp(12));
         Drawable lit = plain ? softGlass(dp(12)) : focusFill();
         row.setBackground(rest);
@@ -1265,6 +1267,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     /** Needs the usage permission that the task manager already has. */
+    @TargetApi(Build.VERSION_CODES.O) // Never asked on Android 7, see showApp.
     private StorageStats appSize(String pkg) {
         try {
             return getSystemService(StorageStatsManager.class)
@@ -1278,6 +1281,8 @@ public final class SettingsActivity extends CardActivity {
     private void showApp(String pkg) {
         Level level = levels.peek();
         listApp(pkg, level, null);
+        // Android 7 gives no app sizes to an app, and those rows are left out.
+        if (Fire.ANDROID_7) return;
         Background.run(() -> {
             StorageStats size = appSize(pkg);
             runOnUiThread(() -> {
@@ -1295,9 +1300,11 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         String text = getString(R.string.settings_app_info_text);
         entries.add(new Entry(getString(R.string.settings_app_version), appVersion(pkg), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+        if (!Fire.ANDROID_7) {
+            entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+        }
         if (launchIntent(pkg) != null) {
             entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
         }

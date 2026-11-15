@@ -11,7 +11,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.view.PixelCopy;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -215,7 +214,7 @@ final class HomeCover {
     static void take(Window window, Runnable taken) {
         if (picture == null) picture = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
         try {
-            PixelCopy.request(window, picture, result -> taken.run(), new Handler(Looper.getMainLooper()));
+            Fire.copy(window, picture, taken, new Handler(Looper.getMainLooper()));
         } catch (IllegalArgumentException e) {
             // The window has no surface any more: the last picture will do.
             taken.run();

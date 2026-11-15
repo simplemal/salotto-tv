@@ -376,7 +376,7 @@ public final class PictureGridActivity extends CardActivity {
         item.setPadding(dp(14), 0, dp(12), 0);
         item.setFocusable(true);
         item.setClickable(true);
-        item.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(item);
         ImageView icon = new ImageView(this);
         item.addView(icon, new LinearLayout.LayoutParams(dp(ICON), dp(ICON)));
         TextView name = label(collection.name, LIST_SP);
@@ -492,7 +492,7 @@ public final class PictureGridActivity extends CardActivity {
         single.setPadding(dp(12), 0, dp(14), 0);
         single.setFocusable(true);
         single.setClickable(true);
-        single.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(single);
         single.setOnClickListener(view -> toggleSingle());
         single.setOnFocusChangeListener((view, focused) -> paintSingle());
         bar.addView(single, new LinearLayout.LayoutParams(-2, dp(BAR_HEIGHT - 2)));
@@ -547,7 +547,7 @@ public final class PictureGridActivity extends CardActivity {
         pill.setPadding(dp(18), 0, dp(18), 0);
         pill.setFocusable(true);
         pill.setClickable(true);
-        pill.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(pill);
         Drawable rest = softGlass(dp(17));
         Drawable lit = selectedFill(dp(17));
         pill.setBackground(rest);
@@ -818,7 +818,7 @@ public final class PictureGridActivity extends CardActivity {
         cell.setScaleType(ImageView.ScaleType.CENTER_CROP);
         cell.setBackgroundColor(Color.rgb(28, 30, 36));
         cell.setClickable(true);
-        cell.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(cell);
         cell.setClipToOutline(true);
         cell.setOutlineProvider(new ViewOutlineProvider() {
             @Override public void getOutline(View view, Outline outline) {
@@ -1257,7 +1257,7 @@ public final class PictureGridActivity extends CardActivity {
         trash.setContentDescription(getString(R.string.grid_delete));
         trash.setFocusable(true);
         trash.setClickable(true);
-        trash.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(trash);
         GradientDrawable fill = new GradientDrawable();
         fill.setShape(GradientDrawable.OVAL);
         trash.setBackground(fill);
@@ -1306,7 +1306,7 @@ public final class PictureGridActivity extends CardActivity {
         button.setSingleLine(true);
         button.setFocusable(true);
         button.setClickable(true);
-        button.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(button);
         button.setPadding(dp(QUIET_SIDE), dp(QUIET_TOP), dp(QUIET_SIDE), dp(QUIET_TOP));
         // A trash before the words: it says at a glance what the button does.
         Drawable bin = getDrawable(R.drawable.ic_s_delete).mutate();

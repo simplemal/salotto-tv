@@ -19,7 +19,6 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -421,15 +420,15 @@ final class AdbClient implements Closeable {
         KeyFactory factory = KeyFactory.getInstance("RSA");
         if (privateFile.isFile() && publicFile.isFile()) {
             return new KeyPair(
-                factory.generatePublic(new X509EncodedKeySpec(Files.readAllBytes(publicFile.toPath()))),
-                factory.generatePrivate(new PKCS8EncodedKeySpec(Files.readAllBytes(privateFile.toPath()))));
+                factory.generatePublic(new X509EncodedKeySpec(Bytes.read(publicFile))),
+                factory.generatePrivate(new PKCS8EncodedKeySpec(Bytes.read(privateFile))));
         }
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(KEY_BITS);
         KeyPair pair = generator.generateKeyPair();
         folder.mkdirs();
-        Files.write(privateFile.toPath(), pair.getPrivate().getEncoded());
-        Files.write(publicFile.toPath(), pair.getPublic().getEncoded());
+        Bytes.write(privateFile, pair.getPrivate().getEncoded());
+        Bytes.write(publicFile, pair.getPublic().getEncoded());
         share(context, pair.getPublic().getEncoded());
         return pair;
     }
@@ -439,7 +438,7 @@ final class AdbClient implements Closeable {
         File publicFile = new File(new File(context.getFilesDir(), KEY_FOLDER), "public");
         if (!publicFile.isFile()) return;
         try {
-            share(context, Files.readAllBytes(publicFile.toPath()));
+            share(context, Bytes.read(publicFile));
         } catch (IOException e) {
             Log.w(TAG, "Could not read the adb key", e);
         }
@@ -448,7 +447,7 @@ final class AdbClient implements Closeable {
     /** Only for the installer's check: losing it must not cost the connection. */
     private static void share(Context context, byte[] publicKey) {
         try {
-            Files.write(new File(context.getExternalMediaDirs()[0], SHARED_KEY).toPath(), publicKey);
+            Bytes.write(new File(context.getExternalMediaDirs()[0], SHARED_KEY), publicKey);
         } catch (IOException | RuntimeException e) {
             Log.w(TAG, "Could not share the adb key", e);
         }

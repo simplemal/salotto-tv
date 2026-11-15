@@ -248,7 +248,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             Drawable banner = manager.getApplicationBanner(pkg);
             // Some apps wrap a full 16:9 banner in an adaptive icon, which zooms and crops it.
             Drawable bannerBack = null;
-            if (banner instanceof AdaptiveIconDrawable) {
+            if (!Fire.ANDROID_7 && banner instanceof AdaptiveIconDrawable) {
                 bannerBack = ((AdaptiveIconDrawable) banner).getBackground();
                 banner = ((AdaptiveIconDrawable) banner).getForeground();
             }
@@ -258,7 +258,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
                 art.look = BANNER;
             } else {
                 art.image = manager.getApplicationIcon(pkg);
-                if (art.image instanceof AdaptiveIconDrawable) {
+                if (!Fire.ANDROID_7 && art.image instanceof AdaptiveIconDrawable) {
                     AdaptiveIconDrawable layered = (AdaptiveIconDrawable) art.image;
                     boolean store = LAYERED_ICON.contains(pkg);
                     art.back = store ? storeBack() : layered.getBackground();
@@ -306,7 +306,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
             if (back != null) {
                 image.setBackground(back);
             } else {
-                if (drawable != null) image.setImageDrawable(new InsetDrawable(drawable, look == GLASS ? 0.3f : 0.2f));
+                if (drawable != null) image.setImageDrawable(Fire.inset(drawable, look == GLASS ? 0.3f : 0.2f));
                 image.setBackground(cardFill(look));
             }
         }
@@ -370,7 +370,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         tile.setClipChildren(false);
         tile.setFocusable(true);
         tile.setClickable(true);
-        tile.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(tile);
         // A marked card zooms as one piece, so the check mark stays in its corner.
         View art = isMarked(tag) ? marked(image) : image;
         tile.addView(art, new LinearLayout.LayoutParams(-1, artHeight));
@@ -482,7 +482,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         lightPillIcon(button, false);
         button.setFocusable(true);
         button.setClickable(true);
-        button.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(button);
         button.setContentDescription(name);
         button.setOnFocusChangeListener((view, focused) -> lightPillIcon(button, focused));
         return button;
@@ -514,7 +514,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         view.setFocusable(true);
         view.setClickable(true);
         view.setPadding(dp(20), dp(BUTTON_PADDING), dp(20), dp(BUTTON_PADDING));
-        view.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(view);
         Drawable rest = softGlass(dp(BUTTON_RADIUS));
         Drawable selected = selectedFill(dp(BUTTON_RADIUS));
         view.setBackground(rest);
@@ -680,7 +680,7 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         button.setPadding(dp(28), dp(10), dp(28), dp(10));
         button.setFocusable(true);
         button.setClickable(true);
-        button.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(button);
         Drawable rest = softGlass(dp(20));
         Drawable lit = selectedFill(dp(20));
         button.setBackground(rest);

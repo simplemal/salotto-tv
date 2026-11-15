@@ -37,7 +37,7 @@ public final class AboutActivity extends CardActivity {
         write();
         scroll = new ScrollView(this);
         scroll.setFocusable(true);
-        scroll.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(scroll);
         scroll.setScrollbarFadingEnabled(false);
         scroll.setVerticalFadingEdgeEnabled(true);
         scroll.setFadingEdgeLength(dp(40));

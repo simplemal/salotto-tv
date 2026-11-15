@@ -718,7 +718,7 @@ public final class FirstRunActivity extends CardActivity {
         card.setGravity(Gravity.CENTER_HORIZONTAL);
         card.setFocusable(true);
         card.setClickable(true);
-        card.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(card);
         FrameLayout frame = new FrameLayout(this);
         ImageView image = new ImageView(this);
         image.setImageResource(picture);
@@ -809,7 +809,7 @@ public final class FirstRunActivity extends CardActivity {
         field.setHint(hint);
         field.setHintTextColor(Color.argb(130, 255, 255, 255));
         field.setPadding(dp(12), dp(10), dp(12), dp(10));
-        field.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(field);
         Runnable paint = () -> {
             GradientDrawable fill = new GradientDrawable();
             fill.setCornerRadius(dp(12));

@@ -32,7 +32,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.PixelCopy;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
@@ -47,7 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -249,7 +247,7 @@ public final class TaskService extends AccessibilityService {
         int[] corner = new int[2];
         button.getLocationOnScreen(corner);
         Rect place = new Rect(corner[0], corner[1], corner[0] + button.getWidth(), corner[1] + button.getHeight());
-        PixelCopy.request(page.getWindow(), picture, result -> service.coverForStop(picture, place, pkg, answer), service.main);
+        Fire.copy(page.getWindow(), picture, () -> service.coverForStop(picture, place, pkg, answer), service.main);
     }
 
     /** Where the X was: a wheel until an OK there would reach Force stop, the X from then on. */
@@ -1107,7 +1105,7 @@ public final class TaskService extends AccessibilityService {
         File file = RunningApps.picture(this, pkg);
         try {
             file.getParentFile().mkdirs();
-            Files.write(file.toPath(), jpeg);
+            Bytes.write(file, jpeg);
         } catch (IOException e) {
             file.delete();
         }

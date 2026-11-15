@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.Map;
 import org.json.JSONException;
@@ -38,11 +37,11 @@ final class Backup {
             all.put(store, values);
         }
         file(context).getParentFile().mkdirs();
-        Files.write(file(context).toPath(), all.toString(2).getBytes(StandardCharsets.UTF_8));
+        Bytes.write(file(context), all.toString(2).getBytes(StandardCharsets.UTF_8));
     }
 
     static void restore(Context context) throws IOException, JSONException {
-        String text = new String(Files.readAllBytes(file(context).toPath()), StandardCharsets.UTF_8);
+        String text = new String(Bytes.read(file(context)), StandardCharsets.UTF_8);
         JSONObject all = new JSONObject(text);
         for (String store : STORES) {
             JSONObject values = all.optJSONObject(store);

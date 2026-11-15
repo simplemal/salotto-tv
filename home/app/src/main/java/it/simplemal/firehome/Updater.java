@@ -23,8 +23,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -165,8 +163,7 @@ final class Updater {
     /** Android's installer only goes forward, so the way back has to be set aside first. */
     static void keepCurrent(Context context) throws Failure {
         try {
-            Files.copy(new File(context.getPackageCodePath()).toPath(), previous(context).toPath(),
-                StandardCopyOption.REPLACE_EXISTING);
+            Bytes.copy(new File(context.getPackageCodePath()), previous(context));
         } catch (IOException e) {
             throw new Failure(UpdateError.R301);
         }
@@ -349,6 +346,8 @@ final class Updater {
         if (!folder.exists() && !folder.mkdirs()) throw new Failure(UpdateError.F114);
         long free;
         try {
+            // Android 7 cannot say what it keeps for itself: there the room the folder sees counts.
+            if (Fire.ANDROID_7) throw new IOException();
             free = context.getSystemService(StorageManager.class).getAllocatableBytes(StorageManager.UUID_DEFAULT);
         } catch (IOException e) {
             free = new StatFs(folder.getPath()).getAvailableBytes();
@@ -440,7 +439,7 @@ final class Updater {
 
     static String read(File file) {
         try {
-            return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8).trim();
+            return new String(Bytes.read(file), StandardCharsets.UTF_8).trim();
         } catch (IOException e) {
             return "";
         }
@@ -448,7 +447,7 @@ final class Updater {
 
     static void write(File file, String text) {
         try {
-            Files.write(file.toPath(), text.getBytes(StandardCharsets.UTF_8));
+            Bytes.write(file, text.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             file.delete();
         }
