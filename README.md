@@ -13,9 +13,14 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 |---|---|---|---|---|
 | `AFTKM` | Fire TV Stick 4K | 2nd | 2023 | All |
 | `AFTKRT` | Fire TV Stick 4K Max | 2nd | 2023 | All |
-| `AFTKA` | Fire TV Stick 4K Max | 1st | 2021 | Some limited |
-| `AFTSSS` | Fire TV Stick | 3rd | 2020 | Some limited |
-| `AFTSS` | Fire TV Stick Lite | 1st | 2020 | Some limited |
+| `AFTKA` | Fire TV Stick 4K Max | 1st | 2021 | Some limited ¹ |
+| `AFTSSS` | Fire TV Stick | 3rd | 2020 | Some limited ² |
+| `AFTSS` | Fire TV Stick Lite | 1st | 2020 | Some limited ² |
+| `AFTMM` | Fire TV Stick 4K | 1st | 2018 | Being tested ³ |
+
+<sub>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; Fire OS's screensaver cannot be started from the Settings.<br>
+² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
+³ Fire OS 6 does not accept Salotto's service. After the Home key Fire OS holds apps back for about 5 seconds: meanwhile Salotto shows the last picture of its Home with a wheel. At power-on Salotto arrives after about 50 seconds. No features on held-down keys. Plus all the limits of ².</sub>
 
 ## Installation
 

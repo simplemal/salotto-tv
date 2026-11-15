@@ -13,9 +13,14 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 |---|---|---|---|---|
 | `AFTKM` | Fire TV Stick 4K | 2ª | 2023 | Tutte |
 | `AFTKRT` | Fire TV Stick 4K Max | 2ª | 2023 | Tutte |
-| `AFTKA` | Fire TV Stick 4K Max | 1ª | 2021 | Alcune limitate |
-| `AFTSSS` | Fire TV Stick | 3ª | 2020 | Alcune limitate |
-| `AFTSS` | Fire TV Stick Lite | 1ª | 2020 | Alcune limitate |
+| `AFTKA` | Fire TV Stick 4K Max | 1ª | 2021 | Alcune limitate ¹ |
+| `AFTSSS` | Fire TV Stick | 3ª | 2020 | Alcune limitate ² |
+| `AFTSS` | Fire TV Stick Lite | 1ª | 2020 | Alcune limitate ² |
+| `AFTMM` | Fire TV Stick 4K | 1ª | 2018 | In prova ³ |
+
+<sub>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; il salvaschermo di Fire OS non si avvia dalle Impostazioni.<br>
+² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
+³ Fire OS 6 non accetta il servizio di Salotto. Dopo il tasto Home Fire OS blocca le app per circa 5 secondi: intanto Salotto mostra l'ultima immagine della sua Home con una rotella. All'accensione Salotto arriva dopo circa 50 secondi. Niente funzioni sui tasti tenuti premuti. In più, tutti i limiti di ².</sub>
 
 ## Installazione
 
