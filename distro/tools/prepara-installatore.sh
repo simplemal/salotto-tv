@@ -39,6 +39,11 @@ fi
 if one 'Salotto-TV-Setup-*.AppImage' Salotto-TV-Setup.AppImage; then
   # The old name too, so a link saved before the new name still downloads it.
   cp "$TARGET/Salotto-TV-Setup.AppImage" "$TARGET/Installa-Salotto-Linux.AppImage"
+  # An AppImage updates itself from latest-linux.yml, like Windows: the fixed name, at the Mac's version.
+  if [ -f "$DIST/latest-linux.yml" ] && [ "$(version "$DIST/latest-linux.yml")" = "$(version "$DIST/latest-mac.yml")" ]; then
+    image="$(sed -n 's/^path: //p' "$DIST/latest-linux.yml")"
+    sed "s|$image|Salotto-TV-Setup.AppImage|" "$DIST/latest-linux.yml" > "$TARGET/latest-linux.yml"
+  fi
 fi
 for image in "$TARGET"/*.dmg; do
   xcrun stapler validate "$image" > /dev/null || { echo "Fermo: $(basename "$image") non è notarizzato."; exit 1; }
