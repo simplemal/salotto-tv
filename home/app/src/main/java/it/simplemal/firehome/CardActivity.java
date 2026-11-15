@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import java.util.function.IntConsumer;
 import android.widget.EditText;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.WindowManager;
 import android.view.Window;
 import android.text.InputType;
@@ -615,6 +616,8 @@ abstract class CardActivity extends Activity implements ControlPanel.Host {
         under.topMargin = dp(16);
         box.addView(button, under);
         Runnable send = () -> {
+            // Google TV's keyboard sits over the screen and could outlive the window: it goes first.
+            if (Fire.GOOGLE_TV) getSystemService(InputMethodManager.class).hideSoftInputFromWindow(field.getWindowToken(), 0);
             dialog.dismiss();
             done.accept(field.getText().toString());
         };

@@ -221,11 +221,7 @@ public final class FirstRunActivity extends CardActivity {
     private String words(int id) { return words.getString(id); }
 
     private void go(int index) {
-        // Fire OS's keyboard is a page of its own and goes with Done. Google TV's sits over the
-        // screen and stayed over the next page after the name (2026-11-15): it goes with the page.
-        if (Fire.GOOGLE_TV && root.getWindowToken() != null) {
-            getSystemService(InputMethodManager.class).hideSoftInputFromWindow(root.getWindowToken(), 0);
-        }
+        hideKeyboard();
         at = index;
         visit++;
         back = index > 0 ? () -> go(index - 1) : due(this) ? () -> { } : this::finish;
@@ -826,10 +822,22 @@ public final class FirstRunActivity extends CardActivity {
         paint.run();
         field.setOnFocusChangeListener((changed, focused) -> paint.run());
         field.setOnEditorActionListener((view, action, event) -> {
+            hideKeyboard();
             done.run();
             return true;
         });
         return field;
+    }
+
+    /**
+     * Fire OS's keyboard is a page of its own and goes with Done. Google TV's sits over the screen:
+     * it stayed over the next page after the name, and over the places found (2026-11-15). It goes
+     * with Done and with the page.
+     */
+    private void hideKeyboard() {
+        if (Fire.GOOGLE_TV && root != null && root.getWindowToken() != null) {
+            getSystemService(InputMethodManager.class).hideSoftInputFromWindow(root.getWindowToken(), 0);
+        }
     }
 
     /** The remote in outline, with a line from each of the three keys to what it does. */
