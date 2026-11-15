@@ -99,7 +99,7 @@ Salotto is an independent project. It is not affiliated with, sponsored or endor
 
 ---
 
-<sub><a name="note-1"></a>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
-<a name="note-2"></a>² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
-<a name="note-3"></a>³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
-<a name="note-4"></a>⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
+<sub><a name="note-1"></a><b>Almost all ¹</b> — Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
+<a name="note-2"></a><b>Some limited ²</b> — As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
+<a name="note-3"></a><b>Not compatible ³</b> — Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
+<a name="note-4"></a><b>Not compatible ⁴</b> — Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
