@@ -2399,9 +2399,10 @@ public final class MainActivity extends CardActivity {
         boolean app = !HomeApps.SETTINGS.equals(pkg);
         String title = app ? HomeApps.label(this, pkg) : getString(R.string.first_does_settings);
         // Salotto's settings can leave the Home too: the gear beside the apps opens them, and Tutte le app puts the card back.
-        String[] choices = app ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
+        String[] choices = !app ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home)}
+            : HomeApps.removable(this, pkg) ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
                 getString(R.string.card_app_info), getString(R.string.card_uninstall)}
-            : new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home)};
+            : new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home), getString(R.string.card_app_info)};
         dialog()
             .setTitle(title)
             .setItems(choices, (dialog, choice) -> {

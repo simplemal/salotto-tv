@@ -1320,10 +1320,11 @@ public final class SettingsActivity extends CardActivity {
                         : getString(R.string.settings_data_not_cleared));
                     refreshIf(level);
                 }))));
-        entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, getString(R.string.settings_uninstall_text), false, () -> {
-            uninstalling = level;
-            uninstall(pkg);
-        }));
+        if (HomeApps.removable(this, pkg)) entries.add(new Entry(getString(R.string.settings_uninstall), null, picture,
+            getString(R.string.settings_uninstall_text), false, () -> {
+                uninstalling = level;
+                uninstall(pkg);
+            }));
         show(HomeApps.label(this, pkg), entries);
     }
 

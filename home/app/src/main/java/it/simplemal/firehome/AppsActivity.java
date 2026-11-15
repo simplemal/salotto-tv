@@ -104,7 +104,8 @@ public final class AppsActivity extends CardActivity {
         dialog()
             .setTitle(app.label)
             .setItems(settings ? new String[]{onHome}
-                    : new String[]{onHome, getString(R.string.card_app_info), getString(R.string.card_uninstall)},
+                    : HomeApps.removable(this, app.pkg) ? new String[]{onHome, getString(R.string.card_app_info), getString(R.string.card_uninstall)}
+                    : new String[]{onHome, getString(R.string.card_app_info)},
                 (dialog, choice) -> {
                     if (choice == 1) {
                         appInfo(app.pkg);
