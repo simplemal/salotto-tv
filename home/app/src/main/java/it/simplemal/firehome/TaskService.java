@@ -118,7 +118,7 @@ public final class TaskService extends AccessibilityService {
      * One line for each press, and only once Android has taken Amazon's Home in: a Home started
      * after this comes out on top of it. The system's own log only, or the reading falls behind.
      */
-    private static final String[] LOG_OPTIONS = {"-b", "system", "-v", "brief", "-T", "1", (Fire.ANDROID_9 ? "ActivityManager" : "ActivityTaskManager") + ":I"};
+    static final String[] LOG_OPTIONS = {"-b", "system", "-v", "brief", "-T", "1", (Fire.ANDROID_9 ? "ActivityManager" : "ActivityTaskManager") + ":I"};
     private static final String HOME_LOG = "logcat " + String.join(" ", LOG_OPTIONS) + " '*:S'";
     private static final String HOME_INTENT = "cat=[" + Intent.CATEGORY_HOME + "]";
     private static final String FROM_SYSTEM = Fire.ANDROID_9 ? "from uid 1000" : "from uid 0";
@@ -1062,10 +1062,15 @@ public final class TaskService extends AccessibilityService {
             if (SystemClock.elapsedRealtime() - started <= HOME_LOG_START_MS) continue;
             if (line.contains(Fire.RECENTS_ACTION)) {
                 main.post(this::holdScreen);
-            } else if (cover != null && line.contains(HOME_INTENT) && line.contains(Fire.AMAZON_HOME) && line.contains(FROM_SYSTEM)) {
+            } else if (cover != null && amazonHome(line)) {
                 cover.heard();
             }
         }
+    }
+
+    /** The log line of a Home press that Android sent to Amazon's Home. */
+    static boolean amazonHome(String line) {
+        return line.contains(HOME_INTENT) && line.contains(Fire.AMAZON_HOME) && line.contains(FROM_SYSTEM);
     }
 
     private void afterHomeLog() {

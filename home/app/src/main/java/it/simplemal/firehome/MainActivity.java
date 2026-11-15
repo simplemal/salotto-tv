@@ -384,6 +384,7 @@ public final class MainActivity extends CardActivity {
         // A backdrop that arrives while the Home is on screen shows at once.
         Packs.arrived = this::backdropArrived;
         TaskService.keysUnlessOff(this);
+        HomeWatch.start(this);
         TaskService.quickAnimationsByDefault(this);
         TaskService.alarmsAtOnce(this);
         TaskService.keepAdbKey(this);
