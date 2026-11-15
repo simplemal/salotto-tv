@@ -45,7 +45,7 @@ final class Weather {
     }
 
     private static final String FILE = "weather";
-    /** In the shared folder, holding "phase/condition": shows that scene, to try all 120. */
+    /** In the shared folder, holding a key of the pictures' table, such as "night/61": shows that picture. */
     private static final String SCENE_TEST = "meteo-prova";
     private static final String PICTURES = "meteo-illustrato/";
     private static final String PHOTOS = "meteo-foto/";
@@ -95,14 +95,6 @@ final class Weather {
             .remove("updated").remove("tomorrow_code").apply();
     }
 
-    /** "phase/condition" of the scene for now, or null without a place or a first reading. */
-    static String scene(Context context) {
-        if (testing(context)) return Updater.read(Updater.shared(context, SCENE_TEST));
-        SharedPreferences saved = prefs(context);
-        if (!active(context) || !saved.contains("code")) return null;
-        return phase(saved) + "/" + condition(saved.getInt("code", 0));
-    }
-
     static boolean testing(Context context) { return Updater.shared(context, SCENE_TEST).exists(); }
 
     /**
@@ -117,7 +109,7 @@ final class Weather {
         boolean aerial = Look.weatherAerial(context);
         String folder = aerial ? AERIAL : photos ? PHOTOS : PICTURES;
         String last = aerial ? "aerial" : photos ? "photo" : "picture";
-        String key = testing(context) ? scene(context)
+        String key = testing(context) ? Updater.read(Updater.shared(context, SCENE_TEST))
             : active(context) && saved.contains("code") ? phase(saved) + "/" + saved.getInt("code", 0) : null;
         String path = key == null ? null : file(context, folder, key);
         if (path == null) return saved.getString(last, byClock(context, folder));
@@ -210,32 +202,6 @@ final class Weather {
         if (now > sunset + 20 * MINUTE_S && now <= sunset + 90 * MINUTE_S) return "evening";
         if (now > sunrise && now < sunset) return (now - sunrise) <= 0.6 * (sunset - sunrise) ? "day" : "afternoon";
         return "night";
-    }
-
-    /** The table of WEATHER_BACKGROUND_INDEX.md. An unknown code keeps the sky, without phenomena. */
-    private static String condition(int code) {
-        switch (code) {
-            case 1: return "mostly_clear";
-            case 2: return "partly_cloudy";
-            case 3: return "overcast";
-            case 45: return "fog";
-            case 48: return "freezing_fog";
-            case 51: case 56: return "light_drizzle";
-            case 53: case 57: return "moderate_drizzle";
-            case 55: return "heavy_drizzle";
-            case 61: case 66: return "light_rain";
-            case 63: return "moderate_rain";
-            case 65: case 67: return "heavy_rain";
-            case 71: case 77: return "light_snow";
-            case 73: return "moderate_snow";
-            case 75: return "heavy_snow";
-            case 80: return "light_rain_showers";
-            case 81: case 82: return "heavy_rain_showers";
-            case 85: return "light_snow_showers";
-            case 86: return "heavy_snow_showers";
-            case 95: case 96: case 97: case 99: return "thunderstorm";
-            default: return "clear_sky";
-        }
     }
 
     /**

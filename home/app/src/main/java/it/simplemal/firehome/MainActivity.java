@@ -1358,8 +1358,7 @@ public final class MainActivity extends CardActivity {
      */
     private void showBackdrop(boolean chosen) {
         if (cornersOnTop()) readCorner();
-        String scene = Look.weatherPictures(this) ? Weather.picture(this)
-            : Look.weatherBackdrop(this) || Weather.testing(this) ? Weather.scene(this) : null;
+        String scene = Look.weatherPictures(this) ? Weather.picture(this) : null;
         // Salotto's colours changing by themselves: the one due now, so that a new one is a change.
         String plain = scene == null ? Look.shownBackdrop(this) : null;
         String before = plainBackdrop;

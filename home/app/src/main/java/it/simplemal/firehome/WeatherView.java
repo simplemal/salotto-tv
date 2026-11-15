@@ -7,7 +7,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.os.SystemClock;
-import android.util.DisplayMetrics;
 import android.view.View;
 import java.util.function.Consumer;
 
@@ -32,6 +31,8 @@ final class WeatherView extends View {
         void ready(Runnable place, Consumer<Canvas> paint);
     }
 
+    /** How long a scene that moves keeps moving after the Home comes back. */
+    private static final double ENTRY_S = 3;
     private static final double FADE_S = 2.5;
     private static final float SHADE_FROM = 0.30f;
     private static final float SHADE_FULL = 0.72f;
@@ -50,7 +51,7 @@ final class WeatherView extends View {
     private String wanted;
     private boolean running;
     private boolean flat;
-    private double enteredAt = -WeatherScene.ENTRY_S;
+    private double enteredAt = -ENTRY_S;
     private double fadeStart;
     private float scroll;
     /** Hidden behind something opaque, the blur of the wheel: nothing to draw or move. */
@@ -128,10 +129,8 @@ final class WeatherView extends View {
         forgotten = false;
         wanted = name;
         Context context = getContext().getApplicationContext();
-        DisplayMetrics screen = getResources().getDisplayMetrics();
         Background.draw(() -> {
-            Scene loaded = Look.picture(name) ? RasterScene.load(context, name)
-                : WeatherScene.load(context, name, screen.widthPixels, screen.heightPixels);
+            Scene loaded = RasterScene.load(context, name);
             post(() -> {
                 if (swap != null) swapIn(loaded, name, swap);
                 else arrive(loaded, name);
@@ -179,7 +178,7 @@ final class WeatherView extends View {
     }
 
     private void paint(Canvas canvas, Scene which) {
-        which.draw(canvas, WeatherScene.ENTRY_S, scroll, 1);
+        which.draw(canvas, ENTRY_S, scroll, 1);
         drawShade(canvas);
     }
 
@@ -243,7 +242,7 @@ final class WeatherView extends View {
         current.draw(canvas, entered, scroll, alpha);
         drawShade(canvas);
         // Every frame the screen can show, for a short while: smooth, and then nothing at all.
-        boolean moving = fading || previous != null || current.moves() && entered < WeatherScene.ENTRY_S;
+        boolean moving = fading || previous != null || current.moves() && entered < ENTRY_S;
         if (running && moving) {
             postInvalidateOnAnimation();
         } else if (!moving && !flat && current.moves()) {

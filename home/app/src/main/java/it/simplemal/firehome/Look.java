@@ -298,7 +298,6 @@ final class Look {
         return hours24(context) ? "HH:mm" : "h:mm";
     }
 
-    /** Not a picture: the Home draws it with WeatherView, and it needs a place for the weather. */
     /** One of the weather's backdrops is the one chosen, or none is yet and the weather's is the first. */
     static boolean weatherChosen(Context context) {
         String chosen = prefs(context).getString("backdrop", null);
