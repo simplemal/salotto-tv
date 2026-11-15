@@ -284,6 +284,13 @@ public final class MainActivity extends CardActivity {
      */
     private static final float LIGHT_LINE = 0.5f;
     /**
+     * Under the first row, by lightness that weighs no colour more: weighed like the line at the top,
+     * green grass by the sea counted as light as snow, and the names turned black where white read
+     * better (2026-11-15). Past this, compared on every backdrop, black reads better: snow and white
+     * sand; below it, with its shadow, white.
+     */
+    private static final float LIGHT_BELOW = 0.6f;
+    /**
      * Over a light picture the free buttons and the clean Home's line turn black, a little
      * see-through: the words hardly, the icons a touch more, as the middle ones are drawn thicker.
      */
@@ -676,7 +683,7 @@ public final class MainActivity extends CardActivity {
             if (clean) {
                 // The whole line at the top; and under the first row, for the names and the credits.
                 light = lightness(picture, width / 16, width * 15 / 16, 0, height / 8) > LIGHT_LINE;
-                below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
+                below = paleness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_BELOW;
             } else {
                 // The wheel's buttons, at the bottom in the middle.
                 light = lightness(picture, width * 3 / 8, width * 5 / 8, height * 5 / 6, height) > LIGHT_CORNER;
@@ -713,6 +720,23 @@ public final class MainActivity extends CardActivity {
             for (int y = top; y < bottom; y += 4) {
                 int pixel = picture.getPixel(x, y);
                 sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : 0;
+    }
+
+    /** Lightness as halfway between the strongest and the weakest of red, green and blue: no colour counts more. */
+    private static double paleness(Bitmap picture, int left, int right, int top, int bottom) {
+        double sum = 0;
+        int count = 0;
+        for (int x = left; x < right; x += 4) {
+            for (int y = top; y < bottom; y += 4) {
+                int pixel = picture.getPixel(x, y);
+                int red = Color.red(pixel);
+                int green = Color.green(pixel);
+                int blue = Color.blue(pixel);
+                sum += (Math.max(red, Math.max(green, blue)) + Math.min(red, Math.min(green, blue))) / 510.0;
                 count++;
             }
         }
