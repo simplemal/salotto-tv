@@ -39,6 +39,14 @@ final class Packs {
     static final String[] ALL = {Look.PICTURES_FOLDER, Look.PHOTOS_FOLDER, Look.AERIAL_FOLDER, Look.ABSTRACT_FOLDER,
         Look.ABSTRACT_3D_FOLDER, Look.NOX_FOLDER, Look.NATURE_FOLDER};
     static final String ROOT = "sfondi";
+    /**
+     * Beside each collection, `miniature-` and its name: its small copies, which the grid and the
+     * mosaic read in a moment, `grandi` and `piccole`. A small archive of their own, so that a
+     * collection already on the TV needs only these; whole, like a collection, with `.completo`.
+     */
+    private static final String THUMBS = "miniature-";
+    private static final String THUMBS_LARGE = "/grandi/";
+    private static final String THUMBS_SMALL = "/piccole/";
     /** Written last, after the last file: a folder without it is a download that stopped half way. */
     static final String COMPLETE = ".completo";
     /**
@@ -54,6 +62,7 @@ final class Packs {
     static final String CHOSEN = "scelte";
     private static final String BASE = "https://github.com/" + Fire.UPDATES_REPO + "/releases/download/sfondi/";
     private static final AtomicBoolean fetching = new AtomicBoolean();
+    private static volatile boolean thumbsTried;
     /** What is coming in now, for the page that waits for it. */
     private static volatile String coming;
     private static volatile long received;
@@ -84,6 +93,37 @@ final class Packs {
     /** On the TV, whole. */
     static boolean onTv(Context context, String pack) {
         return new File(new File(root(context), pack), COMPLETE).isFile();
+    }
+
+    /** Its small copies are on the TV, whole. */
+    static boolean thumbsOnTv(Context context, String pack) {
+        return new File(new File(root(context), THUMBS + pack), COMPLETE).isFile();
+    }
+
+    /**
+     * The small copy of a picture of a collection, `small` for the smallest: null if it is not on
+     * the TV, and the picture itself is to be read instead.
+     */
+    static InputStream thumbnail(Context context, String path, boolean small) {
+        String pack = packOf(path);
+        if (pack == null || !thumbsOnTv(context, pack)) return null;
+        String inside = path.substring(pack.length() + 1);
+        try {
+            return new FileInputStream(new File(root(context), THUMBS + pack + (small ? THUMBS_SMALL : THUMBS_LARGE) + inside));
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /** A collection taken away whole loses its small copies too. */
+    static void forgetThumbs(Context context, String pack) {
+        delete(new File(root(context), THUMBS + pack));
+    }
+
+    private static void delete(File file) {
+        File[] inside = file.listFiles();
+        if (inside != null) for (File one : inside) delete(one);
+        file.delete();
     }
 
     /** Only its first picture so far: the Home can show it, the rest is coming. */
@@ -169,6 +209,15 @@ final class Packs {
         return names;
     }
 
+    /** Whole on the TV, but without their small copies: from before they left the app, or not yet come. */
+    static List<String> thumbsMissing(Context context) {
+        List<String> names = new ArrayList<>();
+        for (String pack : ALL) {
+            if (onTv(context, pack) && !thumbsOnTv(context, pack) && !Look.setTaken(context, pack)) names.add(pack);
+        }
+        return names;
+    }
+
     /**
      * Has a row where a backdrop is chosen: whole on the TV, or inside the app. One with only its
      * first picture only if the Home is showing it, so the choice in use is never without its row;
@@ -214,6 +263,12 @@ final class Packs {
         if (chosen.isFile()) {
             String listed = Updater.read(chosen);
             if (!Arrays.asList(listed.split("\\s+")).contains(pack)) Updater.write(chosen, listed.trim() + "\n" + pack + "\n");
+        }
+        // One fetch at a time: one already going takes this one too, at the end.
+        if (fetching() && !queue.contains(pack)) {
+            List<String> longer = new ArrayList<>(queue);
+            longer.add(pack);
+            queue = longer;
         }
         fetchNow(context);
     }
@@ -290,7 +345,10 @@ final class Packs {
     static void fetchNow(Context context) { fetchAll(context, true); }
 
     private static void fetchAll(Context context, boolean lightestFirst) {
-        if (missing(context).isEmpty() || !fetching.compareAndSet(false, true)) return;
+        boolean onlyThumbs = missing(context).isEmpty();
+        // The Home asks at every return: the small copies alone are tried once while Salotto runs.
+        if (onlyThumbs && (thumbsTried || thumbsMissing(context).isEmpty()) || !fetching.compareAndSet(false, true)) return;
+        if (onlyThumbs) thumbsTried = true;
         stop = Stop.NONE;
         queue = missing(context);
         Background.run(() -> {
@@ -312,12 +370,24 @@ final class Packs {
                     }
                 }
                 queue = new ArrayList<>(order);
+                // First the small copies of the collections already here: little, and the grid wants them now.
+                for (String pack : thumbsMissing(context)) {
+                    JSONObject item = itemOf(packs, pack);
+                    JSONObject thumbs = item != null ? item.optJSONObject("thumbs") : null;
+                    if (thumbs == null) continue;
+                    try {
+                        fetchThumbs(context, pack, thumbs);
+                    } catch (NoRoom e) {
+                        // The collections need the room more: these come another time.
+                    }
+                }
                 long needed = 0;
-                for (String pack : order) {
+                for (int at = 0; at < order.size() || joined(context, order); at++) {
+                    String pack = order.get(at);
                     JSONObject item = itemOf(packs, pack);
                     if (item == null) continue;
                     try {
-                        fetch(context, pack, item);
+                        fetchWhole(context, pack, item);
                     } catch (NoRoom e) {
                         // Too large for what is free: the others may still fit, the user's choice of 2026-11-05.
                         needed += item.getLong("bytes");
@@ -338,6 +408,64 @@ final class Packs {
                 tell();
             }
         });
+    }
+
+    /** Asked by the user while the others came: added at the end. False if none was. */
+    private static boolean joined(Context context, List<String> order) {
+        boolean more = false;
+        for (String pack : missing(context)) {
+            if (order.contains(pack)) continue;
+            order.add(pack);
+            more = true;
+        }
+        if (more) queue = new ArrayList<>(order);
+        return more;
+    }
+
+    /** A collection with its small copies first, on one bar: the copies are a few MB, the collection tens. */
+    private static void fetchWhole(Context context, String pack, JSONObject item)
+            throws JSONException, IOException, GeneralSecurityException {
+        JSONObject thumbs = thumbsOnTv(context, pack) ? null : item.optJSONObject("thumbs");
+        received = 0;
+        expected = item.getLong("bytes") + (thumbs != null ? thumbs.getLong("bytes") : 0);
+        coming = pack;
+        if (thumbs != null) fetchThumbs(context, pack, thumbs);
+        fetch(context, pack, item);
+    }
+
+    /** The small copies of a collection, checked over every byte like the collection, and only then marked whole. */
+    private static void fetchThumbs(Context context, String pack, JSONObject thumbs)
+            throws JSONException, IOException, GeneralSecurityException {
+        long size = thumbs.getLong("bytes");
+        File root = root(context);
+        if (!root.exists() && !root.mkdirs()) throw new IOException("folder");
+        if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new NoRoom();
+        String url = thumbs.getString("url");
+        if (!url.startsWith("https://")) throw new IOException("url");
+        File folder = new File(root, THUMBS + pack);
+        delete(folder);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        long before = received;
+        boolean whole = false;
+        HttpURLConnection connection = Updater.open(url);
+        try {
+            try (InputStream input = new Reading(new DigestInputStream(new Counting(connection.getInputStream()), digest))) {
+                try {
+                    Tar.unpack(input, root, THUMBS + pack);
+                } catch (IOException e) {
+                    String what = String.valueOf(e.getMessage());
+                    if (what.contains("ENOSPC") || what.contains("No space")) throw new NoRoom();
+                    throw e;
+                }
+                byte[] rest = new byte[65536];
+                while (input.read(rest) > 0) { }
+            }
+            if (received - before != size || !hex(digest.digest()).equals(thumbs.getString("sha256"))) throw new IOException("fingerprint");
+            Bytes.write(new File(folder, COMPLETE), new byte[0]);
+            whole = true;
+        } finally {
+            if (!whole) delete(folder);
+        }
     }
 
     private static long bytesOf(JSONArray packs, String pack) {
@@ -468,9 +596,7 @@ final class Packs {
         File folder = new File(root, pack);
         java.util.Set<String> first = firstNames(context, pack);
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        received = 0;
-        expected = size;
-        coming = pack;
+        long before = received;
         boolean whole = false;
         HttpURLConnection connection = Updater.open(url);
         try {
@@ -488,7 +614,7 @@ final class Packs {
                 byte[] rest = new byte[65536];
                 while (input.read(rest) > 0) { }
             }
-            if (received != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
+            if (received - before != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
             Bytes.write(new File(folder, COMPLETE), new byte[0]);
             new File(folder, PARTIAL).delete();
             whole = true;

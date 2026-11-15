@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 # Publishes the collections of backdrops on the fixed release "sfondi", apart from the versions of
-# Salotto: one archive for each, a strip of small pictures to show what it holds, ten larger ones
-# for the installer's gallery, sfondi.json, and sfondi-indice.json with the place of every file in its archive
+# Salotto: one archive for each, one more with its small copies, a strip of small pictures to show
+# what it holds, ten larger ones for the installer's gallery, sfondi.json, and sfondi-indice.json with the place of every file in its archive
 # signed with the key of the updates. Salotto downloads from there only the collections chosen,
 # and checks each archive against the signed list before opening it.
 # Usage: distro/tools/pubblica-sfondi.sh [--prova]   (with --prova it builds everything and uploads nothing)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-ASSETS="$ROOT/home/app/src/main/assets"
-# The collections themselves are kept out of the app, here.
+# The collections themselves are kept out of the app, here, and their small copies beside them,
+# made by prepara-miniature.py.
 PACKS_DIR="$ROOT/home/sfondi"
+THUMBS_DIR="$ROOT/home/miniature"
 KEY="$ROOT/chiavi-aggiornamento/privata.pem"
 REPO="$(sed -n 's/.*UPDATES_REPO = "\(.*\)".*/\1/p' "$ROOT/home/app/src/main/java/it/simplemal/firehome/Fire.java")"
 [ -n "$REPO" ] || { echo "Fermo: repository non trovato in Fire.java."; exit 1; }
@@ -25,12 +26,14 @@ for pack in $PACKS; do
   [ -d "$PACKS_DIR/$pack" ] || { echo "Fermo: manca la cartella $pack."; exit 1; }
   # Plain tar, without the Mac's own extra files: the pictures are compressed already.
   (cd "$PACKS_DIR" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/$pack.tar" "$pack")
+  [ -d "$THUMBS_DIR/miniature-$pack" ] || { echo "Fermo: mancano le miniature di $pack, lancia prepara-miniature.py."; exit 1; }
+  (cd "$THUMBS_DIR" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/miniature-$pack.tar" "miniature-$pack")
 done
 
-python3 - "$WORK" "$ASSETS" "$PACKS_DIR" "$REPO" $PACKS <<'PY'
+python3 - "$WORK" "$THUMBS_DIR" "$PACKS_DIR" "$REPO" $PACKS <<'PY'
 import hashlib, json, os, sys, tarfile
 from PIL import Image
-work, assets, packs_dir, repo, *packs = sys.argv[1:]
+work, thumbs_dir, packs_dir, repo, *packs = sys.argv[1:]
 base = f"https://github.com/{repo}/releases/download/sfondi/"
 SAMPLES, WIDTH, HEIGHT, GAP = 6, 216, 122, 6
 # Seen large in the installer: 10 pictures of each collection, 1280 x 720, asked for only when opened.
@@ -39,13 +42,14 @@ listed = []
 indexes = {}
 for pack in packs:
     # The weather's illustrations sit in a folder for each moment of the day.
-    small = sorted(os.path.relpath(os.path.join(where, name), os.path.join(assets, "miniature", pack))
-                   for where, _, names in os.walk(os.path.join(assets, "miniature", pack))
+    small_dir = os.path.join(thumbs_dir, f"miniature-{pack}", "grandi")
+    small = sorted(os.path.relpath(os.path.join(where, name), small_dir)
+                   for where, _, names in os.walk(small_dir)
                    for name in names if not name.startswith("."))
     picked = [small[round(index * (len(small) - 1) / (SAMPLES - 1))] for index in range(SAMPLES)]
     strip = Image.new("RGB", (SAMPLES * WIDTH + (SAMPLES - 1) * GAP, HEIGHT), (0, 0, 0))
     for index, name in enumerate(picked):
-        with Image.open(os.path.join(assets, "miniature", pack, name)) as picture:
+        with Image.open(os.path.join(small_dir, name)) as picture:
             strip.paste(picture.convert("RGB").resize((WIDTH, HEIGHT)), (index * (WIDTH + GAP), 0))
     sample = os.path.join(work, f"campione-{pack}.webp")
     strip.save(sample, quality=80)
@@ -74,6 +78,7 @@ for pack in packs:
             if member.isfile():
                 body = data[member.offset_data:member.offset_data + member.size]
                 index[member.name] = [member.offset_data, member.size, hashlib.sha256(body).hexdigest()]
+    thumbs = open(os.path.join(work, f"miniature-{pack}.tar"), "rb").read()
     files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(packs_dir, pack)))
     listed.append({
         "id": pack, "bytes": len(data), "files": files,
@@ -81,6 +86,8 @@ for pack in packs:
         "sample": base + f"campione-{pack}.webp",
         "sample_sha256": hashlib.sha256(open(sample, "rb").read()).hexdigest(),
         "gallery": gallery,
+        # Read by Salotto from version 1.1.6: before, the small copies came inside the app.
+        "thumbs": {"url": base + f"miniature-{pack}.tar", "bytes": len(thumbs), "sha256": hashlib.sha256(thumbs).hexdigest()},
     })
     indexes[pack] = index
 json.dump({"version": 1, "packs": listed}, open(os.path.join(work, "sfondi.json"), "w"), indent=2)

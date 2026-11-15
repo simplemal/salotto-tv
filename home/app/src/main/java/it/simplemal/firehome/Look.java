@@ -577,6 +577,7 @@ final class Look {
         File[] files = new File(Packs.root(context), folder).listFiles();
         if (files != null) for (File file : files) file.delete();
         new File(Packs.root(context), folder).delete();
+        Packs.forgetThumbs(context, folder);
     }
 
     private static void addTaken(Context context, String entry) {

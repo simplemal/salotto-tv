@@ -32,6 +32,13 @@ if grep -rnE -f "$ROOT/distro/dati-personali.local" "$ROOT/home/app/src" > /dev/
   echo "Fermo: dati personali nei sorgenti."; exit 1
 fi
 
+# Salotto no longer carries the small copies of the backdrops: each TV downloads them from the
+# release "sfondi", so they must be there before a version without them reaches anyone.
+if ! curl -fsSL "https://github.com/$REPO/releases/download/sfondi/sfondi.json" |
+    python3 -c 'import json, sys; sys.exit(0 if all("thumbs" in p for p in json.load(sys.stdin)["packs"]) else 1)'; then
+  echo "Fermo: il rilascio sfondi non ha ancora le miniature, prima distro/tools/pubblica-sfondi.sh."; exit 1
+fi
+
 BADGING="$("$ROOT/home/.toolchain/android-sdk/build-tools/34.0.0/aapt2" dump badging "$APK" | sed -n 1p)"
 case "$BADGING" in
   *"versionCode='$CODE' versionName='$NAME'"*) ;;

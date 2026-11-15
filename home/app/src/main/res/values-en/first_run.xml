@@ -35,10 +35,6 @@
     <string name="first_does_settings">Settings</string>
     <string name="first_start">Get started</string>
     <string name="first_backdrop_title">Choose a backdrop</string>
-    <string name="first_packs_question">Download the backdrop collections you chose now?</string>
-    <string name="first_packs_size">%1$s in all, it takes a few minutes.</string>
-    <string name="first_packs_now">Download now</string>
-    <string name="first_packs_later">Later</string>
     <string name="first_packs_title">Downloading backdrops</string>
     <string name="first_packs_room">There isn\'t enough space on the TV for the remaining image collections: they need %1$s and %2$s is left. They won\'t arrive until you free up space.</string>
     <string name="first_packs_network">The internet connection dropped. The missing collections will arrive on their own when it\'s back.</string>

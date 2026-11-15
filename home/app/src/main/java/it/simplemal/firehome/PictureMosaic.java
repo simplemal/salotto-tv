@@ -2,6 +2,7 @@ package it.simplemal.firehome;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -21,6 +22,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +40,8 @@ import java.util.Random;
  * own: this GPU cannot repaint the whole screen sixty times a second, but it can repaint two tiles.
  * Between changes nothing is drawn. Weather pictures open with a good and a bad day and a good and a
  * bad night, on the tiles most in view; after that chance picks a moment of the day and a kind of
- * weather, or it would be mostly drizzle.
+ * weather, or it would be mostly drizzle. A collection not yet downloaded shows still, from the
+ * collage the app carries: fifteen of its pictures, one for each tile.
  */
 final class PictureMosaic extends FrameLayout {
     private static final int COLUMNS = 3;
@@ -73,6 +76,10 @@ final class PictureMosaic extends FrameLayout {
     private static final String DAY = "day";
     private static final String NIGHT = "night";
     private static final String ARABIC = "ar";
+    /** Made by prepara-miniature.py: the tiles side by side, five to a row. */
+    private static final String COLLAGE = "collage/";
+    private static final String COLLAGE_FILE = ".webp";
+    private static final int COLLAGE_COLUMNS = 5;
 
     private final class Tile {
         final FrameLayout frame = new FrameLayout(getContext());
@@ -215,18 +222,7 @@ final class PictureMosaic extends FrameLayout {
 
     /** Null stops it and lets the pictures go. */
     void show(String wanted) {
-        if (wanted == null ? folder == null : wanted.equals(folder)) return;
-        folder = wanted;
-        removeCallbacks(change);
-        files = new ArrayList<>();
-        moments.clear();
-        opening.clear();
-        next = 0;
-        for (Tile tile : tiles) tile.clear();
-        setVisibility(wanted == null ? GONE : VISIBLE);
-        if (wanted == null) return;
-        // The rows change sides for Arabic, so the pictures do as well.
-        setScaleX(ARABIC.equals(Language.code(getContext())) ? -1 : 1);
+        if (!start(wanted)) return;
         sortMoments(Weather.pictures(getContext(), wanted + "/"), wanted);
         if (moments.isEmpty()) {
             try {
@@ -244,6 +240,53 @@ final class PictureMosaic extends FrameLayout {
         started = SystemClock.uptimeMillis();
         for (Tile tile : tiles) load(tile, false);
         postDelayed(change, EVERY_MS);
+    }
+
+    /** Still: the collage of a collection not on the TV, one of its pictures on each tile. */
+    void showCollage(String pack) {
+        String key = COLLAGE + pack;
+        if (!start(key)) return;
+        Context context = getContext().getApplicationContext();
+        Background.draw(() -> {
+            Bitmap read = null;
+            try (InputStream input = context.getAssets().open(key + COLLAGE_FILE)) {
+                read = BitmapFactory.decodeStream(input);
+            } catch (IOException e) {
+                // Without its collage the side stays plain.
+            }
+            Bitmap sheet = read;
+            post(() -> {
+                if (!key.equals(folder)) return;
+                if (sheet == null) {
+                    setVisibility(GONE);
+                    return;
+                }
+                int rows = (tiles.size() + COLLAGE_COLUMNS - 1) / COLLAGE_COLUMNS;
+                int width = sheet.getWidth() / COLLAGE_COLUMNS;
+                int height = sheet.getHeight() / rows;
+                for (int index = 0; index < tiles.size(); index++) {
+                    tiles.get(index).dissolve(Bitmap.createBitmap(sheet,
+                        index % COLLAGE_COLUMNS * width, index / COLLAGE_COLUMNS * height, width, height));
+                }
+            });
+        });
+    }
+
+    /** Clears what is on show for `wanted`: false if it is on show already, or if it is null. */
+    private boolean start(String wanted) {
+        if (wanted == null ? folder == null : wanted.equals(folder)) return false;
+        folder = wanted;
+        removeCallbacks(change);
+        files = new ArrayList<>();
+        moments.clear();
+        opening.clear();
+        next = 0;
+        for (Tile tile : tiles) tile.clear();
+        setVisibility(wanted == null ? GONE : VISIBLE);
+        if (wanted == null) return false;
+        // The rows change sides for Arabic, so the pictures do as well.
+        setScaleX(ARABIC.equals(Language.code(getContext())) ? -1 : 1);
+        return true;
     }
 
     private void sortMoments(Properties table, String wanted) {
