@@ -45,7 +45,6 @@
     <string name="first_packs_server">O servidor das coleções não responde. O Salotto tentará de novo mais tarde, sozinho.</string>
     <string name="first_packs_damaged">Uma coleção chegou danificada e foi descartada. O Salotto tentará de novo mais tarde, sozinho.</string>
     <string name="first_preview">Prévia</string>
-    <string name="grid_position">%1$d de %2$d</string>
     <string name="first_backdrop_pictures">Clima ilustrado</string>
     <string name="first_backdrop_photos">Clima fotográfico</string>
     <string name="first_backdrop_night">Noite</string>

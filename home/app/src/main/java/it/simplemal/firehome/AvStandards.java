@@ -38,7 +38,7 @@ import org.json.JSONObject;
 /**
  * The audio and video standards from three sides: what the Stick can do, what the TV announces,
  * what is in use now. All of it is asked of the system at each visit: the tables here only put
- * names and a line of explanation on what it reports. Slow, so never on the main thread.
+ * names on what it reports. Slow, so never on the main thread.
  */
 @SuppressLint("InlinedApi")
 final class AvStandards {
@@ -48,22 +48,18 @@ final class AvStandards {
         final String stick;
         final String tv;
         final String now;
-        final String text;
         boolean opensGroup;
 
-        Line(String name, String stick, String tv, String now, String text) {
+        Line(String name, String stick, String tv, String now) {
             this.name = name;
             this.stick = stick;
             this.tv = tv;
             this.now = now;
-            this.text = text;
         }
     }
 
     /** What is chosen in Video and Audio, already in words. */
     static final class Chosen {
-        String resolution;
-        String range;
         String colorFormat;
         String colorDepth;
         String surround;
@@ -94,22 +90,22 @@ final class AvStandards {
         String picture() { return size(height) + " " + rate + " Hz"; }
     }
 
-    /** Type, name, explanation, in the order of the page. A type found on the Stick and not here joins the "other" row. */
+    /** Type and name, in the order of the page. A type found on the Stick and not here joins the "other" row. */
     private static final Object[][] VIDEO = {
-        {"video/av01", "AV1", R.string.av_video_av1},
-        {"video/hevc", "H.265 (HEVC)", R.string.av_video_hevc},
-        {"video/x-vnd.on2.vp9", "VP9", R.string.av_video_vp9},
-        {"video/avc", "H.264 (AVC)", R.string.av_video_avc},
-        {"video/mpeg2", "MPEG-2", R.string.av_video_mpeg2},
+        {"video/av01", "AV1"},
+        {"video/hevc", "H.265 (HEVC)"},
+        {"video/x-vnd.on2.vp9", "VP9"},
+        {"video/avc", "H.264 (AVC)"},
+        {"video/mpeg2", "MPEG-2"},
     };
-    /** Type, encoding, name, explanation: these can leave the Stick as they are, for the TV or soundbar to decode. */
+    /** Type, encoding and name: these can leave the Stick as they are, for the TV or soundbar to decode. */
     private static final Object[][] SURROUND = {
-        {"audio/eac3", AudioFormat.ENCODING_E_AC3, "Dolby Digital Plus", R.string.av_surround_eac3},
-        {"audio/ac3", AudioFormat.ENCODING_AC3, "Dolby Digital", R.string.av_surround_ac3},
-        {"audio/ac4", AudioFormat.ENCODING_AC4, "Dolby AC-4", R.string.av_surround_ac4},
-        {"audio/true-hd", AudioFormat.ENCODING_DOLBY_TRUEHD, "Dolby TrueHD", R.string.av_surround_truehd},
-        {"audio/vnd.dts", AudioFormat.ENCODING_DTS, "DTS", R.string.av_surround_dts},
-        {"audio/vnd.dts.hd", AudioFormat.ENCODING_DTS_HD, "DTS-HD", R.string.av_surround_dts_hd},
+        {"audio/eac3", AudioFormat.ENCODING_E_AC3, "Dolby Digital Plus"},
+        {"audio/ac3", AudioFormat.ENCODING_AC3, "Dolby Digital"},
+        {"audio/ac4", AudioFormat.ENCODING_AC4, "Dolby AC-4"},
+        {"audio/true-hd", AudioFormat.ENCODING_DOLBY_TRUEHD, "Dolby TrueHD"},
+        {"audio/vnd.dts", AudioFormat.ENCODING_DTS, "DTS"},
+        {"audio/vnd.dts.hd", AudioFormat.ENCODING_DTS_HD, "DTS-HD"},
     };
     private static final String AAC = "audio/mp4a-latm";
     private static final String DOLBY_VISION = "video/dolby-vision";
@@ -191,19 +187,8 @@ final class AvStandards {
         return standards.lines;
     }
 
-    /** Whole sentences, each its own string, one after the other: the empty ones leave no trace. */
-    private static String sentences(String... parts) {
-        StringBuilder text = new StringBuilder();
-        for (String part : parts) {
-            if (part.isEmpty()) continue;
-            if (text.length() > 0) text.append(' ');
-            text.append(part);
-        }
-        return text.toString();
-    }
-
-    private void add(String name, String stick, String tv, String now, String text) {
-        Line line = new Line(name, stick, tv, now, text);
+    private void add(String name, String stick, String tv, String now) {
+        Line line = new Line(name, stick, tv, now);
         line.opensGroup = opening;
         opening = false;
         lines.add(line);
@@ -277,15 +262,10 @@ final class AvStandards {
         Display.Mode mode = display.getMode();
         Decoder best = bestVideo();
         add(context.getString(R.string.av_resolution), best != null ? best.picture() : NONE, tv,
-            size(mode.getPhysicalHeight()) + " " + hz(mode.getRefreshRate()),
-            sentences(context.getString(R.string.av_resolution_text),
-                names.isEmpty() ? "" : context.getString(R.string.av_tv_also, TextUtils.join(", ", names)),
-                context.getString(R.string.av_chosen_in_video, chosen.resolution)));
+            size(mode.getPhysicalHeight()) + " " + hz(mode.getRefreshRate()));
         boolean tenBit = plays("video/hevc", CodecProfileLevel.HEVCProfileMain10);
         add(context.getString(R.string.av_color), tenBit ? "10 bit" : "8 bit", display.isWideColorGamut() ? declared : notDeclared,
-            chosen.colorFormat + ", " + chosen.colorDepth,
-            sentences(context.getString(R.string.av_color_text),
-                display.isWideColorGamut() ? "" : context.getString(R.string.av_tv_no_wide_color)));
+            chosen.colorFormat + ", " + chosen.colorDepth);
     }
 
     private Decoder bestVideo() {
@@ -317,27 +297,19 @@ final class AvStandards {
         String both = context.getString(R.string.av_sdr_and_hdr);
         add(context.getString(R.string.av_dynamic_range), hdr10 || hlg || vision ? both : "SDR",
             tv.isEmpty() ? context.getString(R.string.av_sdr_only) : both,
-            !known ? unknown : on ? "HDR" : "SDR",
-            sentences(context.getString(R.string.av_dynamic_range_text),
-                tv.isEmpty() ? context.getString(R.string.av_tv_no_hdr) : "",
-                context.getString(R.string.av_chosen_in_video, chosen.range)));
+            !known ? unknown : on ? "HDR" : "SDR");
         opening = true;
-        hdrLine("HDR10", hdr10, tv, Display.HdrCapabilities.HDR_TYPE_HDR10, known, on && active.contains("10") && !plus(active),
-            context.getString(R.string.av_hdr10_text));
-        hdrLine("HDR10+", hdr10Plus, tv, Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS, known, on && plus(active),
-            context.getString(R.string.av_hdr10_plus_text));
-        hdrLine("HLG", hlg, tv, Display.HdrCapabilities.HDR_TYPE_HLG, known, on && active.contains("hlg"),
-            context.getString(R.string.av_hlg_text));
-        hdrLine("Dolby Vision", vision, tv, Display.HdrCapabilities.HDR_TYPE_DOLBY_VISION, known, on && active.contains("dolby"),
-            context.getString(R.string.av_dolby_vision_text));
+        hdrLine("HDR10", hdr10, tv, Display.HdrCapabilities.HDR_TYPE_HDR10, known, on && active.contains("10") && !plus(active));
+        hdrLine("HDR10+", hdr10Plus, tv, Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS, known, on && plus(active));
+        hdrLine("HLG", hlg, tv, Display.HdrCapabilities.HDR_TYPE_HLG, known, on && active.contains("hlg"));
+        hdrLine("Dolby Vision", vision, tv, Display.HdrCapabilities.HDR_TYPE_DOLBY_VISION, known, on && active.contains("dolby"));
     }
 
     private static boolean plus(String active) { return active.contains("+") || active.contains("plus"); }
 
-    private void hdrLine(String name, boolean stick, Set<Integer> tv, int type, boolean known, boolean on, String text) {
+    private void hdrLine(String name, boolean stick, Set<Integer> tv, int type, boolean known, boolean on) {
         boolean announced = tv.contains(type);
-        add(name, stick ? yes : no, announced ? declared : notDeclared, !known ? unknown : on ? yes : no,
-            sentences(text, announced ? "" : context.getString(R.string.av_tv_does_not_declare, name)));
+        add(name, stick ? yes : no, announced ? declared : notDeclared, !known ? unknown : on ? yes : no);
     }
 
     private void videoFormats() {
@@ -347,9 +319,7 @@ final class AvStandards {
             String type = (String) format[0];
             listed.add(type);
             Decoder decoder = decoders.get(type);
-            add((String) format[1], decoder != null ? decoder.picture() : no, NOT_NEEDED, NONE,
-                sentences(context.getString((Integer) format[2]), decoder != null ? "" : context.getString(R.string.av_no_decoder),
-                    context.getString(R.string.av_tv_not_needed)));
+            add((String) format[1], decoder != null ? decoder.picture() : no, NOT_NEEDED, NONE);
         }
         for (Object[] format : SURROUND) listed.add((String) format[0]);
         other("video/", context.getString(R.string.av_other_video), listed);
@@ -364,8 +334,7 @@ final class AvStandards {
             names.add(known != null ? known : type.substring(kind.length()));
         }
         if (names.isEmpty()) return;
-        add(name, context.getResources().getQuantityString(R.plurals.av_formats, names.size(), names.size()), NOT_NEEDED, NONE,
-            context.getString(R.string.av_decoded_by_stick, TextUtils.join(", ", names)));
+        add(name, context.getResources().getQuantityString(R.plurals.av_formats, names.size(), names.size()), NOT_NEEDED, NONE);
     }
 
     private void audio() {
@@ -377,8 +346,7 @@ final class AvStandards {
         }
         String name = context.getString(R.string.av_audio_channels);
         String tv = surroundMode != SURROUND_BEST ? unknown : tvChannels > 0 ? channels(tvChannels) : notDeclared;
-        add(name, stickChannels > 0 ? channels(stickChannels) : NONE, tv, chosen.surround,
-            sentences(context.getString(R.string.av_channels_text), tvSentence(tv, context.getString(R.string.av_tv_no_channels))));
+        add(name, stickChannels > 0 ? channels(stickChannels) : NONE, tv, chosen.surround);
         atmos();
         Set<String> listed = new HashSet<>(Arrays.asList(RAW, AAC));
         for (Object[] format : SURROUND) {
@@ -389,14 +357,10 @@ final class AvStandards {
             tv = tvSays(encoding);
             String now = surroundNow(type, encoding);
             boolean decoded = decoders.containsKey(type);
-            add(name, decoded ? yes : no, tv, now, sentences(context.getString((Integer) format[3]),
-                decoded ? "" : context.getString(R.string.av_no_decoder),
-                tvSentence(tv, context.getString(R.string.av_tv_does_not_declare, name)),
-                now.equals(available) ? context.getString(R.string.av_available_text)
-                    : now.equals(selected) ? context.getString(R.string.av_selected_text) : ""));
+            add(name, decoded ? yes : no, tv, now);
         }
         Decoder aac = decoders.get(AAC);
-        add("AAC", aac != null ? channels(aac.channels) : no, NOT_NEEDED, NONE, context.getString(R.string.av_aac_text));
+        add("AAC", aac != null ? channels(aac.channels) : no, NOT_NEEDED, NONE);
         other("audio/", context.getString(R.string.av_other_audio), listed);
     }
 
@@ -404,8 +368,7 @@ final class AvStandards {
         JSONObject features = atmosFeatures();
         String tv = tvSays(AudioFormat.ENCODING_E_AC3_JOC, AudioFormat.ENCODING_DOLBY_MAT);
         String name = "Dolby Atmos";
-        add(name, features != null ? yes : no, tv, features != null && features.optBoolean("enabled") ? available : no,
-            sentences(context.getString(R.string.av_atmos_text), tvSentence(tv, context.getString(R.string.av_tv_does_not_declare, name))));
+        add(name, features != null ? yes : no, tv, features != null && features.optBoolean("enabled") ? available : no);
     }
 
     /** Fire OS keeps here what its audio can do; Atmos has no decoder of its own in the list. */
@@ -425,13 +388,6 @@ final class AvStandards {
             if (tvEncodings.contains(encoding)) return declared;
         }
         return notDeclared;
-    }
-
-    /** `missing` is what to say if the TV does not announce it. */
-    private String tvSentence(String tv, String missing) {
-        if (tv.equals(notDeclared)) return missing;
-        if (tv.equals(unknown)) return context.getString(R.string.av_surround_fixed, chosen.surround);
-        return "";
     }
 
     private String surroundNow(String type, int encoding) {

@@ -63,7 +63,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
 import java.util.function.ToLongFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,7 +175,6 @@ public final class SettingsActivity extends CardActivity {
         final String title;
         final String value;
         final Drawable picture;
-        final String text;
         final Runnable action;
         final boolean branch;
         String family;
@@ -196,11 +194,10 @@ public final class SettingsActivity extends CardActivity {
         /** One of a list of choices: pressing it also closes the window of choices. */
         boolean picks;
 
-        Entry(String title, String value, Drawable picture, String text, boolean branch, Runnable action) {
+        Entry(String title, String value, Drawable picture, boolean branch, Runnable action) {
             this.title = title;
             this.value = value;
             this.picture = picture;
-            this.text = text;
             this.branch = branch;
             this.action = action;
         }
@@ -1019,14 +1016,14 @@ public final class SettingsActivity extends CardActivity {
     /** What Salotto cannot do stays in Fire OS: one row to get there. */
     private void showFire() {
         show(getString(R.string.settings_fire), Collections.singletonList(
-            new Entry(getString(R.string.settings_fire_open), null, null, getString(R.string.settings_fire_text), false, () -> {
+            new Entry(getString(R.string.settings_fire_open), null, null, false, () -> {
                 TaskService.wantFireSettings();
                 open(fireOsSettings());
             })));
     }
 
-    private Entry info(String title, String value, String text) {
-        return new Entry(title, value, null, text, false, () -> { });
+    private Entry info(String title, String value) {
+        return new Entry(title, value, null, false, () -> { });
     }
 
     private String notificationValue() {
@@ -1041,7 +1038,7 @@ public final class SettingsActivity extends CardActivity {
 
     private void showLanguages() {
         show(getString(R.string.settings_language), choices(Language.NAMES, Arrays.asList(Language.CODES).indexOf(Language.code(this)),
-            R.drawable.ic_s_language, getString(R.string.settings_language_text), index -> {
+            R.drawable.ic_s_language, index -> {
                 Language.set(this, Language.CODES[index]);
                 startActivity(new Intent(this, MainActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
@@ -1057,22 +1054,18 @@ public final class SettingsActivity extends CardActivity {
         int style = Look.homeStyle(this);
         boolean circular = style == Look.HOME_CIRCLE;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_home), getString(HOME_NAMES[style]), null, null,
+        entries.add(new Entry(getString(R.string.settings_home), getString(HOME_NAMES[style]), null,
             true, () -> enter(this::showHomes)));
-        entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null,
-            getString(R.string.settings_backdrop_text), true, () -> open(new Intent(this, PictureGridActivity.class))));
+        entries.add(new Entry(getString(R.string.settings_backdrop), Look.backdropName(this, Look.backdrop(this)), null, true, () -> open(new Intent(this, PictureGridActivity.class))));
         // Only for a collection that changes by itself: with one picture or the weather it means nothing.
         if (Look.timedBackdrop(this)) entries.add(paceEntry(false));
         entries.add(groupLabel(HOME_SECTIONS[style]));
         if (circular) {
             // The wheel has no rows, no dock and no names under the circles.
-            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null,
-                getString(R.string.settings_wheel_text), true, () -> enter(this::showWheel)));
-            entries.add(new Entry(getString(R.string.settings_glow), glowNames()[Look.glow(this)], null,
-                getString(R.string.settings_glow_text), true, () -> enter(this::showGlow)));
+            entries.add(new Entry(getString(R.string.settings_wheel), wheelName(Look.wheel(this)), null, true, () -> enter(this::showWheel)));
+            entries.add(new Entry(getString(R.string.settings_glow), glowNames()[Look.glow(this)], null, true, () -> enter(this::showGlow)));
             boolean motion = Look.wheelMotion(this);
-            Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, null,
-                getString(R.string.settings_wheel_motion_text), false, () -> {
+            Entry opening = new Entry(getString(R.string.settings_wheel_motion), motion ? YES : NO, null, false, () -> {
                     Look.setWheelMotion(this, !motion);
                     refresh();
                 });
@@ -1080,37 +1073,34 @@ public final class SettingsActivity extends CardActivity {
             opening.off = !Features.CIRCLE_ANIMATION;
             entries.add(opening);
             boolean blur = Look.wheelBlur(this);
-            entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null,
-                getString(R.string.settings_wheel_blur_text), false, () -> {
+            entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null, false, () -> {
                     Look.setWheelBlur(this, !blur);
                     refresh();
                 }));
         } else {
             // The clean Home has twelve apps a row, always.
-            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null,
-                getString(R.string.settings_app_names_text), true, () -> enter(this::showNames)));
+            entries.add(new Entry(getString(R.string.settings_app_names), Look.nameModes(this)[Look.names(this)], null, true, () -> enter(this::showNames)));
             entries.add(new Entry(getString(R.string.settings_first_row),
                 getString(Look.appsOnly(this) ? R.string.settings_dock_top
-                    : style == Look.HOME_CLEAN && Look.cleanRowMiddle(this) ? R.string.settings_row_middle : R.string.settings_dock_bottom), null,
-                getString(R.string.settings_dock_text), true, () -> enter(this::showDock)));
+                    : style == Look.HOME_CLEAN && Look.cleanRowMiddle(this) ? R.string.settings_row_middle : R.string.settings_dock_bottom), null, true, () -> enter(this::showDock)));
             if (style == Look.HOME_CLEAN) {
                 // Its own switch, off at first: the wheel's is not touched.
                 boolean blur = Look.cleanBlur(this);
-                entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null, null, false, () -> {
+                entries.add(new Entry(getString(R.string.settings_wheel_blur), blur ? YES : NO, null, false, () -> {
                     Look.setCleanBlur(this, !blur);
                     refresh();
                 }));
                 boolean edge = Look.cleanEdge(this);
-                entries.add(new Entry(getString(R.string.settings_app_edge), edge ? YES : NO, null, null, false, () -> {
+                entries.add(new Entry(getString(R.string.settings_app_edge), edge ? YES : NO, null, false, () -> {
                     Look.setCleanEdge(this, !edge);
                     refresh();
                 }));
-                entries.add(new Entry(getString(R.string.settings_icons), iconsNames()[Look.cleanIcons(this)], null, null, true,
+                entries.add(new Entry(getString(R.string.settings_icons), iconsNames()[Look.cleanIcons(this)], null, true,
                     () -> enter(this::showIcons)));
             }
         }
         boolean credits = Look.credits(this);
-        entries.add(new Entry(getString(R.string.settings_credits), credits ? YES : NO, null, null, false, () -> {
+        entries.add(new Entry(getString(R.string.settings_credits), credits ? YES : NO, null, false, () -> {
             Look.setCredits(this, !credits);
             refresh();
         }));
@@ -1127,7 +1117,7 @@ public final class SettingsActivity extends CardActivity {
     private void showHomes() {
         String[] names = new String[HOME_ORDER.length];
         for (int index = 0; index < names.length; index++) names[index] = getString(HOME_NAMES[HOME_ORDER[index]]);
-        show(getString(R.string.settings_home), choices(names, indexOf(HOME_ORDER, Look.homeStyle(this)), R.drawable.ic_s_grid, index -> null, index -> {
+        show(getString(R.string.settings_home), choices(names, indexOf(HOME_ORDER, Look.homeStyle(this)), R.drawable.ic_s_grid, index -> {
             Look.setHomeStyle(this, HOME_ORDER[index]);
             refresh();
         }));
@@ -1137,8 +1127,7 @@ public final class SettingsActivity extends CardActivity {
         int[] counts = Look.WHEEL_CHOICES;
         String[] names = new String[counts.length];
         for (int index = 0; index < counts.length; index++) names[index] = wheelName(counts[index]);
-        show(getString(R.string.settings_wheel), choices(names, indexOf(counts, Look.wheel(this)), R.drawable.ic_apps,
-            getString(R.string.settings_wheel_text), index -> {
+        show(getString(R.string.settings_wheel), choices(names, indexOf(counts, Look.wheel(this)), R.drawable.ic_apps, index -> {
                 Look.setWheel(this, counts[index]);
                 refresh();
             }));
@@ -1149,29 +1138,24 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showGlow() {
-        show(getString(R.string.settings_glow), choices(glowNames(), Look.glow(this), R.drawable.ic_apps,
-            getString(R.string.settings_glow_text), index -> {
+        show(getString(R.string.settings_glow), choices(glowNames(), Look.glow(this), R.drawable.ic_apps, index -> {
                 Look.setGlow(this, index);
                 refresh();
             }));
     }
 
     /** The rows of a list with one choice marked: each runs `choose` with its own index. */
-    private List<Entry> choices(String[] names, int chosen, int picture, IntFunction<String> text, IntConsumer choose) {
+    private List<Entry> choices(String[] names, int chosen, int picture, IntConsumer choose) {
         List<Entry> entries = new ArrayList<>();
         for (int index = 0; index < names.length; index++) {
             int choice = index;
-            Entry entry = new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture),
-                text.apply(index), false, () -> choose.accept(choice));
+            Entry entry = new Entry(names[index], index == chosen ? CHECK : null, getDrawable(picture), false, () -> choose.accept(choice));
             entry.picks = true;
             entries.add(entry);
         }
         return entries;
     }
 
-    private List<Entry> choices(String[] names, int chosen, int picture, String text, IntConsumer choose) {
-        return choices(names, chosen, picture, index -> text, choose);
-    }
 
     private String minutes(int count) { return getResources().getQuantityString(R.plurals.settings_minutes, count, count); }
 
@@ -1196,7 +1180,7 @@ public final class SettingsActivity extends CardActivity {
             // Only here: in the middle as well. Listed as on the screen, the top first (2026-11-09).
             String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_row_middle), getString(R.string.settings_dock_bottom)};
             int chosen = Look.appsOnly(this) ? 0 : Look.cleanRowMiddle(this) ? 1 : 2;
-            show(getString(R.string.settings_first_row), choices(names, chosen, R.drawable.ic_s_grid, index -> null, index -> {
+            show(getString(R.string.settings_first_row), choices(names, chosen, R.drawable.ic_s_grid, index -> {
                 Look.setAppsOnly(this, index == 0);
                 Look.setCleanRowMiddle(this, index == 1);
                 refresh();
@@ -1205,8 +1189,7 @@ public final class SettingsActivity extends CardActivity {
         }
         // The glass Home calls it the first row too (2026-11-09): the word dock is gone.
         String[] names = {getString(R.string.settings_dock_top), getString(R.string.settings_dock_bottom)};
-        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 0 : 1, R.drawable.ic_s_grid,
-            getString(R.string.settings_dock_text), index -> {
+        show(getString(R.string.settings_first_row), choices(names, Look.appsOnly(this) ? 0 : 1, R.drawable.ic_s_grid, index -> {
                 Look.setAppsOnly(this, index == 0);
                 refresh();
             }));
@@ -1219,16 +1202,14 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showIcons() {
-        show(getString(R.string.settings_icons), choices(iconsNames(), Look.cleanIcons(this), R.drawable.ic_apps,
-            getString(R.string.settings_icons_text), index -> {
+        show(getString(R.string.settings_icons), choices(iconsNames(), Look.cleanIcons(this), R.drawable.ic_apps, index -> {
                 Look.setCleanIcons(this, index);
                 refresh();
             }));
     }
 
     private void showNames() {
-        show(getString(R.string.settings_app_names), choices(Look.nameModes(this), Look.names(this), R.drawable.ic_apps,
-            getString(R.string.settings_app_names_text), index -> {
+        show(getString(R.string.settings_app_names), choices(Look.nameModes(this), Look.names(this), R.drawable.ic_apps, index -> {
                 Look.setNames(this, index);
                 refresh();
             }));
@@ -1238,17 +1219,14 @@ public final class SettingsActivity extends CardActivity {
     private void showApps() {
         List<Entry> entries = new ArrayList<>(Arrays.asList(
             new Entry(getString(R.string.settings_all_apps), null, null,
-                getString(R.string.settings_all_apps_text),
                 false, () -> open(new Intent(this, AppsActivity.class))),
             new Entry(getString(R.string.settings_task_manager), null, null,
-                getString(R.string.settings_task_manager_text),
                 false, () -> open(new Intent(this, TasksActivity.class))),
             new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, null,
-                getString(R.string.settings_held_keys_text),
                 false, () -> changeSystem(() -> TaskService.chooseKeys(this, !TaskService.keysOn(this), () -> { if (!isFinishing()) refresh(); })))));
         entries.add(groupLabel(R.string.settings_manage_apps));
         for (HomeApps.App app : HomeApps.installed(this)) {
-            Entry entry = new Entry(app.label, null, null, getString(R.string.settings_manage_app_text),
+            Entry entry = new Entry(app.label, null, null,
                 true, () -> enter(() -> showApp(app.pkg)));
             entry.pkg = app.pkg;
             entries.add(entry);
@@ -1297,21 +1275,20 @@ public final class SettingsActivity extends CardActivity {
     private void listApp(String pkg, Level level, StorageStats size) {
         Drawable picture = appIcon(pkg);
         List<Entry> entries = new ArrayList<>();
-        String text = getString(R.string.settings_app_info_text);
-        entries.add(new Entry(getString(R.string.settings_app_version), appVersion(pkg), picture, text, false, () -> { }));
+        entries.add(new Entry(getString(R.string.settings_app_version), appVersion(pkg), picture, false, () -> { }));
         if (!Fire.ANDROID_7) {
-            entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
-            entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
-            entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, false, () -> { }));
         }
         if (launchIntent(pkg) != null) {
-            entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
+            entries.add(new Entry(getString(R.string.settings_app_open), null, picture, false, () -> openPackage(pkg)));
         }
-        entries.add(new Entry(getString(R.string.settings_app_close), null, picture, getString(R.string.settings_app_close_text), false,
+        entries.add(new Entry(getString(R.string.settings_app_close), null, picture, false,
             () -> TaskService.stop(pkg, stopped -> say(stopped ? getString(R.string.settings_app_closed) : getString(R.string.settings_app_not_closed)))));
-        if (!Features.CLEAR_DATA_HERE) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+        if (!Features.CLEAR_DATA_HERE) entries.add(new Entry(getString(R.string.settings_clear_data), null, picture,
             false, () -> open(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + pkg)))));
-        else entries.add(new Entry(getString(R.string.settings_clear_data), null, picture, getString(R.string.settings_clear_data_text),
+        else entries.add(new Entry(getString(R.string.settings_clear_data), null, picture,
             false, () -> confirm(getString(R.string.settings_clear_data_question, HomeApps.label(this, pkg)),
                 getString(R.string.settings_clear_data_warning), getString(R.string.settings_clear),
                 () -> shell("pm clear " + pkg, output -> {
@@ -1319,8 +1296,7 @@ public final class SettingsActivity extends CardActivity {
                         : getString(R.string.settings_data_not_cleared));
                     refreshIf(level);
                 }))));
-        if (HomeApps.removable(this, pkg)) entries.add(new Entry(getString(R.string.settings_uninstall), null, picture,
-            getString(R.string.settings_uninstall_text), false, () -> {
+        if (HomeApps.removable(this, pkg)) entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, false, () -> {
                 uninstalling = level;
                 uninstall(pkg);
             }));
@@ -1343,21 +1319,18 @@ public final class SettingsActivity extends CardActivity {
         if (sound == null) entries.add(reading());
         else entries.addAll(audioRows(level));
         entries.add(groupLabel(R.string.settings_section_tv));
-        entries.add(new Entry(getString(R.string.settings_cec), cec ? YES : NO, null,
-            getString(R.string.settings_cec_text), false,
+        entries.add(new Entry(getString(R.string.settings_cec), cec ? YES : NO, null, false,
             () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_ENABLED, cec ? 0 : 1))));
-        entries.add(new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, null,
-            getString(R.string.settings_tv_off_text), false,
+        entries.add(new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, null, false,
             () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))));
-        entries.add(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null,
-            getString(R.string.settings_sleep_text), true, () -> enter(this::showSleepTimes)));
-        entries.add(new Entry(getString(R.string.settings_standards), null, null, getString(R.string.settings_standards_text),
+        entries.add(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null, true, () -> enter(this::showSleepTimes)));
+        entries.add(new Entry(getString(R.string.settings_standards), null, null,
             true, () -> enter(this::showStandards)));
         show(getString(R.string.settings_screen), entries);
     }
 
     private Entry reading() {
-        return info(getString(R.string.settings_reading), null, getString(R.string.settings_a_moment));
+        return info(getString(R.string.settings_reading), null);
     }
 
     /** Read again after every change and every return to the page; until then the last values stay. */
@@ -1386,8 +1359,6 @@ public final class SettingsActivity extends CardActivity {
         showWaiting(getString(R.string.settings_standards));
         Background.run(() -> {
             AvStandards.Chosen chosen = new AvStandards.Chosen();
-            chosen.resolution = nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), fire.read(FireSettings.PICTURE, RESOLUTION));
-            chosen.range = nameOf(RANGES, strings(RANGE_NAMES), fire.read(FireSettings.PICTURE, RANGE));
             chosen.colorFormat = nameOf(COLOR_FORMATS, colorFormatNames(), fire.read(FireSettings.PICTURE, COLOR_FORMAT));
             chosen.colorDepth = nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), fire.read(FireSettings.PICTURE, COLOR_DEPTH));
             chosen.surround = nameOf(SURROUNDS, surroundNames(), surroundNow());
@@ -1397,7 +1368,7 @@ public final class SettingsActivity extends CardActivity {
                 Drawable picture = getDrawable(R.drawable.ic_image);
                 List<Entry> entries = new ArrayList<>();
                 for (AvStandards.Line line : lines) {
-                    Entry entry = new Entry(line.name, null, picture, line.text, false, () -> { });
+                    Entry entry = new Entry(line.name, null, picture, false, () -> { });
                     entry.columns = new String[]{line.stick, line.tv, line.now};
                     entry.opensGroup = line.opensGroup;
                     entries.add(entry);
@@ -1418,8 +1389,7 @@ public final class SettingsActivity extends CardActivity {
         Level level = levels.peek();
         if (level.drawn) return;
         int focus = level.focus;
-        show(title, Arrays.asList(new Entry(getString(R.string.settings_reading), null, getDrawable(R.drawable.ic_image),
-            getString(R.string.settings_a_moment), false, () -> { })));
+        show(title, Arrays.asList(new Entry(getString(R.string.settings_reading), null, getDrawable(R.drawable.ic_image), false, () -> { })));
         level.focus = focus;
         level.drawn = false;
     }
@@ -1431,21 +1401,16 @@ public final class SettingsActivity extends CardActivity {
         String depth = picture[3];
         List<Entry> entries = new ArrayList<>();
         // A page of its own: a wrong one can leave the screen black, and the page counts down the way back.
-        entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), null,
-            resolutionText(), true, () -> enter(() -> showResolutions(resolution))));
-        entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), null,
-            getString(R.string.settings_hdr_text), true,
+        entries.add(new Entry(getString(R.string.settings_resolution), nameOf(RESOLUTIONS, strings(RESOLUTION_NAMES), resolution), null, true, () -> enter(() -> showResolutions(resolution))));
+        entries.add(new Entry("HDR", nameOf(RANGES, strings(RANGE_NAMES), range), null, true,
             () -> enter(() -> showChoices("HDR", FireSettings.PICTURE, RANGE, RANGES, strings(RANGE_NAMES), range))));
-        entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), null,
-            getString(R.string.settings_color_format_text), true,
+        entries.add(new Entry(getString(R.string.settings_color_format), nameOf(COLOR_FORMATS, colorFormatNames(), format), null, true,
             () -> enter(() -> showChoices(getString(R.string.settings_color_format), FireSettings.PICTURE, COLOR_FORMAT, COLOR_FORMATS, colorFormatNames(), format))));
         if (depth != null && !depth.isEmpty()) {
-            entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), null,
-                getString(R.string.settings_color_depth_text), true,
+            entries.add(new Entry(getString(R.string.settings_color_depth), nameOf(COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth), null, true,
                 () -> enter(() -> showChoices(getString(R.string.settings_color_depth), FireSettings.PICTURE, COLOR_DEPTH, COLOR_DEPTHS, strings(COLOR_DEPTH_NAMES), depth))));
         }
-        entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), null,
-            getString(R.string.settings_video_quality_text), true, () -> enter(this::showVideoQuality)));
+        entries.add(new Entry(getString(R.string.settings_video_quality), getString(VIDEO_QUALITY_NAMES[videoQuality()]), null, true, () -> enter(this::showVideoQuality)));
         return entries;
     }
 
@@ -1454,15 +1419,12 @@ public final class SettingsActivity extends CardActivity {
         boolean clear = "true".equals(sound[1]);
         String surround = surroundNow();
         return Arrays.asList(
-            new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null,
-                getString(R.string.settings_surround_text), true,
+            new Entry(getString(R.string.settings_surround), nameOf(SURROUNDS, surroundNames(), surround), null, true,
                 () -> enter(() -> showChoices(getString(R.string.settings_surround), FireSettings.AUDIO, SURROUND, SURROUND_ACTIONS,
                     surroundNames(), SURROUND_ACTIONS[Arrays.asList(SURROUNDS).indexOf(surround)]))),
-            new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null,
-                getString(R.string.settings_dialogue_text), false,
+            new Entry(getString(R.string.settings_dialogue), clear ? YES : NO, null, false,
                 () -> writeFire(FireSettings.AUDIO, DIALOGUE, clear ? "false" : "true", () -> refreshIf(level))),
-            new Entry(getString(R.string.settings_leveler), even ? YES : NO, null,
-                getString(R.string.settings_leveler_text), false,
+            new Entry(getString(R.string.settings_leveler), even ? YES : NO, null, false,
                 () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level))));
     }
 
@@ -1496,7 +1458,6 @@ public final class SettingsActivity extends CardActivity {
     private void showChoices(String title, String provider, String id, String[] actions, String[] names, String current) {
         Level level = levels.peek();
         show(title, choices(names, Arrays.asList(actions).indexOf(current), R.drawable.ic_image,
-            getString(R.string.settings_fire_may_refuse),
             index -> writeFire(provider, id, actions[index], () -> {
                 if (levels.peek() == level) closeChoices(level);
                 else refresh();
@@ -1519,8 +1480,7 @@ public final class SettingsActivity extends CardActivity {
             values.subList(1, 3).clear();
             names.subList(1, 3).clear();
         }
-        List<Entry> entries = choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image,
-            resolutionText(), index -> {
+        List<Entry> entries = choices(names.toArray(new String[0]), values.indexOf(current), R.drawable.ic_image, index -> {
                 if (!values.get(index).equals(current)) changeResolution(current, values.get(index));
             });
         // The window stays while the question counts down: it closes when the answer comes.
@@ -1593,7 +1553,6 @@ public final class SettingsActivity extends CardActivity {
         String[] names = new String[last + 1];
         for (int index = 0; index <= last; index++) names[index] = getString(VIDEO_QUALITY_NAMES[last - index]);
         show(getString(R.string.settings_video_quality), choices(names, last - videoQuality(), R.drawable.ic_image,
-            getString(R.string.settings_video_quality_text),
             index -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), VIDEO_QUALITY, last - index))));
     }
 
@@ -1602,16 +1561,14 @@ public final class SettingsActivity extends CardActivity {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         List<Entry> entries = new ArrayList<>();
         if (adapter == null || !adapter.isEnabled()) {
-            entries.add(info(getString(R.string.settings_bluetooth_off), null, getString(R.string.settings_bluetooth_off_text)));
+            entries.add(info(getString(R.string.settings_bluetooth_off), null));
             return entries;
         }
         for (BluetoothDevice device : adapter.getBondedDevices()) {
             String name = device.getName() != null ? device.getName() : device.getAddress();
-            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), null,
-                getString(R.string.settings_press_to_forget_device), false, () -> forgetBluetooth(device, name)));
+            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), null, false, () -> forgetBluetooth(device, name)));
         }
         entries.add(new Entry(getString(R.string.settings_find_devices), null, null,
-            getString(R.string.settings_find_devices_text),
             true, () -> enter(this::showBluetoothSearch)));
         return entries;
     }
@@ -1648,13 +1605,13 @@ public final class SettingsActivity extends CardActivity {
             List<Entry> entries = new ArrayList<>();
             for (BluetoothDevice device : found.values()) {
                 String name = device.getName();
-                entries.add(new Entry(name, null, picture, getString(R.string.settings_press_to_pair), false, () -> {
+                entries.add(new Entry(name, null, picture, false, () -> {
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     sayLong(device.createBond() ? getString(R.string.settings_pairing, name) : getString(R.string.settings_pairing_failed));
                 }));
             }
             if (entries.isEmpty()) {
-                entries.add(new Entry(getString(R.string.first_searching), null, picture, getString(R.string.settings_pairing_mode), false, () -> { }));
+                entries.add(new Entry(getString(R.string.first_searching), null, picture, false, () -> { }));
             }
             show(getString(R.string.settings_find_devices), entries);
         };
@@ -1711,14 +1668,11 @@ public final class SettingsActivity extends CardActivity {
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
         boolean counted = NotificationCounter.allowed(this);
         List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, null,
-                getString(R.string.settings_limit_ads_text), false,
+            new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, null, false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
-            new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, null,
-                getString(R.string.settings_usage_data_text), false,
+            new Entry(getString(R.string.settings_usage_data), metrics ? YES : NO, null, false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), USAGE_METRICS, metrics ? 0 : 1)))));
-        if (Features.NOTIFICATION_COUNT) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, null,
-            getString(R.string.settings_notification_count_text), false,
+        if (Features.NOTIFICATION_COUNT) entries.add(0, new Entry(getString(R.string.settings_notification_count), counted ? YES : NO, null, false,
             () -> changeCounter(counted)));
         return entries;
     }
@@ -1727,19 +1681,15 @@ public final class SettingsActivity extends CardActivity {
         boolean clicks = Settings.System.getInt(getContentResolver(), Settings.System.SOUND_EFFECTS_ENABLED, 0) == 1;
         boolean quick = Settings.Global.getFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, 1) < 1;
         List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_language), Language.name(this), null,
-                getString(R.string.settings_language_text), true, () -> enter(this::showLanguages)),
-            new Entry(getString(R.string.panel_notifications), notificationValue(), null,
-                getString(R.string.settings_notifications_text), false, () -> {
+            new Entry(getString(R.string.settings_language), Language.name(this), null, true, () -> enter(this::showLanguages)),
+            new Entry(getString(R.string.panel_notifications), notificationValue(), null, false, () -> {
                     NotificationCounter.seen(this);
                     open(Fire.notifications());
                 }),
-            new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, null,
-                getString(R.string.settings_sounds_text), false,
+            new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, null, false,
                 () -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
                     Settings.System.SOUND_EFFECTS_ENABLED, clicks ? 0 : 1))),
-            new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, null,
-                getString(R.string.settings_quick_animations_text), false,
+            new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, null, false,
                 () -> changeSystem(() -> {
                     float scale = quick ? 1 : QUICK_SCALE;
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
@@ -1758,21 +1708,21 @@ public final class SettingsActivity extends CardActivity {
 
     private void showSleepTimes() {
         show(getString(R.string.settings_sleep), choices(minuteNames(SLEEP_MINUTES), indexOf(SLEEP_MINUTES, sleepMinutes()),
-            R.drawable.ic_image, getString(R.string.settings_sleep_text),
+            R.drawable.ic_image,
             index -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SLEEP_TIMEOUT,
                 SLEEP_MINUTES[index] * MINUTE))));
     }
 
-    private List<Entry> infoRows(List<String[]> rows, Drawable picture, String text) {
+    private List<Entry> infoRows(List<String[]> rows, Drawable picture) {
         List<Entry> entries = new ArrayList<>();
-        for (String[] row : rows) entries.add(new Entry(row[0], row[1], picture, text, false, () -> { }));
+        for (String[] row : rows) entries.add(new Entry(row[0], row[1], picture, false, () -> { }));
         return entries;
     }
 
     /** With a cable Wi-Fi stays on but idle, and neither its switch nor its networks would mean anything. */
     private List<Entry> wiredRows() {
-        List<Entry> entries = infoRows(DeviceInfo.network(this), null, getString(R.string.settings_connection_state));
-        entries.add(info("Wi-Fi", getString(R.string.settings_wifi_on_cable), getString(R.string.settings_wifi_on_cable_text)));
+        List<Entry> entries = infoRows(DeviceInfo.network(this), null);
+        entries.add(info("Wi-Fi", getString(R.string.settings_wifi_on_cable)));
         return entries;
     }
 
@@ -1781,16 +1731,16 @@ public final class SettingsActivity extends CardActivity {
         boolean on = getSystemService(WifiManager.class).isWifiEnabled();
         List<Entry> entries = new ArrayList<>();
         if (!Features.WIFI_NETWORKS) {
-            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_on_fire),
+            entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null,
                 false, () -> open(new Intent(Settings.ACTION_WIFI_SETTINGS))));
         } else {
-            entries.add(new Entry("Wi-Fi", on ? YES : NO, null, getString(R.string.settings_wifi_text), false,
+            entries.add(new Entry("Wi-Fi", on ? YES : NO, null, false,
                 () -> setWifi(!on)));
         }
         if (on) {
-            if (Features.WIFI_NETWORKS) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null, getString(R.string.settings_wifi_networks_text),
+            if (Features.WIFI_NETWORKS) entries.add(new Entry(getString(R.string.settings_wifi_networks), null, null,
                 true, () -> enter(this::showWifi)));
-            entries.addAll(infoRows(DeviceInfo.network(this), null, getString(R.string.settings_connection_state)));
+            entries.addAll(infoRows(DeviceInfo.network(this), null));
         }
         return entries;
     }
@@ -1835,8 +1785,7 @@ public final class SettingsActivity extends CardActivity {
 
     private void showWifi() {
         Level level = levels.peek();
-        show(getString(R.string.settings_wifi_networks), Arrays.asList(new Entry(getString(R.string.settings_wifi_scanning), null, getDrawable(R.drawable.ic_wifi),
-            getString(R.string.settings_wifi_scanning_text), false, () -> { })));
+        show(getString(R.string.settings_wifi_networks), Arrays.asList(new Entry(getString(R.string.settings_wifi_scanning), null, getDrawable(R.drawable.ic_wifi), false, () -> { })));
         withLocation(() -> {
             getSystemService(WifiManager.class).startScan();
             rows.postDelayed(() -> {
@@ -1867,9 +1816,7 @@ public final class SettingsActivity extends CardActivity {
             String name = network.SSID;
             boolean connected = name.equals(current);
             String security = wifiSecurity(network);
-            Entry entry = new Entry(name, connected ? getString(R.string.settings_wifi_connected) : wifiStrength(network.level), picture,
-                (connected ? getString(R.string.settings_wifi_press_to_forget) : getString(R.string.settings_wifi_press_to_join))
-                    + "\n\n" + wifiDetails(network, connected), false,
+            Entry entry = new Entry(name, connected ? getString(R.string.settings_wifi_connected) : wifiStrength(network.level), picture, false,
                 () -> {
                     if (connected) forgetWifi(name);
                     else joinWifi(name, security);
@@ -1878,8 +1825,7 @@ public final class SettingsActivity extends CardActivity {
             entries.add(entry);
         }
         if (entries.isEmpty()) {
-            entries.add(new Entry(getString(R.string.settings_wifi_none), null, picture,
-                getString(R.string.settings_wifi_none_text), false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_wifi_none), null, picture, false, () -> { }));
         }
         show(getString(R.string.settings_wifi_networks), entries);
     }
@@ -1934,12 +1880,12 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private List<Entry> deviceRows() {
-        List<Entry> entries = infoRows(DeviceInfo.system(this), null, getString(R.string.settings_device_info_text));
-        if (Features.USB_SETTINGS) entries.add(new Entry(getString(R.string.settings_usb), null, null, getString(R.string.settings_usb_text),
+        List<Entry> entries = infoRows(DeviceInfo.system(this), null);
+        if (Features.USB_SETTINGS) entries.add(new Entry(getString(R.string.settings_usb), null, null,
             true, () -> enter(this::showUsb)));
-        entries.add(new Entry(getString(R.string.settings_standby), null, null, getString(R.string.settings_standby_text), false,
+        entries.add(new Entry(getString(R.string.settings_standby), null, null, false,
             TaskService::standby));
-        entries.add(new Entry(getString(R.string.settings_restart), null, null, getString(R.string.settings_restart_text), false,
+        entries.add(new Entry(getString(R.string.settings_restart), null, null, false,
             () -> confirm(getString(R.string.settings_restart_question), getString(R.string.settings_restart_warning), getString(R.string.settings_restart),
                 TaskService::restart)));
         return entries;
@@ -1949,19 +1895,15 @@ public final class SettingsActivity extends CardActivity {
         boolean beta = Updater.beta(this);
         boolean doubleHome = HomeCover.doubleHome;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_about), null, null,
-            getString(R.string.settings_about_text), true, () -> open(new Intent(this, AboutActivity.class))));
+        entries.add(new Entry(getString(R.string.settings_about), null, null, true, () -> open(new Intent(this, AboutActivity.class))));
         entries.add(groupLabel(R.string.settings_update));
-        entries.add(new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), null,
-            getString(R.string.settings_update_text), true, () -> open(new Intent(this, UpdateActivity.class))));
-        entries.add(new Entry(getString(R.string.settings_beta), beta ? YES : NO, null,
-            getString(R.string.settings_beta_text), false, () -> {
+        entries.add(new Entry(getString(R.string.settings_update_check), BuildVersion.name(this), null, true, () -> open(new Intent(this, UpdateActivity.class))));
+        entries.add(new Entry(getString(R.string.settings_beta), beta ? YES : NO, null, false, () -> {
                 Updater.setBeta(this, !beta);
                 refresh();
             }));
         entries.add(groupLabel(R.string.settings_backup));
-        entries.add(new Entry(getString(R.string.settings_save_choices), null, null,
-            getString(R.string.settings_save_choices_text), false, () -> {
+        entries.add(new Entry(getString(R.string.settings_save_choices), null, null, false, () -> {
                 try {
                     Backup.save(this);
                     say(getString(R.string.settings_choices_saved));
@@ -1970,8 +1912,7 @@ public final class SettingsActivity extends CardActivity {
                     sayLong(getString(R.string.settings_save_failed));
                 }
             }));
-        entries.add(new Entry(getString(R.string.settings_restore_choices), Backup.exists(this) ? null : getString(R.string.settings_no_backup), null,
-            getString(R.string.settings_restore_choices_text), false, () -> {
+        entries.add(new Entry(getString(R.string.settings_restore_choices), Backup.exists(this) ? null : getString(R.string.settings_no_backup), null, false, () -> {
                 try {
                     Backup.restore(this);
                     say(getString(R.string.settings_choices_restored));
@@ -1982,13 +1923,11 @@ public final class SettingsActivity extends CardActivity {
                 }
             }));
         entries.add(groupLabel(R.string.settings_tools));
-        entries.add(new Entry(getString(R.string.settings_tour), null, null,
-            getString(R.string.settings_tour_text), false,
+        entries.add(new Entry(getString(R.string.settings_tour), null, null, false,
             () -> open(new Intent(this, FirstRunActivity.class))));
-        entries.add(new Entry("AirPlay", null, null, getString(R.string.settings_airplay_text),
+        entries.add(new Entry("AirPlay", null, null,
             false, () -> openPackage(Fire.AIRPLAY)));
-        entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null,
-            getString(R.string.settings_double_home_text), false, () -> {
+        entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null, false, () -> {
                 TaskService.rememberDoubleHome(this, !doubleHome);
                 refresh();
             }));
@@ -1999,8 +1938,7 @@ public final class SettingsActivity extends CardActivity {
     private void showUsb() {
         Level level = levels.peek();
         Drawable picture = getDrawable(R.drawable.ic_settings);
-        show(getString(R.string.settings_usb), Arrays.asList(new Entry(getString(R.string.settings_usb_checking), null, picture,
-            getString(R.string.settings_usb_checking_text), false, () -> { })));
+        show(getString(R.string.settings_usb), Arrays.asList(new Entry(getString(R.string.settings_usb_checking), null, picture, false, () -> { })));
         shell("sm list-volumes public", output -> {
             if (levels.peek() != level) return;
             List<Entry> entries = new ArrayList<>();
@@ -2009,12 +1947,11 @@ public final class SettingsActivity extends CardActivity {
                 if (parts.length < 2 || !parts[0].startsWith("public:")) continue;
                 boolean mounted = parts[1].equals("mounted");
                 String name = parts.length > 2 && !parts[2].equals("null") ? parts[2] : parts[0];
-                entries.add(new Entry(name, mounted ? getString(R.string.settings_connected) : getString(R.string.settings_not_connected), picture,
-                    mounted ? getString(R.string.settings_usb_press_to_unmount) : getString(R.string.settings_usb_can_remove), false, () -> {
+                entries.add(new Entry(name, mounted ? getString(R.string.settings_connected) : getString(R.string.settings_not_connected), picture, false, () -> {
                         if (mounted) shell("sm unmount " + parts[0], done -> refreshIf(level));
                     }));
             }
-            if (entries.isEmpty()) entries.add(new Entry(getString(R.string.settings_usb_none), null, picture, getString(R.string.settings_usb_none_text), false, () -> { }));
+            if (entries.isEmpty()) entries.add(new Entry(getString(R.string.settings_usb_none), null, picture, false, () -> { }));
             show(getString(R.string.settings_usb), entries);
         });
     }
@@ -2029,7 +1966,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private Entry groupLabel(String name) {
-        Entry entry = new Entry(name, null, null, "", false, () -> { });
+        Entry entry = new Entry(name, null, null, false, () -> { });
         entry.label = true;
         return entry;
     }
@@ -2037,10 +1974,9 @@ public final class SettingsActivity extends CardActivity {
     /** How long each picture stays: the backdrop's and the screensaver's are two different times. */
     private Entry paceEntry(boolean forSaver) {
         int now = forSaver ? Look.saverMinutes(this) : Look.abstractMinutes(this);
-        String text = getString(forSaver ? R.string.settings_saver_minutes_text : R.string.settings_abstract_time_home_text);
-        return new Entry(getString(R.string.settings_abstract_time), minutes(now), null, text, true,
+        return new Entry(getString(R.string.settings_abstract_time), minutes(now), null, true,
             () -> enter(() -> show(getString(R.string.settings_abstract_time), choices(minuteNames(Look.ABSTRACT_MINUTES),
-                indexOf(Look.ABSTRACT_MINUTES, now), R.drawable.ic_timer, text, index -> {
+                indexOf(Look.ABSTRACT_MINUTES, now), R.drawable.ic_timer, index -> {
                     if (forSaver) Look.setSaverMinutes(this, Look.ABSTRACT_MINUTES[index]);
                     else Look.setAbstractMinutes(this, Look.ABSTRACT_MINUTES[index]);
                     refresh();
@@ -2056,20 +1992,17 @@ public final class SettingsActivity extends CardActivity {
         String place = Weather.place(this);
         show(getString(R.string.settings_cat_clock), Arrays.asList(
             groupLabel(R.string.settings_time_group),
-            new Entry(getString(R.string.settings_show_on_home), getString(CLEAN_SHOW_NAMES[Look.cleanShows(this)]), null, null,
+            new Entry(getString(R.string.settings_show_on_home), getString(CLEAN_SHOW_NAMES[Look.cleanShows(this)]), null,
                 true, () -> enter(this::showCleanShows)),
-            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.cleanFont(this)], null, null,
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.cleanFont(this)], null,
                 true, () -> enter(this::showCleanFonts)),
             groupLabel(R.string.settings_weather),
-            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null,
-                getString(R.string.settings_weather_show_text), false, () -> {
+            new Entry(getString(R.string.settings_show_on_home), enabled ? YES : NO, null, false, () -> {
                     Weather.setEnabled(this, !enabled);
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null,
-                getString(R.string.settings_place_text), true, this::askPlace),
-            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null,
-                getString(R.string.settings_units_text), false, () -> {
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null, true, this::askPlace),
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null, false, () -> {
                     Weather.setFahrenheit(this, !Weather.fahrenheit(this));
                     refresh();
                 })));
@@ -2078,14 +2011,14 @@ public final class SettingsActivity extends CardActivity {
     private void showCleanShows() {
         String[] names = new String[CLEAN_SHOW_NAMES.length];
         for (int index = 0; index < names.length; index++) names[index] = getString(CLEAN_SHOW_NAMES[index]);
-        show(getString(R.string.settings_show_on_home), choices(names, Look.cleanShows(this), R.drawable.ic_clock, index -> null, index -> {
+        show(getString(R.string.settings_show_on_home), choices(names, Look.cleanShows(this), R.drawable.ic_clock, index -> {
             Look.setCleanShows(this, index);
             refresh();
         }));
     }
 
     private void showCleanFonts() {
-        List<Entry> entries = choices(Look.fontNames(this), Look.cleanFont(this), R.drawable.ic_clock, index -> null, index -> {
+        List<Entry> entries = choices(Look.fontNames(this), Look.cleanFont(this), R.drawable.ic_clock, index -> {
             Look.setCleanFont(this, index);
             refresh();
         });
@@ -2107,49 +2040,36 @@ public final class SettingsActivity extends CardActivity {
         String shown = getString(wheel ? R.string.settings_show_on_home : R.string.settings_big);
         show(getString(R.string.settings_cat_clock), Arrays.asList(
             groupLabel(R.string.settings_time_group),
-            new Entry(shown, visible ? YES : NO, null,
-                getString(wheel ? R.string.settings_clock_hidden_text : R.string.settings_clock_show_text), false, () -> {
+            new Entry(shown, visible ? YES : NO, null, false, () -> {
                     Look.setClock(this, !visible);
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], null,
-                getString(R.string.settings_font_text), true, () -> enter(this::showFonts)),
-            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], null,
-                getString(R.string.settings_size_text), true, () -> enter(this::showSizes)),
-            new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), null,
-                getString(R.string.settings_hours_text), false, () -> {
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.font(this)], null, true, () -> enter(this::showFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.size(this)], null, true, () -> enter(this::showSizes)),
+            new Entry(getString(R.string.settings_hours), Look.hours24(this) ? getString(R.string.settings_hours_24) : getString(R.string.settings_hours_12), null, false, () -> {
                     Look.setHours24(this, !Look.hours24(this));
                     refresh();
                 }),
             groupLabel(R.string.settings_date),
-            new Entry(shown, Look.date(this) ? YES : NO, null,
-                getString(wheel ? R.string.settings_date_hidden_text : R.string.settings_date_show_text), false, () -> {
+            new Entry(shown, Look.date(this) ? YES : NO, null, false, () -> {
                     Look.setDate(this, !Look.date(this));
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], null,
-                getString(R.string.settings_date_font_text), true, () -> enter(this::showDateFonts)),
-            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], null,
-                getString(R.string.settings_date_size_text), true, () -> enter(this::showDateSizes)),
-            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null,
-                getString(R.string.settings_date_format_text), true, () -> enter(this::showDateFormats)),
+            new Entry(getString(R.string.settings_font), Look.fontNames(this)[Look.dateFont(this)], null, true, () -> enter(this::showDateFonts)),
+            new Entry(getString(R.string.settings_size), Look.sizeNames(this)[Look.dateSize(this)], null, true, () -> enter(this::showDateSizes)),
+            new Entry(getString(R.string.settings_hours), dateFormatName(Look.dateNumeric(this)), null, true, () -> enter(this::showDateFormats)),
             groupLabel(R.string.settings_weather),
-            new Entry(shown, enabled ? YES : NO, null,
-                getString(wheel ? R.string.settings_weather_show_text : R.string.settings_weather_big_text), false, () -> {
+            new Entry(shown, enabled ? YES : NO, null, false, () -> {
                     Weather.setEnabled(this, !enabled);
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null,
-                getString(R.string.settings_place_text), true, this::askPlace),
-            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null,
-                getString(R.string.settings_units_text), false, () -> {
+            new Entry(getString(R.string.settings_place), place != null ? place : getString(R.string.settings_place_unset), null, true, this::askPlace),
+            new Entry(getString(R.string.settings_units), Weather.fahrenheit(this) ? "°F" : "°C", null, false, () -> {
                     Weather.setFahrenheit(this, !Weather.fahrenheit(this));
                     refresh();
                 }),
-            new Entry(getString(R.string.settings_font), weatherFontName(), null,
-                getString(R.string.settings_weather_font_text), true, () -> enter(this::showWeatherFonts)),
-            new Entry(getString(R.string.settings_size), weatherSizeName(), null,
-                getString(R.string.settings_weather_size_text), true, () -> enter(this::showWeatherSizes))));
+            new Entry(getString(R.string.settings_font), weatherFontName(), null, true, () -> enter(this::showWeatherFonts)),
+            new Entry(getString(R.string.settings_size), weatherSizeName(), null, true, () -> enter(this::showWeatherSizes))));
     }
 
     private String dateFormatName(boolean numeric) {
@@ -2163,8 +2083,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showDateFonts() {
-        List<Entry> entries = choices(Look.fontNames(this), Look.dateFont(this), R.drawable.ic_clock,
-            getString(R.string.settings_date_font_text), index -> {
+        List<Entry> entries = choices(Look.fontNames(this), Look.dateFont(this), R.drawable.ic_clock, index -> {
                 Look.setDateFont(this, index);
                 refresh();
             });
@@ -2173,8 +2092,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showDateSizes() {
-        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.dateSize(this), R.drawable.ic_clock,
-            getString(R.string.settings_date_size_text), index -> {
+        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.dateSize(this), R.drawable.ic_clock, index -> {
                 Look.setDateSize(this, index);
                 refresh();
             }));
@@ -2182,8 +2100,7 @@ public final class SettingsActivity extends CardActivity {
 
     private void showDateFormats() {
         String[] names = {dateFormatName(false), dateFormatName(true)};
-        show(getString(R.string.settings_hours), choices(names, Look.dateNumeric(this) ? 1 : 0, R.drawable.ic_clock,
-            index -> today(index == 1), index -> {
+        show(getString(R.string.settings_hours), choices(names, Look.dateNumeric(this) ? 1 : 0, R.drawable.ic_clock, index -> {
                 Look.setDateNumeric(this, index == 1);
                 refresh();
             }));
@@ -2208,8 +2125,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showWeatherFonts() {
-        List<Entry> entries = choices(likeDate(Look.fontNames(this)), Look.weatherFont(this) + 1, R.drawable.ic_cloud,
-            getString(R.string.settings_weather_font_text), index -> {
+        List<Entry> entries = choices(likeDate(Look.fontNames(this)), Look.weatherFont(this) + 1, R.drawable.ic_cloud, index -> {
                 Look.setWeatherFont(this, index - 1);
                 refresh();
             });
@@ -2219,8 +2135,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showWeatherSizes() {
-        show(getString(R.string.settings_size), choices(likeDate(Look.sizeNames(this)), Look.weatherSize(this) + 1, R.drawable.ic_cloud,
-            getString(R.string.settings_weather_size_text), index -> {
+        show(getString(R.string.settings_size), choices(likeDate(Look.sizeNames(this)), Look.weatherSize(this) + 1, R.drawable.ic_cloud, index -> {
                 Look.setWeatherSize(this, index - 1);
                 refresh();
             }));
@@ -2248,8 +2163,7 @@ public final class SettingsActivity extends CardActivity {
     private void showPlaces(List<Weather.Place> places) {
         List<Entry> entries = new ArrayList<>();
         for (Weather.Place place : places) {
-            entries.add(new Entry(place.name, place.detail, getDrawable(R.drawable.ic_cloud),
-                getString(R.string.settings_choose_place_text), false, () -> {
+            entries.add(new Entry(place.name, place.detail, getDrawable(R.drawable.ic_cloud), false, () -> {
                     Weather.setPlace(this, place);
                     onBackPressed();
                 }));
@@ -2287,33 +2201,28 @@ public final class SettingsActivity extends CardActivity {
         boolean own = ownSaver();
         String picture = own ? Look.saverPicture(this) : null;
         List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
-            getString(R.string.settings_saver_active_text), false,
+        entries.add(new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null, false,
             () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))));
         // Where Salotto has no screensaver of its own there is nothing to choose: Fire OS's, from its menu.
-        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
-            getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)));
-        entries.add(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
+        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null, true, () -> enter(this::showSaverManagers)));
+        entries.add(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, true,
             () -> enter(this::showSaverTimes)));
         if (own) {
             entries.add(new Entry(getString(R.string.grid_saver_title),
-                picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null,
-                getString(R.string.settings_saver_pictures_text), true,
+                picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null, true,
                 () -> open(new Intent(this, PictureGridActivity.class).putExtra(PictureGridActivity.SAVER, true))));
             if (picture == null) entries.add(paceEntry(true));
         } else {
-            entries.add(new Entry(getString(R.string.settings_saver_choose), null, null,
-                getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
+            entries.add(new Entry(getString(R.string.settings_saver_choose), null, null, true, () -> open(Fire.saverMenu())));
         }
-        if (own || Features.FIRE_SAVER_NOW) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
+        if (own || Features.FIRE_SAVER_NOW) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         if (own) {
             entries.add(groupLabel(R.string.settings_section_saver_shows));
             entries.add(saverShows(R.string.settings_saver_time, R.drawable.ic_clock, Look.saverTime(this), Look::setSaverTime));
             entries.add(saverShows(R.string.settings_saver_date, R.drawable.ic_clock, Look.saverDate(this), Look::setSaverDate));
             entries.add(saverShows(R.string.settings_saver_weather, R.drawable.ic_cloud, Look.saverWeather(this), Look::setSaverWeather));
-            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], null,
-                getString(R.string.settings_saver_place_text), true, () -> enter(this::showSaverPlaces)));
+            entries.add(new Entry(getString(R.string.settings_saver_place), saverPlaces()[Look.saverPlace(this)], null, true, () -> enter(this::showSaverPlaces)));
         }
         show(getString(R.string.settings_saver), entries);
     }
@@ -2321,8 +2230,7 @@ public final class SettingsActivity extends CardActivity {
     /** Salotto with its own pictures, or the screensaver Fire OS decides. */
     private void showSaverManagers() {
         String[] names = {Brand.NAME, "Fire OS"};
-        show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
-            getString(R.string.settings_saver_managed_text), index -> changeSystem(() -> Look.chooseSaver(this, index == 0))));
+        show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image, index -> changeSystem(() -> Look.chooseSaver(this, index == 0))));
     }
 
     private String[] saverPlaces() {
@@ -2331,8 +2239,7 @@ public final class SettingsActivity extends CardActivity {
 
     private void showSaverPlaces() {
         Level level = levels.peek();
-        show(getString(R.string.settings_saver_place), choices(saverPlaces(), Look.saverPlace(this), R.drawable.ic_clock,
-            getString(R.string.settings_saver_place_text), index -> {
+        show(getString(R.string.settings_saver_place), choices(saverPlaces(), Look.saverPlace(this), R.drawable.ic_clock, index -> {
                 Look.setSaverPlace(this, index);
                 backFrom(level);
             }));
@@ -2340,7 +2247,7 @@ public final class SettingsActivity extends CardActivity {
 
     /** Only one screensaver runs at a time: choosing ours is what turns off Fire OS's. */
     private Entry saverShows(int name, int icon, boolean on, BiConsumer<Context, Boolean> set) {
-        return new Entry(getString(name), on ? YES : NO, getDrawable(icon), getString(R.string.settings_saver_shows_text), false, () -> {
+        return new Entry(getString(name), on ? YES : NO, getDrawable(icon), false, () -> {
             set.accept(this, !on);
             refresh();
         });
@@ -2373,7 +2280,6 @@ public final class SettingsActivity extends CardActivity {
 
     private void showSaverTimes() {
         List<Entry> entries = choices(minuteNames(SAVER_MINUTES), indexOf(SAVER_MINUTES, saverMinutes()), R.drawable.ic_image,
-            saverWait(),
             index -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
                 Settings.System.SCREEN_OFF_TIMEOUT, SAVER_MINUTES[index] * MINUTE)));
         boolean limited = false;
@@ -2388,8 +2294,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showFonts() {
-        List<Entry> entries = choices(Look.fontNames(this), Look.font(this), R.drawable.ic_clock,
-            getString(R.string.settings_font_text), index -> {
+        List<Entry> entries = choices(Look.fontNames(this), Look.font(this), R.drawable.ic_clock, index -> {
                 Look.setFont(this, index);
                 refresh();
             });
@@ -2398,8 +2303,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     private void showSizes() {
-        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.size(this), R.drawable.ic_clock,
-            getString(R.string.settings_size_text), index -> {
+        show(getString(R.string.settings_size), choices(Look.sizeNames(this), Look.size(this), R.drawable.ic_clock, index -> {
                 Look.setSize(this, index);
                 refresh();
             }));
