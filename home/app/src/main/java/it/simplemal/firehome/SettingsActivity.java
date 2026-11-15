@@ -36,6 +36,7 @@ import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.Formatter;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -1332,16 +1333,20 @@ public final class SettingsActivity extends CardActivity {
     /** Picture and sound come from Fire OS, slowly: the page opens at once and they join it. */
     private void showScreen() {
         Level level = levels.peek();
-        readAv(level);
+        if (!Fire.GOOGLE_TV) readAv(level);
         boolean cec = Settings.Global.getInt(getContentResolver(), CEC_ENABLED, 1) == 1;
         boolean tvOff = Settings.Global.getInt(getContentResolver(), CEC_TV_OFF, 0) == 1;
         List<Entry> entries = new ArrayList<>();
-        entries.add(groupLabel(R.string.settings_video));
-        if (picture == null) entries.add(reading());
-        else entries.addAll(videoRows(level));
-        entries.add(groupLabel(R.string.settings_audio));
-        if (sound == null) entries.add(reading());
-        else entries.addAll(audioRows(level));
+        if (Fire.GOOGLE_TV) {
+            entries.addAll(googleTvAvRows(level));
+        } else {
+            entries.add(groupLabel(R.string.settings_video));
+            if (picture == null) entries.add(reading());
+            else entries.addAll(videoRows(level));
+            entries.add(groupLabel(R.string.settings_audio));
+            if (sound == null) entries.add(reading());
+            else entries.addAll(audioRows(level));
+        }
         entries.add(groupLabel(R.string.settings_section_tv));
         entries.add(new Entry(getString(R.string.settings_cec), cec ? YES : NO, null,
             getString(R.string.settings_cec_text), false,
@@ -1464,6 +1469,29 @@ public final class SettingsActivity extends CardActivity {
             new Entry(getString(R.string.settings_leveler), even ? YES : NO, null,
                 getString(R.string.settings_leveler_text), false,
                 () -> writeFire(FireSettings.AUDIO, LEVELER, even ? "false" : "true", () -> refreshIf(level))));
+    }
+
+    /**
+     * Google TV: no service of Amazon's to read or write picture and sound. Resolution, HDR and the
+     * rest stay in Google TV's own page, which no app can change; surround is Android's own setting,
+     * which Android applies as it is written (seen on the Chromecast, 2026-11-15). Only automatic and
+     * stereo: Android's 2 forces surround on every output, and 3 asks for the formats one by one.
+     */
+    private List<Entry> googleTvAvRows(Level level) {
+        Display.Mode mode = getWindowManager().getDefaultDisplay().getMode();
+        String shown = mode.getPhysicalWidth() + "×" + mode.getPhysicalHeight() + ", " + Math.round(mode.getRefreshRate()) + " Hz";
+        int surround = Settings.Global.getInt(getContentResolver(), SURROUND_MODE, 0) == 1 ? 1 : 0;
+        String[] names = {getString(R.string.settings_surround_best), getString(R.string.settings_surround_stereo)};
+        List<Entry> entries = new ArrayList<>();
+        entries.add(groupLabel(R.string.settings_video));
+        entries.add(new Entry(getString(R.string.settings_fire_open), shown, null, getString(R.string.settings_cat_screen_text), false,
+            () -> open(new Intent(Settings.ACTION_SOUND_SETTINGS))));
+        entries.add(groupLabel(R.string.settings_audio));
+        entries.add(new Entry(getString(R.string.settings_surround), names[surround], null, getString(R.string.settings_surround_text), true,
+            () -> enter(() -> show(getString(R.string.settings_surround), choices(names, surround, R.drawable.ic_s_tv,
+                getString(R.string.settings_surround_text),
+                index -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), SURROUND_MODE, index)))))));
+        return entries;
     }
 
     /** The service names this value differently when read; the system setting is unambiguous. */
