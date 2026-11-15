@@ -2291,7 +2291,7 @@ public final class SettingsActivity extends CardActivity {
             getString(R.string.settings_saver_active_text), false,
             () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))));
         // Where Salotto has no screensaver of its own there is nothing to choose: Fire OS's, from its menu.
-        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
+        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : Fire.SYSTEM_NAME, null,
             getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)));
         entries.add(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
             () -> enter(this::showSaverTimes)));
@@ -2305,7 +2305,8 @@ public final class SettingsActivity extends CardActivity {
             entries.add(new Entry(getString(R.string.settings_saver_choose), null, null,
                 getString(R.string.settings_saver_choose_text), true, () -> open(Fire.saverMenu())));
         }
-        if (own || Features.FIRE_SAVER_NOW) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
+        // Google TV starts its own screensaver as Android does, with the same call as Salotto's.
+        if (own || Features.FIRE_SAVER_NOW || Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_saver_start), null, null, getString(R.string.settings_saver_start_text), false,
             () -> open(own ? new Intent(this, SaverActivity.class) : Fire.screensaver(this))));
         if (own) {
             entries.add(groupLabel(R.string.settings_section_saver_shows));
@@ -2320,7 +2321,7 @@ public final class SettingsActivity extends CardActivity {
 
     /** Salotto with its own pictures, or the screensaver Fire OS decides. */
     private void showSaverManagers() {
-        String[] names = {Brand.NAME, "Fire OS"};
+        String[] names = {Brand.NAME, Fire.SYSTEM_NAME};
         show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
             getString(R.string.settings_saver_managed_text), index -> changeSystem(() -> Look.chooseSaver(this, index == 0))));
     }

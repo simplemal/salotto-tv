@@ -55,6 +55,11 @@ final class Fire {
     /** Google TV's own Home, where its Home key goes. */
     static final String GOOGLE_HOME = "com.google.android.apps.tv.launcherx";
     static final String GOOGLE_HOME_PAGE = "com.google.android.apps.tv.launcherx.home.HomeActivity";
+    /** The system's name where a choice is between Salotto and the system, as for the screensaver. */
+    static final String SYSTEM_NAME = GOOGLE_TV ? "Google TV" : "Fire OS";
+    /** Google TV's page of its screensaver, Ambient mode: Android's own action finds nothing there. */
+    static final String GOOGLE_SAVER_PAGE = "com.google.android.tv.settings.ambient";
+    static final String GOOGLE_SAVER = "com.google.android.apps.tv.dreamx/.service.Backdrop";
     /** The Home the system itself brings with the Home key, which Salotto takes over from. */
     static final String SYSTEM_HOME = GOOGLE_TV ? GOOGLE_HOME : AMAZON_HOME;
     static final String SYSTEM_HOME_PAGE = GOOGLE_TV ? GOOGLE_HOME_PAGE : AMAZON_HOME_PAGE;
@@ -204,7 +209,10 @@ final class Fire {
     }
 
     /** Fire OS's own menu of its screensavers. */
-    static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }
+    static Intent saverMenu() {
+        if (GOOGLE_TV) return new Intent(GOOGLE_SAVER_PAGE);
+        return new Intent("com.amazon.device.settings.action.SCREENSAVERS");
+    }
 
     /** Not a settings page: Android's own way to start the chosen screensaver. Android 9 has none, so Fire OS's can only be chosen there. */
     static Intent screensaver(Context context) {

@@ -474,7 +474,8 @@ final class Look {
 
     /** Salotto's screensaver or Fire OS's. */
     static void chooseSaver(Context context, boolean own) {
-        String name = own && Fire.OWN_SAVER ? new ComponentName(context, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER;
+        String system = Fire.GOOGLE_TV ? Fire.GOOGLE_SAVER : Fire.AMAZON_SAVER;
+        String name = own && Fire.OWN_SAVER ? new ComponentName(context, SaverService.class).flattenToShortString() : system;
         Settings.Secure.putString(context.getContentResolver(), SAVER_COMPONENT, name);
     }
 
