@@ -2286,14 +2286,15 @@ public final class SettingsActivity extends CardActivity {
         boolean on = saverOn();
         boolean own = ownSaver();
         String picture = own ? Look.saverPicture(this) : null;
-        List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
-                getString(R.string.settings_saver_active_text), false,
-                () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
-                getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)),
-            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
-                () -> enter(this::showSaverTimes))));
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
+            getString(R.string.settings_saver_active_text), false,
+            () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))));
+        // Where Salotto has no screensaver of its own there is nothing to choose: Fire OS's, from its menu.
+        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
+            getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)));
+        entries.add(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
+            () -> enter(this::showSaverTimes)));
         if (own) {
             entries.add(new Entry(getString(R.string.grid_saver_title),
                 picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null,

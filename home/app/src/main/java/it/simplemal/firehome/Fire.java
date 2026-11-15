@@ -154,11 +154,12 @@ final class Fire {
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
     /**
-     * Fire OS 7 stops all of Salotto as its screensaver, run as Android's, ends: the service goes with
-     * it and the Home key goes to Amazon (issue #4). There Salotto's screensaver is only its page,
-     * from the Home, and Android's stays Fire OS's.
+     * Salotto's own screensaver. Not on Fire OS 7: there, as Salotto's screensaver ends, Fire OS stops
+     * all of Salotto, the service goes with it and the Home key goes to Amazon (issue #4). Only from
+     * the Home it would have shown Fire OS's inside the apps: the user chose Fire OS's alone
+     * (2026-11-15).
      */
-    static final boolean SAVER_FROM_HOME_ONLY = ANDROID_9;
+    static final boolean OWN_SAVER = !ANDROID_9;
 
     static String[] forceStop(Context context) { return labels(context, SETTINGS, FORCE_STOP_WORDS, FORCE_STOP); }
 
