@@ -15,7 +15,7 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 | `AFTSS` | Fire TV Stick HD | 2024 | Some limited [²](#note-2) |
 | `AFTKM` | Fire TV Stick 4K (2nd) | 2023 | All |
 | `AFTKRT` | Fire TV Stick 4K Max (2nd) | 2023 | All |
-| `AFTKA` | Fire TV Stick 4K Max (1st) | 2021 | Some limited [¹](#note-1) |
+| `AFTKA` | Fire TV Stick 4K Max (1st) | 2021 | Few limits [¹](#note-1) |
 | `AFTSSS` | Fire TV Stick (3rd) | 2020 | Some limited [²](#note-2) |
 | `AFTSS` | Fire TV Stick Lite (1st) | 2020 | Some limited [²](#note-2) |
 | `AFTMM` | Fire TV Stick 4K (1st) | 2018 | Not compatible [³](#note-3) |
@@ -25,11 +25,6 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 | `AFTS` | Fire TV (2nd) | 2015 | Not compatible [⁴](#note-4) |
 | `AFTM` | Fire TV Stick (1st) | 2014 | Not compatible [⁴](#note-4) |
 | `AFTB` | Fire TV (1st) | 2014 | Not compatible [⁴](#note-4) |
-
-<sub><a name="note-1"></a>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
-<a name="note-2"></a>² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
-<a name="note-3"></a>³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
-<a name="note-4"></a>⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
 
 Salotto cannot work on the recent Fire TVs with Vega OS, as it does not allow installing Android apps such as Salotto.
 
@@ -101,3 +96,10 @@ Salotto is free and open source. If it has been useful to you and you want to su
 [PolyForm Noncommercial 1.0.0](LICENSE): it can be used, studied, modified and built upon for free for non-commercial purposes. Selling it requires the author's permission. Credits and third-party software are in [NOTICE.md](NOTICE.md).
 
 Salotto is an independent project. It is not affiliated with, sponsored or endorsed by Amazon, Apple or the other brands mentioned, which belong to their respective owners.
+
+---
+
+<sub><a name="note-1"></a>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
+<a name="note-2"></a>² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
+<a name="note-3"></a>³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
+<a name="note-4"></a>⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>

@@ -15,7 +15,7 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 | `AFTSS` | Fire TV Stick HD | 2024 | Alcune limitate [²](#nota-2) |
 | `AFTKM` | Fire TV Stick 4K (2ª) | 2023 | Tutte |
 | `AFTKRT` | Fire TV Stick 4K Max (2ª) | 2023 | Tutte |
-| `AFTKA` | Fire TV Stick 4K Max (1ª) | 2021 | Alcune limitate [¹](#nota-1) |
+| `AFTKA` | Fire TV Stick 4K Max (1ª) | 2021 | Poche limitazioni [¹](#nota-1) |
 | `AFTSSS` | Fire TV Stick (3ª) | 2020 | Alcune limitate [²](#nota-2) |
 | `AFTSS` | Fire TV Stick Lite (1ª) | 2020 | Alcune limitate [²](#nota-2) |
 | `AFTMM` | Fire TV Stick 4K (1ª) | 2018 | Non compatibile [³](#nota-3) |
@@ -25,11 +25,6 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 | `AFTS` | Fire TV (2ª) | 2015 | Non compatibile [⁴](#nota-4) |
 | `AFTM` | Fire TV Stick (1ª) | 2014 | Non compatibile [⁴](#nota-4) |
 | `AFTB` | Fire TV (1ª) | 2014 | Non compatibile [⁴](#nota-4) |
-
-<sub><a name="nota-1"></a>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; niente salvaschermo di Salotto, perché uscendo dal salvaschermo Fire OS 7 chiude Salotto: resta quello di Fire OS, che non si avvia dalle Impostazioni.<br>
-<a name="nota-2"></a>² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
-<a name="nota-3"></a>³ Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
-<a name="nota-4"></a>⁴ Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>
 
 Salotto non può funzionare sulle Fire TV recenti con Vega OS, poiché non consente di installare app Android come Salotto.
 
@@ -101,3 +96,10 @@ Salotto è gratuito e open-source. Se ti è stato utile e vuoi sostenerne lo svi
 [PolyForm Noncommercial 1.0.0](LICENSE): si può usare, studiare, modificare e derivare gratis per scopi non commerciali. Per venderlo serve il permesso dell'autore. Crediti e software di altri sono in [NOTICE.md](NOTICE.md).
 
 Salotto è un progetto indipendente. Non è affiliato, sponsorizzato né approvato da Amazon, Apple o dagli altri marchi citati, che appartengono ai rispettivi proprietari.
+
+---
+
+<sub><a name="nota-1"></a>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; niente salvaschermo di Salotto, perché uscendo dal salvaschermo Fire OS 7 chiude Salotto: resta quello di Fire OS, che non si avvia dalle Impostazioni.<br>
+<a name="nota-2"></a>² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
+<a name="nota-3"></a>³ Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
+<a name="nota-4"></a>⁴ Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>
