@@ -13,6 +13,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.text.format.Formatter;
@@ -156,8 +157,6 @@ public final class FirstRunActivity extends CardActivity {
     /** Tells a late answer that its page is gone. */
     private int visit;
     private Runnable back = () -> { };
-    /** The question about the collections is asked once per visit. */
-    private boolean packsAsked;
     /** The backdrop under the focus, kept when the page is drawn again as collections arrive. */
     private String focusedChoice;
 
@@ -442,55 +441,22 @@ public final class FirstRunActivity extends CardActivity {
     }
 
     /**
-     * After the city: with collections chosen and not yet here, and a network, the user is asked
-     * first whether to fetch them now, the user's design of 2026-11-05. Asked once per visit.
+     * After the city. The collections chosen in the installer and not yet here start coming at once;
+     * the others have a row with the download mark, the user's design of 2026-11-15.
      */
     private void showBackdrop() {
-        if (!packsAsked && !Packs.fetching() && online() && !Packs.missing(this).isEmpty()) askPacks();
-        else showChoices();
+        if (!Packs.fetching() && online() && !Packs.missing(this).isEmpty()) Packs.fetchNow(this);
+        showChoices();
     }
 
     private boolean online() {
         return getSystemService(ConnectivityManager.class).getActiveNetwork() != null;
     }
 
-    /** The question on a line of its own, the weight and the time smaller under it, once they are known. */
-    private void askPacks() {
-        heading(words(R.string.first_packs_question), "");
-        int asked = visit;
-        Background.run(() -> {
-            long bytes = Packs.missingBytes(this);
-            runOnUiThread(() -> {
-                if (asked == visit && bytes > 0) {
-                    note.setText(words.getString(R.string.first_packs_size, size(bytes)));
-                }
-            });
-        });
-        View now = button(words(R.string.first_packs_now), BUTTON_SP, () -> answered(true));
-        page.addView(now, place(WIDE, 26));
-        page.addView(button(words(R.string.first_packs_later), BUTTON_SP, () -> answered(false)), place(WIDE, 10));
-        now.requestFocus();
-    }
-
-    /** Back from the choices goes to the question; once collections are coming it is answered, and Back goes to the city. */
-    private void answered(boolean now) {
-        packsAsked = true;
-        if (now) Packs.fetchNow(this);
-        int page = at;
-        back = () -> {
-            if (Packs.fetching()) {
-                go(page - 1);
-                return;
-            }
-            packsAsked = false;
-            go(page);
-        };
-        showChoices();
-    }
-
     /**
-     * The backdrops to choose: only the collections here, and the plain ones. While collections are
-     * coming, each has a bar instead, and becomes a choice once whole; going on leaves them coming.
+     * The backdrops to choose. A collection here is a choice; one coming has a bar instead, and
+     * becomes a choice once whole; one neither here nor coming has the download mark, and pressed
+     * starts coming. Going on leaves them coming.
      */
     private void showChoices() {
         visit++;
@@ -527,12 +493,13 @@ public final class FirstRunActivity extends CardActivity {
         explained.setAlpha(0.85f);
         View first = null;
         View kept = null;
+        // In the order of the choices, null for a bar: the focus stays near a row that became one.
+        List<String> keys = new ArrayList<>();
+        List<View> focusable = new ArrayList<>();
         boolean dynamic = false;
         boolean statics = false;
         for (Choice choice : choices) {
             boolean here = choice.folder == null || Packs.listed(this, choice.folder);
-            // A collection not here is not listed, the user's rule of 2026-11-05; one coming shows its bar.
-            if (!here && !coming.contains(choice.folder)) continue;
             if (choice.folder != null && !dynamic) {
                 dynamic = true;
                 rows.addView(groupLabel(R.string.first_backdrop_dynamic));
@@ -544,10 +511,20 @@ public final class FirstRunActivity extends CardActivity {
             String name = choice.name == 0 ? choice.key : words(choice.name);
             LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(-1, dp(ROW_HEIGHT));
             size.bottomMargin = dp(ROW_GAP);
+            if (!here && !coming.contains(choice.folder)) {
+                TextView row = downloadRow(choice, name, explained);
+                rows.addView(row, size);
+                if (choice.key.equals(focusedKey)) kept = row;
+                keys.add(choice.key);
+                focusable.add(row);
+                continue;
+            }
             if (!here) {
                 TextView bar = arrivingRow(name, choice.mark);
                 rows.addView(bar, size);
                 bars.add(new Object[]{bar, choice.folder, name});
+                keys.add(choice.key);
+                focusable.add(null);
                 continue;
             }
             if (choice.folder != null) whole.add(choice.folder);
@@ -567,13 +544,16 @@ public final class FirstRunActivity extends CardActivity {
             if (choice.mark != 0) {
                 Drawable mark = getDrawable(choice.mark).mutate();
                 mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
-                row.setCompoundDrawablesRelative(mark, null, null, null);
+                row.setCompoundDrawablesRelative(mark, null, balance(), null);
                 row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
             }
             rows.addView(row, size);
             if (first == null || choice.key.equals(Look.backdrop(this))) first = row;
             if (choice.key.equals(focusedKey)) kept = row;
+            keys.add(choice.key);
+            focusable.add(row);
         }
+        if (kept == null) kept = nearest(keys, focusable, focusedKey);
         ScrollView list = new ScrollView(this);
         list.setVerticalScrollBarEnabled(false);
         list.setClipChildren(false);
@@ -600,6 +580,24 @@ public final class FirstRunActivity extends CardActivity {
         page.addView(columns, new LinearLayout.LayoutParams(-1, -1));
         (kept != null ? kept : first).requestFocus();
         if (!bars.isEmpty()) root.postDelayed(() -> follow(shownVisit, whole, bars), PROGRESS_MS);
+    }
+
+    /** Nothing, as wide as the download mark: the names stay in the middle of the rows that have one. */
+    private Drawable balance() {
+        Drawable room = new ColorDrawable(Color.TRANSPARENT);
+        room.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+        return room;
+    }
+
+    /** The row next to `key`, below it first: null if `key` has no place in the list. */
+    private static View nearest(List<String> keys, List<View> rows, String key) {
+        int at = keys.indexOf(key);
+        if (at < 0) return null;
+        for (int step = 1; step < rows.size(); step++) {
+            if (at + step < rows.size() && rows.get(at + step) != null) return rows.get(at + step);
+            if (at - step >= 0 && rows.get(at - step) != null) return rows.get(at - step);
+        }
+        return null;
     }
 
     /** A weight in the page's language, its number and unit never split over two lines. */
@@ -634,13 +632,47 @@ public final class FirstRunActivity extends CardActivity {
         root.postDelayed(() -> follow(shownVisit, whole, bars), PROGRESS_MS);
     }
 
+    /**
+     * A collection not on the TV: its pictures still, from the collage in the app, while it has the
+     * focus; pressed, it starts coming and becomes a bar.
+     */
+    private TextView downloadRow(Choice choice, String name, TextView explained) {
+        TextView row = button(name, BUTTON_SP, () -> {
+            Context app = getApplicationContext();
+            int asked = visit;
+            Background.run(() -> {
+                Packs.ask(app, choice.folder);
+                runOnUiThread(() -> {
+                    if (asked == visit && !isFinishing()) showChoices();
+                });
+            });
+        });
+        row.setContentDescription(name + ", " + words(R.string.grid_download));
+        View.OnFocusChangeListener style = row.getOnFocusChangeListener();
+        row.setOnFocusChangeListener((view, focused) -> {
+            style.onFocusChange(view, focused);
+            row.setCompoundDrawableTintList(ColorStateList.valueOf(focused ? Fire.INK : Color.WHITE));
+            if (focused) {
+                focusedChoice = choice.key;
+                preview(choice, explained);
+            }
+        });
+        Drawable mark = choice.mark != 0 ? getDrawable(choice.mark).mutate() : null;
+        if (mark != null) mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+        Drawable download = getDrawable(R.drawable.ic_download).mutate();
+        download.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
+        row.setCompoundDrawablesRelative(mark, null, download, null);
+        row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
+        return row;
+    }
+
     /** A row that cannot be chosen yet: its name, and behind it a bar of how much has come. */
     private TextView arrivingRow(String name, int markId) {
         TextView row = label(name, BUTTON_SP);
         if (markId != 0) {
             Drawable mark = getDrawable(markId).mutate();
             mark.setBounds(0, 0, dp(MARK_SIZE), dp(MARK_SIZE));
-            row.setCompoundDrawablesRelative(mark, null, null, null);
+            row.setCompoundDrawablesRelative(mark, null, balance(), null);
             row.setCompoundDrawableTintList(ColorStateList.valueOf(Color.WHITE));
         }
         row.setGravity(Gravity.CENTER);
@@ -673,7 +705,8 @@ public final class FirstRunActivity extends CardActivity {
 
     private void preview(Choice choice, TextView explained) {
         explained.setText(words(choice.text));
-        mosaic.show(choice.folder);
+        if (choice.folder != null && !Packs.listed(this, choice.folder)) mosaic.showCollage(choice.folder);
+        else mosaic.show(choice.folder);
         if (choice.folder == null) root.setBackground(Look.preset(choice.key));
         previewNote.setText(words(R.string.first_preview));
         previewNote.setVisibility(choice.folder != null ? View.GONE : View.VISIBLE);
