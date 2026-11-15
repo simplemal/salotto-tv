@@ -12,24 +12,24 @@ A clean Home for Fire TV Stick: your apps, the backdrop, the time and the weathe
 | Code | Model | Year | Features |
 |---|---|---|---|
 | `AFTMA08C15` | Fire TV Stick 4K Plus | 2025 | All |
-| `AFTSS` | Fire TV Stick HD | 2024 | Some limited ² |
+| `AFTSS` | Fire TV Stick HD | 2024 | Some limited [²](#note-2) |
 | `AFTKM` | Fire TV Stick 4K (2nd) | 2023 | All |
 | `AFTKRT` | Fire TV Stick 4K Max (2nd) | 2023 | All |
-| `AFTKA` | Fire TV Stick 4K Max (1st) | 2021 | Some limited ¹ |
-| `AFTSSS` | Fire TV Stick (3rd) | 2020 | Some limited ² |
-| `AFTSS` | Fire TV Stick Lite (1st) | 2020 | Some limited ² |
-| `AFTMM` | Fire TV Stick 4K (1st) | 2018 | Not compatible ³ |
-| `AFTN` | Fire TV (3rd) | 2017 | Not compatible ³ |
-| `AFTT` | Fire TV Stick Basic Edition | 2017 | Not compatible ⁴ |
-| `AFTT` | Fire TV Stick (2nd) | 2016 | Not compatible ⁴ |
-| `AFTS` | Fire TV (2nd) | 2015 | Not compatible ⁴ |
-| `AFTM` | Fire TV Stick (1st) | 2014 | Not compatible ⁴ |
-| `AFTB` | Fire TV (1st) | 2014 | Not compatible ⁴ |
+| `AFTKA` | Fire TV Stick 4K Max (1st) | 2021 | Some limited [¹](#note-1) |
+| `AFTSSS` | Fire TV Stick (3rd) | 2020 | Some limited [²](#note-2) |
+| `AFTSS` | Fire TV Stick Lite (1st) | 2020 | Some limited [²](#note-2) |
+| `AFTMM` | Fire TV Stick 4K (1st) | 2018 | Not compatible [³](#note-3) |
+| `AFTN` | Fire TV (3rd) | 2017 | Not compatible [³](#note-3) |
+| `AFTT` | Fire TV Stick Basic Edition | 2017 | Not compatible [⁴](#note-4) |
+| `AFTT` | Fire TV Stick (2nd) | 2016 | Not compatible [⁴](#note-4) |
+| `AFTS` | Fire TV (2nd) | 2015 | Not compatible [⁴](#note-4) |
+| `AFTM` | Fire TV Stick (1st) | 2014 | Not compatible [⁴](#note-4) |
+| `AFTB` | Fire TV (1st) | 2014 | Not compatible [⁴](#note-4) |
 
-<sub>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
-² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
-³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
-⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
+<sub><a name="note-1"></a>¹ Fire OS 7: no notification count on the Home and no USB page in the Settings; Wi-Fi networks and clearing an app's data open Fire OS's pages; no Salotto screensaver, because leaving a screensaver Fire OS 7 closes Salotto: Fire OS's stays, and it cannot be started from the Settings.<br>
+<a name="note-2"></a>² As ¹, and also: apps do not open with the animation from the circle; under the Settings the backdrop is black instead of the blurred Home; the backdrop changes without a fade; resolution up to 1080p.<br>
+<a name="note-3"></a>³ Fire OS 6 accepts only accessibility services signed by Amazon. Without Salotto's, the Home key brings Salotto back after 5 seconds, at power-on Amazon's Home shows first, and held-down keys, the pictures in the task manager and the apps' animation are missing. So I chose not to make it available.<br>
+<a name="note-4"></a>⁴ Fire OS 5 is based on Android 5.1, while Salotto needs at least Android 7: it cannot work.</sub>
 
 Salotto cannot work on the recent Fire TVs with Vega OS, as it does not allow installing Android apps such as Salotto.
 
