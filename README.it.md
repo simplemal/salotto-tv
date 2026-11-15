@@ -9,18 +9,31 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 
 ## Fire TV supportate
 
-| Codice | Modello | Generazione | Anno | Funzioni |
-|---|---|---|---|---|
-| `AFTKM` | Fire TV Stick 4K | 2ª | 2023 | Tutte |
-| `AFTKRT` | Fire TV Stick 4K Max | 2ª | 2023 | Tutte |
-| `AFTKA` | Fire TV Stick 4K Max | 1ª | 2021 | Alcune limitate ¹ |
-| `AFTSSS` | Fire TV Stick | 3ª | 2020 | Alcune limitate ² |
-| `AFTSS` | Fire TV Stick Lite | 1ª | 2020 | Alcune limitate ² |
-| `AFTMM` | Fire TV Stick 4K | 1ª | 2018 | In prova ³ |
+| Codice | Modello | Anno | Funzioni |
+|---|---|---|---|
+| `AFTMA08C15` | Fire TV Stick 4K Plus | 2025 | Tutte |
+| `AFTSS` | Fire TV Stick HD | 2024 | Alcune limitate ² |
+| `AFTKM` | Fire TV Stick 4K (2ª) | 2023 | Tutte |
+| `AFTKRT` | Fire TV Stick 4K Max (2ª) | 2023 | Tutte |
+| `AFTKA` | Fire TV Stick 4K Max (1ª) | 2021 | Alcune limitate ¹ |
+| `AFTSSS` | Fire TV Stick (3ª) | 2020 | Alcune limitate ² |
+| `AFTSS` | Fire TV Stick Lite (1ª) | 2020 | Alcune limitate ² |
+| `AFTMM` | Fire TV Stick 4K (1ª) | 2018 | Non compatibile ³ |
+| `AFTN` | Fire TV (3ª) | 2017 | Non compatibile ³ |
+| `AFTT` | Fire TV Stick Basic Edition | 2017 | Non compatibile ⁴ |
+| `AFTT` | Fire TV Stick (2ª) | 2016 | Non compatibile ⁴ |
+| `AFTS` | Fire TV (2ª) | 2015 | Non compatibile ⁴ |
+| `AFTM` | Fire TV Stick (1ª) | 2014 | Non compatibile ⁴ |
+| `AFTB` | Fire TV (1ª) | 2014 | Non compatibile ⁴ |
 
 <sub>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; il salvaschermo di Fire OS non si avvia dalle Impostazioni.<br>
 ² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
-³ Fire OS 6 non accetta il servizio di Salotto. Dopo il tasto Home Fire OS blocca le app per circa 5 secondi: intanto Salotto mostra l'ultima immagine della sua Home con una rotella. All'accensione Salotto arriva dopo circa 50 secondi. Niente funzioni sui tasti tenuti premuti. In più, tutti i limiti di ².</sub>
+³ Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
+⁴ Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>
+
+Salotto non può funzionare sulle Fire TV recenti con Vega OS, poiché non consente di installare app Android come Salotto.
+
+Per quanto Salotto possa teoricamente funzionare sulla maggior parte dei televisori Fire TV e dei Fire TV Cube con Android, l'installazione non è stata abilitata perché non è possibile provarla direttamente.
 
 ## Installazione
 

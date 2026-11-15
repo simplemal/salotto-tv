@@ -20,13 +20,8 @@ final class Features {
     static final String STICK_LITE_2020 = "AFTSS";
     /** Fire OS 6, Android 7, 1.5 GB: like the Sticks of 2020, with what Android 7 lacks left to Fire.ANDROID_7. */
     static final String STICK_4K_2018 = "AFTMM";
-    /**
-     * Added on 2026-11-15 from Amazon's specifications, not tried: the 4K Plus has the hardware of
-     * the Stick 4K of 2023 and Fire OS 8; the two Cubes Fire OS 7 and 2 GB, as the 4K Max of 2021.
-     */
+    /** Added on 2026-11-15 from Amazon's specifications, not tried: the hardware of the Stick 4K of 2023, and Fire OS 8. */
     static final String STICK_4K_PLUS_2025 = "AFTMA08C15";
-    static final String CUBE_2019 = "AFTR";
-    static final String CUBE_2022 = "AFTGAZL";
 
     /** The emulator stands for the Stick 4K of 2023, the one everything is tried on. */
     static final String MODEL = Build.MODEL.startsWith("sdk_") ? STICK_4K_2023 : Build.MODEL;
@@ -34,17 +29,17 @@ final class Features {
     // ---------- 2 GB and a graphics chip that draws two whole screens at once ----------
 
     /** Opening and closing an app from the wheel with its circle: elsewhere the switch is shown, off. */
-    static final boolean CIRCLE_ANIMATION = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean CIRCLE_ANIMATION = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
     /** The Home's backdrop, blurred, under the settings and the pictures' page: elsewhere black. */
-    static final boolean MENU_BACKDROP = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean MENU_BACKDROP = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
     /** A new backdrop fades in over the old one: elsewhere it comes in one step. */
-    static final boolean BACKDROP_FADE = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean BACKDROP_FADE = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
     /** The pictures of cards, circles and grid kept in memory at full size: elsewhere half. */
-    static final boolean LARGE_PICTURE_MEMORY = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean LARGE_PICTURE_MEMORY = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
     /** Which window is in front, asked at once: the Sticks of 2020 can take seconds, so it is asked aside. */
-    static final boolean QUICK_WINDOW_LOOKUP = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean QUICK_WINDOW_LOOKUP = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
     /** Resolutions above 1080p: the Sticks of 2020 would show a black screen. */
-    static final boolean RESOLUTION_4K = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025, CUBE_2019, CUBE_2022);
+    static final boolean RESOLUTION_4K = on(STICK_4K_2023, STICK_4K_MAX_2023, STICK_4K_MAX_2021, STICK_4K_PLUS_2025);
 
     // ---------- Fire OS 8, the models of 2023 ----------
 
