@@ -4,6 +4,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.content.res.ColorStateList;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.usage.StorageStats;
@@ -24,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Bundle;
@@ -131,7 +133,6 @@ public final class SettingsActivity extends CardActivity {
     private static final String WIFI_ON = "wifi-on";
     private static final int MINUTE = (int) Fire.MINUTE_MS;
     private static final String SAVER_ENABLED = "screensaver_enabled";
-    private static final String SAVER_CHOSEN = "screensaver_components";
     private static final int[] SAVER_MINUTES = {1, 5, 10, 15, 30};
     private static final int SAVER_DEFAULT = 5 * MINUTE;
     private static final int[] SLEEP_MINUTES = {5, 20, 30, 60};
@@ -517,7 +518,7 @@ public final class SettingsActivity extends CardActivity {
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(14), 0, dp(12), 0);
-        row.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(row);
         row.setClickable(true);
         ImageView icon = new ImageView(this);
         icon.setImageResource(sections[index].icon);
@@ -906,7 +907,7 @@ public final class SettingsActivity extends CardActivity {
     private void selectable(LinearLayout row, Entry entry, Consumer<Boolean> paint, boolean plain) {
         row.setFocusable(true);
         row.setClickable(true);
-        row.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(row);
         Drawable rest = plain ? null : softGlass(dp(12));
         Drawable lit = plain ? softGlass(dp(12)) : focusFill();
         row.setBackground(rest);
@@ -1244,7 +1245,7 @@ public final class SettingsActivity extends CardActivity {
                 false, () -> open(new Intent(this, TasksActivity.class))),
             new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, null,
                 getString(R.string.settings_held_keys_text),
-                false, () -> changeSystem(() -> TaskService.setKeys(this, !TaskService.keysOn(this))))));
+                false, () -> changeSystem(() -> TaskService.chooseKeys(this, !TaskService.keysOn(this), () -> { if (!isFinishing()) refresh(); })))));
         entries.add(groupLabel(R.string.settings_manage_apps));
         for (HomeApps.App app : HomeApps.installed(this)) {
             Entry entry = new Entry(app.label, null, null, getString(R.string.settings_manage_app_text),
@@ -1265,6 +1266,7 @@ public final class SettingsActivity extends CardActivity {
     }
 
     /** Needs the usage permission that the task manager already has. */
+    @TargetApi(Build.VERSION_CODES.O) // Never asked on Android 7, see showApp.
     private StorageStats appSize(String pkg) {
         try {
             return getSystemService(StorageStatsManager.class)
@@ -1278,6 +1280,8 @@ public final class SettingsActivity extends CardActivity {
     private void showApp(String pkg) {
         Level level = levels.peek();
         listApp(pkg, level, null);
+        // Android 7 gives no app sizes to an app, and those rows are left out.
+        if (Fire.ANDROID_7) return;
         Background.run(() -> {
             StorageStats size = appSize(pkg);
             runOnUiThread(() -> {
@@ -1295,9 +1299,11 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         String text = getString(R.string.settings_app_info_text);
         entries.add(new Entry(getString(R.string.settings_app_version), appVersion(pkg), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
-        entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+        if (!Fire.ANDROID_7) {
+            entries.add(new Entry(getString(R.string.settings_apps), sizeText(size, StorageStats::getAppBytes), picture, text, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_data), sizeText(size, StorageStats::getDataBytes), picture, text, false, () -> { }));
+            entries.add(new Entry(getString(R.string.settings_app_cache), sizeText(size, StorageStats::getCacheBytes), picture, text, false, () -> { }));
+        }
         if (launchIntent(pkg) != null) {
             entries.add(new Entry(getString(R.string.settings_app_open), null, picture, getString(R.string.settings_app_open_text), false, () -> openPackage(pkg)));
         }
@@ -1313,10 +1319,11 @@ public final class SettingsActivity extends CardActivity {
                         : getString(R.string.settings_data_not_cleared));
                     refreshIf(level);
                 }))));
-        entries.add(new Entry(getString(R.string.settings_uninstall), null, picture, getString(R.string.settings_uninstall_text), false, () -> {
-            uninstalling = level;
-            uninstall(pkg);
-        }));
+        if (HomeApps.removable(this, pkg)) entries.add(new Entry(getString(R.string.settings_uninstall), null, picture,
+            getString(R.string.settings_uninstall_text), false, () -> {
+                uninstalling = level;
+                uninstall(pkg);
+            }));
         show(HomeApps.label(this, pkg), entries);
     }
 
@@ -2279,14 +2286,15 @@ public final class SettingsActivity extends CardActivity {
         boolean on = saverOn();
         boolean own = ownSaver();
         String picture = own ? Look.saverPicture(this) : null;
-        List<Entry> entries = new ArrayList<>(Arrays.asList(
-            new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
-                getString(R.string.settings_saver_active_text), false,
-                () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))),
-            new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
-                getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)),
-            new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
-                () -> enter(this::showSaverTimes))));
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(getString(R.string.settings_saver_active), on ? YES : NO, null,
+            getString(R.string.settings_saver_active_text), false,
+            () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), SAVER_ENABLED, on ? 0 : 1))));
+        // Where Salotto has no screensaver of its own there is nothing to choose: Fire OS's, from its menu.
+        if (Fire.OWN_SAVER) entries.add(new Entry(getString(R.string.settings_saver_managed), own ? Brand.NAME : "Fire OS", null,
+            getString(R.string.settings_saver_managed_text), true, () -> enter(this::showSaverManagers)));
+        entries.add(new Entry(getString(R.string.settings_saver_after), minutes(saverMinutes()), null, saverWait(), true,
+            () -> enter(this::showSaverTimes)));
         if (own) {
             entries.add(new Entry(getString(R.string.grid_saver_title),
                 picture != null ? Look.backdropName(this, new File(picture).getName()) : ownSaverName(), null,
@@ -2314,8 +2322,7 @@ public final class SettingsActivity extends CardActivity {
     private void showSaverManagers() {
         String[] names = {Brand.NAME, "Fire OS"};
         show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
-            getString(R.string.settings_saver_managed_text), index -> chooseSaver(index == 0
-                ? new ComponentName(this, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER)));
+            getString(R.string.settings_saver_managed_text), index -> changeSystem(() -> Look.chooseSaver(this, index == 0))));
     }
 
     private String[] saverPlaces() {
@@ -2350,10 +2357,6 @@ public final class SettingsActivity extends CardActivity {
         }
         if (Look.saverFolder(this).startsWith("/")) return personalSaver().name;
         return Brand.NAME;
-    }
-
-    private void chooseSaver(String name) {
-        changeSystem(() -> Settings.Secure.putString(getContentResolver(), SAVER_CHOSEN, name));
     }
 
     /** The Stick goes to sleep at its own time, whatever the screensaver is doing. */

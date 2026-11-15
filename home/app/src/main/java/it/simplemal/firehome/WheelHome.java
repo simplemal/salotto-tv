@@ -140,7 +140,7 @@ final class WheelHome extends FrameLayout {
         density = context.getResources().getDisplayMetrics().density;
         setClipChildren(false);
         setFocusable(true);
-        setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(this);
         ticker.setTimeListener((animation, total, delta) -> step(Math.min(delta, 50) / 1000f));
         setOnFocusChangeListener((view, focused) -> place());
     }

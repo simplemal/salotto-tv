@@ -99,7 +99,7 @@ final class PortalWindow extends View {
         outside.rewind();
         outside.addCircle(x, y, outer, Path.Direction.CW);
         canvas.save();
-        canvas.clipOutPath(outside);
+        Fire.clipOut(canvas, outside);
         whole.set(0, 0, width, height);
         canvas.drawBitmap(home, null, whole, picture);
         canvas.restore();
@@ -121,7 +121,7 @@ final class PortalWindow extends View {
             if (inner > 0) {
                 gap.rewind();
                 gap.addCircle(x, y, inner, Path.Direction.CW);
-                canvas.clipOutPath(gap);
+                Fire.clipOut(canvas, gap);
             }
             canvas.drawBitmap(art, null, place, picture);
             canvas.restore();

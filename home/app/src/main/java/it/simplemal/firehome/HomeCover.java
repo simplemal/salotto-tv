@@ -3,6 +3,7 @@ package it.simplemal.firehome;
 import android.accessibilityservice.AccessibilityService;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -11,7 +12,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.view.PixelCopy;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -215,7 +215,7 @@ final class HomeCover {
     static void take(Window window, Runnable taken) {
         if (picture == null) picture = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
         try {
-            PixelCopy.request(window, picture, result -> taken.run(), new Handler(Looper.getMainLooper()));
+            Fire.copy(window, picture, taken, new Handler(Looper.getMainLooper()));
         } catch (IllegalArgumentException e) {
             // The window has no surface any more: the last picture will do.
             taken.run();
@@ -248,13 +248,18 @@ final class HomeCover {
 
     private void startHome() {
         startedAt = SystemClock.elapsedRealtime();
+        startSalotto(service, startedAt);
+    }
+
+    /** Salotto over Amazon's Home. Android 9 holds back an app's starts for a while after Home: an alarm is let through. */
+    static void startSalotto(Context context, long at) {
         Intent salotto = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
-            .setClass(service, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            .setClass(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (Fire.ANDROID_9) {
-            service.getSystemService(AlarmManager.class).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, startedAt,
-                PendingIntent.getActivity(service, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT));
+            context.getSystemService(AlarmManager.class).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, at,
+                PendingIntent.getActivity(context, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT));
         } else {
-            service.startActivity(salotto);
+            context.startActivity(salotto);
         }
     }
 

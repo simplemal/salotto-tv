@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -108,6 +109,21 @@ final class HomeApps {
         PackageManager manager = context.getPackageManager();
         return manager.getLeanbackLaunchIntentForPackage(pkg) != null
             || manager.getLaunchIntentForPackage(pkg) != null;
+    }
+
+    /**
+     * Whether Android can take it away: only an app installed after Fire OS. On the Stick of 2018
+     * Android's dialog said only that it failed, both for Downloads, in the system, and for Amazon
+     * Live Shopping, in the system and updated since (2026-11-15). Only there: on the other models
+     * nobody has seen it fail.
+     */
+    static boolean removable(Context context, String pkg) {
+        if (!Fire.ANDROID_7) return true;
+        try {
+            return (context.getPackageManager().getApplicationInfo(pkg, 0).flags & ApplicationInfo.FLAG_SYSTEM) == 0;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     /** Salotto, or the Fire OS screens that take over from an app. */

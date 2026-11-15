@@ -97,7 +97,7 @@ final class ControlPanel extends LinearLayout {
             view.setGravity(Gravity.CENTER);
             view.setFocusable(true);
             view.setClickable(true);
-            view.setDefaultFocusHighlightEnabled(false);
+            Fire.noHighlight(view);
             view.setContentDescription(name);
             view.setOnFocusChangeListener((changed, focused) -> {
                 if (focused) last = view;

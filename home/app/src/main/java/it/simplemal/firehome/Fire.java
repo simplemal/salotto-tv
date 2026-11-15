@@ -3,21 +3,39 @@ package it.simplemal.firehome;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.Region;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.DrawableWrapper;
+import android.graphics.drawable.InsetDrawable;
 import android.os.Build;
+import android.os.Handler;
+import android.provider.Settings;
+import android.view.PixelCopy;
+import android.view.View;
+import android.view.Window;
 import java.util.Arrays;
 
 /** What several screens share about the Stick and the apps around Salotto. */
 final class Fire {
     /**
-     * The 4K Max of 2021. Its adbd answers only other machines, so Salotto has no shell there, and
-     * after Home it holds every start for 5 s, except one made by an alarm.
+     * The 4K Max of 2021 and the Sticks of 2020, and the Stick 4K of 2018 on Android 7 too. Their
+     * adbd answers only other machines, so Salotto has no shell there, and after Home they hold
+     * every start for 5 s, except one made by an alarm.
      */
     static final boolean ANDROID_9 = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
+    /** The Stick 4K of 2018, on Fire OS 6: Android 7, before adaptive icons, fonts as resources and storage figures. */
+    static final boolean ANDROID_7 = Build.VERSION.SDK_INT < Build.VERSION_CODES.O;
     /** The tools read this line too: pubblica-aggiornamento.sh and genera-errori.py. */
     static final String UPDATES_REPO = "simplemal/salotto-tv";
     /** Took the Home key to Salotto on Sticks set up before Salotto did that itself. */
@@ -52,6 +70,8 @@ final class Fire {
     /** What Fire OS opens on the recent apps key. */
     static final String RECENTS_PAGE = "com.amazon.tv.launcher.deeplink.activity.RecentDeepLinkActivityDI";
     static final String CMD_SLEEP = "input keyevent SLEEP";
+    /** Android 7 allows installing for the whole TV, not app by app. The installer turns it on too. */
+    static final String ALLOW_INSTALLS_7 = "settings put secure install_non_market_apps 1";
     static final long MINUTE_MS = 60 * 1000L;
     static final long DAY_MS = 24 * 60 * MINUTE_MS;
     /** Text and symbols on a white surface. */
@@ -60,6 +80,59 @@ final class Fire {
     private static final String REMOTE_NAME = "Remote";
 
     private Fire() {}
+
+    /** Android 8 lights a focused view by itself, and Salotto draws its own focus. Android 7 has nothing to turn off. */
+    static void noHighlight(View view) {
+        if (!ANDROID_7) view.setDefaultFocusHighlightEnabled(false);
+    }
+
+    /** A margin measured on the size it is drawn at. InsetDrawable learnt fractions with Android 8. */
+    static Drawable inset(Drawable drawable, float fraction) {
+        if (!ANDROID_7) return new InsetDrawable(drawable, fraction);
+        return new DrawableWrapper(drawable) {
+            @Override protected void onBoundsChange(Rect bounds) {
+                int x = (int) (bounds.width() * fraction), y = (int) (bounds.height() * fraction);
+                getDrawable().setBounds(bounds.left + x, bounds.top + y, bounds.right - x, bounds.bottom - y);
+            }
+        };
+    }
+
+    /** Whether Salotto may install what it brings: its updates and its cover. */
+    @SuppressWarnings("deprecation")
+    static boolean canInstall(Context context) {
+        if (!ANDROID_7) return context.getPackageManager().canRequestPackageInstalls();
+        ContentResolver resolver = context.getContentResolver();
+        return Settings.Secure.getInt(resolver, Settings.Secure.INSTALL_NON_MARKET_APPS, 0) == 1;
+    }
+
+    /** Everything but the path. Android 7 has only the older way of saying it. */
+    @SuppressWarnings("deprecation")
+    static void clipOut(Canvas canvas, Path path) {
+        if (ANDROID_7) canvas.clipPath(path, Region.Op.DIFFERENCE);
+        else canvas.clipOutPath(path);
+    }
+
+    /**
+     * The window as it is on screen, scaled into the picture. Android 7 cannot copy a window, so its
+     * views draw themselves there instead, at once.
+     */
+    static void copy(Window window, Bitmap picture, Runnable done, Handler handler) {
+        if (!ANDROID_7) {
+            PixelCopy.request(window, picture, result -> done.run(), handler);
+            return;
+        }
+        View root = window.getDecorView();
+        if (root.getWidth() > 0 && root.getHeight() > 0) {
+            // At full size first: a picture backdrop fills the canvas it is given, and drawn into a
+            // scaled one it came out a quarter of the screen, grey around it (2026-11-15).
+            Bitmap whole = Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888);
+            root.draw(new Canvas(whole));
+            new Canvas(picture).drawBitmap(whole, null, new Rect(0, 0, picture.getWidth(), picture.getHeight()),
+                new Paint(Paint.FILTER_BITMAP_FLAG));
+            whole.recycle();
+        }
+        handler.post(done);
+    }
 
     /** Bonded only says it was paired once. Android has the answer, but keeps the call to itself. */
     static boolean connected(BluetoothDevice device) {
@@ -80,6 +153,13 @@ final class Fire {
     }
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
+    /**
+     * Salotto's own screensaver. Not on Fire OS 7: there, as Salotto's screensaver ends, Fire OS stops
+     * all of Salotto, the service goes with it and the Home key goes to Amazon (issue #4). Only from
+     * the Home it would have shown Fire OS's inside the apps: the user chose Fire OS's alone
+     * (2026-11-15).
+     */
+    static final boolean OWN_SAVER = !ANDROID_9;
 
     static String[] forceStop(Context context) { return labels(context, SETTINGS, FORCE_STOP_WORDS, FORCE_STOP); }
 

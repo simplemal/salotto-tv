@@ -29,7 +29,7 @@ Il passaggio dalla chiave di sviluppo è stato fatto il 2026-11-01. Android rifi
 1. `adb exec-out run-as it.simplemal.firehome tar cf - shared_prefs files > salotto-dati.tar`, fuori dal repository.
 2. `adb uninstall` di `it.simplemal.firehome.cover` e di `it.simplemal.firehome`.
 3. `adb install` del nuovo APK e, prima di aprirlo, `adb exec-in run-as it.simplemal.firehome tar xf - < salotto-dati.tar`. Controlla che `files` sia tornata: una volta il primo tentativo si è fermato a `shared_prefs`.
-4. Apri Installa Salotto, che dà di nuovo i permessi e riattiva i servizi.
+4. Apri Salotto TV Setup, che dà di nuovo i permessi e riattiva i servizi.
 
 Tieni una copia della cartella `chiavi-aggiornamento/` fuori da Dropbox, per esempio nel gestore di password: chi perde la chiave deve far reinstallare tutti.
 

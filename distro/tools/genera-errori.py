@@ -35,7 +35,7 @@ ENGLISH = {
     "F105": ("The version offered is not newer than the one installed.", "Nothing to do."),
     "F106": ("There is not enough space on the Stick to download and install the new version.",
              "Salotto has not been touched. Free up space by removing apps you do not use, then try again, "
-             "or update from a computer with Installa Salotto."),
+             "or update from a computer with Salotto TV Setup."),
     "F107": ("The file was not downloaded completely.", "Check the connection and try again."),
     "F108": ("The fingerprint of the downloaded file does not match the expected one.",
              "Try again: the file is downloaded again. If it persists, report it."),
@@ -60,17 +60,17 @@ ENGLISH = {
              "From the Mac run install.sh from the distro: it reinstalls Salotto keeping your choices. Then report the problem."),
     "R303": ("The update did not leave a readable outcome.", "Check that Salotto works, then report the problem."),
     "R304": ("On this TV Salotto cannot go back to the previous version by itself.",
-             "Open Installa Salotto on the computer and choose “Go back to the previous version”."),
+             "Open Salotto TV Setup on the computer and choose “Go back to the previous version”."),
 }
 # Only for this page: what a code meant on versions that are still out there. English, then Italian.
 NOTES = {
     "C202": (f"With a Salotto version older than 1.0.18 this error most likely means there is not enough space on "
              f"the Fire TV for the update. It is usually solved by uninstalling some apps you no longer use, or by "
-             f"downloading the new version directly from a computer with [Installa Salotto]({INSTALLER}). From 1.0.18 "
+             f"downloading the new version directly from a computer with [Salotto TV Setup]({INSTALLER}). From 1.0.18 "
              f"Salotto checks the space before starting and, if it is not enough, says so with SAL-F106.",
              f"Con una versione di Salotto precedente alla 1.0.18 questo errore indica probabilmente che sulla Fire TV "
              f"non c'è spazio sufficiente per l'aggiornamento. Di solito si risolve disinstallando qualche app non più "
-             f"in uso, oppure scaricando direttamente la nuova versione dal computer con [Installa Salotto]({INSTALLER_IT}). "
+             f"in uso, oppure scaricando direttamente la nuova versione dal computer con [Salotto TV Setup]({INSTALLER_IT}). "
              f"Dalla 1.0.18 Salotto controlla lo spazio prima di iniziare e, se non basta, lo dice con SAL-F106."),
 }
 
@@ -109,10 +109,10 @@ def main():
             if code in NOTES:
                 lines += [NOTES[code][0], "", italic(NOTES[code][1]), ""]
     lines += ["## If the problem persists", "",
-              f"Update Salotto from a computer with [Installa Salotto]({INSTALLER}), for Mac and Windows: it installs the "
+              f"Update Salotto from a computer with [Salotto TV Setup]({INSTALLER}), for Mac and Windows: it installs the "
               "latest version without going through the TV's update, and your choices stay.", "",
               f"If that is not enough, [open an issue]({ISSUES}) with the code and the versions of Salotto and Fire OS.", "",
-              italic(f"Se il problema resta, aggiorna Salotto dal computer con [Installa Salotto]({INSTALLER_IT}), per Mac "
+              italic(f"Se il problema resta, aggiorna Salotto dal computer con [Salotto TV Setup]({INSTALLER_IT}), per Mac "
                      "e Windows: installa l'ultima versione senza passare dall'aggiornamento della TV, e le tue scelte restano."), "",
               italic(f"Se non basta, [apri una segnalazione]({ISSUES}) indicando codice, versione di Salotto e di Fire OS."), ""]
     pathlib.Path(sys.argv[1]).write_text("\n".join(lines), encoding="utf-8")

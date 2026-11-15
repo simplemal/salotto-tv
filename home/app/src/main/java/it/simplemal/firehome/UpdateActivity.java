@@ -175,7 +175,7 @@ public final class UpdateActivity extends CardActivity {
             list.addView(item);
         }
         ScrollView box = new ScrollView(this);
-        box.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(box);
         box.setScrollbarFadingEnabled(false);
         // The padding keeps the scroll bar off the rounded corners; the text still reaches the edge.
         box.setPadding(0, dp(12), dp(5), dp(12));
@@ -301,12 +301,12 @@ public final class UpdateActivity extends CardActivity {
 
     /** Given at installation: only a Stick set up by an older version comes through here, once. */
     private void allowInstalling() throws Updater.Failure {
-        if (getPackageManager().canRequestPackageInstalls()) return;
+        if (Fire.canInstall(this)) return;
         step(COPY, getString(R.string.update_detail_allow));
         waitForConnection();
-        TaskService.shell("appops set " + getPackageName() + " REQUEST_INSTALL_PACKAGES allow", output -> { });
+        TaskService.shell(Fire.ANDROID_7 ? Fire.ALLOW_INSTALLS_7 : "appops set " + getPackageName() + " REQUEST_INSTALL_PACKAGES allow", output -> { });
         long limit = System.currentTimeMillis() + ALLOW_WAIT_MS;
-        while (!getPackageManager().canRequestPackageInstalls()) {
+        while (!Fire.canInstall(this)) {
             if (System.currentTimeMillis() > limit) throw new Updater.Failure(UpdateError.F115);
             pause();
         }

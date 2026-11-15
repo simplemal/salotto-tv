@@ -284,6 +284,13 @@ public final class MainActivity extends CardActivity {
      */
     private static final float LIGHT_LINE = 0.5f;
     /**
+     * Under the first row, by lightness that weighs no colour more: weighed like the line at the top,
+     * green grass by the sea counted as light as snow, and the names turned black where white read
+     * better (2026-11-15). Past this, compared on every backdrop, black reads better: snow and white
+     * sand; below it, with its shadow, white.
+     */
+    private static final float LIGHT_BELOW = 0.6f;
+    /**
      * Over a light picture the free buttons and the clean Home's line turn black, a little
      * see-through: the words hardly, the icons a touch more, as the middle ones are drawn thicker.
      */
@@ -376,7 +383,9 @@ public final class MainActivity extends CardActivity {
         }
         // A backdrop that arrives while the Home is on screen shows at once.
         Packs.arrived = this::backdropArrived;
-        TaskService.keysByDefault(this);
+        TaskService.keysUnlessOff(this);
+        Look.fireSaverOnly(this);
+        HomeWatch.start(this);
         TaskService.quickAnimationsByDefault(this);
         TaskService.alarmsAtOnce(this);
         TaskService.keepAdbKey(this);
@@ -517,7 +526,7 @@ public final class MainActivity extends CardActivity {
         allAppsCircle.setPadding(inset, inset, inset, inset);
         allAppsCircle.setFocusable(true);
         allAppsCircle.setClickable(true);
-        allAppsCircle.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(allAppsCircle);
         allAppsCircle.setContentDescription(getString(R.string.main_all_apps));
         allAppsCircle.setVisibility(View.GONE);
         int radius = dp(ALL_APPS_CIRCLE) / 2;
@@ -676,7 +685,7 @@ public final class MainActivity extends CardActivity {
             if (clean) {
                 // The whole line at the top; and under the first row, for the names and the credits.
                 light = lightness(picture, width / 16, width * 15 / 16, 0, height / 8) > LIGHT_LINE;
-                below = lightness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_LINE;
+                below = paleness(picture, width / 16, width * 15 / 16, height * 7 / 10, height) > LIGHT_BELOW;
             } else {
                 // The wheel's buttons, at the bottom in the middle.
                 light = lightness(picture, width * 3 / 8, width * 5 / 8, height * 5 / 6, height) > LIGHT_CORNER;
@@ -713,6 +722,23 @@ public final class MainActivity extends CardActivity {
             for (int y = top; y < bottom; y += 4) {
                 int pixel = picture.getPixel(x, y);
                 sum += (0.2126 * Color.red(pixel) + 0.7152 * Color.green(pixel) + 0.0722 * Color.blue(pixel)) / 255;
+                count++;
+            }
+        }
+        return count > 0 ? sum / count : 0;
+    }
+
+    /** Lightness as halfway between the strongest and the weakest of red, green and blue: no colour counts more. */
+    private static double paleness(Bitmap picture, int left, int right, int top, int bottom) {
+        double sum = 0;
+        int count = 0;
+        for (int x = left; x < right; x += 4) {
+            for (int y = top; y < bottom; y += 4) {
+                int pixel = picture.getPixel(x, y);
+                int red = Color.red(pixel);
+                int green = Color.green(pixel);
+                int blue = Color.blue(pixel);
+                sum += (Math.max(red, Math.max(green, blue)) + Math.min(red, Math.min(green, blue))) / 510.0;
                 count++;
             }
         }
@@ -982,8 +1008,9 @@ public final class MainActivity extends CardActivity {
         panelOpen = open;
         // Fading out, its tiles were still there for the arrows: Right pressed quickly past the settings
         // went into them and opened it again, slowly it went down to the apps (2026-11-10). Only on the
-        // clean Home, where it was seen.
-        if (clean) panel.setDescendantFocusability(open ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        // clean Home, where it was seen. The same panel serves every Home: on the others it is always
+        // let through, or a close on the clean one left the arrows out of it there (issue #3).
+        panel.setDescendantFocusability(open || !clean ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
         // Closing, the tiles go quickly first and the row climbs only then: together they met on the
         // way (2026-11-09).
@@ -1077,7 +1104,7 @@ public final class MainActivity extends CardActivity {
         view.setPadding(dp(12), dp(4), dp(12), dp(4));
         view.setFocusable(true);
         view.setClickable(true);
-        view.setDefaultFocusHighlightEnabled(false);
+        Fire.noHighlight(view);
         Drawable logo = getDrawable(R.drawable.ic_salotto);
         logo.setBounds(0, 0, dp(FOOTER_LOGO), dp(FOOTER_LOGO));
         view.setCompoundDrawablesRelative(logo, null, null, null);
@@ -1229,6 +1256,7 @@ public final class MainActivity extends CardActivity {
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
+        root.postOnAnimation(HomeWatch::homeIsBack);
         if (!HomeCover.ready()) root.postDelayed(() -> HomeCover.take(getWindow()), FIRST_PICTURE_MS);
         home = HomeApps.load(this);
         List<String> apps = visible();
@@ -2102,10 +2130,14 @@ public final class MainActivity extends CardActivity {
         // Logo only shows the monochrome tile on the selected app, never its colour (the user, 2026-11-10).
         boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO || Look.cleanIcons(this) == Look.ICONS_LOGO;
         boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
+        // Logo only: Salotto's settings like Tutte le app, its white icon at rest and the veil when
+        // selected; with its grey tile it was the one picture left among the logos (2026-11-15).
+        boolean ownLogo = Look.cleanIcons(this) == Look.ICONS_LOGO && HomeApps.SETTINGS.equals(tag);
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
         int grown = Math.round(size * CLEAN_FOCUS_SCALE);
-        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "");
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "")
+            + (ownLogo ? "/logo" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2126,15 +2158,15 @@ public final class MainActivity extends CardActivity {
             plain.recycle();
         }
         // Tutte le app: a light veil and the icon, drawn at once, with no shadow under it.
-        if (ALL_APPS.equals(tag) && known == null) {
-            known = allAppsSquircle(grown);
+        if ((ALL_APPS.equals(tag) || ownLogo) && known == null) {
+            known = ownSquircle(grown, ownLogo ? R.drawable.ic_settings : R.drawable.ic_apps);
             CIRCLE_ART.put(key, known);
         }
         Bitmap shown = known != null ? known : squirclePlaceholder;
         View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null,
-            ALL_APPS.equals(tag) ? GLASS : ICON, size, action, hold);
+            ALL_APPS.equals(tag) || ownLogo ? GLASS : ICON, size, action, hold);
         // Logo only: the white logo at rest, the glass tile on the selected app. Tutte le app too.
-        boolean bare = Look.cleanIcons(this) == Look.ICONS_LOGO && (glassy || ALL_APPS.equals(tag));
+        boolean bare = Look.cleanIcons(this) == Look.ICONS_LOGO && (glassy || ALL_APPS.equals(tag) || ownLogo);
         if (bare) bareTile(tile, tag, key, grown, mono);
         else if (known == null) {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
@@ -2174,8 +2206,9 @@ public final class MainActivity extends CardActivity {
         Drawable shadow = tile.getBackground();
         View.OnFocusChangeListener before = tile.getOnFocusChangeListener();
         Bitmap[] both = {CIRCLE_ART.get(key), CIRCLE_ART.get(key + "/bare")};
-        if (ALL_APPS.equals(tag) && both[1] == null) {
-            both[1] = allAppsLogo(grown);
+        boolean own = ALL_APPS.equals(tag) || HomeApps.SETTINGS.equals(tag);
+        if (own && both[1] == null) {
+            both[1] = ownLogo(grown, ALL_APPS.equals(tag) ? R.drawable.ic_apps : R.drawable.ic_settings);
             CIRCLE_ART.put(key + "/bare", both[1]);
         }
         Runnable show = () -> {
@@ -2254,7 +2287,7 @@ public final class MainActivity extends CardActivity {
         return Math.round(channel + (255 - channel) * CLEAN_EDGE_LIGHT);
     }
 
-    private Bitmap allAppsSquircle(int size) {
+    private Bitmap ownSquircle(int size, int iconRes) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -2270,7 +2303,7 @@ public final class MainActivity extends CardActivity {
         rim.setStrokeWidth(line);
         rim.setColor(ALL_APPS_EDGE);
         canvas.drawPath(edge, rim);
-        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable icon = getDrawable(iconRes).mutate();
         icon.setTint(Color.WHITE);
         int inset = size * 3 / 10;
         icon.setBounds(inset, inset, size - inset, size - inset);
@@ -2278,17 +2311,17 @@ public final class MainActivity extends CardActivity {
         return made;
     }
 
-    /** Tutte le app with the logo only: its icon in white over a soft shadow, as the apps' logos. */
-    private Bitmap allAppsLogo(int size) {
+    /** Tutte le app and the settings with the logo only: the icon in white over a soft shadow, as the apps' logos. */
+    private Bitmap ownLogo(int size, int iconRes) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         int inset = size * 3 / 10;
         int drop = Math.max(1, Math.round(0.75f * getResources().getDisplayMetrics().density));
-        Drawable shade = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable shade = getDrawable(iconRes).mutate();
         shade.setTint(Color.argb(90, 0, 0, 0));
         shade.setBounds(inset, inset + drop, size - inset, size - inset + drop);
         shade.draw(canvas);
-        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable icon = getDrawable(iconRes).mutate();
         icon.setTint(Color.WHITE);
         icon.setBounds(inset, inset, size - inset, size - inset);
         icon.draw(canvas);
@@ -2367,9 +2400,10 @@ public final class MainActivity extends CardActivity {
         boolean app = !HomeApps.SETTINGS.equals(pkg);
         String title = app ? HomeApps.label(this, pkg) : getString(R.string.first_does_settings);
         // Salotto's settings can leave the Home too: the gear beside the apps opens them, and Tutte le app puts the card back.
-        String[] choices = app ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
+        String[] choices = !app ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home)}
+            : HomeApps.removable(this, pkg) ? new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home),
                 getString(R.string.card_app_info), getString(R.string.card_uninstall)}
-            : new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home)};
+            : new String[]{getString(R.string.main_move), getString(R.string.card_remove_from_home), getString(R.string.card_app_info)};
         dialog()
             .setTitle(title)
             .setItems(choices, (dialog, choice) -> {

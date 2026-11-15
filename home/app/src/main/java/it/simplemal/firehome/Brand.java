@@ -1,5 +1,6 @@
 package it.simplemal.firehome;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Spannable;
@@ -7,10 +8,14 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /** The name is always set in Space Grotesk, even in the middle of a sentence. */
 final class Brand {
     static final String NAME = "Salotto";
+    private static final String FONT_FILE = "space_grotesk.ttf";
 
     private static Typeface face;
 
@@ -22,8 +27,21 @@ final class Brand {
     }
 
     static Typeface face(Context context) {
-        if (face == null) face = context.getResources().getFont(R.font.space_grotesk);
+        if (face == null) face = Fire.ANDROID_7 ? fromFile(context) : context.getResources().getFont(R.font.space_grotesk);
         return face;
+    }
+
+    /** Android 7 reads fonts only from a file, so the one in the resources is copied out once. */
+    @SuppressLint("ResourceType") // A font is a plain file in the package, and opens as one.
+    private static Typeface fromFile(Context context) {
+        File file = new File(context.getCacheDir(), FONT_FILE);
+        try (InputStream input = context.getResources().openRawResource(R.font.space_grotesk)) {
+            if (!file.isFile()) Bytes.copy(input, file);
+            return Typeface.createFromFile(file);
+        } catch (IOException | RuntimeException e) {
+            file.delete();
+            return Typeface.DEFAULT;
+        }
     }
 
     static CharSequence mark(Context context, String text) {

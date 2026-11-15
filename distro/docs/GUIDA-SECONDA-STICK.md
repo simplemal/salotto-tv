@@ -1,6 +1,6 @@
 # Guida: installare Salotto su un'altra Fire TV Stick
 
-**Senza terminale:** l'app Installa Salotto, in `installatore/`, fa gli stessi passi in una sola finestra. Questa guida resta per chi usa `install.sh`.
+**Senza terminale:** l'app Salotto TV Setup, in `installatore/`, fa gli stessi passi in una sola finestra. Questa guida resta per chi usa `install.sh`.
 
 Da seguire in ordine. Tempo previsto: circa 30 minuti, più gli aggiornamenti di Fire OS.
 

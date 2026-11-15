@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -26,7 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * The collections of backdrops. Installa Salotto writes which ones were chosen in `sfondi/scelte`,
+ * The collections of backdrops. Salotto TV Setup writes which ones were chosen in `sfondi/scelte`,
  * in the folder Salotto shares with the computer; Salotto downloads them from the release "sfondi"
  * on GitHub, each into a folder of the same name, which counts only once `.completo` is written in
  * it after its last file. A collection not on the TV is read from inside the app, while it carries it.
@@ -413,7 +412,7 @@ final class Packs {
         if (picture == null || !index.has(picture)) return false;
         part(context, url, index, picture);
         String names = (Weather.weatherPack(pack) ? Weather.tableOf(pack) + "\n" : "") + picture + "\n";
-        Files.write(new File(new File(root(context), pack), PARTIAL).toPath(), names.getBytes(StandardCharsets.UTF_8));
+        Bytes.write(new File(new File(root(context), pack), PARTIAL), names.getBytes(StandardCharsets.UTF_8));
         tell();
         return true;
     }
@@ -438,7 +437,7 @@ final class Packs {
         File parent = target.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) throw new IOException("folder");
         // Checked already, and read only once `.inizio` names it: written in place, never moved.
-        Files.write(target.toPath(), body);
+        Bytes.write(target, body);
     }
 
     private static String hex(byte[] bytes) {
@@ -490,7 +489,7 @@ final class Packs {
                 while (input.read(rest) > 0) { }
             }
             if (received != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
-            Files.write(new File(folder, COMPLETE).toPath(), new byte[0]);
+            Bytes.write(new File(folder, COMPLETE), new byte[0]);
             new File(folder, PARTIAL).delete();
             whole = true;
             tell();

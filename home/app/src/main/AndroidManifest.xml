@@ -56,6 +56,8 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
@@ -84,6 +86,14 @@
             </intent-filter>
         </activity>
         <receiver android:name=".SelfInstall" android:exported="false" />
+        <!-- The Home key on Fire OS 6, where TaskService is turned away: see HomeWatch. -->
+        <service android:name=".HomeWatch" android:exported="false" />
+        <receiver android:name=".HomeWatch$Boot" android:exported="true">
+            <!-- Fire OS hands the boot to its receivers one at a time, for minutes: ahead of the queue. -->
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <activity android:name=".AppsActivity" android:exported="false"
             android:screenOrientation="landscape" />
         <activity android:name=".AboutActivity" android:exported="false"

@@ -1,6 +1,8 @@
 package it.simplemal.firehome;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +105,8 @@ final class Look {
     private static Bitmap cachedImage;
 
     private Look() {}
+
+    private static final String SAVER_COMPONENT = "screensaver_components";
 
     private static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -462,8 +467,32 @@ final class Look {
 
     /** Salotto's screensaver is the one chosen. */
     static boolean ownSaver(Context context) {
-        String chosen = Settings.Secure.getString(context.getContentResolver(), "screensaver_components");
+        if (!Fire.OWN_SAVER) return false;
+        String chosen = Settings.Secure.getString(context.getContentResolver(), SAVER_COMPONENT);
         return chosen != null && chosen.startsWith(context.getPackageName() + "/");
+    }
+
+    /** Salotto's screensaver or Fire OS's. */
+    static void chooseSaver(Context context, boolean own) {
+        String name = own && Fire.OWN_SAVER ? new ComponentName(context, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER;
+        Settings.Secure.putString(context.getContentResolver(), SAVER_COMPONENT, name);
+    }
+
+    /**
+     * Where Salotto has no screensaver of its own (Fire.OWN_SAVER): a TV that had it gets Fire OS's,
+     * and Salotto's is taken out of Android's list, so that it cannot be chosen in Fire OS's menu either.
+     */
+    static void fireSaverOnly(Context context) {
+        if (Fire.OWN_SAVER) return;
+        context.getPackageManager().setComponentEnabledSetting(new ComponentName(context, SaverService.class),
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        String chosen = Settings.Secure.getString(context.getContentResolver(), SAVER_COMPONENT);
+        if (chosen == null || !chosen.startsWith(context.getPackageName() + "/")) return;
+        try {
+            chooseSaver(context, false);
+        } catch (SecurityException e) {
+            Log.w("Salotto", "No permission yet for the screensaver", e);
+        }
     }
 
     /** What the screensaver shows over its pictures. */

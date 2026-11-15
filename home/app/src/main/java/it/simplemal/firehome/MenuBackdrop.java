@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.function.Consumer;
 
 /**
@@ -87,7 +86,7 @@ final class MenuBackdrop {
 
     private static String savedName(Context context) {
         try {
-            return new String(Files.readAllBytes(new File(context.getCacheDir(), NAME).toPath()), StandardCharsets.UTF_8);
+            return new String(Bytes.read(new File(context.getCacheDir(), NAME)), StandardCharsets.UTF_8);
         } catch (IOException e) {
             return null;
         }
@@ -100,7 +99,7 @@ final class MenuBackdrop {
         named.delete();
         try (FileOutputStream out = new FileOutputStream(file)) {
             picture.compress(Bitmap.CompressFormat.JPEG, QUALITY, out);
-            Files.write(named.toPath(), name.getBytes(StandardCharsets.UTF_8));
+            Bytes.write(named, name.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             // Made again the next time the settings open.
         }
