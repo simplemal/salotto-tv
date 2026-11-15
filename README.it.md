@@ -15,7 +15,7 @@ Una Home pulita per Fire TV Stick: le tue app, lo sfondo, l'orario e il meteo. N
 | `AFTSS` | Fire TV Stick HD | 2024 | Alcune limitate [²](#nota-2) |
 | `AFTKM` | Fire TV Stick 4K (2ª) | 2023 | Tutte |
 | `AFTKRT` | Fire TV Stick 4K Max (2ª) | 2023 | Tutte |
-| `AFTKA` | Fire TV Stick 4K Max (1ª) | 2021 | Poche limitazioni [¹](#nota-1) |
+| `AFTKA` | Fire TV Stick 4K Max (1ª) | 2021 | Quasi tutte [¹](#nota-1) |
 | `AFTSSS` | Fire TV Stick (3ª) | 2020 | Alcune limitate [²](#nota-2) |
 | `AFTSS` | Fire TV Stick Lite (1ª) | 2020 | Alcune limitate [²](#nota-2) |
 | `AFTMM` | Fire TV Stick 4K (1ª) | 2018 | Non compatibile [³](#nota-3) |
