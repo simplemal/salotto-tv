@@ -45,7 +45,6 @@
     <string name="first_packs_server">合集服务器没有响应。Salotto 稍后会自动重试。</string>
     <string name="first_packs_damaged">有一个合集下载后已损坏，已被丢弃。Salotto 稍后会自动重试。</string>
     <string name="first_preview">预览</string>
-    <string name="grid_position">%1$d / %2$d</string>
     <string name="first_backdrop_pictures">插画天气</string>
     <string name="first_backdrop_photos">摄影天气</string>
     <string name="first_backdrop_night">夜晚</string>

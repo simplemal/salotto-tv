@@ -2,40 +2,19 @@
 <!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
      Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
 <resources>
-    <string name="settings_language_text">لغة Salotto. لغة Google TV لا تتغير.</string>
-    <string name="settings_apps_text">كل التطبيقات المثبتة، وترتيب الشاشة الرئيسية، وإدارة Google TV.</string>
     <string name="settings_fire">إعدادات Google TV</string>
-    <string name="settings_task_manager_text">التطبيقات المستخدمة منذ تشغيل الجهاز، لإعادة فتحها أو إغلاقها.</string>
     <string name="settings_data_not_cleared">لا يسمح Google TV بمسحها</string>
-    <string name="settings_uninstall_text">يزيل التطبيق من الجهاز.</string>
-    <string name="settings_sleep_text">بعد كم من الوقت يدخل الجهاز في وضع الاستعداد إذا لم تستخدمه.</string>
-    <string name="settings_cec_text">يسمح للجهاز والتلفاز بالتحكم ببعضهما عبر كابل HDMI.</string>
     <string name="settings_tv_off">إطفاء التلفاز مع الجهاز</string>
-    <string name="settings_tv_off_text">عندما يدخل الجهاز في وضع الاستعداد يُطفأ التلفاز أيضًا. يعمل إذا كان التلفاز يدعم HDMI-CEC.</string>
-    <string name="settings_standards_text">ما يستطيع الجهاز والتلفاز فعله، وما المستخدم الآن.</string>
     <string name="settings_fire_refused">لم يقبل Google TV الاختيار</string>
-    <string name="settings_fire_may_refuse">إذا لم يدعمه التلفاز، يرفضه Google TV.</string>
     <string name="settings_fire_forbids">لا يسمح Google TV بذلك</string>
-    <string name="settings_notifications_text">الإشعارات الواردة من Google TV والتطبيقات.</string>
-    <string name="settings_wifi_text">بدون Wi-Fi لا يتصل الجهاز بالإنترنت.</string>
-    <string name="settings_wifi_on_cable_text">مع توصيل الكابل يستخدم الجهاز الشبكة السلكية. للانتقال إلى Wi-Fi افصل الكابل.</string>
-    <string name="settings_wifi_networks_text">اختر شبكة واتصل. تبقى كلمات المرور على الجهاز.</string>
     <string name="settings_wifi_off_warning">يبقى الجهاز بلا إنترنت حتى تعيد تشغيله من هنا أو تعيد تشغيل الجهاز.</string>
     <string name="settings_wifi_forget_warning">ينفصل الجهاز، وللعودة ستحتاج إلى كلمة المرور مجددًا.</string>
-    <string name="settings_standby_text">يضع الجهاز في وضع الاستعداد فورًا.</string>
-    <string name="settings_restart_text">يعيد تشغيل الجهاز. يستغرق ذلك نحو دقيقة.</string>
     <string name="settings_restart_question">إعادة تشغيل الجهاز؟</string>
-    <string name="settings_save_choices_text">تُحفظ تطبيقات الشاشة الرئيسية والمظهر والساعة والطقس في ملف على الجهاز.</string>
-    <string name="settings_saver_active_text">تبدأ شاشة التوقف عندما يبقى الجهاز دون استخدام.</string>
-    <string name="settings_saver_fire">يحدده Google TV</string>
-    <string name="settings_saver_choose_text">يفتح قائمة Google TV للاختيار بين شاشات التوقف الخاصة به: الصور، النمط، السرعة. وقت البدء المعتمد هو المختار هنا في Salotto.</string>
     <string name="settings_saver_wait_text">كم ينتظر الجهاز قبل تشغيل شاشة التوقف.</string>
     <string name="settings_table_stick">الجهاز</string>
-    <string name="settings_date_format_text">كما تكتبه لغة Google TV.</string>
     <string name="settings_cat_system_text">اللغة والإشعارات والخصوصية ومعلومات عن هذا الجهاز.</string>
     <string name="settings_section_device">هذا الجهاز</string>
     <string name="settings_fire_open">فتح إعدادات Google TV</string>
-    <string name="settings_saver_managed_text">من يقرر ما تعرضه شاشة التوقف: Salotto بصوره، أو Google TV.</string>
     <string name="first_name_title">اسم هذا الجهاز</string>
     <string name="first_name_hint">اسم الجهاز</string>
     <string name="first_name_refused">لم يقبل Google TV الاسم</string>
@@ -44,8 +23,4 @@
     <string name="task_restarting">جارٍ إعادة تشغيل الجهاز</string>
     <string name="about_tagline">مشغّل لـ Google TV، من simplemal.</string>
     <string name="about_clean_text">تضع الشاشة الرئيسية في Google TV الإعلانات والمحتوى المقترح والفيديوهات التلقائية أمام تطبيقاتك. يعرض Salotto تطبيقاتك فقط، والخلفية، والوقت، والطقس. بلا إعلانات وبلا عروض.</string>
-    <string name="av_no_decoder">لا يوجد في الجهاز مفكك ترميز لذلك.</string>
-    <string name="av_tv_not_needed">لا علاقة للتلفاز هنا: يفك الجهاز ترميز الفيديو فيصل إلى التلفاز جاهزًا.</string>
-    <string name="av_decoded_by_stick">يفك الجهاز ترميزها: %1$s.</string>
-    <string name="av_aac_text">الصوت العادي لمعظم فيديوهات البث. لا علاقة للتلفاز: يفك الجهاز ترميزه.</string>
 </resources>

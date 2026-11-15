@@ -45,7 +45,6 @@
     <string name="first_packs_server">Il server delle collezioni non risponde. Salotto riproverà da solo più tardi.</string>
     <string name="first_packs_damaged">Una collezione è arrivata danneggiata ed è stata scartata. Salotto riproverà da solo più tardi.</string>
     <string name="first_preview">Anteprima</string>
-    <string name="grid_position">%1$d di %2$d</string>
     <string name="first_backdrop_pictures">Meteo illustrato</string>
     <string name="first_backdrop_photos">Meteo fotografico</string>
     <string name="first_backdrop_night">Notte</string>

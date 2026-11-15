@@ -5,7 +5,6 @@
 -->
 <resources>
     <!-- Shared by the screens -->
-    <string name="grid_picture" translatable="false">%1$s · %2$s</string>
     <string name="card_confirm">Conferma</string>
     <string name="card_cancel">Annulla</string>
     <string name="card_close">Chiudi</string>
@@ -216,60 +215,20 @@
     <string name="av_available">Disponibile</string>
     <!-- In-use column: this format is the fixed choice -->
     <string name="av_selected">Scelto</string>
-    <string name="av_no_decoder">Sulla Stick non c’è un decoder.</string>
-    <string name="av_available_text">Disponibile: ora l’uscita HDMI può portarlo.</string>
-    <!-- Audio surround is a page of the Settings: same words as there -->
-    <string name="av_selected_text">Scelto: è il formato fisso di Audio surround.</string>
-    <string name="av_tv_not_needed">La TV non c’entra: il video lo decodifica la Stick e alla TV arriva già pronto.</string>
-    <!-- %1$s is a name, such as Dolby Atmos -->
-    <string name="av_tv_does_not_declare">La TV collegata non dichiara %1$s.</string>
-    <string name="av_tv_no_channels">La TV collegata non dichiara i canali.</string>
-    <string name="av_tv_no_wide_color">La TV collegata non dichiara una gamma di colori ampia.</string>
-    <string name="av_tv_no_hdr">La TV collegata non dichiara nessun tipo di HDR.</string>
-    <string name="av_video_av1">Il formato più recente: stessa qualità con meno dati.</string>
-    <string name="av_video_hevc">Il formato di gran parte dei video 4K e HDR.</string>
-    <string name="av_video_vp9">Il formato di Google, usato soprattutto da YouTube.</string>
-    <string name="av_video_avc">Il formato più diffuso, soprattutto per i video in HD.</string>
-    <string name="av_video_mpeg2">Il formato dei DVD e della vecchia TV digitale.</string>
-    <string name="av_surround_eac3">Surround con pochi dati: è l’audio più comune in streaming.</string>
-    <string name="av_surround_ac3">Il surround 5.1 classico, capito da quasi tutte le TV e soundbar.</string>
-    <string name="av_surround_ac4">Il formato Dolby più recente, pensato per TV e streaming.</string>
-    <string name="av_surround_truehd">Audio senza perdita di qualità, quello dei dischi Blu-ray.</string>
-    <string name="av_surround_dts">L’alternativa a Dolby, comune su dischi e film scaricati.</string>
-    <string name="av_surround_dts_hd">La versione di DTS con la qualità più alta.</string>
     <string name="av_resolution">Risoluzione</string>
     <!-- %1$s is a size, such as 4K, %2$s a rate, such as 60 Hz -->
     <string name="av_size_at_rate">%1$s a %2$s</string>
-    <string name="av_resolution_text">Quanti punti ha l’immagine e quante volte al secondo cambia.</string>
-    <!-- %1$s is a list of resolutions -->
-    <string name="av_tv_also">La TV dichiara anche %1$s.</string>
-    <!-- Video is a page of the Settings. %1$s is the choice made there -->
-    <string name="av_chosen_in_video">Scelta in Video: %1$s.</string>
     <string name="av_color">Colore</string>
-    <string name="av_color_text">Quante sfumature e quanto è ampia la gamma dei colori.</string>
     <string name="av_dynamic_range">Gamma dinamica</string>
     <string name="av_sdr_and_hdr">SDR e HDR</string>
     <string name="av_sdr_only">Solo SDR</string>
-    <string name="av_dynamic_range_text">SDR è l’immagine normale, HDR ha luci più forti e colori più ricchi.</string>
-    <string name="av_hdr10_text">L’HDR più diffuso: l’immagine è regolata una volta per tutto il film.</string>
-    <string name="av_hdr10_plus_text">Come HDR10, ma l’immagine è regolata scena per scena.</string>
-    <string name="av_hlg_text">L’HDR delle trasmissioni TV: si vede bene anche sugli schermi normali.</string>
-    <string name="av_dolby_vision_text">L’HDR di Dolby: regola l’immagine scena per scena, fino a 12 bit.</string>
     <string name="av_other_video">Altri video</string>
     <string name="av_other_audio">Altri audio</string>
     <plurals name="av_formats">
         <item quantity="one">%1$d formato</item>
         <item quantity="other">%1$d formati</item>
     </plurals>
-    <!-- %1$s is a list of formats -->
-    <string name="av_decoded_by_stick">Li decodifica la Stick: %1$s.</string>
     <string name="av_audio_channels">Canali audio</string>
-    <!-- Audio surround is a page of the Settings: same words as there -->
-    <string name="av_channels_text">Stereo sono due casse, 5.1 e 7.1 sono il surround. In uso c’è la scelta di Audio surround.</string>
-    <string name="av_aac_text">L’audio normale di gran parte dei video in streaming. La TV non c’entra: lo decodifica la Stick.</string>
-    <string name="av_atmos_text">Audio a oggetti: i suoni si muovono intorno a te, anche dall’alto.</string>
-    <!-- Audio surround and Migliore disponibile are a page and a choice of the Settings: same words as there. %1$s is the choice in use -->
-    <string name="av_surround_fixed">Audio surround è fisso su %1$s: Android non chiede alla TV, quindi qui non si sa cosa supporta. Con Migliore disponibile si legge dalla TV.</string>
     <string name="av_stereo">Stereo</string>
     <string name="av_mono">Mono</string>
 
@@ -311,7 +270,6 @@
     <string name="update_done">Aggiornamento completato</string>
     <!-- %1$s is a version -->
     <string name="update_done_text">Ora hai Salotto %1$s.</string>
-    <string name="update_backdrops">Scarico gli sfondi da GitHub: %1$d%%</string>
     <string name="update_backdrop_first">Preparo lo sfondo…</string>
     <!-- %1$s is the problem, %2$s its code, such as SAL-F101 -->
     <string name="update_problem_line">%1$s (%2$s)</string>
@@ -351,7 +309,6 @@
     <string name="update_error_r301">Copia precedente non disponibile</string>
     <string name="update_error_r302">Ritorno alla versione precedente non riuscito</string>
     <string name="update_error_r303">Stato finale sconosciuto</string>
-    <string name="settings_wifi_on_fire">Le reti Wi-Fi si gestiscono nelle impostazioni di Fire OS.</string>
     <string name="reenabled_group_ads">Pubblicità sulla Home Amazon</string>
     <string name="reenabled_group_alexa">Alexa</string>
     <string name="reenabled_steps">Per rispegnerle serve un computer:\n1. Apri Salotto TV Setup.\n2. Scegli questa TV.\n3. Segui i passi che propone.</string>

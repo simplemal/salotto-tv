@@ -45,7 +45,6 @@
     <string name="first_packs_server">Der Server der Sammlungen antwortet nicht. Salotto versucht es später von selbst erneut.</string>
     <string name="first_packs_damaged">Eine Sammlung kam beschädigt an und wurde verworfen. Salotto versucht es später von selbst erneut.</string>
     <string name="first_preview">Vorschau</string>
-    <string name="grid_position">%1$d von %2$d</string>
     <string name="first_backdrop_pictures">Illustriertes Wetter</string>
     <string name="first_backdrop_photos">Fotografisches Wetter</string>
     <string name="first_backdrop_night">Nacht</string>

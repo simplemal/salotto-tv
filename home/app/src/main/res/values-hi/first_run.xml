@@ -45,7 +45,6 @@
     <string name="first_packs_server">संग्रहों का सर्वर जवाब नहीं दे रहा। Salotto बाद में अपने आप फिर कोशिश करेगा।</string>
     <string name="first_packs_damaged">एक संग्रह खराब होकर आया और हटा दिया गया। Salotto बाद में अपने आप फिर कोशिश करेगा।</string>
     <string name="first_preview">पूर्वावलोकन</string>
-    <string name="grid_position">%2$d में से %1$d</string>
     <string name="first_backdrop_pictures">चित्रित मौसम</string>
     <string name="first_backdrop_photos">फ़ोटो मौसम</string>
     <string name="first_backdrop_night">रात</string>

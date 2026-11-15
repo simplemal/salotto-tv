@@ -2,40 +2,19 @@
 <!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
      Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
 <resources>
-    <string name="settings_language_text">Salotto 的语言。Google TV 的语言不变。</string>
-    <string name="settings_apps_text">所有已安装的应用、主屏幕的排序以及 Google TV 管理。</string>
     <string name="settings_fire">Google TV 设置</string>
-    <string name="settings_task_manager_text">自打开设备以来使用过的应用，可重新打开或关闭。</string>
     <string name="settings_data_not_cleared">Google TV 不允许清除</string>
-    <string name="settings_uninstall_text">从设备上移除该应用。</string>
-    <string name="settings_sleep_text">不使用时，设备多久后进入待机。</string>
-    <string name="settings_cec_text">让设备和电视通过 HDMI 线互相控制。</string>
     <string name="settings_tv_off">随设备关闭电视</string>
-    <string name="settings_tv_off_text">设备进入待机时也会关闭电视。电视支持 HDMI-CEC 时有效。</string>
-    <string name="settings_standards_text">设备和电视能做什么，以及当前正在使用什么。</string>
     <string name="settings_fire_refused">Google TV 未接受该选择</string>
-    <string name="settings_fire_may_refuse">如果电视不支持，Google TV 会拒绝。</string>
     <string name="settings_fire_forbids">Google TV 不允许</string>
-    <string name="settings_notifications_text">来自 Google TV 和应用的通知。</string>
-    <string name="settings_wifi_text">没有 Wi-Fi，设备就无法上网。</string>
-    <string name="settings_wifi_on_cable_text">插着网线时，设备使用有线网络。要切换到 Wi-Fi，请拔掉网线。</string>
-    <string name="settings_wifi_networks_text">选择网络并连接。密码保存在设备上。</string>
     <string name="settings_wifi_off_warning">在你从这里重新打开或重启设备之前，设备将无法上网。</string>
     <string name="settings_wifi_forget_warning">设备会断开连接，重新连接时需要再次输入密码。</string>
-    <string name="settings_standby_text">立即让设备进入待机。</string>
-    <string name="settings_restart_text">重启设备。大约需要一分钟。</string>
     <string name="settings_restart_question">重启设备？</string>
-    <string name="settings_save_choices_text">主屏幕应用、外观、时钟和天气会保存到设备上的一个文件中。</string>
-    <string name="settings_saver_active_text">设备闲置时启动屏幕保护程序。</string>
-    <string name="settings_saver_fire">由 Google TV 决定</string>
-    <string name="settings_saver_choose_text">打开 Google TV 的菜单，在它的屏幕保护程序中选择：照片、风格、速度。启动时间以这里在 Salotto 中选择的为准。</string>
     <string name="settings_saver_wait_text">设备等待多久后启动屏幕保护程序。</string>
     <string name="settings_table_stick">设备</string>
-    <string name="settings_date_format_text">按 Google TV 的语言书写。</string>
     <string name="settings_cat_system_text">语言、通知、隐私以及此设备的信息。</string>
     <string name="settings_section_device">此设备</string>
     <string name="settings_fire_open">打开 Google TV 设置</string>
-    <string name="settings_saver_managed_text">由谁决定屏幕保护程序显示什么：Salotto 和它的图片，或 Google TV。</string>
     <string name="first_name_title">此设备的名称</string>
     <string name="first_name_hint">设备名称</string>
     <string name="first_name_refused">Google TV 未接受该名称</string>
@@ -44,8 +23,4 @@
     <string name="task_restarting">正在重启设备</string>
     <string name="about_tagline">Google TV 启动器，作者 simplemal。</string>
     <string name="about_clean_text">Google TV 主屏幕会在你的应用前放置广告、推荐内容和自动播放的视频。Salotto 只显示你的应用、背景、时间和天气。没有广告，也没有推销。</string>
-    <string name="av_no_decoder">设备没有对应的解码器。</string>
-    <string name="av_tv_not_needed">与电视无关：视频由设备解码，送到电视时已准备好。</string>
-    <string name="av_decoded_by_stick">由设备解码：%1$s。</string>
-    <string name="av_aac_text">大多数流媒体视频的普通音频。与电视无关：由设备解码。</string>
 </resources>

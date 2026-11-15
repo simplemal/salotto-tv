@@ -2,40 +2,19 @@
 <!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
      Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
 <resources>
-    <string name="settings_language_text">The language of Salotto. Google TV stays as it is.</string>
-    <string name="settings_apps_text">All installed apps, the order of the Home and Google TV management.</string>
     <string name="settings_fire">Google TV settings</string>
-    <string name="settings_task_manager_text">The apps used since you turned the device on, to reopen or close.</string>
     <string name="settings_data_not_cleared">Google TV doesn’t allow clearing it</string>
-    <string name="settings_uninstall_text">Removes the app from the device.</string>
-    <string name="settings_sleep_text">How long until the device goes to standby when you’re not using it.</string>
-    <string name="settings_cec_text">Lets the device and the TV control each other through the HDMI cable.</string>
     <string name="settings_tv_off">Turn off the TV with the device</string>
-    <string name="settings_tv_off_text">When the device goes to standby, the TV turns off too. Works if the TV supports HDMI-CEC.</string>
-    <string name="settings_standards_text">What the device and the TV can do, and what is in use now.</string>
     <string name="settings_fire_refused">Google TV did not accept the choice</string>
-    <string name="settings_fire_may_refuse">If the TV doesn’t support it, Google TV refuses it.</string>
     <string name="settings_fire_forbids">Google TV doesn’t allow it</string>
-    <string name="settings_notifications_text">Notifications from Google TV and your apps.</string>
-    <string name="settings_wifi_text">Without Wi-Fi the device has no internet.</string>
-    <string name="settings_wifi_on_cable_text">With the cable plugged in, the device uses the wired network. To switch to Wi-Fi, unplug the cable.</string>
-    <string name="settings_wifi_networks_text">Pick a network and connect. Passwords stay on the device.</string>
     <string name="settings_wifi_off_warning">The device stays without internet until you turn it back on from here or restart it.</string>
     <string name="settings_wifi_forget_warning">The device disconnects, and you’ll need the password again to come back.</string>
-    <string name="settings_standby_text">Puts the device in standby right away.</string>
-    <string name="settings_restart_text">Restarts the device. It takes about a minute.</string>
     <string name="settings_restart_question">Restart the device?</string>
-    <string name="settings_save_choices_text">Home apps, appearance, clock and weather go into a file on the device.</string>
-    <string name="settings_saver_active_text">The screensaver starts when the device sits idle.</string>
-    <string name="settings_saver_fire">Decided by Google TV</string>
-    <string name="settings_saver_choose_text">Opens the Google TV menu to pick between its screensavers: photos, style, speed. The start time that counts is the one chosen here in Salotto.</string>
     <string name="settings_saver_wait_text">How long the device waits before starting the screensaver.</string>
     <string name="settings_table_stick">Device</string>
-    <string name="settings_date_format_text">As Google TV’s language writes it.</string>
     <string name="settings_cat_system_text">Language, notifications, privacy and information about this device.</string>
     <string name="settings_section_device">This device</string>
     <string name="settings_fire_open">Open the Google TV settings</string>
-    <string name="settings_saver_managed_text">Who decides what the screensaver shows: Salotto with its pictures, or Google TV.</string>
     <string name="first_name_title">This device’s name</string>
     <string name="first_name_hint">Device name</string>
     <string name="first_name_refused">Google TV did not accept the name</string>
@@ -44,8 +23,4 @@
     <string name="task_restarting">Restarting the device</string>
     <string name="about_tagline">A launcher for Google TV, by simplemal.</string>
     <string name="about_clean_text">The Google TV Home puts ads, recommended content and autoplay videos in front of your apps. Salotto shows only your apps, the backdrop, the time and the weather. No ads and no offers.</string>
-    <string name="av_no_decoder">The device has no decoder for this.</string>
-    <string name="av_tv_not_needed">The TV doesn’t matter here: the device decodes the video and it reaches the TV ready to play.</string>
-    <string name="av_decoded_by_stick">The device decodes them: %1$s.</string>
-    <string name="av_aac_text">The normal audio of most streaming video. The TV doesn’t matter: the device decodes it.</string>
 </resources>
