@@ -11,6 +11,9 @@ import java.util.Locale;
  * back on English, not on Italian, which is only where the words start from.
  */
 final class Language {
+    /** The resources made for Google TV, see apply. */
+    private static final int GOOGLE_TV_MCC = 999;
+
     static final String[] CODES = {"it", "en", "es", "fr", "de", "pt", "ru", "ar", "hi", "zh"};
     /** Each in its own words: this list is not translated. */
     static final String[] NAMES = {"italiano", "English", "español", "français", "Deutsch",
@@ -40,6 +43,8 @@ final class Language {
         Locale.setDefault(locale);
         Configuration config = new Configuration(base.getResources().getConfiguration());
         config.setLocale(locale);
+        // Google TV reads its own words, in res/values-mcc999*: a country code no TV has, set here only.
+        if (Fire.GOOGLE_TV) config.mcc = GOOGLE_TV_MCC;
         return base.createConfigurationContext(config);
     }
 }

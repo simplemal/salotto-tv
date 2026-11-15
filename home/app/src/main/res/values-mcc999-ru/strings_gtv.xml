@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
+     Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
+<resources>
+    <string name="settings_language_text">Язык Salotto. Язык Google TV не меняется.</string>
+    <string name="settings_apps_text">Все установленные приложения, порядок на главном экране и управление Google TV.</string>
+    <string name="settings_fire">Настройки Google TV</string>
+    <string name="settings_task_manager_text">Приложения, использованные с момента включения устройства, — открыть снова или закрыть.</string>
+    <string name="settings_data_not_cleared">Google TV не позволяет их удалить</string>
+    <string name="settings_uninstall_text">Удаляет приложение с устройства.</string>
+    <string name="settings_sleep_text">Через сколько времени без использования устройство уходит в режим ожидания.</string>
+    <string name="settings_cec_text">Позволяет устройству и телевизору управлять друг другом по кабелю HDMI.</string>
+    <string name="settings_tv_off">Выключать телевизор вместе с устройством</string>
+    <string name="settings_tv_off_text">Когда устройство уходит в режим ожидания, выключается и телевизор. Работает, если телевизор поддерживает HDMI-CEC.</string>
+    <string name="settings_standards_text">Что умеют устройство и телевизор и что используется сейчас.</string>
+    <string name="settings_fire_refused">Google TV не принял выбор</string>
+    <string name="settings_fire_may_refuse">Если телевизор это не поддерживает, Google TV откажет.</string>
+    <string name="settings_fire_forbids">Google TV этого не позволяет</string>
+    <string name="settings_notifications_text">Уведомления от Google TV и приложений.</string>
+    <string name="settings_wifi_text">Без Wi-Fi у устройства нет интернета.</string>
+    <string name="settings_wifi_on_cable_text">С подключённым кабелем устройство использует проводную сеть. Чтобы перейти на Wi-Fi, отключите кабель.</string>
+    <string name="settings_wifi_networks_text">Выберите сеть и подключитесь. Пароли остаются на устройстве.</string>
+    <string name="settings_wifi_off_warning">Устройство останется без интернета, пока вы не включите его здесь или не перезагрузите.</string>
+    <string name="settings_wifi_forget_warning">Устройство отключится, и чтобы вернуться, снова понадобится пароль.</string>
+    <string name="settings_standby_text">Сразу переводит устройство в режим ожидания.</string>
+    <string name="settings_restart_text">Перезагружает устройство. Это занимает около минуты.</string>
+    <string name="settings_restart_question">Перезагрузить устройство?</string>
+    <string name="settings_save_choices_text">Приложения главного экрана, оформление, часы и погода сохраняются в файл на устройстве.</string>
+    <string name="settings_saver_active_text">Заставка запускается, когда устройство не используется.</string>
+    <string name="settings_saver_fire">Решает Google TV</string>
+    <string name="settings_saver_choose_text">Открывает меню Google TV, чтобы выбрать одну из его заставок: фото, стиль, скорость. Время запуска берётся из настройки здесь, в Salotto.</string>
+    <string name="settings_saver_wait_text">Сколько устройство ждёт перед запуском заставки.</string>
+    <string name="settings_table_stick">Устройство</string>
+    <string name="settings_date_format_text">Как её пишет язык Google TV.</string>
+    <string name="settings_cat_system_text">Язык, уведомления, конфиденциальность и сведения об этом устройстве.</string>
+    <string name="settings_section_device">Это устройство</string>
+    <string name="settings_fire_open">Открыть настройки Google TV</string>
+    <string name="settings_saver_managed_text">Кто решает, что показывает заставка: Salotto со своими картинками или Google TV.</string>
+    <string name="first_name_title">Имя этого устройства</string>
+    <string name="first_name_hint">Имя устройства</string>
+    <string name="first_name_refused">Google TV не принял имя</string>
+    <string name="first_network_on">Устройство подключено к интернету.</string>
+    <string name="first_network_off">Устройство не подключено к интернету.</string>
+    <string name="task_restarting">Перезагрузка устройства</string>
+    <string name="about_tagline">Лаунчер для Google TV от simplemal.</string>
+    <string name="about_clean_text">Главный экран Google TV ставит рекламу, рекомендации и автоматические видео перед вашими приложениями. Salotto показывает только ваши приложения, фон, время и погоду. Никакой рекламы и никаких предложений.</string>
+    <string name="av_no_decoder">У устройства нет для этого декодера.</string>
+    <string name="av_tv_not_needed">Телевизор здесь ни при чём: видео декодирует устройство, и на телевизор оно приходит уже готовым.</string>
+    <string name="av_decoded_by_stick">Их декодирует устройство: %1$s.</string>
+    <string name="av_aac_text">Обычный звук большинства потоковых видео. Телевизор ни при чём: его декодирует устройство.</string>
+</resources>

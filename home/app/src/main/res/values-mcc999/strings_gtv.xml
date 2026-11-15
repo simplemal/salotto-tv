@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
+     Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
+<resources>
+    <string name="settings_language_text">La lingua di Salotto. Quella di Google TV non cambia.</string>
+    <string name="settings_apps_text">Tutte le app installate, l’ordine della Home e la gestione di Google TV.</string>
+    <string name="settings_fire">Impostazioni Google TV</string>
+    <string name="settings_task_manager_text">Le app usate da quando hai acceso il dispositivo, da riaprire o chiudere.</string>
+    <string name="settings_data_not_cleared">Google TV non permette di cancellarli</string>
+    <string name="settings_uninstall_text">Toglie l’app dal dispositivo.</string>
+    <string name="settings_sleep_text">Dopo quanto il dispositivo va in standby se non lo usi.</string>
+    <string name="settings_cec_text">Permette al dispositivo e alla TV di comandarsi a vicenda attraverso il cavo HDMI.</string>
+    <string name="settings_tv_off">Spegni la TV con il dispositivo</string>
+    <string name="settings_tv_off_text">Quando il dispositivo va in standby, spegne anche la TV. Funziona se la TV supporta HDMI-CEC.</string>
+    <string name="settings_standards_text">Cosa sanno fare il dispositivo e la TV, e cosa è in uso adesso.</string>
+    <string name="settings_fire_refused">Google TV non ha accettato la scelta</string>
+    <string name="settings_fire_may_refuse">Se la TV non lo supporta, Google TV lo rifiuta.</string>
+    <string name="settings_fire_forbids">Google TV non lo permette</string>
+    <string name="settings_notifications_text">Le notifiche ricevute da Google TV e dalle app.</string>
+    <string name="settings_wifi_text">Senza Wi-Fi il dispositivo non ha Internet.</string>
+    <string name="settings_wifi_on_cable_text">Con il cavo collegato il dispositivo usa la rete via cavo. Per passare al Wi-Fi scollega il cavo.</string>
+    <string name="settings_wifi_networks_text">Scegli una rete e collegati. Le password restano sul dispositivo.</string>
+    <string name="settings_wifi_off_warning">Il dispositivo resta senza Internet finché non lo riattivi da qui o non lo riavvii.</string>
+    <string name="settings_wifi_forget_warning">Il dispositivo si scollega e per tornare serve di nuovo la password.</string>
+    <string name="settings_standby_text">Mette subito il dispositivo in standby.</string>
+    <string name="settings_restart_text">Riavvia il dispositivo. Ci vuole circa un minuto.</string>
+    <string name="settings_restart_question">Riavviare il dispositivo?</string>
+    <string name="settings_save_choices_text">App della Home, aspetto, orologio e meteo finiscono in un file sul dispositivo.</string>
+    <string name="settings_saver_active_text">Il salvaschermo parte quando il dispositivo resta fermo.</string>
+    <string name="settings_saver_fire">Deciso da Google TV</string>
+    <string name="settings_saver_choose_text">Apre il menu di Google TV per scegliere tra i suoi salvaschermi: foto, stile, velocità. Il tempo di avvio che conta è quello scelto qui in Salotto.</string>
+    <string name="settings_saver_wait_text">Quanto aspetta il dispositivo prima di far partire il salvaschermo.</string>
+    <string name="settings_table_stick">Dispositivo</string>
+    <string name="settings_date_format_text">Come la scrive la lingua di Google TV.</string>
+    <string name="settings_cat_system_text">Lingua, notifiche, privacy e informazioni su questo dispositivo.</string>
+    <string name="settings_section_device">Questo dispositivo</string>
+    <string name="settings_fire_open">Apri le impostazioni di Google TV</string>
+    <string name="settings_saver_managed_text">Chi sceglie cosa mostra il salvaschermo: Salotto con le sue immagini, oppure Google TV.</string>
+    <string name="first_name_title">Il nome di questo dispositivo</string>
+    <string name="first_name_hint">Nome del dispositivo</string>
+    <string name="first_name_refused">Google TV non ha accettato il nome</string>
+    <string name="first_network_on">Il dispositivo è collegato a Internet.</string>
+    <string name="first_network_off">Il dispositivo non è collegato a Internet.</string>
+    <string name="task_restarting">Riavvio del dispositivo</string>
+    <string name="about_tagline">Launcher per Google TV, di simplemal.</string>
+    <string name="about_clean_text">La Home di Google TV mette pubblicità, contenuti consigliati e video automatici davanti alle tue app. Salotto mostra solo le tue app, lo sfondo, l’orario e il meteo. Niente pubblicità e niente offerte.</string>
+    <string name="av_no_decoder">Sul dispositivo non c’è un decoder.</string>
+    <string name="av_tv_not_needed">La TV non c’entra: il video lo decodifica il dispositivo e alla TV arriva già pronto.</string>
+    <string name="av_decoded_by_stick">Li decodifica il dispositivo: %1$s.</string>
+    <string name="av_aac_text">L’audio normale di gran parte dei video in streaming. La TV non c’entra: lo decodifica il dispositivo.</string>
+</resources>

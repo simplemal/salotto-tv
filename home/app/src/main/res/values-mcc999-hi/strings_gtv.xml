@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Google TV: the same texts as on Fire OS, with "device" for Stick and Google TV for Fire TV and
+     Fire OS. Language.apply sets mcc 999 on Google TV only, so these win there and nowhere else. -->
+<resources>
+    <string name="settings_language_text">Salotto की भाषा। Google TV की भाषा नहीं बदलती।</string>
+    <string name="settings_apps_text">सभी इंस्टॉल ऐप, होम का क्रम और Google TV का प्रबंधन।</string>
+    <string name="settings_fire">Google TV सेटिंग</string>
+    <string name="settings_task_manager_text">डिवाइस चालू करने के बाद से इस्तेमाल हुए ऐप, फिर से खोलने या बंद करने के लिए।</string>
+    <string name="settings_data_not_cleared">Google TV इन्हें मिटाने नहीं देता</string>
+    <string name="settings_uninstall_text">ऐप को डिवाइस से हटाता है।</string>
+    <string name="settings_sleep_text">इस्तेमाल न होने पर डिवाइस कितनी देर बाद स्टैंडबाय में जाए।</string>
+    <string name="settings_cec_text">डिवाइस और टीवी को HDMI केबल से एक-दूसरे को नियंत्रित करने देता है।</string>
+    <string name="settings_tv_off">डिवाइस के साथ टीवी बंद करें</string>
+    <string name="settings_tv_off_text">जब डिवाइस स्टैंडबाय में जाता है, तो टीवी भी बंद हो जाता है। टीवी में HDMI-CEC हो तो काम करता है।</string>
+    <string name="settings_standards_text">डिवाइस और टीवी क्या कर सकते हैं, और अभी क्या इस्तेमाल हो रहा है।</string>
+    <string name="settings_fire_refused">Google TV ने चुनाव स्वीकार नहीं किया</string>
+    <string name="settings_fire_may_refuse">अगर टीवी इसे सपोर्ट नहीं करता, तो Google TV इसे मना कर देता है।</string>
+    <string name="settings_fire_forbids">Google TV इसकी अनुमति नहीं देता</string>
+    <string name="settings_notifications_text">Google TV और ऐप्स से आई सूचनाएँ।</string>
+    <string name="settings_wifi_text">Wi-Fi के बिना डिवाइस में इंटरनेट नहीं है।</string>
+    <string name="settings_wifi_on_cable_text">केबल लगी होने पर डिवाइस वायर्ड नेटवर्क इस्तेमाल करता है। Wi-Fi पर जाने के लिए केबल निकालें।</string>
+    <string name="settings_wifi_networks_text">कोई नेटवर्क चुनें और कनेक्ट करें। पासवर्ड डिवाइस पर ही रहते हैं।</string>
+    <string name="settings_wifi_off_warning">जब तक आप इसे यहाँ से फिर चालू न करें या डिवाइस रीस्टार्ट न करें, डिवाइस बिना इंटरनेट के रहेगा।</string>
+    <string name="settings_wifi_forget_warning">डिवाइस डिस्कनेक्ट हो जाएगा, और वापस जुड़ने के लिए फिर पासवर्ड चाहिए होगा।</string>
+    <string name="settings_standby_text">डिवाइस को तुरंत स्टैंडबाय में डालता है।</string>
+    <string name="settings_restart_text">डिवाइस को रीस्टार्ट करता है। लगभग एक मिनट लगता है।</string>
+    <string name="settings_restart_question">डिवाइस रीस्टार्ट करें?</string>
+    <string name="settings_save_choices_text">होम के ऐप, रूप, घड़ी और मौसम डिवाइस पर एक फ़ाइल में सहेजे जाते हैं।</string>
+    <string name="settings_saver_active_text">डिवाइस के खाली पड़े रहने पर स्क्रीनसेवर शुरू होता है।</string>
+    <string name="settings_saver_fire">Google TV तय करता है</string>
+    <string name="settings_saver_choose_text">Google TV का मेनू खोलता है ताकि आप उसके स्क्रीनसेवर में से चुन सकें: फ़ोटो, शैली, गति। शुरू होने का समय वही मान्य है जो यहाँ Salotto में चुना गया है।</string>
+    <string name="settings_saver_wait_text">स्क्रीनसेवर शुरू करने से पहले डिवाइस कितनी देर रुकता है।</string>
+    <string name="settings_table_stick">डिवाइस</string>
+    <string name="settings_date_format_text">जैसे Google TV की भाषा इसे लिखती है।</string>
+    <string name="settings_cat_system_text">भाषा, सूचनाएँ, निजता और इस डिवाइस की जानकारी।</string>
+    <string name="settings_section_device">यह डिवाइस</string>
+    <string name="settings_fire_open">Google TV सेटिंग खोलें</string>
+    <string name="settings_saver_managed_text">स्क्रीनसेवर क्या दिखाए, यह कौन तय करे: Salotto अपनी तस्वीरों के साथ, या Google TV।</string>
+    <string name="first_name_title">इस डिवाइस का नाम</string>
+    <string name="first_name_hint">डिवाइस का नाम</string>
+    <string name="first_name_refused">Google TV ने नाम स्वीकार नहीं किया</string>
+    <string name="first_network_on">डिवाइस इंटरनेट से जुड़ा है।</string>
+    <string name="first_network_off">डिवाइस इंटरनेट से नहीं जुड़ा है।</string>
+    <string name="task_restarting">डिवाइस रीस्टार्ट हो रहा है</string>
+    <string name="about_tagline">Google TV के लिए लॉन्चर, simplemal की ओर से।</string>
+    <string name="about_clean_text">Google TV का होम आपके ऐप्स के आगे विज्ञापन, सुझाई गई सामग्री और अपने-आप चलने वाले वीडियो रखता है। Salotto सिर्फ़ आपके ऐप, पृष्ठभूमि, समय और मौसम दिखाता है। न विज्ञापन, न ऑफ़र।</string>
+    <string name="av_no_decoder">डिवाइस में इसके लिए डिकोडर नहीं है।</string>
+    <string name="av_tv_not_needed">यहाँ टीवी की भूमिका नहीं है: वीडियो डिवाइस डिकोड करता है और टीवी तक तैयार पहुँचता है।</string>
+    <string name="av_decoded_by_stick">इन्हें डिवाइस डिकोड करता है: %1$s।</string>
+    <string name="av_aac_text">ज़्यादातर स्ट्रीमिंग वीडियो का सामान्य ऑडियो। टीवी की भूमिका नहीं: इसे डिवाइस डिकोड करता है।</string>
+</resources>
