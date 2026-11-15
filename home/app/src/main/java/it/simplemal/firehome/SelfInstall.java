@@ -44,7 +44,9 @@ public final class SelfInstall extends BroadcastReceiver {
             // Android has its own copy now: this one would only take room the install needs.
             apk.delete();
             Intent answer = new Intent(context, SelfInstall.class).putExtra(EXTRA_PACKAGE, pkg);
-            session.commit(PendingIntent.getBroadcast(context, id, answer, PendingIntent.FLAG_UPDATE_CURRENT).getIntentSender());
+            // Mutable: Android writes the result into it. Android 12 asks every pending intent to say which.
+            session.commit(PendingIntent.getBroadcast(context, id, answer,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE).getIntentSender());
         }
     }
 

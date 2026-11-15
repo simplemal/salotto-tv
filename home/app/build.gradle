@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId 'it.simplemal.firehome'
         minSdk 25
-        targetSdk 30
+        targetSdk 34
         versionCode 95
         versionName '1.1.5'
     }

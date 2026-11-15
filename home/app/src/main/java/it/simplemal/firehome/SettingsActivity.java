@@ -1633,10 +1633,15 @@ public final class SettingsActivity extends CardActivity {
             entries.add(info(getString(R.string.settings_bluetooth_off), null, getString(R.string.settings_bluetooth_off_text)));
             return entries;
         }
-        for (BluetoothDevice device : adapter.getBondedDevices()) {
-            String name = device.getName() != null ? device.getName() : device.getAddress();
-            entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), null,
-                getString(R.string.settings_press_to_forget_device), false, () -> forgetBluetooth(device, name)));
+        // From Android 12 BLUETOOTH_CONNECT, given at installation: without it, no list rather than a crash.
+        try {
+            for (BluetoothDevice device : adapter.getBondedDevices()) {
+                String name = device.getName() != null ? device.getName() : device.getAddress();
+                entries.add(new Entry(name, getString(Fire.connected(device) ? R.string.settings_connected : R.string.settings_paired), null,
+                    getString(R.string.settings_press_to_forget_device), false, () -> forgetBluetooth(device, name)));
+            }
+        } catch (SecurityException e) {
+            android.util.Log.w("Salotto", "No Bluetooth permission", e);
         }
         entries.add(new Entry(getString(R.string.settings_find_devices), null, null,
             getString(R.string.settings_find_devices_text),
@@ -1699,7 +1704,11 @@ public final class SettingsActivity extends CardActivity {
         bluetoothListener = listener;
         registerReceiver(listener, new IntentFilter(BluetoothDevice.ACTION_FOUND));
         withLocation(() -> {
-            if (levels.peek() == level) BluetoothAdapter.getDefaultAdapter().startDiscovery();
+            try {
+                if (levels.peek() == level) BluetoothAdapter.getDefaultAdapter().startDiscovery();
+            } catch (SecurityException e) {
+                android.util.Log.w("Salotto", "No Bluetooth permission to search", e);
+            }
         });
     }
 

@@ -257,7 +257,7 @@ final class HomeCover {
             .setClass(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (Fire.ANDROID_9) {
             context.getSystemService(AlarmManager.class).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, at,
-                PendingIntent.getActivity(context, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT));
+                PendingIntent.getActivity(context, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
         } else {
             context.startActivity(salotto);
         }

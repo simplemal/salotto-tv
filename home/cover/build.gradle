@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId 'it.simplemal.firehome.cover'
         minSdk 25
-        targetSdk 30
+        targetSdk 34
         versionCode 4
         versionName '4'
     }

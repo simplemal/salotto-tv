@@ -752,7 +752,7 @@ final class ControlPanel extends LinearLayout {
         });
     }
 
-    /** Salotto targets Android 11, where BLUETOOTH is enough: BLUETOOTH_CONNECT came later. */
+    /** Up to Android 11 BLUETOOTH is enough; from Android 12 BLUETOOTH_CONNECT, given at installation. Without it, none. */
     @SuppressLint("MissingPermission")
     private void showBluetooth(Tile tile) {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -762,8 +762,12 @@ final class ControlPanel extends LinearLayout {
             return;
         }
         int devices = 0;
-        for (BluetoothDevice device : adapter.getBondedDevices()) {
-            if (Fire.connected(device) && !Fire.remote(device)) devices++;
+        try {
+            for (BluetoothDevice device : adapter.getBondedDevices()) {
+                if (Fire.connected(device) && !Fire.remote(device)) devices++;
+            }
+        } catch (SecurityException e) {
+            devices = 0;
         }
         tile.link(devices > 0);
         tile.show(devices == 0 ? getContext().getString(R.string.panel_bluetooth_none)
