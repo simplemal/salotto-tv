@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -122,9 +123,13 @@ final class Fire {
         }
         View root = window.getDecorView();
         if (root.getWidth() > 0 && root.getHeight() > 0) {
-            Canvas canvas = new Canvas(picture);
-            canvas.scale((float) picture.getWidth() / root.getWidth(), (float) picture.getHeight() / root.getHeight());
-            root.draw(canvas);
+            // At full size first: a picture backdrop fills the canvas it is given, and drawn into a
+            // scaled one it came out a quarter of the screen, grey around it (2026-11-15).
+            Bitmap whole = Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888);
+            root.draw(new Canvas(whole));
+            new Canvas(picture).drawBitmap(whole, null, new Rect(0, 0, picture.getWidth(), picture.getHeight()),
+                new Paint(Paint.FILTER_BITMAP_FLAG));
+            whole.recycle();
         }
         handler.post(done);
     }

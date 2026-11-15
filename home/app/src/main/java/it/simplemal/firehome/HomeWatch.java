@@ -4,11 +4,17 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,16 +29,28 @@ import java.util.List;
  * read on 2026-11-15), so TaskService never runs. This follows the same log line TaskService
  * follows, with READ_LOGS given at installation, and brings Salotto back over Amazon's Home. It
  * starts with the TV and with Salotto, on Android 7 only.
+ *
+ * Android 7 holds every app back for 5 s after Home, Salotto too: in the meantime the last picture
+ * of Salotto's Home covers Amazon's, in a window over the others (SYSTEM_ALERT_WINDOW, given by the
+ * installer), which takes the keys so that nothing moves underneath.
  */
 public final class HomeWatch extends Service {
     private static final String TAG = "Salotto";
     /** logcat first repeats the last line it has: that press is long over. */
     private static final long START_MS = 1000;
     private static final long RETRY_MS = 30000;
+    /** Should the Home never say it is back, the cover goes all the same. */
+    private static final long COVER_LIMIT_MS = 8000;
+    /** The Home comes in with an animation: the cover stays over it until that has ended. */
+    private static final long AFTER_HOME_MS = 300;
+
+    private static volatile HomeWatch running;
 
     private Handler main;
     private volatile Process log;
     private volatile boolean stopped;
+    private View cover;
+    private final Runnable uncover = this::uncover;
 
     static void start(Context context) {
         if (!Fire.ANDROID_7) return;
@@ -52,9 +70,16 @@ public final class HomeWatch extends Service {
         }
     }
 
+    /** Salotto's Home is on screen again. */
+    static void homeIsBack() {
+        HomeWatch watch = running;
+        if (watch != null) watch.main.postDelayed(watch.uncover, AFTER_HOME_MS);
+    }
+
     @Override public void onCreate() {
         super.onCreate();
         main = new Handler(Looper.getMainLooper());
+        running = this;
         watch();
     }
 
@@ -68,6 +93,8 @@ public final class HomeWatch extends Service {
 
     @Override public void onDestroy() {
         stopped = true;
+        if (running == this) running = null;
+        uncover();
         Process process = log;
         if (process != null) process.destroy();
         main.removeCallbacksAndMessages(null);
@@ -91,12 +118,51 @@ public final class HomeWatch extends Service {
             long started = SystemClock.elapsedRealtime();
             for (String line; (line = lines.readLine()) != null; ) {
                 if (SystemClock.elapsedRealtime() - started <= START_MS) continue;
-                if (TaskService.amazonHome(line)) HomeCover.startSalotto(this, SystemClock.elapsedRealtime());
+                if (TaskService.amazonHome(line)) {
+                    main.post(this::cover);
+                    HomeCover.startSalotto(this, SystemClock.elapsedRealtime());
+                }
             }
         } catch (IOException e) {
             Log.w(TAG, "No Home log", e);
         }
         log = null;
         if (!stopped) main.postDelayed(this::watch, RETRY_MS);
+    }
+
+    private void cover() {
+        Bitmap picture = HomeCover.lastPicture();
+        if (cover != null || picture == null || !Settings.canDrawOverlays(this)) return;
+        ImageView view = new ImageView(this);
+        view.setScaleType(ImageView.ScaleType.FIT_XY);
+        view.setImageBitmap(picture);
+        view.setFocusable(true);
+        view.setOnKeyListener((v, code, event) -> true);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+            PixelFormat.OPAQUE);
+        try {
+            getSystemService(WindowManager.class).addView(view, params);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "No cover over Amazon's Home", e);
+            return;
+        }
+        cover = view;
+        view.requestFocus();
+        main.postDelayed(uncover, COVER_LIMIT_MS);
+    }
+
+    private void uncover() {
+        main.removeCallbacks(uncover);
+        if (cover == null) return;
+        try {
+            getSystemService(WindowManager.class).removeView(cover);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Cover already gone", e);
+        }
+        cover = null;
     }
 }

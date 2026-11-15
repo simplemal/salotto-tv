@@ -1255,6 +1255,7 @@ public final class MainActivity extends CardActivity {
         HomeCover.homeShown(getWindow());
         if (panelOpen) panel.refresh();
         root.postOnAnimation(TaskService::homeBack);
+        root.postOnAnimation(HomeWatch::homeIsBack);
         if (!HomeCover.ready()) root.postDelayed(() -> HomeCover.take(getWindow()), FIRST_PICTURE_MS);
         home = HomeApps.load(this);
         List<String> apps = visible();
@@ -2128,10 +2129,14 @@ public final class MainActivity extends CardActivity {
         // Logo only shows the monochrome tile on the selected app, never its colour (the user, 2026-11-10).
         boolean mono = Look.cleanIcons(this) == Look.ICONS_GLASS_MONO || Look.cleanIcons(this) == Look.ICONS_LOGO;
         boolean edged = Look.cleanEdge(this) && !ALL_APPS.equals(tag) && !glassy;
+        // Logo only: Salotto's settings like Tutte le app, its white icon at rest and the veil when
+        // selected; with its grey tile it was the one picture left among the logos (2026-11-15).
+        boolean ownLogo = Look.cleanIcons(this) == Look.ICONS_LOGO && HomeApps.SETTINGS.equals(tag);
         // Made as large as the focus shows it, and only made smaller at rest: grown from the resting
         // size, the picture was soft and its curves came out in steps (2026-11-09).
         int grown = Math.round(size * CLEAN_FOCUS_SCALE);
-        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "");
+        String key = circleKey(tag, grown) + "/squircle" + (edged ? "/edge" : "") + (glassy ? mono ? "/glass-mono" : "/glass" : "")
+            + (ownLogo ? "/logo" : "");
         Bitmap known = CIRCLE_ART.get(key);
         Runnable action;
         Runnable hold;
@@ -2152,15 +2157,15 @@ public final class MainActivity extends CardActivity {
             plain.recycle();
         }
         // Tutte le app: a light veil and the icon, drawn at once, with no shadow under it.
-        if (ALL_APPS.equals(tag) && known == null) {
-            known = allAppsSquircle(grown);
+        if ((ALL_APPS.equals(tag) || ownLogo) && known == null) {
+            known = ownSquircle(grown, ownLogo ? R.drawable.ic_settings : R.drawable.ic_apps);
             CIRCLE_ART.put(key, known);
         }
         Bitmap shown = known != null ? known : squirclePlaceholder;
         View tile = card(row, tag, circleName(tag), new BitmapDrawable(getResources(), shown), null,
-            ALL_APPS.equals(tag) ? GLASS : ICON, size, action, hold);
+            ALL_APPS.equals(tag) || ownLogo ? GLASS : ICON, size, action, hold);
         // Logo only: the white logo at rest, the glass tile on the selected app. Tutte le app too.
-        boolean bare = Look.cleanIcons(this) == Look.ICONS_LOGO && (glassy || ALL_APPS.equals(tag));
+        boolean bare = Look.cleanIcons(this) == Look.ICONS_LOGO && (glassy || ALL_APPS.equals(tag) || ownLogo);
         if (bare) bareTile(tile, tag, key, grown, mono);
         else if (known == null) {
             ImageView image = (ImageView) ((LinearLayout) tile).getChildAt(0);
@@ -2200,8 +2205,9 @@ public final class MainActivity extends CardActivity {
         Drawable shadow = tile.getBackground();
         View.OnFocusChangeListener before = tile.getOnFocusChangeListener();
         Bitmap[] both = {CIRCLE_ART.get(key), CIRCLE_ART.get(key + "/bare")};
-        if (ALL_APPS.equals(tag) && both[1] == null) {
-            both[1] = allAppsLogo(grown);
+        boolean own = ALL_APPS.equals(tag) || HomeApps.SETTINGS.equals(tag);
+        if (own && both[1] == null) {
+            both[1] = ownLogo(grown, ALL_APPS.equals(tag) ? R.drawable.ic_apps : R.drawable.ic_settings);
             CIRCLE_ART.put(key + "/bare", both[1]);
         }
         Runnable show = () -> {
@@ -2280,7 +2286,7 @@ public final class MainActivity extends CardActivity {
         return Math.round(channel + (255 - channel) * CLEAN_EDGE_LIGHT);
     }
 
-    private Bitmap allAppsSquircle(int size) {
+    private Bitmap ownSquircle(int size, int iconRes) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -2296,7 +2302,7 @@ public final class MainActivity extends CardActivity {
         rim.setStrokeWidth(line);
         rim.setColor(ALL_APPS_EDGE);
         canvas.drawPath(edge, rim);
-        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable icon = getDrawable(iconRes).mutate();
         icon.setTint(Color.WHITE);
         int inset = size * 3 / 10;
         icon.setBounds(inset, inset, size - inset, size - inset);
@@ -2304,17 +2310,17 @@ public final class MainActivity extends CardActivity {
         return made;
     }
 
-    /** Tutte le app with the logo only: its icon in white over a soft shadow, as the apps' logos. */
-    private Bitmap allAppsLogo(int size) {
+    /** Tutte le app and the settings with the logo only: the icon in white over a soft shadow, as the apps' logos. */
+    private Bitmap ownLogo(int size, int iconRes) {
         Bitmap made = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(made);
         int inset = size * 3 / 10;
         int drop = Math.max(1, Math.round(0.75f * getResources().getDisplayMetrics().density));
-        Drawable shade = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable shade = getDrawable(iconRes).mutate();
         shade.setTint(Color.argb(90, 0, 0, 0));
         shade.setBounds(inset, inset + drop, size - inset, size - inset + drop);
         shade.draw(canvas);
-        Drawable icon = getDrawable(R.drawable.ic_apps).mutate();
+        Drawable icon = getDrawable(iconRes).mutate();
         icon.setTint(Color.WHITE);
         icon.setBounds(inset, inset, size - inset, size - inset);
         icon.draw(canvas);
