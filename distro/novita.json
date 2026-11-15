@@ -1,77 +1,32 @@
 {
-  "versionName": "1.1.4",
+  "versionName": "1.1.5",
   "changes": {
     "en": [
-      "Fire TV Stick 4K Plus: now supported",
-      "Control center: on Glass and Circular the arrows work even after passing through the Clean Home",
-      "Home key: if Fire OS turns off Salotto's service, just open Salotto again to turn it back on",
-      "Fire TVs with Fire OS 7: the screensaver is Fire OS's, so Salotto no longer closes",
-      "Logo only: Settings shows only its logo too",
-      "The app that installs Salotto from the computer is now called Salotto TV Setup"
+      "Salotto screensaver: the TV goes to standby at the chosen time again"
     ],
     "es": [
-      "Fire TV Stick 4K Plus: ahora compatible",
-      "Centro de control: en Cristal y Circular las flechas funcionan también después de pasar por la Home Limpia",
-      "Tecla Home: si Fire OS apaga el servicio de Salotto, basta con volver a abrir Salotto para reactivarlo",
-      "Fire TV con Fire OS 7: el salvapantallas es el de Fire OS, así Salotto ya no se cierra",
-      "Solo logo: también Ajustes muestra solo su logo",
-      "La app para instalar Salotto desde el ordenador ahora se llama Salotto TV Setup"
+      "Salvapantallas de Salotto: la TV vuelve a pasar a reposo a la hora elegida"
     ],
     "fr": [
-      "Fire TV Stick 4K Plus : désormais prise en charge",
-      "Centre de contrôle : en Verre et Circulaire, les flèches fonctionnent aussi après être passé par l’accueil Épurée",
-      "Touche Accueil : si Fire OS désactive le service de Salotto, il suffit de rouvrir Salotto pour le réactiver",
-      "Fire TV avec Fire OS 7 : l’économiseur d’écran est celui de Fire OS, Salotto ne se ferme plus",
-      "Logo seul : Réglages n’affiche plus que son logo, lui aussi",
-      "L’appli qui installe Salotto depuis l’ordinateur s’appelle désormais Salotto TV Setup"
+      "Économiseur d’écran de Salotto : la TV se remet en veille à l’heure choisie"
     ],
     "de": [
-      "Fire TV Stick 4K Plus: jetzt unterstützt",
-      "Kontrollzentrum: In Glas und Kreis funktionieren die Pfeile auch nach dem Wechsel über Home Schlicht",
-      "Home-Taste: Schaltet Fire OS den Dienst von Salotto ab, genügt es, Salotto erneut zu öffnen",
-      "Fire TV mit Fire OS 7: Der Bildschirmschoner ist der von Fire OS, Salotto schließt sich nicht mehr",
-      "Nur Logo: Auch Einstellungen zeigt nur sein Logo",
-      "Die App, die Salotto vom Computer aus installiert, heißt jetzt Salotto TV Setup"
+      "Bildschirmschoner von Salotto: Der TV geht wieder zur gewählten Zeit in den Standby"
     ],
     "pt": [
-      "Fire TV Stick 4K Plus: agora compatível",
-      "Central de controle: em Vidro e Circular as setas funcionam também depois de passar pela Home Limpa",
-      "Tecla Home: se o Fire OS desligar o serviço do Salotto, basta abrir o Salotto de novo para reativá-lo",
-      "Fire TV com Fire OS 7: o protetor de tela é o do Fire OS, assim o Salotto não fecha mais",
-      "Só logo: Configurações também mostra só o seu logo",
-      "O app que instala o Salotto pelo computador agora se chama Salotto TV Setup"
+      "Protetor de tela do Salotto: a TV volta a entrar em espera no horário escolhido"
     ],
     "ru": [
-      "Fire TV Stick 4K Plus: теперь поддерживается",
-      "Центр управления: на экранах «Стекло» и «Круг» стрелки работают и после экрана «Чистый»",
-      "Кнопка «Домой»: если Fire OS отключает службу Salotto, достаточно снова открыть Salotto",
-      "Fire TV с Fire OS 7: заставка теперь от Fire OS, и Salotto больше не закрывается",
-      "Только логотип: «Настройки» тоже показывают только свой логотип",
-      "Приложение для установки Salotto с компьютера теперь называется Salotto TV Setup"
+      "Заставка Salotto: телевизор снова уходит в режим ожидания в выбранное время"
     ],
     "ar": [
-      "Fire TV Stick 4K Plus: أصبح مدعومًا",
-      "مركز التحكم: في «زجاج» و«دائري» تعمل الأسهم حتى بعد المرور بالشاشة «نظيفة»",
-      "زر الرئيسية: إذا أوقف Fire OS خدمة Salotto، يكفي فتح Salotto مجددًا لإعادة تشغيلها",
-      "أجهزة Fire TV بنظام Fire OS 7: شاشة التوقف هي شاشة Fire OS، ولم يعد Salotto يُغلق",
-      "الشعار فقط: الإعدادات أيضًا تعرض شعارها فقط",
-      "التطبيق الذي يثبّت Salotto من الكمبيوتر أصبح اسمه Salotto TV Setup"
+      "شاشة توقف Salotto: يعود التلفاز إلى وضع الاستعداد في الوقت المختار"
     ],
     "hi": [
-      "Fire TV Stick 4K Plus: अब समर्थित",
-      "कंट्रोल सेंटर: ग्लास और गोल में साफ़ होम से गुज़रने के बाद भी तीर काम करते हैं",
-      "होम बटन: अगर Fire OS, Salotto की सेवा बंद कर दे, तो उसे फिर चालू करने के लिए बस Salotto दोबारा खोलें",
-      "Fire OS 7 वाले Fire TV: स्क्रीनसेवर Fire OS का है, इसलिए Salotto अब बंद नहीं होता",
-      "केवल लोगो: सेटिंग भी अब सिर्फ़ अपना लोगो दिखाती है",
-      "कंप्यूटर से Salotto इंस्टॉल करने वाले ऐप का नाम अब Salotto TV Setup है"
+      "Salotto स्क्रीनसेवर: टीवी फिर से चुने गए समय पर स्टैंडबाय में जाता है"
     ],
     "zh": [
-      "Fire TV Stick 4K Plus：现已支持",
-      "控制中心：在玻璃和圆形主屏幕中，经过简洁主屏幕之后方向键也能正常使用",
-      "主页键：如果 Fire OS 关闭了 Salotto 的服务，只需再次打开 Salotto 即可恢复",
-      "使用 Fire OS 7 的 Fire TV：屏幕保护程序改为 Fire OS 自带的，Salotto 不再被关闭",
-      "仅标志：设置也只显示它的标志",
-      "从电脑安装 Salotto 的应用现在叫作 Salotto TV Setup"
+      "Salotto 屏幕保护程序：电视重新按所选时间进入待机"
     ]
   }
 }
