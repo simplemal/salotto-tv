@@ -99,7 +99,7 @@ Salotto è un progetto indipendente. Non è affiliato, sponsorizzato né approva
 
 ---
 
-<sub><a name="nota-1"></a>¹ Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; niente salvaschermo di Salotto, perché uscendo dal salvaschermo Fire OS 7 chiude Salotto: resta quello di Fire OS, che non si avvia dalle Impostazioni.<br>
-<a name="nota-2"></a>² Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
-<a name="nota-3"></a>³ Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
-<a name="nota-4"></a>⁴ Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>
+<sub><a name="nota-1"></a><b>Quasi tutte ¹</b> — Fire OS 7: niente numero delle notifiche sulla Home e niente pagina USB nelle Impostazioni; le reti Wi-Fi e la cancellazione dei dati di un'app si aprono nelle pagine di Fire OS; niente salvaschermo di Salotto, perché uscendo dal salvaschermo Fire OS 7 chiude Salotto: resta quello di Fire OS, che non si avvia dalle Impostazioni.<br>
+<a name="nota-2"></a><b>Alcune limitate ²</b> — Come ¹, e inoltre: le app non si aprono con l'animazione dal cerchio; sotto le Impostazioni lo sfondo è nero invece della Home sfocata; lo sfondo cambia senza dissolvenza; risoluzione fino a 1080p.<br>
+<a name="nota-3"></a><b>Non compatibile ³</b> — Fire OS 6 accetta solo servizi di accessibilità firmati da Amazon. Senza quello di Salotto il tasto Home riporta a Salotto dopo 5 secondi, all'accensione si vede prima la Home di Amazon, e mancano i tasti tenuti premuti, le immagini nel task manager e l'animazione delle app. Per questo ho scelto di non renderla disponibile.<br>
+<a name="nota-4"></a><b>Non compatibile ⁴</b> — Fire OS 5 si basa su Android 5.1, mentre Salotto richiede almeno Android 7: non può funzionare.</sub>
