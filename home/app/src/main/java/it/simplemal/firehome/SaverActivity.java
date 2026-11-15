@@ -35,8 +35,10 @@ public final class SaverActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         screen.start();
+        // Already in milliseconds, as the Settings write it: read as seconds, 20 minutes kept the TV
+        // awake for about 14 days (found on 2026-11-15).
         int sleep = Settings.Secure.getInt(getContentResolver(), SLEEP_TIMEOUT, 0);
-        if (sleep > 0) main.postDelayed(letSleep, sleep * 1000L);
+        if (sleep > 0) main.postDelayed(letSleep, sleep);
     }
 
     @Override protected void onPause() {
