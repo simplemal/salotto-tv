@@ -505,7 +505,12 @@ public final class PictureGridActivity extends CardActivity {
         // With its pictures out of reach Down would otherwise stop on the scrolling area itself.
         scroll.setFocusable(false);
         scroll.setClipToPadding(false);
-        rows = new LinearLayout(this);
+        // Half see-through while the grid is locked: as one picture that would be the whole grid, a
+        // collection of 59 is 4872 pixels tall, more than the Stick of 2018 can draw in one, and it
+        // showed nothing at all (2026-11-15). Each cell takes the transparency on its own instead.
+        rows = new LinearLayout(this) {
+            @Override public boolean hasOverlappingRendering() { return false; }
+        };
         rows.setOrientation(LinearLayout.VERTICAL);
         rows.setPadding(dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM), dp(SIDE_ROOM));
         scroll.addView(rows);
