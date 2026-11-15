@@ -1246,7 +1246,7 @@ public final class SettingsActivity extends CardActivity {
                 false, () -> open(new Intent(this, TasksActivity.class))),
             new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, null,
                 getString(R.string.settings_held_keys_text),
-                false, () -> changeSystem(() -> TaskService.setKeys(this, !TaskService.keysOn(this))))));
+                false, () -> changeSystem(() -> TaskService.chooseKeys(this, !TaskService.keysOn(this), () -> { if (!isFinishing()) refresh(); })))));
         entries.add(groupLabel(R.string.settings_manage_apps));
         for (HomeApps.App app : HomeApps.installed(this)) {
             Entry entry = new Entry(app.label, null, null, getString(R.string.settings_manage_app_text),

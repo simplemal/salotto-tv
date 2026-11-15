@@ -89,7 +89,10 @@ public final class TaskService extends AccessibilityService {
     private static final String ALARM_SETTINGS = "alarm_manager_constants";
     private static final String ALARM_AT_ONCE = "min_futurity=0";
     private static final String KEYS_FILE = "keys";
-    private static final String KEYS_CHOSEN = "chosen";
+    private static final String KEYS_OFF = "off_by_choice";
+    /** Never a service: only there to change the list, see turnOn. */
+    private static final String NUDGE = "it.simplemal.firehome/.NoService";
+    private static final long NUDGE_MS = 800;
     private static final String QUICK_CHOSEN = "quick_animations";
     private static final long FIRST_PICTURE_MS = 3000;
     private static final long PICTURE_EVERY_MS = 20000;
@@ -812,17 +815,40 @@ public final class TaskService extends AccessibilityService {
 
     /** Keeps every other service exactly as it is. */
     static void setKeys(Context context, boolean on) {
+        putServices(context, on ? serviceName(context) : null);
+    }
+
+    /** The other services as they are, then this one, if any. */
+    private static void putServices(Context context, String added) {
         String name = serviceName(context);
         String current = Settings.Secure.getString(context.getContentResolver(), ENABLED_SERVICES);
         List<String> services = new ArrayList<>();
         if (current != null) {
             for (String service : current.split(":")) {
-                if (!service.isEmpty() && !service.equals(name)) services.add(service);
+                if (!service.isEmpty() && !service.equals(name) && !service.equals(NUDGE)) services.add(service);
             }
         }
-        if (on) services.add(name);
+        if (added != null) services.add(added);
         Settings.Secure.putString(context.getContentResolver(), ENABLED_SERVICES, TextUtils.join(":", services));
         Settings.Secure.putInt(context.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED, 1);
+    }
+
+    /**
+     * On again after Android stopped it. A service whose app was stopped stays "crashed" for Android,
+     * which then skips it even when it is listed again, until the list changes without it: so first a
+     * list with a name that is no service, then the one with Salotto. Seen on the Android 11 emulator,
+     * 2026-11-15: listed again at once, it stayed unbound.
+     */
+    private static void turnOn(Context context, Runnable done) {
+        putServices(context, NUDGE);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                setKeys(context, true);
+            } catch (SecurityException e) {
+                Log.w(TAG, "No permission yet for the keys", e);
+            }
+            if (done != null) done.run();
+        }, NUDGE_MS);
     }
 
     /**
@@ -838,16 +864,25 @@ public final class TaskService extends AccessibilityService {
         }
     }
 
-    /** On from the first start. Later the choice is the one in the Settings. */
-    static void keysByDefault(Context context) {
-        SharedPreferences first = context.getSharedPreferences(KEYS_FILE, Context.MODE_PRIVATE);
-        if (first.getBoolean(KEYS_CHOSEN, false)) return;
+    /**
+     * On, unless the person turned it off in the Settings. Fire OS takes it away when it stops all of
+     * Salotto: by hand, or on Fire OS 7 as Salotto's screensaver ends (issue #4). The Home key then
+     * went to Amazon until someone put it back with adb (issue #5): opening Salotto puts it back.
+     */
+    static void keysUnlessOff(Context context) {
+        if (context.getSharedPreferences(KEYS_FILE, Context.MODE_PRIVATE).getBoolean(KEYS_OFF, false) || keysOn(context)) return;
         try {
-            if (!keysOn(context)) setKeys(context, true);
-            first.edit().putBoolean(KEYS_CHOSEN, true).apply();
+            turnOn(context.getApplicationContext(), null);
         } catch (SecurityException e) {
             Log.w(TAG, "No permission yet for the keys", e);
         }
+    }
+
+    /** The choice in the Settings, kept: only the person turns it off for good. Done runs once it is on. */
+    static void chooseKeys(Context context, boolean on, Runnable done) {
+        if (on) turnOn(context.getApplicationContext(), done);
+        else setKeys(context, false);
+        context.getSharedPreferences(KEYS_FILE, Context.MODE_PRIVATE).edit().putBoolean(KEYS_OFF, !on).apply();
     }
 
     /** Android 9 keeps every alarm 5 s away, and the Home key needs one at once. Fire OS may reset this with an update. */
