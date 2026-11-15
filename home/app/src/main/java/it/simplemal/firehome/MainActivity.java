@@ -982,8 +982,9 @@ public final class MainActivity extends CardActivity {
         panelOpen = open;
         // Fading out, its tiles were still there for the arrows: Right pressed quickly past the settings
         // went into them and opened it again, slowly it went down to the apps (2026-11-10). Only on the
-        // clean Home, where it was seen.
-        if (clean) panel.setDescendantFocusability(open ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
+        // clean Home, where it was seen. The same panel serves every Home: on the others it is always
+        // let through, or a close on the clean one left the arrows out of it there (issue #3).
+        panel.setDescendantFocusability(open || !clean ? ViewGroup.FOCUS_BEFORE_DESCENDANTS : ViewGroup.FOCUS_BLOCK_DESCENDANTS);
         // Clean, first row at the top: it steps down to the middle under the tiles, and back up after.
         // Closing, the tiles go quickly first and the row climbs only then: together they met on the
         // way (2026-11-09).
