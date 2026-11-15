@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
+import android.os.Build;
 import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,11 @@ public final class SelfInstall extends BroadcastReceiver {
         PackageInstaller.SessionParams params =
             new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
         params.setAppPackageName(pkg);
+        // Fire OS asks, and TaskService presses Install. From Android 12 an app that updates itself, or
+        // what it installed, can be let through without asking: Google TV asked and no one pressed (2026-11-15).
+        if (Fire.GOOGLE_TV && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            params.setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED);
+        }
         int id = installer.createSession(params);
         try (PackageInstaller.Session session = installer.openSession(id)) {
             try (InputStream input = new FileInputStream(apk);

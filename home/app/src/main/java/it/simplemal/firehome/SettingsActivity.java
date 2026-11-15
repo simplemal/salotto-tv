@@ -1738,7 +1738,8 @@ public final class SettingsActivity extends CardActivity {
         boolean adsLimited = Settings.Secure.getInt(getContentResolver(), ADS_LIMITED, 1) == 1;
         boolean metrics = Settings.Secure.getInt(getContentResolver(), USAGE_METRICS, 0) == 1;
         boolean counted = NotificationCounter.allowed(this);
-        List<Entry> entries = new ArrayList<>(Arrays.asList(
+        // Amazon's two keys mean nothing on Google TV: its choices live in Google's own pages.
+        List<Entry> entries = Fire.GOOGLE_TV ? new ArrayList<>() : new ArrayList<>(Arrays.asList(
             new Entry(getString(R.string.settings_limit_ads), adsLimited ? YES : NO, null,
                 getString(R.string.settings_limit_ads_text), false,
                 () -> changeSystem(() -> Settings.Secure.putInt(getContentResolver(), ADS_LIMITED, adsLimited ? 0 : 1))),
@@ -2013,9 +2014,10 @@ public final class SettingsActivity extends CardActivity {
         entries.add(new Entry(getString(R.string.settings_tour), null, null,
             getString(R.string.settings_tour_text), false,
             () -> open(new Intent(this, FirstRunActivity.class))));
-        entries.add(new Entry("AirPlay", null, null, getString(R.string.settings_airplay_text),
+        // AirPlay comes with Fire OS's installer, and the double Home leaves Amazon's Home: not on Google TV.
+        if (!Fire.GOOGLE_TV) entries.add(new Entry("AirPlay", null, null, getString(R.string.settings_airplay_text),
             false, () -> openPackage(Fire.AIRPLAY)));
-        entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null,
+        if (!Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null,
             getString(R.string.settings_double_home_text), false, () -> {
                 TaskService.rememberDoubleHome(this, !doubleHome);
                 refresh();
