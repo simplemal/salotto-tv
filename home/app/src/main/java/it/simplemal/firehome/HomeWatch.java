@@ -4,6 +4,8 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.os.Handler;
@@ -12,9 +14,12 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +37,8 @@ import java.util.List;
  *
  * Android 7 holds every app back for 5 s after Home, Salotto too: in the meantime the last picture
  * of Salotto's Home covers Amazon's, in a window over the others (SYSTEM_ALERT_WINDOW, given by the
- * installer), which takes the keys so that nothing moves underneath.
+ * installer), which takes the keys so that nothing moves underneath. A wheel in the middle says
+ * that Salotto is on its way (the user, 2026-11-15).
  */
 public final class HomeWatch extends Service {
     private static final String TAG = "Salotto";
@@ -43,6 +49,8 @@ public final class HomeWatch extends Service {
     private static final long COVER_LIMIT_MS = 8000;
     /** The Home comes in with an animation: the cover stays over it until that has ended. */
     private static final long AFTER_HOME_MS = 300;
+    /** As the wheel of «Caricamento della Home». */
+    private static final int WHEEL_DP = 40;
 
     private static volatile HomeWatch running;
 
@@ -133,9 +141,15 @@ public final class HomeWatch extends Service {
     private void cover() {
         Bitmap picture = HomeCover.lastPicture();
         if (cover != null || picture == null || !Settings.canDrawOverlays(this)) return;
-        ImageView view = new ImageView(this);
-        view.setScaleType(ImageView.ScaleType.FIT_XY);
-        view.setImageBitmap(picture);
+        FrameLayout view = new FrameLayout(this);
+        ImageView still = new ImageView(this);
+        still.setScaleType(ImageView.ScaleType.FIT_XY);
+        still.setImageBitmap(picture);
+        view.addView(still, new FrameLayout.LayoutParams(-1, -1));
+        ProgressBar wheel = new ProgressBar(this);
+        wheel.setIndeterminateTintList(ColorStateList.valueOf(Color.WHITE));
+        int side = Math.round(WHEEL_DP * getResources().getDisplayMetrics().density);
+        view.addView(wheel, new FrameLayout.LayoutParams(side, side, Gravity.CENTER));
         view.setFocusable(true);
         view.setOnKeyListener((v, code, event) -> true);
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
