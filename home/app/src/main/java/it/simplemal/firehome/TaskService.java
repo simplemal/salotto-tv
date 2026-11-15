@@ -665,7 +665,7 @@ public final class TaskService extends AccessibilityService {
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
         // The mask is a window too, and it would take itself for whatever comes next.
         else if (!MASK_WINDOW.equals(page)) uncoverUninstall();
-        if (Fire.AMAZON_HOME_PAGE.equals(page)) cover.amazonShown();
+        if (Fire.SYSTEM_HOME_PAGE.equals(page)) cover.amazonShown();
         if (name.equals(getPackageName())) fireSettingsWanted = false;
         // A remote's Settings key opens Fire OS's page, from any app: only the link in Salotto's stays.
         if (!fireSettingsWanted && Fire.SETTINGS_PAGE.contentEquals(String.valueOf(event.getClassName()))) openSettings();
@@ -759,7 +759,7 @@ public final class TaskService extends AccessibilityService {
         if (now - recentsAt < RECENTS_ONCE_MS) return;
         recentsAt = now;
         holdScreen();
-        closePage(Fire.AMAZON_HOME, this::openTasks, PAGE_TRIES, PAGE_NO_BACK);
+        closePage(Fire.SYSTEM_HOME, this::openTasks, PAGE_TRIES, PAGE_NO_BACK);
     }
 
     /** From the system log when it can be: Fire OS's page starts black, well before anyone hears of it. */
@@ -1070,7 +1070,7 @@ public final class TaskService extends AccessibilityService {
 
     /** The log line of a Home press that Android sent to Amazon's Home. */
     static boolean amazonHome(String line) {
-        return line.contains(HOME_INTENT) && line.contains(Fire.AMAZON_HOME) && line.contains(FROM_SYSTEM);
+        return line.contains(HOME_INTENT) && line.contains(Fire.SYSTEM_HOME) && line.contains(FROM_SYSTEM);
     }
 
     private void afterHomeLog() {

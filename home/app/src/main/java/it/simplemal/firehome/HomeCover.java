@@ -293,7 +293,7 @@ final class HomeCover {
 
     private boolean amazonActive() {
         AccessibilityNodeInfo active = service.getRootInActiveWindow();
-        return active != null && Fire.AMAZON_HOME.contentEquals(active.getPackageName());
+        return active != null && Fire.SYSTEM_HOME.contentEquals(active.getPackageName());
     }
 
     private void answered(boolean there) {

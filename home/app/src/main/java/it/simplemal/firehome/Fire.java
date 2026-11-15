@@ -29,6 +29,13 @@ import java.util.Arrays;
 /** What several screens share about the Stick and the apps around Salotto. */
 final class Fire {
     /**
+     * The system under Salotto, asked first: Google TV, tried on the branch google-tv since
+     * 2026-11-15, or else Amazon's Fire OS, which everything was made for. Where the two differ the
+     * code asks this and splits there; Fire OS's way stays as it was. The emulator stands for a Fire TV.
+     */
+    static final boolean GOOGLE_TV = "Google".equalsIgnoreCase(Build.MANUFACTURER)
+        && !Build.MODEL.startsWith("sdk_") && !Build.PRODUCT.startsWith("sdk");
+    /**
      * The 4K Max of 2021 and the Sticks of 2020, and the Stick 4K of 2018 on Android 7 too. Their
      * adbd answers only other machines, so Salotto has no shell there, and after Home they hold
      * every start for 5 s, except one made by an alarm.
@@ -45,6 +52,12 @@ final class Fire {
     static final String AMBIENT = "com.amazon.tv.ftvambient";
     /** Its package also holds the recent apps page: only this one is the Home itself. */
     static final String AMAZON_HOME_PAGE = "com.amazon.tv.launcher.ui.HomeActivity_vNext";
+    /** Google TV's own Home, where its Home key goes. */
+    static final String GOOGLE_HOME = "com.google.android.apps.tv.launcherx";
+    static final String GOOGLE_HOME_PAGE = "com.google.android.apps.tv.launcherx.home.HomeActivity";
+    /** The Home the system itself brings with the Home key, which Salotto takes over from. */
+    static final String SYSTEM_HOME = GOOGLE_TV ? GOOGLE_HOME : AMAZON_HOME;
+    static final String SYSTEM_HOME_PAGE = GOOGLE_TV ? GOOGLE_HOME_PAGE : AMAZON_HOME_PAGE;
     static final String APPSTORE = "com.amazon.venezia";
     /** The store itself. Its launcher entry only asks Amazon's Home for a tab, and Salotto has replaced that Home. */
     static final String APPSTORE_PAGE = "com.amazon.venezia.ade.FEATURED_LAUNCH";
@@ -185,7 +198,10 @@ final class Fire {
     static Intent notifications() { return new Intent("com.amazon.tv.action.NOTIFICATION_CENTER"); }
 
     /** Fire OS's own settings, the page behind a remote's Settings key. */
-    static Intent settings() { return new Intent().setClassName(AMAZON_HOME, SETTINGS_PAGE); }
+    static Intent settings() {
+        if (GOOGLE_TV) return new Intent(Settings.ACTION_SETTINGS);
+        return new Intent().setClassName(AMAZON_HOME, SETTINGS_PAGE);
+    }
 
     /** Fire OS's own menu of its screensavers. */
     static Intent saverMenu() { return new Intent("com.amazon.device.settings.action.SCREENSAVERS"); }
