@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -220,6 +221,11 @@ public final class FirstRunActivity extends CardActivity {
     private String words(int id) { return words.getString(id); }
 
     private void go(int index) {
+        // Fire OS's keyboard is a page of its own and goes with Done. Google TV's sits over the
+        // screen and stayed over the next page after the name (2026-11-15): it goes with the page.
+        if (Fire.GOOGLE_TV && root.getWindowToken() != null) {
+            getSystemService(InputMethodManager.class).hideSoftInputFromWindow(root.getWindowToken(), 0);
+        }
         at = index;
         visit++;
         back = index > 0 ? () -> go(index - 1) : due(this) ? () -> { } : this::finish;
