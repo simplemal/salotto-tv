@@ -133,7 +133,6 @@ public final class SettingsActivity extends CardActivity {
     private static final String WIFI_ON = "wifi-on";
     private static final int MINUTE = (int) Fire.MINUTE_MS;
     private static final String SAVER_ENABLED = "screensaver_enabled";
-    private static final String SAVER_CHOSEN = "screensaver_components";
     private static final int[] SAVER_MINUTES = {1, 5, 10, 15, 30};
     private static final int SAVER_DEFAULT = 5 * MINUTE;
     private static final int[] SLEEP_MINUTES = {5, 20, 30, 60};
@@ -2322,8 +2321,7 @@ public final class SettingsActivity extends CardActivity {
     private void showSaverManagers() {
         String[] names = {Brand.NAME, "Fire OS"};
         show(getString(R.string.settings_saver_managed), choices(names, ownSaver() ? 0 : 1, R.drawable.ic_image,
-            getString(R.string.settings_saver_managed_text), index -> chooseSaver(index == 0
-                ? new ComponentName(this, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER)));
+            getString(R.string.settings_saver_managed_text), index -> changeSystem(() -> Look.chooseSaver(this, index == 0))));
     }
 
     private String[] saverPlaces() {
@@ -2358,10 +2356,6 @@ public final class SettingsActivity extends CardActivity {
         }
         if (Look.saverFolder(this).startsWith("/")) return personalSaver().name;
         return Brand.NAME;
-    }
-
-    private void chooseSaver(String name) {
-        changeSystem(() -> Settings.Secure.putString(getContentResolver(), SAVER_CHOSEN, name));
     }
 
     /** The Stick goes to sleep at its own time, whatever the screensaver is doing. */

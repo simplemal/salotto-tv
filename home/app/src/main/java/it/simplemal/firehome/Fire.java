@@ -153,6 +153,12 @@ final class Fire {
     }
 
     static final String AMAZON_SAVER = "com.amazon.ftv.screensaver/.app.services.ScreensaverService";
+    /**
+     * Fire OS 7 stops all of Salotto as its screensaver, run as Android's, ends: the service goes with
+     * it and the Home key goes to Amazon (issue #4). There Salotto's screensaver is only its page,
+     * from the Home, and Android's stays Fire OS's.
+     */
+    static final boolean SAVER_FROM_HOME_ONLY = ANDROID_9;
 
     static String[] forceStop(Context context) { return labels(context, SETTINGS, FORCE_STOP_WORDS, FORCE_STOP); }
 

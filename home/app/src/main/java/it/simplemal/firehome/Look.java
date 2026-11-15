@@ -1,5 +1,6 @@
 package it.simplemal.firehome;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +104,10 @@ final class Look {
     private static Bitmap cachedImage;
 
     private Look() {}
+
+    private static final String SAVER_COMPONENT = "screensaver_components";
+    /** Salotto's screensaver chosen, where Android's stays Fire OS's: see Fire.SAVER_FROM_HOME_ONLY. */
+    private static final String OWN_SAVER = "own_saver";
 
     private static SharedPreferences prefs(Context context) {
         return context.getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -462,8 +468,29 @@ final class Look {
 
     /** Salotto's screensaver is the one chosen. */
     static boolean ownSaver(Context context) {
-        String chosen = Settings.Secure.getString(context.getContentResolver(), "screensaver_components");
+        if (Fire.SAVER_FROM_HOME_ONLY) return prefs(context).getBoolean(OWN_SAVER, false);
+        String chosen = Settings.Secure.getString(context.getContentResolver(), SAVER_COMPONENT);
         return chosen != null && chosen.startsWith(context.getPackageName() + "/");
+    }
+
+    /** Salotto's screensaver or Fire OS's. Where Salotto's runs only from the Home, Android's stays Fire OS's. */
+    static void chooseSaver(Context context, boolean own) {
+        String name = own && !Fire.SAVER_FROM_HOME_ONLY
+            ? new ComponentName(context, SaverService.class).flattenToShortString() : Fire.AMAZON_SAVER;
+        Settings.Secure.putString(context.getContentResolver(), SAVER_COMPONENT, name);
+        if (Fire.SAVER_FROM_HOME_ONLY) prefs(context).edit().putBoolean(OWN_SAVER, own).apply();
+    }
+
+    /** A TV that had Salotto as Android's screensaver before Fire.SAVER_FROM_HOME_ONLY keeps it, from the Home. */
+    static void saverFromHome(Context context) {
+        if (!Fire.SAVER_FROM_HOME_ONLY) return;
+        String chosen = Settings.Secure.getString(context.getContentResolver(), SAVER_COMPONENT);
+        if (chosen == null || !chosen.startsWith(context.getPackageName() + "/")) return;
+        try {
+            chooseSaver(context, true);
+        } catch (SecurityException e) {
+            Log.w("Salotto", "No permission yet for the screensaver", e);
+        }
     }
 
     /** What the screensaver shows over its pictures. */
