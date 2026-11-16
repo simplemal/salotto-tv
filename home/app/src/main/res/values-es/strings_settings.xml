@@ -22,6 +22,7 @@
     <string name="settings_all_apps">Todas las apps</string>
     <string name="settings_task_manager">Administrador de tareas</string>
     <string name="settings_held_keys">Botones mantenidos</string>
+    <string name="settings_app_key">Botón de %1$s</string>
     <string name="settings_manage_apps">Gestión de apps</string>
     <string name="settings_app_version">Versión</string>
     <string name="settings_app_data">Datos</string>

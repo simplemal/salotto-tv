@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -89,6 +90,11 @@ public final class TaskService extends AccessibilityService {
     private static final String ALARM_SETTINGS = "alarm_manager_constants";
     private static final String ALARM_AT_ONCE = "min_futurity=0";
     private static final String KEYS_FILE = "keys";
+    /** Google TV's YouTube and Netflix keys: the app each opens, when the user has chosen another. */
+    private static final String APP_KEY = "app_key_";
+    static final int[] APP_KEYS = {KeyEvent.KEYCODE_BUTTON_3, KeyEvent.KEYCODE_BUTTON_4};
+    /** What each key opens on its own, in the order of APP_KEYS. */
+    static final String[] APP_KEY_APPS = {"com.google.android.youtube.tv", "com.netflix.ninja"};
     private static final String KEYS_OFF = "off_by_choice";
     /** Never a service: only there to change the list, see turnOn. */
     private static final String NUDGE = "it.simplemal.firehome/.NoService";
@@ -135,6 +141,9 @@ public final class TaskService extends AccessibilityService {
     private final Runnable picture = this::takePicture;
     private final Runnable holdMenu = this::menuHeld;
     private final Runnable holdBack = this::backHeld;
+    private final Runnable holdHome = this::homeHeld;
+    /** Google TV's Home key has been held: its release opens nothing more. */
+    private boolean homeHeld;
     private final Runnable sleepNow = this::sleep;
     /** The timer belongs to one evening: going to standby in any other way ends it. */
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {
@@ -688,6 +697,9 @@ public final class TaskService extends AccessibilityService {
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
         if (panelWindow != null && panelWindow.key(event)) return true;
         if (stopAnswer != null) return keyOnPreparedStop(event, key, ok, up);
+        if (Fire.GOOGLE_TV && key == KeyEvent.KEYCODE_HOME && cover != null
+            && getSystemService(PowerManager.class).isInteractive()) return googleHome(event);
+        if (Fire.GOOGLE_TV && appKey(event)) return true;
         // Under a mask a press would move on a page nobody can see, a step from Reset or Uninstall.
         if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;
         if (ok && fireSteps != null) return !okReachesPage(event);
@@ -719,6 +731,53 @@ public final class TaskService extends AccessibilityService {
         // Back's release always goes on: Android TV reads Back with OK as a shortcut, and a Back
         // that never ends swallows every OK after it.
         return fired && menu;
+    }
+
+    /**
+     * On Google TV the Home key comes here before Google's Home hears it: kept here, Google's never
+     * starts and Salotto comes at once. Held, it opens Salotto's control panel, as on Fire OS 7.
+     * With the screen off it goes on, to wake the TV.
+     */
+    private boolean googleHome(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (event.getRepeatCount() == 0) {
+                homeHeld = false;
+                main.postDelayed(holdHome, ViewConfiguration.getLongPressTimeout());
+            }
+            return true;
+        }
+        main.removeCallbacks(holdHome);
+        if (!homeHeld) cover.heard();
+        homeHeld = false;
+        return true;
+    }
+
+    /**
+     * Google TV's YouTube and Netflix keys, when the user has chosen another app for one: they too
+     * come here first. Left alone, or with the screen off, they go on to Google TV, which also wakes the TV.
+     */
+    private boolean appKey(KeyEvent event) {
+        String pkg = appKeyChoice(this, event.getKeyCode());
+        if (pkg == null || !getSystemService(PowerManager.class).isInteractive()) return false;
+        Intent open = getPackageManager().getLeanbackLaunchIntentForPackage(pkg);
+        if (open == null) open = getPackageManager().getLaunchIntentForPackage(pkg);
+        if (open == null) return false;
+        if (event.getAction() == KeyEvent.ACTION_UP) startActivity(open.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        return true;
+    }
+
+    /** The app chosen for a key of APP_KEYS, or null for the one Google TV opens. */
+    static String appKeyChoice(Context context, int key) {
+        return context.getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getString(APP_KEY + key, null);
+    }
+
+    static void chooseAppKey(Context context, int key, String pkg) {
+        context.getSharedPreferences(KEYS_FILE, MODE_PRIVATE).edit().putString(APP_KEY + key, pkg).apply();
+    }
+
+    private void homeHeld() {
+        homeHeld = true;
+        openPanelHere();
     }
 
     /**

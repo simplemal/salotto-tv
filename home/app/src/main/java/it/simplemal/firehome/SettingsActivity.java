@@ -1225,6 +1225,15 @@ public final class SettingsActivity extends CardActivity {
                 false, () -> open(new Intent(this, TasksActivity.class))),
             new Entry(getString(R.string.settings_held_keys), TaskService.keysOn(this) ? YES : NO, null,
                 false, () -> changeSystem(() -> TaskService.chooseKeys(this, !TaskService.keysOn(this), () -> { if (!isFinishing()) refresh(); })))));
+        if (Fire.GOOGLE_TV) {
+            for (int index = 0; index < TaskService.APP_KEYS.length; index++) {
+                int key = TaskService.APP_KEYS[index];
+                String own = TaskService.APP_KEY_APPS[index];
+                String chosen = TaskService.appKeyChoice(this, key);
+                entries.add(new Entry(getString(R.string.settings_app_key, HomeApps.label(this, own)),
+                    HomeApps.label(this, chosen != null ? chosen : own), null, true, () -> enter(() -> showAppKey(key, own))));
+            }
+        }
         entries.add(groupLabel(R.string.settings_manage_apps));
         for (HomeApps.App app : HomeApps.installed(this)) {
             Entry entry = new Entry(app.label, null, null,
@@ -1233,6 +1242,32 @@ public final class SettingsActivity extends CardActivity {
             entries.add(entry);
         }
         show(getString(R.string.settings_apps), entries);
+    }
+
+    /** What a key of Google TV's remote opens: first the app it opens on its own, then every other. */
+    private void showAppKey(int key, String own) {
+        List<String> packages = new ArrayList<>();
+        packages.add(own);
+        for (HomeApps.App app : HomeApps.installed(this)) {
+            if (!app.pkg.equals(own)) packages.add(app.pkg);
+        }
+        String[] names = new String[packages.size()];
+        for (int index = 0; index < names.length; index++) names[index] = HomeApps.label(this, packages.get(index));
+        String chosen = TaskService.appKeyChoice(this, key);
+        int at = chosen == null ? 0 : Math.max(0, packages.indexOf(chosen));
+        show(getString(R.string.settings_app_key, names[0]), choices(names, at, R.drawable.ic_apps, index -> {
+            TaskService.chooseAppKey(this, key, index == 0 ? null : packages.get(index));
+            refresh();
+        }));
+    }
+
+    private boolean installed(String pkg) {
+        try {
+            getPackageManager().getPackageInfo(pkg, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     private String appVersion(String pkg) {
@@ -1962,8 +1997,8 @@ public final class SettingsActivity extends CardActivity {
         entries.add(groupLabel(R.string.settings_tools));
         entries.add(new Entry(getString(R.string.settings_tour), null, null, false,
             () -> open(new Intent(this, FirstRunActivity.class))));
-        // AirPlay comes with Fire OS's installer, and the double Home leaves Amazon's Home: not on Google TV.
-        if (!Fire.GOOGLE_TV) entries.add(new Entry("AirPlay", null, null,
+        // AirPlay comes with the installer: on Google TV, only once it is there. The double Home leaves Amazon's Home.
+        if (!Fire.GOOGLE_TV || installed(Fire.AIRPLAY)) entries.add(new Entry("AirPlay", null, null,
             false, () -> openPackage(Fire.AIRPLAY)));
         if (!Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_double_home), doubleHome ? YES : NO, null, false, () -> {
                 TaskService.rememberDoubleHome(this, !doubleHome);
