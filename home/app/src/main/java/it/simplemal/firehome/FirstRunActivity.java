@@ -873,7 +873,7 @@ public final class FirstRunActivity extends CardActivity {
         }
     }
 
-    /** The remote in outline, with a line from each of the three keys to what it does. */
+    /** The remote in outline, with a line from each of Salotto's keys to what it does. */
     private final class Guide extends View {
         private static final float BODY_HALF = 56;
         private static final float BODY_BOTTOM = 176;
@@ -884,6 +884,16 @@ public final class FirstRunActivity extends CardActivity {
         private static final float REACH = 170;
         private static final float HOME_LINE_END = 192;
         private static final float HOME_NAME_Y = 214;
+        // Google TV's remote is a pill: the top is a half circle, the pad nearly as wide as the body.
+        private static final float G_BODY_HALF = 56;
+        private static final float G_RING_Y = 58;
+        private static final float G_RING = 45;
+        private static final float G_CENTRE = 17;
+        private static final float G_APART = 26;
+        private static final float G_KEY = 15;
+        private static final float G_BACK_Y = 134;
+        private static final float G_HOME_Y = 178;
+        private static final float G_REACH = 150;
 
         private final Paint line = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint key = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -911,6 +921,10 @@ public final class FirstRunActivity extends CardActivity {
         private float px(float value) { return value * getResources().getDisplayMetrics().density; }
 
         @Override protected void onDraw(Canvas canvas) {
+            if (Fire.GOOGLE_TV) {
+                drawGoogle(canvas);
+                return;
+            }
             float mid = getWidth() / 2f;
             float corner = px(28);
             float half = px(BODY_HALF);
@@ -935,6 +949,82 @@ public final class FirstRunActivity extends CardActivity {
             write(canvas, words(R.string.first_key_menu), words(R.string.first_does_panel), mid + gap, y, Paint.Align.LEFT);
             name.setTextAlign(Paint.Align.CENTER);
             canvas.drawText(words(R.string.first_key_home), mid, px(HOME_NAME_Y), name);
+        }
+
+        /**
+         * Google TV's remote, from the top down to the row of Home: the rest has no key of Salotto's.
+         * Back held opens the task manager, Home held the control panel; Assistant and Mute stay
+         * Google's, so they are drawn dimmer and with no line.
+         */
+        private void drawGoogle(Canvas canvas) {
+            float mid = getWidth() / 2f;
+            float half = px(G_BODY_HALF);
+            float bottom = getHeight() - px(2);
+            Path body = new Path();
+            body.moveTo(mid - half, bottom);
+            body.lineTo(mid - half, px(1) + half);
+            body.arcTo(new RectF(mid - half, px(1), mid + half, px(1) + 2 * half), 180, 180);
+            body.lineTo(mid + half, bottom);
+            canvas.drawPath(body, line);
+            canvas.drawCircle(mid, px(G_RING_Y), px(G_RING), line);
+            canvas.drawCircle(mid, px(G_RING_Y), px(G_CENTRE), line);
+
+            float left = mid - px(G_APART);
+            float right = mid + px(G_APART);
+            float back = px(G_BACK_Y);
+            float home = px(G_HOME_Y);
+            canvas.drawCircle(left, back, px(G_KEY), key);
+            canvas.drawCircle(left, home, px(G_KEY), key);
+            canvas.drawPath(arrowIcon(left, back), line);
+            canvas.drawPath(homeIcon(left, home), line);
+            int full = line.getAlpha();
+            line.setAlpha(110);
+            canvas.drawCircle(right, back, px(G_KEY), line);
+            canvas.drawCircle(right, home, px(G_KEY), line);
+            canvas.drawPath(assistantIcon(right, back), line);
+            canvas.drawPath(muteIcon(right, home), line);
+            line.setAlpha(full);
+
+            float end = mid - px(G_REACH);
+            canvas.drawLine(left - px(G_KEY), back, end, back, key);
+            canvas.drawLine(left - px(G_KEY), home, end, home, key);
+            float at = end - px(12);
+            write(canvas, words(R.string.first_key_back), words(R.string.first_does_tasks), at, back, Paint.Align.RIGHT);
+            write(canvas, words(R.string.first_key_home_button), words(R.string.first_does_panel), at, home, Paint.Align.RIGHT);
+        }
+
+        private Path arrowIcon(float x, float y) {
+            Path path = new Path();
+            path.moveTo(x + px(6), y);
+            path.lineTo(x - px(6), y);
+            path.moveTo(x - px(1.5f), y - px(4.5f));
+            path.lineTo(x - px(6), y);
+            path.lineTo(x - px(1.5f), y + px(4.5f));
+            return path;
+        }
+
+        /** Google's Assistant: four dots, the big one low on the left. */
+        private Path assistantIcon(float x, float y) {
+            Path path = new Path();
+            path.addCircle(x - px(2.5f), y + px(0.5f), px(3.2f), Path.Direction.CW);
+            path.addCircle(x + px(3.5f), y - px(3.5f), px(1.6f), Path.Direction.CW);
+            path.addCircle(x + px(3.5f), y + px(4f), px(1.8f), Path.Direction.CW);
+            path.addCircle(x + px(6.5f), y + px(0.5f), px(0.9f), Path.Direction.CW);
+            return path;
+        }
+
+        private Path muteIcon(float x, float y) {
+            Path path = new Path();
+            path.moveTo(x - px(6), y - px(2.5f));
+            path.lineTo(x - px(3), y - px(2.5f));
+            path.lineTo(x + px(1.5f), y - px(6));
+            path.lineTo(x + px(1.5f), y + px(6));
+            path.lineTo(x - px(3), y + px(2.5f));
+            path.lineTo(x - px(6), y + px(2.5f));
+            path.close();
+            path.moveTo(x - px(6), y - px(6));
+            path.lineTo(x + px(6), y + px(6));
+            return path;
         }
 
         private void write(Canvas canvas, String title, String does, float x, float y, Paint.Align align) {

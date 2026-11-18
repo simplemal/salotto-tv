@@ -30,6 +30,7 @@
     <string name="first_key_back">返回</string>
     <string name="first_key_menu">菜单</string>
     <string name="first_key_home">Salotto 主页</string>
+    <string name="first_key_home_button">主页</string>
     <string name="first_does_tasks">任务管理器</string>
     <string name="first_does_panel">控制中心</string>
     <string name="first_does_settings">设置</string>
