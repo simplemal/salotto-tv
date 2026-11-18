@@ -1,0 +1,19 @@
+# Google TV: servizi che non servono per guardare la TV. Li spegne l'installatore, per ogni profilo.
+# Mai qui: launcherx (tasti YouTube e Netflix, salvaschermo), setupwraith (Cast), katniss (Assistente),
+# chromecastservice, mediashell (Cast), gms, gsf, vending. Controllati sul Chromecast il 2026-11-18.
+com.google.android.tv.remotecontrol.logging
+com.google.android.apps.tv.netoscope
+com.google.android.feedback
+com.google.android.onetimeinitializer
+com.google.android.partnersetup
+com.google.android.apps.education.cast2class
+com.google.android.play.games
+com.google.android.videos
+com.google.android.syncadapters.calendar
+com.android.wallpaperbackup
+com.google.android.tvrecommendations
+com.google.android.adservices.api
+com.google.android.ext.adservices.api
+com.google.android.federatedcompute
+com.google.android.ondevicepersonalization.services
+com.android.printspooler
