@@ -697,8 +697,7 @@ public final class TaskService extends AccessibilityService {
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
         if (panelWindow != null && panelWindow.key(event)) return true;
         if (stopAnswer != null) return keyOnPreparedStop(event, key, ok, up);
-        if (Fire.GOOGLE_TV && key == KeyEvent.KEYCODE_HOME && cover != null
-            && getSystemService(PowerManager.class).isInteractive()) return googleHome(event);
+        if (Fire.GOOGLE_TV && key == KeyEvent.KEYCODE_HOME && cover != null) return googleHome(event);
         if (Fire.GOOGLE_TV && appKey(event)) return true;
         // Under a mask a press would move on a page nobody can see, a step from Reset or Uninstall.
         if (fireSteps != null && !ok && key != KeyEvent.KEYCODE_BACK && key != KeyEvent.KEYCODE_HOME) return true;
@@ -736,7 +735,8 @@ public final class TaskService extends AccessibilityService {
     /**
      * On Google TV the Home key comes here before Google's Home hears it: kept here, Google's never
      * starts and Salotto comes at once. Held, it opens Salotto's control panel, as on Fire OS 7.
-     * With the screen off it goes on, to wake the TV.
+     * With the screen off it is kept here too: Android wakes the TV before the key reaches this
+     * filter, and let go on it showed Google's Home for a moment (2026-11-18).
      */
     private boolean googleHome(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
