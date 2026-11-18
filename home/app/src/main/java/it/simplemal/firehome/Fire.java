@@ -214,8 +214,13 @@ final class Fire {
         return new Intent("com.amazon.device.settings.action.SCREENSAVERS");
     }
 
-    /** Not a settings page: Android's own way to start the chosen screensaver. Android 9 has none, so Fire OS's can only be chosen there. */
+    /**
+     * Not a settings page: Android's own way to start the chosen screensaver. Android 9 has none, so
+     * Fire OS's can only be chosen there. Google TV has no Somnambulator: its settings start the
+     * screensaver on the voice action «sleep» (DaydreamVoiceAction, tried on the Chromecast 2026-11-18).
+     */
     static Intent screensaver(Context context) {
+        if (GOOGLE_TV) return new Intent("com.google.android.pano.action.SLEEP");
         if (!ANDROID_9) return new Intent().setClassName("com.android.systemui", "com.android.systemui.Somnambulator");
         return Look.ownSaver(context) ? new Intent(context, SaverActivity.class) : saverMenu();
     }
