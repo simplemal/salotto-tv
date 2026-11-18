@@ -144,6 +144,10 @@ public final class TaskService extends AccessibilityService {
     private final Runnable holdHome = this::homeHeld;
     /** Google TV's Home key has been held: its release opens nothing more. */
     private boolean homeHeld;
+    /** Google's screensaver was on when Home went down: it has to end first. */
+    private boolean homeOverDream;
+    /** Back reaches the screensaver and ends it: what comes after waits this long, or Back would reach it. */
+    private static final long DREAM_END_MS = 200;
     private final Runnable sleepNow = this::sleep;
     /** The timer belongs to one evening: going to standby in any other way ends it. */
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {
@@ -742,14 +746,35 @@ public final class TaskService extends AccessibilityService {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (event.getRepeatCount() == 0) {
                 homeHeld = false;
+                homeOverDream = dreaming();
                 main.postDelayed(holdHome, ViewConfiguration.getLongPressTimeout());
             }
             return true;
         }
         main.removeCallbacks(holdHome);
-        if (!homeHeld) cover.heard();
+        if (!homeHeld) afterDream(cover::heard);
         homeHeld = false;
         return true;
+    }
+
+    /**
+     * Google's screensaver never hears the Home key Salotto keeps, so it stayed under Salotto and took
+     * the next arrow (2026-11-18). Back ends it, as the remote's own Back does.
+     */
+    private void afterDream(Runnable then) {
+        if (!homeOverDream) {
+            then.run();
+            return;
+        }
+        homeOverDream = false;
+        performGlobalAction(GLOBAL_ACTION_BACK);
+        main.postDelayed(then, DREAM_END_MS);
+    }
+
+    private boolean dreaming() {
+        AccessibilityNodeInfo active = getRootInActiveWindow();
+        CharSequence pkg = active == null ? null : active.getPackageName();
+        return pkg != null && Fire.GOOGLE_SAVER.startsWith(pkg + "/");
     }
 
     /**
@@ -777,7 +802,7 @@ public final class TaskService extends AccessibilityService {
 
     private void homeHeld() {
         homeHeld = true;
-        openPanelHere();
+        afterDream(this::openPanelHere);
     }
 
     /**
