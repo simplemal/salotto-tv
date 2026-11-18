@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Publishes the built Salotto as a release of this repository: APK, signed update.json, error page,
 # and next to them the latest installer, which is what people download.
-# Usage: distro/tools/pubblica-aggiornamento.sh [--beta] "first change" "second change" ...
+# Usage: distro/tools/pubblica-aggiornamento.sh [--beta] [--google-tv] "first change" "second change" ...
+# With --google-tv the same release carries Salotto for Google TV too, built by compila-googletv.sh:
+# salotto-googletv.apk and its own signed update-googletv.json, which only Google TV reads.
 # With --beta the version, named like 1.0.20-beta.1, becomes a pre-release, which GitHub's "latest"
 # never points to: only the TVs with the betas on find it, through the fixed pre-release "beta". The
 # installer, README and error page stay on the stable version. Betas and stable versions share one row
@@ -11,10 +13,18 @@
 set -euo pipefail
 
 BETA=false
-if [ "${1:-}" = "--beta" ]; then BETA=true; shift; fi
+GOOGLE_TV=false
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --beta) BETA=true; shift ;;
+    --google-tv) GOOGLE_TV=true; shift ;;
+    *) break ;;
+  esac
+done
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APK="$ROOT/home/.toolchain/app-build/outputs/apk/debug/app-debug.apk"
+GOOGLE_APK="$ROOT/home/.toolchain/googletv/salotto-googletv.apk"
 KEY="$ROOT/chiavi-aggiornamento/privata.pem"
 # The certificate of firma-salotto.jks, which is public: every Stick has it. A build with any other
 # key cannot update them.
@@ -39,19 +49,31 @@ if ! curl -fsSL "https://github.com/$REPO/releases/download/sfondi/sfondi.json" 
   echo "Fermo: il rilascio sfondi non ha ancora le miniature, prima distro/tools/pubblica-sfondi.sh."; exit 1
 fi
 
-BADGING="$("$ROOT/home/.toolchain/android-sdk/build-tools/34.0.0/aapt2" dump badging "$APK" | sed -n 1p)"
-case "$BADGING" in
-  *"versionCode='$CODE' versionName='$NAME'"*) ;;
-  *) echo "Fermo: l'APK non è la versione $NAME ($CODE), va ricompilato."; exit 1 ;;
-esac
-
 TOOLS="$ROOT/home/.toolchain"
-SIGNER="$(JAVA_HOME="$(echo "$TOOLS"/jdk-*/Contents/Home)" "$TOOLS/android-sdk/build-tools/34.0.0/apksigner" verify --print-certs "$APK" 2>/dev/null | sed -n 's/.*certificate SHA-256 digest: //p' | sed -n 1p)"
-[ "$SIGNER" = "$CERTIFICATE" ] || { echo "Fermo: l'APK non ha la firma definitiva."; exit 1; }
+check_apk() {
+  local badging signer
+  badging="$("$TOOLS/android-sdk/build-tools/34.0.0/aapt2" dump badging "$1" | sed -n 1p)"
+  case "$badging" in
+    *"versionCode='$CODE' versionName='$NAME'"*) ;;
+    *) echo "Fermo: $2 non è la versione $NAME ($CODE), va ricompilato."; exit 1 ;;
+  esac
+  signer="$(JAVA_HOME="$(echo "$TOOLS"/jdk-*/Contents/Home)" "$TOOLS/android-sdk/build-tools/34.0.0/apksigner" verify --print-certs "$1" 2>/dev/null | sed -n 's/.*certificate SHA-256 digest: //p' | sed -n 1p)"
+  [ "$signer" = "$CERTIFICATE" ] || { echo "Fermo: $2 non ha la firma definitiva."; exit 1; }
+}
+check_apk "$APK" "l'APK"
+if $GOOGLE_TV; then
+  [ -f "$GOOGLE_APK" ] || { echo "Fermo: manca Salotto per Google TV, prima distro/tools/compila-googletv.sh."; exit 1; }
+  check_apk "$GOOGLE_APK" "l'APK per Google TV"
+fi
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
 cp "$APK" "$WORK/salotto.apk"
+FILES=("$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig")
+if $GOOGLE_TV; then
+  cp "$GOOGLE_APK" "$WORK/salotto-googletv.apk"
+  FILES+=("$WORK/salotto-googletv.apk" "$WORK/update-googletv.json" "$WORK/update-googletv.json.sig")
+fi
 $BETA || "$ROOT/distro/tools/prepara-installatore.sh" "$WORK/installatore"
 python3 - "$WORK" "$CODE" "$NAME" "$REPO" "$ROOT" "$@" <<'PY'
 import hashlib, json, os, re, sys
@@ -72,25 +94,34 @@ for language in codes:
     if not lines or len(lines) != len(changes):
         sys.exit(f"Fermo: in distro/novita.json la lingua {language} non ha {len(changes)} novità.")
     languages[language] = lines
-apk = os.path.join(work, "salotto.apk")
-data = open(apk, "rb").read()
-json.dump({"versionCode": int(code), "versionName": name,
-           "url": f"https://github.com/{repo}/releases/download/v{name}/salotto.apk",
-           "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes,
-           "changes_by_language": languages},
-          open(os.path.join(work, "update.json"), "w"), ensure_ascii=False, indent=2)
+for apk_name, manifest in (("salotto.apk", "update.json"), ("salotto-googletv.apk", "update-googletv.json")):
+    apk = os.path.join(work, apk_name)
+    if not os.path.exists(apk):
+        continue
+    data = open(apk, "rb").read()
+    json.dump({"versionCode": int(code), "versionName": name,
+               "url": f"https://github.com/{repo}/releases/download/v{name}/{apk_name}",
+               "sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "changes": changes,
+               "changes_by_language": languages},
+              open(os.path.join(work, manifest), "w"), ensure_ascii=False, indent=2)
 PY
-openssl dgst -sha256 -sign "$KEY" -out "$WORK/update.json.sig" "$WORK/update.json"
-openssl dgst -sha256 -verify <(openssl pkey -in "$KEY" -pubout 2>/dev/null) -signature "$WORK/update.json.sig" "$WORK/update.json"
+MANIFESTS=(update.json)
+$GOOGLE_TV && MANIFESTS+=(update-googletv.json)
+for manifest in "${MANIFESTS[@]}"; do
+  openssl dgst -sha256 -sign "$KEY" -out "$WORK/$manifest.sig" "$WORK/$manifest"
+  openssl dgst -sha256 -verify <(openssl pkey -in "$KEY" -pubout 2>/dev/null) -signature "$WORK/$manifest.sig" "$WORK/$manifest"
+done
 
 NOTES="$(printf -- '- %s\n' "$@")"
 if $BETA; then
-  gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" \
+  gh release create "v$NAME" "${FILES[@]}" \
     --repo "$REPO" --title "Salotto $NAME" --notes "$NOTES" --prerelease --latest=false
   gh release view beta --repo "$REPO" > /dev/null 2>&1 ||
     gh release create beta --repo "$REPO" --title "Salotto beta" --prerelease --latest=false \
       --notes "Il canale beta: Salotto lo legge solo con Impostazioni → Aggiornamento → Versioni beta. Le versioni sono nelle pre-release."
-  gh release upload beta "$WORK/update.json" "$WORK/update.json.sig" --repo "$REPO" --clobber
+  for manifest in "${MANIFESTS[@]}"; do
+    gh release upload beta "$WORK/$manifest" "$WORK/$manifest.sig" --repo "$REPO" --clobber
+  done
   echo "Pubblicata la beta $NAME ($CODE)"
   exit 0
 fi
@@ -100,6 +131,6 @@ python3 "$ROOT/distro/tools/genera-errori.py" "$ROOT/ERRORI.md"
 git -C "$ROOT" add ERRORI.md
 git -C "$ROOT" diff --cached --quiet || git -C "$ROOT" commit -q -m "Errori per la versione $NAME"
 git -C "$ROOT" push -q origin HEAD
-gh release create "v$NAME" "$WORK/salotto.apk" "$WORK/update.json" "$WORK/update.json.sig" "$WORK"/installatore/* \
+gh release create "v$NAME" "${FILES[@]}" "$WORK"/installatore/* \
   --repo "$REPO" --title "Salotto $NAME" --notes "$NOTES" --latest
 echo "Pubblicata la versione $NAME ($CODE)"

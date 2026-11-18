@@ -76,6 +76,8 @@ gh release create v0.1.0 rilasci/salotto-distro-0.1.0.zip --title "Salotto 0.1.0
 
 Lo strumento controlla versione e dati personali, firma `update.json`, aggiorna `ERRORI.md` e crea la release in questo repository. Le Stick la propongono al controllo successivo. Le novità compaiono così sulla TV: scrivile per chi la usa.
 
+Per mettere nella stessa release anche Salotto per Google TV: prima unisci il ramo in uso in `google-tv`, poi lancia `distro/tools/compila-googletv.sh`, che compila `google-tv` in una copia a parte, e infine aggiungi `--google-tv` allo strumento. Allega `salotto-googletv.apk` e `update-googletv.json`, firmato; Salotto su Google TV legge solo quest'ultimo. Senza `--google-tv` la release resta solo per Fire TV.
+
 ## Prima del primo rilascio pubblico
 
 - [ ] Licenza di Salotto scelta. AirPlay Server e Aurora sono GPL-3.0, e non vengono ridistribuiti
