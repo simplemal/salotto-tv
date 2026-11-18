@@ -149,11 +149,18 @@ public final class TaskService extends AccessibilityService {
     /** Back reaches the screensaver and ends it: what comes after waits this long, or Back would reach it. */
     private static final long DREAM_END_MS = 200;
     private final Runnable sleepNow = this::sleep;
+    private static final String SYSTEM_UI = "com.android.systemui";
+    private final BroadcastReceiver screenOn = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (cover != null) cover.woke();
+        }
+    };
     /** The timer belongs to one evening: going to standby in any other way ends it. */
     private final BroadcastReceiver screenOff = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
             setSleepTimer(0);
             if (panelWindow != null) panelWindow.close();
+            if (Fire.GOOGLE_TV && cover != null) cover.asleep();
         }
     };
     private HandlerThread worker;
@@ -633,6 +640,7 @@ public final class TaskService extends AccessibilityService {
         adb = new Handler(worker.getLooper());
         running = this;
         registerReceiver(screenOff, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        if (Fire.GOOGLE_TV) registerReceiver(screenOn, new IntentFilter(Intent.ACTION_SCREEN_ON));
         cover = new HomeCover(this);
         showVeil();
         HomeCover.doubleHome = getSharedPreferences(KEYS_FILE, MODE_PRIVATE).getBoolean(DOUBLE_HOME, false);
@@ -653,6 +661,7 @@ public final class TaskService extends AccessibilityService {
         sleepAt = 0;
         if (panelWindow != null) panelWindow.close();
         unregisterReceiver(screenOff);
+        if (Fire.GOOGLE_TV) unregisterReceiver(screenOn);
         main.removeCallbacksAndMessages(null);
         if (cover != null) cover.close();
         if (homeLog != null) homeLog.run();
@@ -673,6 +682,9 @@ public final class TaskService extends AccessibilityService {
         // Masks, the veil and messages are windows of Android's own classes, not pages: the app under them stays.
         boolean realPage = !page.startsWith(ANDROID_CLASS);
         if (name.equals(getPackageName()) && !realPage) return;
+        // Woken into YouTube or a Cast, not Google's Home: Salotto's picture must not stay over it.
+        if (Fire.GOOGLE_TV && realPage && !name.equals(getPackageName()) && !Fire.SYSTEM_HOME.equals(name)
+            && !name.equals(SYSTEM_UI)) cover.wakeOver();
         if (panelWindow != null && realPage && !name.equals(panelApp)
             && (HomeApps.isHome(this, name) || HomeApps.isUserApp(this, name))) panelWindow.close();
         if (name.equals(Fire.INSTALLER) && page.endsWith(Fire.UNINSTALL_PROGRESS)) coverUninstall();
@@ -697,6 +709,7 @@ public final class TaskService extends AccessibilityService {
 
     @Override protected boolean onKeyEvent(KeyEvent event) {
         int key = event.getKeyCode();
+        if (Fire.GOOGLE_TV && cover != null) cover.wakeOver();
         boolean ok = key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER;
         boolean up = event.getAction() == KeyEvent.ACTION_UP;
         if (panelWindow != null && panelWindow.key(event)) return true;

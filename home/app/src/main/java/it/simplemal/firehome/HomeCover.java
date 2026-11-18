@@ -44,6 +44,10 @@ final class HomeCover {
     private static final long FADE_SETTLE_MS = 50;
     /** The circle waits for the Home; should nothing say it has come, it closes all the same after this. */
     private static final long CLOSE_LIMIT_MS = 2500;
+    /** Google TV can take seconds to hand the screen back after waking: should nothing come, the cover goes after this. */
+    private static final long WAKE_LIMIT_MS = 4000;
+    /** After waking Google TV fades Salotto in over its Home: the cover stays until that is over. */
+    private static final long WAKE_AFTER_HOME_MS = 900;
 
     /** The setting: a double press leaves Amazon's Home on screen. */
     static volatile boolean doubleHome;
@@ -68,6 +72,9 @@ final class HomeCover {
     private volatile long lastHeard;
     private boolean holding;
     private Bitmap held;
+    /** Up from the moment Google TV went to sleep, until Salotto has been started again and is back. */
+    private boolean waking;
+    private volatile long wokeAt;
 
     /** A window takes long to add and a frame to show, so it is always there, hidden. */
     HomeCover(AccessibilityService service) {
@@ -255,6 +262,8 @@ final class HomeCover {
     static void startSalotto(Context context, long at) {
         Intent salotto = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
             .setClass(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Google TV fades Salotto in over its own Home: without the animation the cover waits less (2026-11-18).
+        if (Fire.GOOGLE_TV) salotto.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         if (Fire.ANDROID_9) {
             context.getSystemService(AlarmManager.class).setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, at,
                 PendingIntent.getActivity(context, 0, salotto, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
@@ -341,8 +350,40 @@ final class HomeCover {
         main.postDelayed(hide, SHOW_LIMIT_MS);
     }
 
+    /**
+     * Google TV wakes into its own Home: the Home key that wakes it never reaches Salotto, and
+     * launcherx is on screen before the log or even Android's screen-on says so, 0,65 s later
+     * (2026-11-18). So Salotto's last picture goes up as the screen goes off, and is there as it
+     * comes back on, until the Home started after that is back.
+     */
+    void asleep() {
+        if (holding || picture == null) return;
+        waking = true;
+        wokeAt = SystemClock.elapsedRealtime();
+        main.removeCallbacks(hide);
+        view.setImageBitmap(picture);
+        view.invalidate();
+        frame.animate().cancel();
+        frame.setAlpha(1f);
+        frame.setVisibility(View.VISIBLE);
+    }
+
+    /** Should Google's Home never come, the picture goes all the same. */
+    void woke() {
+        if (!waking) return;
+        main.removeCallbacks(hide);
+        main.postDelayed(hide, WAKE_LIMIT_MS);
+    }
+
+    /** Another app came after waking, or a key was pressed: the screen is the user's again. */
+    void wakeOver() {
+        if (waking) hide();
+    }
+
     /** The Home has drawn itself. */
     void homeBack() {
+        // Salotto shows for a moment as the TV wakes, before Google's Home: only the start after that counts.
+        if (waking && startedAt < wokeAt) return;
         homeBackAt = SystemClock.uptimeMillis();
         // The closing circle starts once the Home is there, and takes the cover away itself.
         if (shrinking) {
@@ -353,11 +394,12 @@ final class HomeCover {
         }
         if (frame.getVisibility() != View.VISIBLE) return;
         main.removeCallbacks(hide);
-        main.postDelayed(hide, AFTER_HOME_MS);
+        main.postDelayed(hide, waking ? WAKE_AFTER_HOME_MS : AFTER_HOME_MS);
     }
 
     private void hide() {
         holding = false;
+        waking = false;
         held = null;
         main.removeCallbacks(hide);
         main.removeCallbacks(shrink);
