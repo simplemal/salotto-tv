@@ -86,6 +86,8 @@ final class Updater {
     /** Only updates signed by the private half of this key are ever considered. */
     private static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+Xr4FLe8cXoDAqAen4eIgxam1dviQ81GfwoMv51vrd0sajsazDnwlEzdFR3+VfTHJDTFK7qeOebtfvoWzgePQ==";
     private static final String FILE = "update";
+    /** Google TV has a Salotto of its own, published in the same release with a list of its own. */
+    private static final String MANIFEST = Fire.GOOGLE_TV ? "update-googletv.json" : "update.json";
     private static final String APK = "update.apk";
     private static final String PREVIOUS = "update-previous.apk";
     /** A failed look is usually a network still waking up. */
@@ -220,8 +222,8 @@ final class Updater {
 
     /** Betas and stable versions share one row of version codes, so the higher one is the newer. */
     private static Release newest(String base) throws Failure {
-        byte[] manifest = fetch(base + "update.json");
-        verify(manifest, fetch(base + "update.json.sig"));
+        byte[] manifest = fetch(base + MANIFEST);
+        verify(manifest, fetch(base + MANIFEST + ".sig"));
         return parse(manifest);
     }
 
