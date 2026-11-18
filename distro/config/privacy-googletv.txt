@@ -1,0 +1,2 @@
+# Google TV: namespace chiave valore. ID pubblicitario e diagnostica si cambiano solo dalle pagine di Google.
+global wifi_scan_always_enabled 0
