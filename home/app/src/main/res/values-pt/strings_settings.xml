@@ -21,6 +21,17 @@
     <string name="settings_all_apps">Todos os apps</string>
     <string name="settings_task_manager">Gerenciador de tarefas</string>
     <string name="settings_held_keys">Botões mantidos pressionados</string>
+    <string name="settings_text_size">Tamanho do texto</string>
+    <string name="settings_text_normal">Normal</string>
+    <string name="settings_text_large">Grande</string>
+    <string name="settings_text_larger">Muito grande</string>
+    <string name="settings_audio_output">Saída de áudio</string>
+    <string name="settings_tv_inputs">Entradas da TV</string>
+    <string name="settings_network_status">Status da rede</string>
+    <string name="settings_remote_tv_keys">Botões da TV no controle</string>
+    <string name="settings_pair_remote">Parear um controle</string>
+    <string name="settings_tts">Conversão de texto em voz</string>
+    <string name="settings_color_correction">Correção de cor</string>
     <string name="settings_app_key">Botão do %1$s</string>
     <string name="settings_manage_apps">Gerenciar apps</string>
     <string name="settings_app_version">Versão</string>

@@ -21,6 +21,17 @@
     <string name="settings_all_apps">सभी ऐप</string>
     <string name="settings_task_manager">टास्क मैनेजर</string>
     <string name="settings_held_keys">दबाए रखने वाले बटन</string>
+    <string name="settings_text_size">टेक्स्ट का आकार</string>
+    <string name="settings_text_normal">सामान्य</string>
+    <string name="settings_text_large">बड़ा</string>
+    <string name="settings_text_larger">बहुत बड़ा</string>
+    <string name="settings_audio_output">ऑडियो आउटपुट</string>
+    <string name="settings_tv_inputs">टीवी इनपुट</string>
+    <string name="settings_network_status">नेटवर्क की स्थिति</string>
+    <string name="settings_remote_tv_keys">रिमोट पर टीवी के बटन</string>
+    <string name="settings_pair_remote">रिमोट जोड़ें</string>
+    <string name="settings_tts">टेक्स्ट-टू-स्पीच</string>
+    <string name="settings_color_correction">रंग सुधार</string>
     <string name="settings_app_key">%1$s बटन</string>
     <string name="settings_manage_apps">ऐप मैनेजमेंट</string>
     <string name="settings_app_version">वर्ज़न</string>

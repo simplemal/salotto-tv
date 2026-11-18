@@ -21,6 +21,17 @@
     <string name="settings_all_apps">Alle Apps</string>
     <string name="settings_task_manager">Task-Manager</string>
     <string name="settings_held_keys">Gedrückt gehaltene Tasten</string>
+    <string name="settings_text_size">Textgröße</string>
+    <string name="settings_text_normal">Normal</string>
+    <string name="settings_text_large">Groß</string>
+    <string name="settings_text_larger">Sehr groß</string>
+    <string name="settings_audio_output">Audioausgabe</string>
+    <string name="settings_tv_inputs">TV-Eingänge</string>
+    <string name="settings_network_status">Netzwerkstatus</string>
+    <string name="settings_remote_tv_keys">TV-Tasten der Fernbedienung</string>
+    <string name="settings_pair_remote">Fernbedienung koppeln</string>
+    <string name="settings_tts">Sprachausgabe</string>
+    <string name="settings_color_correction">Farbkorrektur</string>
     <string name="settings_app_key">%1$s-Taste</string>
     <string name="settings_manage_apps">App-Verwaltung</string>
     <string name="settings_app_version">Version</string>

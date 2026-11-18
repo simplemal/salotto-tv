@@ -21,6 +21,17 @@
     <string name="settings_all_apps">Все приложения</string>
     <string name="settings_task_manager">Диспетчер задач</string>
     <string name="settings_held_keys">Удержание кнопок</string>
+    <string name="settings_text_size">Размер текста</string>
+    <string name="settings_text_normal">Обычный</string>
+    <string name="settings_text_large">Крупный</string>
+    <string name="settings_text_larger">Очень крупный</string>
+    <string name="settings_audio_output">Аудиовыход</string>
+    <string name="settings_tv_inputs">Входы телевизора</string>
+    <string name="settings_network_status">Состояние сети</string>
+    <string name="settings_remote_tv_keys">Кнопки телевизора на пульте</string>
+    <string name="settings_pair_remote">Подключить пульт</string>
+    <string name="settings_tts">Синтез речи</string>
+    <string name="settings_color_correction">Коррекция цвета</string>
     <string name="settings_app_key">Кнопка %1$s</string>
     <string name="settings_manage_apps">Управление приложениями</string>
     <string name="settings_app_version">Версия</string>

@@ -1363,6 +1363,8 @@ public final class SettingsActivity extends CardActivity {
             () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_ENABLED, cec ? 0 : 1))));
         entries.add(new Entry(getString(R.string.settings_tv_off), tvOff ? YES : NO, null, false,
             () -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), CEC_TV_OFF, tvOff ? 0 : 1))));
+        if (Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_tv_inputs), null, null, false,
+            () -> open(new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.system.InputsActivity"))));
         entries.add(new Entry(getString(R.string.settings_sleep), minutes(sleepMinutes()), null, true, () -> enter(this::showSleepTimes)));
         entries.add(new Entry(getString(R.string.settings_standards), null, null,
             true, () -> enter(this::showStandards)));
@@ -1483,11 +1485,53 @@ public final class SettingsActivity extends CardActivity {
         entries.add(groupLabel(R.string.settings_video));
         entries.add(new Entry(getString(R.string.settings_fire_open), shown, null, false,
             () -> open(new Intent(Settings.ACTION_SOUND_SETTINGS))));
+        float scale = Settings.System.getFloat(getContentResolver(), Settings.System.FONT_SCALE, 1f);
+        String[] sizes = {getString(R.string.settings_text_normal), getString(R.string.settings_text_large), getString(R.string.settings_text_larger)};
+        int size = indexOfScale(scale);
+        entries.add(new Entry(getString(R.string.settings_text_size), size >= 0 ? sizes[size] : "—", null, true,
+            () -> enter(() -> show(getString(R.string.settings_text_size), choices(sizes, indexOfScale(Settings.System.getFloat(getContentResolver(), Settings.System.FONT_SCALE, 1f)), R.drawable.ic_s_tv,
+                index -> writeSystem(Settings.System.FONT_SCALE, String.valueOf(TEXT_SCALES[index])))))));
         entries.add(groupLabel(R.string.settings_audio));
+        entries.add(new Entry(getString(R.string.settings_audio_output), null, null, false,
+            () -> open(new Intent(GOOGLE_AUDIO_OUTPUT))));
         entries.add(new Entry(getString(R.string.settings_surround), names[surround], null, true,
             () -> enter(() -> show(getString(R.string.settings_surround), choices(names, surround, R.drawable.ic_s_tv,
                 index -> changeSystem(() -> Settings.Global.putInt(getContentResolver(), SURROUND_MODE, index)))))));
         return entries;
+    }
+
+    /** Google TV's text sizes, as Android's font_scale: normal, large, larger. Tried on the Chromecast 2026-11-18. */
+    private static final float[] TEXT_SCALES = {1f, 1.15f, 1.3f};
+    /** Google TV's own pages that Salotto links to, found on the Chromecast 2026-11-18 (GOOGLE-TV.md). */
+    private static final String GOOGLE_AUDIO_OUTPUT = "com.android.systemui.TV_MEDIA_OUTPUT_DIALOG";
+    private static final String GOOGLE_CAST = "com.google.android.settings.CAST_RECEIVER_SETTINGS";
+    private static final String GOOGLE_TV_KEYS = "com.google.android.tv.IR_WIZARD";
+    private static final String GOOGLE_PAIR_REMOTE = "com.google.android.tvsetup.app.REPAIR_REMOTE";
+    private static final String GOOGLE_COLOR_CORRECTION = "android.settings.ACCESSIBILITY_COLOR_CORRECTION_TV_OEM_LINK";
+
+    private int indexOfScale(float scale) {
+        for (int index = 0; index < TEXT_SCALES.length; index++) {
+            if (Math.abs(TEXT_SCALES[index] - scale) < 0.01f) return index;
+        }
+        return -1;
+    }
+
+    /**
+     * A setting of Android's system table. Salotto has no WRITE_SETTINGS: where Android refuses, the
+     * shell writes it, as on Google TV, where the shell may (Salotto's own, after the emergency access).
+     */
+    private void writeSystem(String key, String value) {
+        try {
+            Settings.System.putString(getContentResolver(), key, value);
+            refresh();
+        } catch (SecurityException e) {
+            Level level = levels.peek();
+            shell("settings put system " + key + " " + value, output -> runOnUiThread(() -> {
+                if (isDestroyed()) return;
+                if (output == null) sayLong(getString(R.string.settings_no_permission));
+                refreshIf(level);
+            }));
+        }
     }
 
     /** The service names this value differently when read; the system setting is unambiguous. */
@@ -1759,14 +1803,17 @@ public final class SettingsActivity extends CardActivity {
                     open(Fire.notifications());
                 }),
             new Entry(getString(R.string.settings_sounds), clicks ? YES : NO, null, false,
-                () -> changeSystem(() -> Settings.System.putInt(getContentResolver(),
-                    Settings.System.SOUND_EFFECTS_ENABLED, clicks ? 0 : 1))),
+                () -> writeSystem(Settings.System.SOUND_EFFECTS_ENABLED, clicks ? "0" : "1")),
             new Entry(getString(R.string.settings_quick_animations), quick ? YES : NO, null, false,
                 () -> changeSystem(() -> {
                     float scale = quick ? 1 : QUICK_SCALE;
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.WINDOW_ANIMATION_SCALE, scale);
                     Settings.Global.putFloat(getContentResolver(), Settings.Global.TRANSITION_ANIMATION_SCALE, scale);
                 }))));
+        if (Fire.GOOGLE_TV) {
+            entries.add(new Entry(getString(R.string.settings_tts), null, null, false, () -> open(new Intent("android.settings.TTS_SETTINGS"))));
+            entries.add(new Entry(getString(R.string.settings_color_correction), null, null, false, () -> open(new Intent(GOOGLE_COLOR_CORRECTION))));
+        }
         entries.add(groupLabel(R.string.settings_privacy));
         entries.addAll(privacyRows());
         entries.add(groupLabel(R.string.settings_section_device));
@@ -1822,9 +1869,18 @@ public final class SettingsActivity extends CardActivity {
         List<Entry> entries = new ArrayList<>();
         entries.add(groupLabel(R.string.settings_network));
         entries.addAll(networkRows());
+        if (Fire.GOOGLE_TV) {
+            entries.add(new Entry(getString(R.string.settings_network_status), null, null, false,
+                () -> open(new Intent().setClassName("com.android.tv.settings", "com.android.tv.settings.about.StatusActivity"))));
+            entries.add(new Entry("Google Cast", null, null, false, () -> open(new Intent(GOOGLE_CAST))));
+        }
         entries.add(groupLabel(R.string.settings_remotes));
         int remotes = entries.size();
         entries.addAll(remoteRows());
+        if (Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_remote_tv_keys), null, null, false,
+            () -> open(new Intent(GOOGLE_TV_KEYS))));
+        if (Fire.GOOGLE_TV) entries.add(new Entry(getString(R.string.settings_pair_remote), null, null, false,
+            () -> open(new Intent(GOOGLE_PAIR_REMOTE))));
         if (toRemotes) {
             toRemotes = false;
             level.focus = remotes;

@@ -21,6 +21,17 @@
     <string name="settings_all_apps">Tutte le app</string>
     <string name="settings_task_manager">Task manager</string>
     <string name="settings_held_keys">Tasti tenuti premuti</string>
+    <string name="settings_text_size">Dimensione del testo</string>
+    <string name="settings_text_normal">Normale</string>
+    <string name="settings_text_large">Grande</string>
+    <string name="settings_text_larger">Molto grande</string>
+    <string name="settings_audio_output">Uscita audio</string>
+    <string name="settings_tv_inputs">Ingressi della TV</string>
+    <string name="settings_network_status">Stato della rete</string>
+    <string name="settings_remote_tv_keys">Tasti della TV sul telecomando</string>
+    <string name="settings_pair_remote">Accoppia un telecomando</string>
+    <string name="settings_tts">Sintesi vocale</string>
+    <string name="settings_color_correction">Correzione del colore</string>
     <string name="settings_app_key">Tasto %1$s</string>
     <string name="settings_manage_apps">Gestione app</string>
     <string name="settings_app_version">Versione</string>

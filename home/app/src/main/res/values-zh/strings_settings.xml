@@ -22,6 +22,17 @@
     <string name="settings_all_apps">所有应用</string>
     <string name="settings_task_manager">任务管理器</string>
     <string name="settings_held_keys">长按按键</string>
+    <string name="settings_text_size">文字大小</string>
+    <string name="settings_text_normal">正常</string>
+    <string name="settings_text_large">大</string>
+    <string name="settings_text_larger">特大</string>
+    <string name="settings_audio_output">音频输出</string>
+    <string name="settings_tv_inputs">电视输入源</string>
+    <string name="settings_network_status">网络状态</string>
+    <string name="settings_remote_tv_keys">遥控器上的电视按键</string>
+    <string name="settings_pair_remote">配对遥控器</string>
+    <string name="settings_tts">文字转语音</string>
+    <string name="settings_color_correction">色彩校正</string>
     <string name="settings_app_key">%1$s 按钮</string>
     <string name="settings_manage_apps">应用管理</string>
     <string name="settings_app_version">版本</string>
