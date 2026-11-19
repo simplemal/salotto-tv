@@ -76,9 +76,6 @@ final class Packs {
     private static final String LIST_COPY_SIG = ".elenco.json.sig";
     /** Beside each file, in a collection whole on the TV: its fingerprint, as the signed index gave it. */
     private static final String PRINTS = ".impronte";
-    /** The still collage of a collection added later, which the app cannot carry: `collage-` and its name. */
-    private static final String COLLAGE = "collage-";
-    private static final String COLLAGE_FILE = ".webp";
     /** The collections are looked at for new versions of their files at most this often. */
     private static final long UPDATES_EVERY_MS = 12 * 60 * 60 * 1000L;
     private static volatile long updatesAt;
@@ -165,16 +162,6 @@ final class Packs {
         List<String> names = new ArrayList<>(Arrays.asList(ALL));
         for (Extra one : extras(context)) names.add(one.id);
         return names;
-    }
-
-    /** The collage of a collection added later, or null: the app carries only those of its own. */
-    static InputStream collage(Context context, String pack) {
-        if (extra(context, pack) == null) return null;
-        try {
-            return new FileInputStream(new File(root(context), COLLAGE + pack + COLLAGE_FILE));
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     /** On the TV, whole. */
@@ -497,7 +484,7 @@ final class Packs {
                         needed += item.getLong("bytes");
                     }
                 }
-                // Last, and quietly: new versions of what is here already, and the collages of the collections added later.
+                // Last, and quietly: new versions of what is here already.
                 if (updates) {
                     coming = null;
                     if (update(context, packs)) updatesAt = System.currentTimeMillis();
@@ -523,8 +510,7 @@ final class Packs {
      * The collections whole on the TV, brought to the version in the signed list: only the files
      * that changed come, each checked, and the ones no longer in it go. A collection that came
      * before versions were written, with an empty `.completo`, has its files read once to know
-     * which. Their small copies come again whole, being small; the collages of the collections added
-     * later come too. True if everything is now as the list says.
+     * which. Their small copies come again whole, being small. True if everything is now as the list says.
      */
     private static boolean update(Context context, JSONArray packs) {
         JSONObject indexes = null;
@@ -543,7 +529,6 @@ final class Packs {
                     fetchThumbs(context, pack, thumbs);
                     tell();
                 }
-                if (extra(context, pack) != null) fetchCollage(context, pack, item.optJSONObject("collage"));
             } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
                 // This one another time: the others may still come.
                 done = false;
@@ -659,21 +644,6 @@ final class Packs {
         StringBuilder lines = new StringBuilder();
         for (java.util.Map.Entry<String, String> one : prints.entrySet()) lines.append(one.getValue()).append(' ').append(one.getKey()).append('\n');
         Bytes.write(new File(folder, PRINTS), lines.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
-    /** The collage of a collection added later, checked against the signed list; only if it is not here already, or changed. */
-    private static void fetchCollage(Context context, String pack, JSONObject collage)
-            throws JSONException, IOException, GeneralSecurityException {
-        if (collage == null) return;
-        String url = collage.getString("url");
-        String sha = collage.getString("sha256");
-        if (!url.startsWith("https://")) throw new IOException("url");
-        File file = new File(root(context), COLLAGE + pack + COLLAGE_FILE);
-        if (file.isFile() && hex(MessageDigest.getInstance("SHA-256").digest(Bytes.read(file))).equals(sha)) return;
-        byte[] body = small(url);
-        if (!hex(MessageDigest.getInstance("SHA-256").digest(body)).equals(sha)) throw new IOException("fingerprint");
-        Bytes.write(file, body);
-        tell();
     }
 
     /** Asked by the user while the others came: added at the end. False if none was. */
