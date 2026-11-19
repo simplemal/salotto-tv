@@ -21,7 +21,6 @@ if [ "${1:-}" = "--prova" ]; then TRY=true; fi
 # reach every Salotto through the signed list, with no update of the app.
 LIST="$ROOT/distro/config/sfondi.txt"
 PACKS="$(grep -v '^#' "$LIST" | cut -f1 | xargs)"
-COLLAGES="$ROOT/home/app/src/main/assets/collage"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "${WORK:?}"' EXIT
@@ -31,8 +30,6 @@ for pack in $PACKS; do
   (cd "$PACKS_DIR" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/$pack.tar" "$pack")
   [ -d "$THUMBS_DIR/miniature-$pack" ] || { echo "Fermo: mancano le miniature di $pack, lancia prepara-miniature.py."; exit 1; }
   (cd "$THUMBS_DIR" && COPYFILE_DISABLE=1 tar --format ustar -cf "$WORK/miniature-$pack.tar" "miniature-$pack")
-  [ -f "$COLLAGES/$pack.webp" ] || { echo "Fermo: manca il collage di $pack, lancia prepara-miniature.py."; exit 1; }
-  cp "$COLLAGES/$pack.webp" "$WORK/collage-$pack.webp"
 done
 
 python3 - "$WORK" "$THUMBS_DIR" "$PACKS_DIR" "$REPO" "$LIST" $PACKS <<'PY'
@@ -94,7 +91,6 @@ for pack in packs:
                 index[member.name] = [member.offset_data, member.size, hashlib.sha256(body).hexdigest()]
     thumbs = open(os.path.join(work, f"miniature-{pack}.tar"), "rb").read()
     files = sum(len([f for f in fs if not f.startswith(".")]) for _, _, fs in os.walk(os.path.join(packs_dir, pack)))
-    collage = open(os.path.join(work, f"collage-{pack}.webp"), "rb").read()
     listed.append({
         "id": pack, "name": names[pack], "kind": kinds[pack], "bytes": len(data), "files": files,
         "sha256": hashlib.sha256(data).hexdigest(), "url": base + f"{pack}.tar",
@@ -103,8 +99,6 @@ for pack in packs:
         "gallery": gallery,
         # Read by Salotto from version 1.1.6: before, the small copies came inside the app.
         "thumbs": {"url": base + f"miniature-{pack}.tar", "bytes": len(thumbs), "sha256": hashlib.sha256(thumbs).hexdigest()},
-        # Read by Salotto for a collection added later: the app does not carry its collage.
-        "collage": {"url": base + f"collage-{pack}.webp", "sha256": hashlib.sha256(collage).hexdigest()},
     })
     indexes[pack] = index
 json.dump({"version": 1, "packs": listed}, open(os.path.join(work, "sfondi.json"), "w"), indent=2)
@@ -128,5 +122,5 @@ fi
 gh release view sfondi --repo "$REPO" > /dev/null 2>&1 ||
   gh release create sfondi --repo "$REPO" --title "Salotto: collezioni di sfondi" --prerelease --latest=false \
     --notes "Le collezioni di sfondi che Salotto scarica quando si scelgono. Non si installano a mano."
-gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK"/collage-*.webp "$WORK"/vista-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" "$WORK/sfondi-indice.json" "$WORK/sfondi-indice.json.sig" --repo "$REPO" --clobber
+gh release upload sfondi "$WORK"/*.tar "$WORK"/campione-*.webp "$WORK"/vista-*.webp "$WORK/sfondi.json" "$WORK/sfondi.json.sig" "$WORK/sfondi-indice.json" "$WORK/sfondi-indice.json.sig" --repo "$REPO" --clobber
 echo "Pubblicate le collezioni di sfondi."
