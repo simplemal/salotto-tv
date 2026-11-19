@@ -134,7 +134,10 @@ final class Look {
         if (photo.matches()) return context.getString(R.string.personal_photo, Integer.parseInt(photo.group(1)));
         if (key.endsWith(Weather.PICTURE_FILE)) return pictureName(key);
         int preset = Arrays.asList(PRESET_NAMES).indexOf(key);
-        return preset >= 0 ? context.getString(PRESET_LABELS[preset]) : key;
+        if (preset >= 0) return context.getString(PRESET_LABELS[preset]);
+        // A collection added later is chosen by its folder, and named as the signed list names it.
+        Packs.Extra extra = Packs.extra(context, key);
+        return extra != null ? extra.name : key;
     }
 
     /** From the file: 001-marea-obliqua.webp is Marea obliqua. */
@@ -325,6 +328,7 @@ final class Look {
         if (ABSTRACT.equals(chosen)) return ABSTRACT_FOLDER;
         if (ABSTRACT_3D.equals(chosen)) return ABSTRACT_3D_FOLDER;
         if (NOX.equals(chosen)) return NOX_FOLDER;
+        if (Packs.extra(context, chosen) != null) return chosen;
         if (PERSONAL.equals(chosen)) return personalFolder(context).getPath();
         return NATURE.equals(chosen) ? NATURE_FOLDER : null;
     }
@@ -458,7 +462,7 @@ final class Look {
         // Personale's photos can be gone, after a backup is restored on another Stick.
         if (folder.startsWith("/") && images(context).isEmpty()) folder = ABSTRACT_3D_FOLDER;
         if (setTaken(context, folder) || !folder.startsWith("/") && !Packs.present(context, folder)) {
-            for (String set : SETS) if (!setTaken(context, set) && Packs.present(context, set)) return set;
+            for (String set : sets(context)) if (!setTaken(context, set) && Packs.present(context, set)) return set;
         }
         return folder;
     }
@@ -524,7 +528,7 @@ final class Look {
         }
         // A collection still on its way, after the installer or the update that took it out of the app:
         // something else for now, without forgetting the choice.
-        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        String folder = folderOf(context, WEATHER.equals(chosen) ? PICTURES : chosen);
         if (folder != null && !Packs.present(context, folder)) return fallback(context);
         if (!WEATHER.equals(chosen) && !PICTURES.equals(chosen) && !PHOTOS.equals(chosen) && !AERIAL.equals(chosen)) return chosen;
         if (!place) {
@@ -540,6 +544,48 @@ final class Look {
     /** The sets whose pictures can be taken away one by one, or all at once. */
     static final String[] SETS = {ABSTRACT_3D_FOLDER, ABSTRACT_FOLDER, NOX_FOLDER, NATURE_FOLDER};
     private static final String TAKEN = "taken_pictures";
+
+    /** The sets, with those added later at the end: these are chosen by their folder. */
+    static List<String> sets(Context context) {
+        List<String> all = new ArrayList<>(Arrays.asList(SETS));
+        for (Packs.Extra extra : Packs.extras(context)) all.add(extra.id);
+        return all;
+    }
+
+    /** The keys the sets are chosen by, in the order the Home falls back on them. */
+    private static List<String> setKeys(Context context) {
+        List<String> keys = new ArrayList<>(Arrays.asList(ABSTRACT_3D, ABSTRACT, NOX, NATURE));
+        for (Packs.Extra extra : Packs.extras(context)) keys.add(extra.id);
+        return keys;
+    }
+
+    /**
+     * A picture of a set published again under another name, or no longer: what was chosen of it
+     * follows the new one, or the set it was in. Called after the file has gone.
+     */
+    static void replaced(Context context, String old, String now) {
+        SharedPreferences saved = prefs(context);
+        SharedPreferences.Editor change = saved.edit();
+        if (old.equals(saved.getString("backdrop", null))) {
+            String folder = old.substring(0, old.indexOf('/'));
+            change.putString("backdrop", now != null ? now : setKey(context, folder));
+        }
+        if (old.equals(saved.getString("saver_picture", null))) {
+            if (now != null) change.putString("saver_picture", now);
+            else change.remove("saver_picture");
+        }
+        if (old.equals(saved.getString("abstract", null))) {
+            if (now != null) change.putString("abstract", now);
+            else change.remove("abstract");
+        }
+        change.apply();
+    }
+
+    /** The key a set is chosen by, from its folder. */
+    private static String setKey(Context context, String folder) {
+        for (String key : setKeys(context)) if (folder.equals(folderOf(context, key))) return key;
+        return fallback(context);
+    }
     /** Ends the name of a set taken away whole, in the same list as the pictures. */
     private static final String WHOLE = "/*";
 
@@ -551,7 +597,7 @@ final class Look {
     static boolean taken(Context context, String name) {
         Set<String> taken = prefs(context).getStringSet(TAKEN, Collections.emptySet());
         if (taken.isEmpty()) return false;
-        String folder = folderOf(name);
+        String folder = folderOf(context, name);
         return taken.contains(name) || folder != null && taken.contains(folder + WHOLE);
     }
 
@@ -586,7 +632,8 @@ final class Look {
     }
 
     /** The set a backdrop belongs to: a picture's folder, or the folder of a set that changes on its own. */
-    private static String folderOf(String name) {
+    private static String folderOf(Context context, String name) {
+        if (Packs.extra(context, name) != null) return name;
         if (PICTURES.equals(name)) return PICTURES_FOLDER;
         if (PHOTOS.equals(name)) return PHOTOS_FOLDER;
         if (AERIAL.equals(name)) return AERIAL_FOLDER;
@@ -610,7 +657,7 @@ final class Look {
         if (PERSONAL.equals(chosen) && images(context).isEmpty() || taken(context, chosen)) return fallbackPack(context);
         boolean weather = WEATHER.equals(chosen) || PICTURES.equals(chosen) || PHOTOS.equals(chosen) || AERIAL.equals(chosen);
         if (weather && !place) return fallbackPack(context);
-        String folder = folderOf(WEATHER.equals(chosen) ? PICTURES : chosen);
+        String folder = folderOf(context, WEATHER.equals(chosen) ? PICTURES : chosen);
         // A collection that will never come, not chosen or deleted: the Home shows the first set instead.
         return folder != null && !coming(context, folder) ? fallbackPack(context) : folder;
     }
@@ -622,9 +669,8 @@ final class Look {
 
     /** The set fallback() will show: the first one not deleted that is here or on its way. */
     private static String fallbackPack(Context context) {
-        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
-        for (String name : names) {
-            String folder = folderOf(name);
+        for (String name : setKeys(context)) {
+            String folder = folderOf(context, name);
             if (!taken(context, name) && coming(context, folder)) return folder;
         }
         return null;
@@ -648,8 +694,7 @@ final class Look {
 
     /** Abstract 3D, or the first set still there, or the first plain colour. */
     private static String fallback(Context context) {
-        String[] names = {ABSTRACT_3D, ABSTRACT, NOX, NATURE};
-        for (String name : names) if (!taken(context, name) && Packs.present(context, folderOf(name))) return name;
+        for (String name : setKeys(context)) if (!taken(context, name) && Packs.present(context, folderOf(context, name))) return name;
         return PRESET_NAMES[0];
     }
 

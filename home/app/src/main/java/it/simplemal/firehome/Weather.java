@@ -176,6 +176,9 @@ final class Weather {
     /** The table of a collection still coming, read by Salotto where it just put it, checked. */
     static void knowTable(String folder, Properties table) { PICTURE_TABLES.put(folder, table); }
 
+    /** A table published again: read anew the next time it is needed. */
+    static void forgetTable(String folder) { PICTURE_TABLES.remove(folder); }
+
     static Properties pictures(Context context, String folder) {
         Properties known = PICTURE_TABLES.get(folder);
         if (known != null) return known;

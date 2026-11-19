@@ -18,8 +18,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 PACKS = ROOT / "home/sfondi"
 OUT = ROOT / "home/miniature"
 COLLAGE = ROOT / "home/app/src/main/assets/collage"
-# The same order and names as Packs.ALL in Salotto.
-SETS = ("meteo-illustrato", "meteo-foto", "meteo-aereo", "astratti", "astratti-3d", "nox-city", "natura-aerea")
+# Every collection, from the list pubblica-sfondi.sh publishes too: the first ones are Packs.ALL in Salotto.
+SETS = tuple(line.split("\t")[0] for line in (ROOT / "distro/config/sfondi.txt").read_text().splitlines()
+             if line.strip() and not line.startswith("#"))
 # The cell of PictureGridActivity on the screen, pixel for pixel. It is not quite 16:9, so a line of
 # the picture goes at the edges: enlarged instead, on the Stick, the whole picture would go soft.
 SIZES = {"grandi": ((432, 244), 90), "piccole": ((108, 61), 55)}

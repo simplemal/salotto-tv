@@ -1,0 +1,11 @@
+# Le collezioni di sfondi, nell'ordine delle pagine: cartella in home/sfondi, tipo, nome.
+# Le prime sette Salotto le conosce già. Una nuova va in fondo, di tipo "timed": a ogni Salotto
+# arriva con l'elenco firmato, senza aggiornare l'app. Il nome resta lo stesso in ogni lingua.
+# cartella	tipo	nome
+meteo-illustrato	weather	Meteo illustrato
+meteo-foto	weather	Meteo fotografico
+meteo-aereo	weather	Meteo aereo
+astratti	timed	Abstract Illustrated
+astratti-3d	timed	Abstract 3D
+nox-city	timed	Nox City
+natura-aerea	timed	Aerial Nature

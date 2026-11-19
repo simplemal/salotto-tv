@@ -278,6 +278,8 @@ public final class PictureGridActivity extends CardActivity {
         String[][] sets = {{Look.ABSTRACT, Look.ABSTRACT_FOLDER}, {Look.ABSTRACT_3D, Look.ABSTRACT_3D_FOLDER},
             {Look.NOX, Look.NOX_FOLDER}, {Look.NATURE, Look.NATURE_FOLDER}};
         for (String[] one : sets) add(one, TIMED);
+        // Published after this version: chosen by their folder.
+        for (Packs.Extra extra : Packs.extras(this)) add(new String[] {extra.id, extra.id}, TIMED);
         collections.add(new Collection(getString(R.string.settings_backdrop_personal), Look.personalFolder(this).getPath(), Look.PERSONAL, PERSONAL));
         if (saver) return;
         String[][] weather = {{Look.PICTURES, Look.PICTURES_FOLDER}, {Look.PHOTOS, Look.PHOTOS_FOLDER}, {Look.AERIAL, Look.AERIAL_FOLDER}};
