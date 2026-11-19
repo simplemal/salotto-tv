@@ -2392,6 +2392,8 @@ public final class SettingsActivity extends CardActivity {
         for (Saver saver : SAVERS) {
             if (saver.folder.equals(Look.saverFolder(this))) return saver.name;
         }
+        Packs.Extra extra = Packs.extra(this, Look.saverFolder(this));
+        if (extra != null) return extra.name;
         if (Look.saverFolder(this).startsWith("/")) return personalSaver().name;
         return Brand.NAME;
     }

@@ -68,6 +68,39 @@ final class Packs {
     private static volatile long received;
     private static volatile long expected = 1;
     private static volatile List<String> queue = new ArrayList<>();
+    /**
+     * A copy of the last signed list, with its signature, checked again when read: the collections
+     * published after this version of Salotto are known from it, even with no network.
+     */
+    private static final String LIST_COPY = ".elenco.json";
+    private static final String LIST_COPY_SIG = ".elenco.json.sig";
+    /** Beside each file, in a collection whole on the TV: its fingerprint, as the signed index gave it. */
+    private static final String PRINTS = ".impronte";
+    /** The still collage of a collection added later, which the app cannot carry: `collage-` and its name. */
+    private static final String COLLAGE = "collage-";
+    private static final String COLLAGE_FILE = ".webp";
+    /** The collections are looked at for new versions of their files at most this often. */
+    private static final long UPDATES_EVERY_MS = 12 * 60 * 60 * 1000L;
+    private static volatile long updatesAt;
+    /** Only a plain name: it becomes a folder, and a line in `scelte`. */
+    private static final java.util.regex.Pattern EXTRA_ID = java.util.regex.Pattern.compile("[a-z0-9][a-z0-9-]{0,39}");
+    private static final int EXTRA_NAME_MAX = 40;
+    /** The only kind a collection added later can be: one that changes on a timer. The weather's need their own code. */
+    private static final String TIMED_KIND = "timed";
+
+    /** A collection published after this version of Salotto, named in the signed list. */
+    static final class Extra {
+        final String id;
+        final String name;
+
+        Extra(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    private static volatile List<Extra> extras;
+
     /** Why the last fetch stopped: told to the user, who can do something only about the room. */
     enum Stop { NONE, ROOM, NETWORK, SERVER, DAMAGED }
     private static volatile Stop stop = Stop.NONE;
@@ -90,6 +123,60 @@ final class Packs {
 
     static File root(Context context) { return Updater.shared(context, ROOT); }
 
+    /** The collections added later, from the copy of the signed list: none until it has come once. */
+    static List<Extra> extras(Context context) {
+        List<Extra> known = extras;
+        if (known != null) return known;
+        known = new ArrayList<>();
+        try {
+            byte[] list = Bytes.read(new File(root(context), LIST_COPY));
+            Updater.verify(list, Bytes.read(new File(root(context), LIST_COPY_SIG)));
+            known = extrasIn(new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs"));
+        } catch (Updater.Failure | JSONException | IOException e) {
+            // No copy yet, or not ours: only the collections this version knows.
+        }
+        extras = known;
+        return known;
+    }
+
+    private static List<Extra> extrasIn(JSONArray packs) {
+        List<Extra> found = new ArrayList<>();
+        for (int index = 0; index < packs.length(); index++) {
+            JSONObject item = packs.optJSONObject(index);
+            if (item == null) continue;
+            String id = item.optString("id");
+            String name = item.optString("name").trim();
+            if (!EXTRA_ID.matcher(id).matches() || Arrays.asList(ALL).contains(id) || !TIMED_KIND.equals(item.optString("kind"))
+                || name.isEmpty() || name.length() > EXTRA_NAME_MAX) continue;
+            found.add(new Extra(id, name));
+        }
+        return found;
+    }
+
+    /** One of the collections added later, by its folder, or null. */
+    static Extra extra(Context context, String id) {
+        if (id == null) return null;
+        for (Extra one : extras(context)) if (one.id.equals(id)) return one;
+        return null;
+    }
+
+    /** Every collection, the ones of this version first, then those added later. */
+    static List<String> all(Context context) {
+        List<String> names = new ArrayList<>(Arrays.asList(ALL));
+        for (Extra one : extras(context)) names.add(one.id);
+        return names;
+    }
+
+    /** The collage of a collection added later, or null: the app carries only those of its own. */
+    static InputStream collage(Context context, String pack) {
+        if (extra(context, pack) == null) return null;
+        try {
+            return new FileInputStream(new File(root(context), COLLAGE + pack + COLLAGE_FILE));
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     /** On the TV, whole. */
     static boolean onTv(Context context, String pack) {
         return new File(new File(root(context), pack), COMPLETE).isFile();
@@ -105,7 +192,7 @@ final class Packs {
      * the TV, and the picture itself is to be read instead.
      */
     static InputStream thumbnail(Context context, String path, boolean small) {
-        String pack = packOf(path);
+        String pack = packOf(context, path);
         if (pack == null || !thumbsOnTv(context, pack)) return null;
         String inside = path.substring(pack.length() + 1);
         try {
@@ -146,10 +233,10 @@ final class Packs {
     }
 
     /** The collection's own folder of a path like `astratti-3d/001.webp`, or null. */
-    private static String packOf(String path) {
+    private static String packOf(Context context, String path) {
         int slash = path.indexOf('/');
         String first = slash > 0 ? path.substring(0, slash) : path;
-        return Arrays.asList(ALL).contains(first) ? first : null;
+        return all(context).contains(first) ? first : null;
     }
 
     /**
@@ -157,7 +244,7 @@ final class Packs {
      * still coming shows only the files that came first, checked one by one, not those arriving.
      */
     static String[] list(Context context, String path) throws IOException {
-        String pack = packOf(path);
+        String pack = packOf(context, path);
         if (pack != null && onTv(context, pack)) {
             String[] names = new File(root(context), path).list((folder, name) -> !name.startsWith("."));
             if (names == null) return new String[0];
@@ -193,8 +280,9 @@ final class Packs {
     static List<String> wanted(Context context) {
         List<String> names = new ArrayList<>();
         File chosen = new File(root(context), CHOSEN);
+        // Before the choice existed, every collection of then: one added later only when asked for.
         List<String> listed = chosen.isFile() ? Arrays.asList(Updater.read(chosen).split("\\s+")) : Arrays.asList(ALL);
-        for (String pack : ALL) {
+        for (String pack : all(context)) {
             if (listed.contains(pack) && !Look.setTaken(context, pack)) names.add(pack);
         }
         return names;
@@ -212,7 +300,7 @@ final class Packs {
     /** Whole on the TV, but without their small copies: from before they left the app, or not yet come. */
     static List<String> thumbsMissing(Context context) {
         List<String> names = new ArrayList<>();
-        for (String pack : ALL) {
+        for (String pack : all(context)) {
             if (onTv(context, pack) && !thumbsOnTv(context, pack) && !Look.setTaken(context, pack)) names.add(pack);
         }
         return names;
@@ -300,9 +388,24 @@ final class Packs {
 
     /** The list signed with the update key: its collections, each with the place of every file in its archive. */
     private static JSONArray signedList() throws Updater.Failure, JSONException, IOException {
+        return signedList(null);
+    }
+
+    /** With `context`, a copy is kept on the TV, and the collections added later are known from it. */
+    private static JSONArray signedList(Context context) throws Updater.Failure, JSONException, IOException {
         byte[] list = small(BASE + "sfondi.json");
-        Updater.verify(list, small(BASE + "sfondi.json.sig"));
-        return new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
+        byte[] signature = small(BASE + "sfondi.json.sig");
+        Updater.verify(list, signature);
+        JSONArray packs = new JSONObject(new String(list, StandardCharsets.UTF_8)).getJSONArray("packs");
+        if (context != null) {
+            File root = root(context);
+            if (root.isDirectory() || root.mkdirs()) {
+                Bytes.write(new File(root, LIST_COPY), list);
+                Bytes.write(new File(root, LIST_COPY_SIG), signature);
+            }
+            extras = extrasIn(packs);
+        }
+        return packs;
     }
 
     /** Where each file sits in its archive, signed apart from the list: by collection, then by path. */
@@ -346,14 +449,15 @@ final class Packs {
 
     private static void fetchAll(Context context, boolean lightestFirst) {
         boolean onlyThumbs = missing(context).isEmpty();
+        boolean updates = System.currentTimeMillis() - updatesAt >= UPDATES_EVERY_MS;
         // The Home asks at every return: the small copies alone are tried once while Salotto runs.
-        if (onlyThumbs && (thumbsTried || thumbsMissing(context).isEmpty()) || !fetching.compareAndSet(false, true)) return;
+        if (onlyThumbs && !updates && (thumbsTried || thumbsMissing(context).isEmpty()) || !fetching.compareAndSet(false, true)) return;
         if (onlyThumbs) thumbsTried = true;
         stop = Stop.NONE;
         queue = missing(context);
         Background.run(() -> {
             try {
-                JSONArray packs = signedList();
+                JSONArray packs = signedList(context);
                 List<String> order = missing(context);
                 if (lightestFirst) {
                     order.sort((one, other) -> Long.compare(bytesOf(packs, one), bytesOf(packs, other)));
@@ -393,6 +497,11 @@ final class Packs {
                         needed += item.getLong("bytes");
                     }
                 }
+                // Last, and quietly: new versions of what is here already, and the collages of the collections added later.
+                if (updates) {
+                    coming = null;
+                    if (update(context, packs)) updatesAt = System.currentTimeMillis();
+                }
                 if (needed > 0) {
                     roomNeeded = needed;
                     roomFree = new StatFs(root(context).getPath()).getAvailableBytes();
@@ -408,6 +517,163 @@ final class Packs {
                 tell();
             }
         });
+    }
+
+    /**
+     * The collections whole on the TV, brought to the version in the signed list: only the files
+     * that changed come, each checked, and the ones no longer in it go. A collection that came
+     * before versions were written, with an empty `.completo`, has its files read once to know
+     * which. Their small copies come again whole, being small; the collages of the collections added
+     * later come too. True if everything is now as the list says.
+     */
+    private static boolean update(Context context, JSONArray packs) {
+        JSONObject indexes = null;
+        boolean done = true;
+        for (String pack : all(context)) {
+            try {
+                JSONObject item = itemOf(packs, pack);
+                if (item == null || Look.setTaken(context, pack)) continue;
+                if (onTv(context, pack) && !item.getString("sha256").equals(version(new File(root(context), pack)))) {
+                    if (indexes == null) indexes = signedIndex();
+                    renew(context, pack, item, indexes.optJSONObject(pack));
+                }
+                JSONObject thumbs = item.optJSONObject("thumbs");
+                if (thumbs != null && thumbsOnTv(context, pack)
+                    && !thumbs.getString("sha256").equals(version(new File(root(context), THUMBS + pack)))) {
+                    fetchThumbs(context, pack, thumbs);
+                    tell();
+                }
+                if (extra(context, pack) != null) fetchCollage(context, pack, item.optJSONObject("collage"));
+            } catch (Updater.Failure | JSONException | IOException | GeneralSecurityException e) {
+                // This one another time: the others may still come.
+                done = false;
+            }
+        }
+        return done;
+    }
+
+    /** What `.completo` says it came from: empty if it came before versions were written. */
+    private static String version(File folder) {
+        return Updater.read(new File(folder, COMPLETE)).trim();
+    }
+
+    /** One collection, from what is on the TV to the version of `item`, file by file. */
+    private static void renew(Context context, String pack, JSONObject item, JSONObject index)
+            throws JSONException, IOException, GeneralSecurityException {
+        if (index == null) throw new IOException("index");
+        File root = root(context);
+        File folder = new File(root, pack);
+        java.util.Map<String, String> have = printsHere(folder, pack);
+        java.util.Map<String, String> want = printsOf(index);
+        List<String> come = new ArrayList<>();
+        long size = 0;
+        for (java.util.Map.Entry<String, String> one : want.entrySet()) {
+            String name = one.getKey();
+            if (!name.startsWith(pack + "/")) throw new IOException("index");
+            if (Look.taken(context, name) || one.getValue().equals(have.get(name))) continue;
+            come.add(name);
+            size += index.getJSONArray(name).getLong(1);
+        }
+        if (new StatFs(root.getPath()).getAvailableBytes() < size) throw new NoRoom();
+        String url = item.getString("url");
+        for (String name : come) {
+            part(context, url, index, name);
+            have.put(name, want.get(name));
+            if (name.equals(Weather.tableOf(pack))) Weather.forgetTable(pack + "/");
+        }
+        List<String> gone = new ArrayList<>();
+        for (String name : new ArrayList<>(have.keySet())) {
+            if (want.containsKey(name)) continue;
+            new File(root, name).delete();
+            have.remove(name);
+            gone.add(name);
+        }
+        // A picture chosen on its own and published again under another name stays chosen: the same number before the name.
+        for (String old : gone) Look.replaced(context, old, sameNumber(old, come));
+        writePrints(folder, have);
+        Bytes.write(new File(folder, COMPLETE), item.getString("sha256").getBytes(StandardCharsets.UTF_8));
+        tell();
+    }
+
+    /** Among `names`, the only one in the same folder as `old` that starts with its number, as `028-`. Null if none, or more. */
+    private static String sameNumber(String old, List<String> names) {
+        int slash = old.lastIndexOf('/');
+        String file = old.substring(slash + 1);
+        int dash = file.indexOf('-');
+        if (dash <= 0) return null;
+        String start = old.substring(0, slash + 1) + file.substring(0, dash + 1);
+        String found = null;
+        for (String name : names) {
+            if (!name.startsWith(start) || name.indexOf('/', slash + 1) >= 0) continue;
+            if (found != null) return null;
+            found = name;
+        }
+        return found;
+    }
+
+    /** The fingerprints of a collection's files, by path from the collections' root, as the signed index gives them. */
+    private static java.util.Map<String, String> printsOf(JSONObject index) throws JSONException {
+        java.util.Map<String, String> prints = new java.util.TreeMap<>();
+        for (java.util.Iterator<String> keys = index.keys(); keys.hasNext(); ) {
+            String name = keys.next();
+            prints.put(name, index.getJSONArray(name).getString(2));
+        }
+        return prints;
+    }
+
+    /** The fingerprints of the files on the TV: from `.impronte`, or read from each file when it is not there. */
+    private static java.util.Map<String, String> printsHere(File folder, String pack) throws IOException, GeneralSecurityException {
+        java.util.Map<String, String> prints = new java.util.TreeMap<>();
+        File written = new File(folder, PRINTS);
+        if (written.isFile()) {
+            for (String line : Updater.read(written).split("\n")) {
+                int space = line.indexOf(' ');
+                if (space > 0) prints.put(line.substring(space + 1), line.substring(0, space));
+            }
+            return prints;
+        }
+        readPrints(folder, pack, prints);
+        return prints;
+    }
+
+    private static void readPrints(File folder, String path, java.util.Map<String, String> prints) throws IOException, GeneralSecurityException {
+        File[] inside = folder.listFiles();
+        if (inside == null) return;
+        for (File file : inside) {
+            if (file.getName().startsWith(".")) continue;
+            String name = path + "/" + file.getName();
+            if (file.isDirectory()) {
+                readPrints(file, name, prints);
+                continue;
+            }
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            try (InputStream input = new FileInputStream(file)) {
+                byte[] chunk = new byte[65536];
+                for (int read; (read = input.read(chunk)) > 0; ) digest.update(chunk, 0, read);
+            }
+            prints.put(name, hex(digest.digest()));
+        }
+    }
+
+    private static void writePrints(File folder, java.util.Map<String, String> prints) throws IOException {
+        StringBuilder lines = new StringBuilder();
+        for (java.util.Map.Entry<String, String> one : prints.entrySet()) lines.append(one.getValue()).append(' ').append(one.getKey()).append('\n');
+        Bytes.write(new File(folder, PRINTS), lines.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** The collage of a collection added later, checked against the signed list; only if it is not here already, or changed. */
+    private static void fetchCollage(Context context, String pack, JSONObject collage)
+            throws JSONException, IOException, GeneralSecurityException {
+        if (collage == null) return;
+        String url = collage.getString("url");
+        String sha = collage.getString("sha256");
+        if (!url.startsWith("https://")) throw new IOException("url");
+        File file = new File(root(context), COLLAGE + pack + COLLAGE_FILE);
+        if (file.isFile() && hex(MessageDigest.getInstance("SHA-256").digest(Bytes.read(file))).equals(sha)) return;
+        byte[] body = small(url);
+        if (!hex(MessageDigest.getInstance("SHA-256").digest(body)).equals(sha)) throw new IOException("fingerprint");
+        Bytes.write(file, body);
+        tell();
     }
 
     /** Asked by the user while the others came: added at the end. False if none was. */
@@ -461,7 +727,7 @@ final class Packs {
                 while (input.read(rest) > 0) { }
             }
             if (received - before != size || !hex(digest.digest()).equals(thumbs.getString("sha256"))) throw new IOException("fingerprint");
-            Bytes.write(new File(folder, COMPLETE), new byte[0]);
+            Bytes.write(new File(folder, COMPLETE), thumbs.getString("sha256").getBytes(StandardCharsets.UTF_8));
             whole = true;
         } finally {
             if (!whole) delete(folder);
@@ -615,7 +881,15 @@ final class Packs {
                 while (input.read(rest) > 0) { }
             }
             if (received - before != size || !hex(digest.digest()).equals(item.getString("sha256"))) throw new IOException("fingerprint");
-            Bytes.write(new File(folder, COMPLETE), new byte[0]);
+            // Without the index the prints are made from the files, the first time they are needed.
+            JSONObject index = null;
+            try {
+                index = signedIndex().optJSONObject(pack);
+            } catch (Updater.Failure | JSONException | IOException e) {
+                // Only slower, once.
+            }
+            if (index != null) writePrints(folder, printsOf(index));
+            Bytes.write(new File(folder, COMPLETE), item.getString("sha256").getBytes(StandardCharsets.UTF_8));
             new File(folder, PARTIAL).delete();
             whole = true;
             tell();
@@ -683,7 +957,7 @@ final class Packs {
 
     /** One file of a collection, from the TV when it is there, even before the rest; anything else from inside the app. */
     static InputStream open(Context context, String path) throws IOException {
-        String pack = packOf(path);
+        String pack = packOf(context, path);
         File file = new File(root(context), path);
         if (pack != null && (onTv(context, pack) || firstNames(context, pack).contains(path))) return new FileInputStream(file);
         return context.getAssets().open(path);

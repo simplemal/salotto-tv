@@ -249,8 +249,9 @@ final class PictureMosaic extends FrameLayout {
         Context context = getContext().getApplicationContext();
         Background.draw(() -> {
             Bitmap read = null;
-            try (InputStream input = context.getAssets().open(key + COLLAGE_FILE)) {
-                read = BitmapFactory.decodeStream(input);
+            // A collection added later has it on the TV, downloaded with the signed list.
+            try (InputStream input = Packs.extra(context, pack) != null ? Packs.collage(context, pack) : context.getAssets().open(key + COLLAGE_FILE)) {
+                if (input != null) read = BitmapFactory.decodeStream(input);
             } catch (IOException e) {
                 // Without its collage the side stays plain.
             }
